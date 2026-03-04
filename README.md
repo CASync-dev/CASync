@@ -13,7 +13,7 @@ A project by - UWA Agile Web 2026's 12:40pm Thursday Lab Group
 
 ------
 
-CASync aims to connect students and their schedules. USers create an account, add their cas ical link and connect with friends, hoin groups or create them. The primary feature is a comparitve schedule to show avialibity amongst multiple students. 
+CASync aims to connect students and their schedules. Users create an account, add their cas ical link and connect with friends, join groups or create them. The primary feature is a comparitive schedule to show availability amongst multiple students. 
 
 **Tech Stack:**
 
