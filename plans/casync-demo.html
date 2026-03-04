@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CASync – Connect Your Timetable</title>
+<style>
+  /* ── Reset & tokens ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232636;
+    --border: #2e3147;
+    --accent: #6c63ff;
+    --accent2: #a78bfa;
+    --green: #22c55e;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --muted: #8892a4;
+    --radius: 12px;
+  }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── Screens ── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* ══ LOGIN ══ */
+  #screen-login { align-items: center; justify-content: center; flex-direction: column; gap: 32px; background: radial-gradient(ellipse at 50% 0%, #2d2a5e 0%, var(--bg) 70%); }
+  .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 48px 40px; width: 380px; display: flex; flex-direction: column; align-items: center; gap: 28px; }
+  .logo { font-size: 2rem; font-weight: 800; letter-spacing: -1px; }
+  .logo span { color: var(--accent); }
+  .tagline { color: var(--muted); font-size: 0.9rem; text-align: center; }
+  .sso-btn { width: 100%; padding: 13px; border-radius: 10px; border: none; background: var(--accent); color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity .15s; }
+  .sso-btn:hover { opacity: .88; }
+  .divider { color: var(--muted); font-size: 0.8rem; width: 100%; text-align: center; position: relative; }
+  .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 42%; height: 1px; background: var(--border); }
+  .divider::before { left: 0; } .divider::after { right: 0; }
+  .input-group { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+  .input-group input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 11px 14px; color: var(--text); font-size: 0.95rem; outline: none; }
+  .input-group input:focus { border-color: var(--accent); }
+  .login-card .sso-btn.secondary { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+
+  /* ══ SHELL (after login) ══ */
+  #screen-app { flex-direction: row; }
+  .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 0; gap: 4px; flex-shrink: 0; }
+  .sidebar-logo { padding: 0 20px 20px; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; }
+  .sidebar-logo span { color: var(--accent); }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 20px; color: var(--muted); font-size: 0.9rem; cursor: pointer; border-radius: 8px; margin: 0 8px; transition: background .12s, color .12s; }
+  .nav-item:hover, .nav-item.active { background: var(--surface2); color: var(--text); }
+  .nav-item.active { color: var(--accent2); }
+  .nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+  .sidebar-spacer { flex: 1; }
+  .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 12px 20px; margin: 0 8px; border-top: 1px solid var(--border); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
+  .user-name { font-size: 0.85rem; color: var(--muted); }
+
+  .main { flex: 1; overflow-y: auto; }
+  .panel { display: none; padding: 32px; }
+  .panel.active { display: block; }
+  .page-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
+  .page-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 28px; }
+
+  /* ── Toggle tabs ── */
+  .tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; width: fit-content; margin-bottom: 24px; }
+  .tab { padding: 8px 20px; border-radius: 7px; font-size: 0.85rem; cursor: pointer; color: var(--muted); transition: all .15s; }
+  .tab.active { background: var(--surface2); color: var(--text); font-weight: 600; }
+
+  /* ── Dashboard cards ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .card-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+  .card-val { font-size: 1.8rem; font-weight: 700; }
+  .card-val.green { color: var(--green); }
+  .card-val.accent { color: var(--accent2); }
+
+  /* ── Person chips ── */
+  .person-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .chip { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; border: 2px solid; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all .15s; opacity: .35; user-select: none; }
+  .chip.on { opacity: 1; }
+  .chip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .cal-legend { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--muted); margin-bottom: 20px; }
+  .legend-box { width: 14px; height: 14px; border-radius: 3px; background: rgba(34,197,94,.15); border: 1px solid rgba(34,197,94,.4); flex-shrink: 0; }
+
+  /* ── Overlap day calendar ── */
+  .cal-wrap { display: grid; grid-template-columns: 56px 1fr; }
+  .cal-time-col { display: flex; flex-direction: column; padding-top: 26px; }
+  .cal-time-slot { height: 60px; display: flex; align-items: flex-start; padding-top: 4px; font-size: 0.72rem; color: var(--muted); }
+  .cal-lanes-wrap { display: flex; flex-direction: column; border-left: 1px solid var(--border); }
+  .lane-headers { display: flex; min-height: 26px; border-bottom: 1px solid var(--border); }
+  .lane-head { flex: 1; display: flex; align-items: center; gap: 5px; padding: 0 7px; font-size: 0.72rem; font-weight: 700; border-right: 1px solid var(--border); overflow: hidden; }
+  .lane-head:last-child { border-right: none; }
+  .lanes-body { display: flex; position: relative;
+    background-image: repeating-linear-gradient(to bottom, transparent 0px, transparent 59px, var(--border) 59px, var(--border) 60px); }
+  .free-band { position: absolute; left: 0; right: 0; background: rgba(34,197,94,.07); border-top: 1px solid rgba(34,197,94,.3); border-bottom: 1px solid rgba(34,197,94,.3); pointer-events: none; z-index: 0; }
+  .free-band-label { position: absolute; right: 5px; top: 2px; font-size: 0.62rem; color: var(--green); opacity: .8; white-space: nowrap; }
+  .lane { flex: 1; position: relative; border-right: 1px solid var(--border); }
+  .lane:last-child { border-right: none; }
+  .lane-event { position: absolute; left: 3px; right: 3px; border-radius: 6px; padding: 4px 6px; cursor: pointer; transition: filter .15s; opacity: .92; z-index: 1; }
+  .lane-event:hover { filter: brightness(1.2); opacity: 1; }
+  .lane-ev-label { font-size: 0.7rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lane-ev-sub { font-size: 0.62rem; color: rgba(255,255,255,.75); margin-top: 1px; }
+
+  /* ── Overlap week calendar ── */
+  .week-cal-wrap { overflow-x: auto; }
+  .week-col-label { text-align: center; font-size: 0.78rem; color: var(--muted); padding-bottom: 8px; }
+  .week-col-label.today { color: var(--accent2); font-weight: 700; }
+  .week-day-col-v2 { border-left: 1px solid var(--border); display: flex; position: relative; }
+  .week-day-col-v2.today { background: #ffffff06; }
+  .week-lane { flex: 1; position: relative; border-right: 1px solid #ffffff0a; }
+  .week-lane:last-child { border-right: none; }
+  .week-lane-event { position: absolute; left: 1px; right: 1px; border-radius: 3px; cursor: pointer; z-index: 1; min-height: 4px; }
+  .week-lane-event:hover { filter: brightness(1.35); }
+  .week-free-band { position: absolute; left: 0; right: 0; background: rgba(34,197,94,.09); border-top: 1px solid rgba(34,197,94,.28); pointer-events: none; z-index: 0; }
+  .week-hour-lines { position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(to bottom, transparent 0px, transparent 47px, var(--border) 47px, var(--border) 48px);
+    pointer-events: none; }
+
+  /* ── Friends / Groups ── */
+  .search-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; color: var(--text); font-size: 0.9rem; width: 100%; max-width: 400px; margin-bottom: 20px; outline: none; }
+  .search-bar:focus { border-color: var(--accent); }
+  .friend-list { display: flex; flex-direction: column; gap: 10px; }
+  .friend-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: border-color .15s; }
+  .friend-row:hover { border-color: var(--accent); }
+  .friend-info { flex: 1; }
+  .friend-name { font-weight: 600; font-size: 0.95rem; }
+  .friend-status { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .badge { padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+  .badge.free { background: #14532d; color: var(--green); }
+  .badge.busy { background: #450a0a; color: var(--red); }
+  .badge.soon { background: #451a03; color: var(--amber); }
+
+  /* groups */
+  .group-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+  .group-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; cursor: pointer; transition: border-color .15s; }
+  .group-card:hover { border-color: var(--accent); }
+  .group-name { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+  .group-members { font-size: 0.8rem; color: var(--muted); margin-bottom: 14px; }
+  .member-stack { display: flex; }
+  .member-stack .avatar { margin-left: -8px; border: 2px solid var(--surface); width: 28px; height: 28px; font-size: 0.72rem; }
+  .member-stack .avatar:first-child { margin-left: 0; }
+
+  /* ── Free slots highlight ── */
+  .free-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
+  .free-time { font-size: 0.85rem; font-weight: 600; color: var(--green); min-width: 120px; }
+  .free-people { font-size: 0.82rem; color: var(--muted); }
+
+  /* ── Sync setup ── */
+  .setup-steps { display: flex; flex-direction: column; gap: 16px; max-width: 560px; }
+  .step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; display: flex; gap: 16px; align-items: flex-start; }
+  .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+  .step-body { flex: 1; }
+  .step-title { font-weight: 600; margin-bottom: 4px; }
+  .step-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+  .btn { padding: 9px 18px; border-radius: 8px; border: none; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: opacity .15s; }
+  .btn:hover { opacity: .85; }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .step.done { border-color: var(--green); }
+  .step.done .step-num { background: var(--green); }
+
+  /* ── Notification toast ── */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 0.85rem; box-shadow: 0 8px 32px #000a; opacity: 0; transform: translateY(12px); transition: all .3s; pointer-events: none; z-index: 999; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div class="screen active" id="screen-login">
+  <div class="login-card">
+    <div class="logo">CA<span>Sync</span></div>
+    <p class="tagline">Connect your timetable. Find time with friends.</p>
+    <button class="sso-btn" onclick="goApp()">🎓 Sign in with University SSO</button>
+    <div class="divider">or continue with email</div>
+    <div class="input-group">
+      <input type="email" placeholder="University email" value="liam@uni.edu" />
+      <input type="password" placeholder="Password" value="••••••••" />
+      <button class="sso-btn secondary" onclick="goApp()">Sign in</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ APP SHELL ══════════════ -->
+<div class="screen" id="screen-app">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">CA<span>Sync</span></div>
+    <div class="nav-item active" onclick="showPanel('dashboard',this)"><span class="nav-icon">🏠</span> Dashboard</div>
+    <div class="nav-item" onclick="showPanel('calendar',this)"><span class="nav-icon">📅</span> Calendar</div>
+    <div class="nav-item" onclick="showPanel('friends',this)"><span class="nav-icon">👥</span> Friends</div>
+    <div class="nav-item" onclick="showPanel('groups',this)"><span class="nav-icon">🫂</span> Groups</div>
+    <div class="nav-item" onclick="showPanel('sync',this)"><span class="nav-icon">🔄</span> Sync Setup</div>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-user">
+      <div class="avatar">LM</div>
+      <div class="user-name">Liam M.</div>
+    </div>
+  </nav>
+
+  <!-- Main area -->
+  <main class="main">
+
+    <!-- ── Dashboard ── -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="page-title">Good morning, Liam 👋</div>
+      <div class="page-sub">Wednesday · Week 7 · Here's how your day looks</div>
+
+      <div class="cards">
+        <div class="card"><div class="card-label">Classes today</div><div class="card-val accent">3</div></div>
+        <div class="card"><div class="card-label">Free friends now</div><div class="card-val green">4</div></div>
+        <div class="card"><div class="card-label">Groups</div><div class="card-val">2</div></div>
+        <div class="card"><div class="card-label">Next class</div><div class="card-val" style="font-size:1.1rem;padding-top:8px">COMP3220<br><span style="font-size:.8rem;color:var(--muted)">in 42 min · Rm G14</span></div></div>
+      </div>
+
+      <div class="page-title" style="font-size:1.1rem;margin-bottom:16px">🕑 Free windows today</div>
+      <div class="free-row"><div class="free-time">11:00 – 12:00</div><div class="free-people">You + Ava, Jake, Priya are all free</div><button class="btn btn-accent" style="margin-left:auto" onclick="toast('Pinged the group!')">Ping group</button></div>
+      <div class="free-row"><div class="free-time">14:00 – 15:00</div><div class="free-people">You + Ava are free</div><button class="btn btn-outline" style="margin-left:auto" onclick="toast('Message sent to Ava!')">Message Ava</button></div>
+      <div class="free-row"><div class="free-time">17:00 – 18:00</div><div class="free-people">You + Jake, Sam are free</div><button class="btn btn-outline" style="margin-left:auto" onclick="toast('Pinged Jake & Sam!')">Ping</button></div>
+    </div>
+
+    <!-- ── Calendar ── -->
+    <div class="panel" id="panel-calendar">
+      <div class="page-title">Calendar</div>
+      <div class="page-sub">Wed 4 Mar 2026 · Toggle friends to overlay their schedule</div>
+
+      <!-- Person chips -->
+      <div class="person-chips" id="person-chips"></div>
+      <div class="cal-legend"><div class="legend-box"></div> Everyone selected is free</div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'day-view')">Day</div>
+        <div class="tab" onclick="switchTab(this,'week-view')">Week</div>
+      </div>
+
+      <!-- Day view (JS-rendered) -->
+      <div id="day-view">
+        <div class="cal-wrap">
+          <div class="cal-time-col" id="day-time-col"></div>
+          <div class="cal-lanes-wrap">
+            <div class="lane-headers" id="day-lane-headers"></div>
+            <div class="lanes-body" id="day-lanes-body"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Week view (JS-rendered) -->
+      <div id="week-view" style="display:none">
+        <div class="week-cal-wrap">
+          <div id="week-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Friends ── -->
+    <div class="panel" id="panel-friends">
+      <div class="page-title">Friends</div>
+      <div class="page-sub">See who's free right now</div>
+      <input class="search-bar" placeholder="🔍  Search friends…" />
+      <div class="friend-list">
+        <div class="friend-row" onclick="toast('Viewing Ava\'s timetable')">
+          <div class="avatar" style="background:#7c3aed">AK</div>
+          <div class="friend-info">
+            <div class="friend-name">Ava Kim</div>
+            <div class="friend-status">2nd year · Computer Science</div>
+          </div>
+          <span class="badge free">Free now</span>
+        </div>
+        <div class="friend-row" onclick="toast('Viewing Jake\'s timetable')">
+          <div class="avatar" style="background:#0e7490">JR</div>
+          <div class="friend-info">
+            <div class="friend-name">Jake Rivers</div>
+            <div class="friend-status">3rd year · Computer Science</div>
+          </div>
+          <span class="badge free">Free now</span>
+        </div>
+        <div class="friend-row" onclick="toast('Viewing Priya\'s timetable')">
+          <div class="avatar" style="background:#b45309">PS</div>
+          <div class="friend-info">
+            <div class="friend-name">Priya Shah</div>
+            <div class="friend-status">2nd year · Data Science</div>
+          </div>
+          <span class="badge soon">Free in 30 min</span>
+        </div>
+        <div class="friend-row" onclick="toast('Viewing Sam\'s timetable')">
+          <div class="avatar" style="background:#065f46">SC</div>
+          <div class="friend-info">
+            <div class="friend-name">Sam Chen</div>
+            <div class="friend-status">3rd year · Software Eng</div>
+          </div>
+          <span class="badge busy">In class</span>
+        </div>
+        <div class="friend-row" onclick="toast('Viewing Maya\'s timetable')">
+          <div class="avatar" style="background:#9f1239">ML</div>
+          <div class="friend-info">
+            <div class="friend-name">Maya Lee</div>
+            <div class="friend-status">2nd year · Computer Science</div>
+          </div>
+          <span class="badge busy">In class</span>
+        </div>
+      </div>
+      <br/>
+      <button class="btn btn-outline" onclick="toast('Invite link copied!')">+ Add friend</button>
+    </div>
+
+    <!-- ── Groups ── -->
+    <div class="panel" id="panel-groups">
+      <div class="page-title">Groups</div>
+      <div class="page-sub">Shared schedules with your crews</div>
+      <div class="group-grid">
+        <div class="group-card" onclick="toast('Opening CS Study Crew')">
+          <div class="group-name">CS Study Crew</div>
+          <div class="group-members">5 members · 2 free now</div>
+          <div class="member-stack">
+            <div class="avatar" style="background:#4338ca">LM</div>
+            <div class="avatar" style="background:#7c3aed">AK</div>
+            <div class="avatar" style="background:#0e7490">JR</div>
+            <div class="avatar" style="background:#b45309">PS</div>
+            <div class="avatar" style="background:#065f46">SC</div>
+          </div>
+        </div>
+        <div class="group-card" onclick="toast('Opening COMP3220 Group')">
+          <div class="group-name">COMP3220 Squad</div>
+          <div class="group-members">3 members · all in class now</div>
+          <div class="member-stack">
+            <div class="avatar" style="background:#4338ca">LM</div>
+            <div class="avatar" style="background:#9f1239">ML</div>
+            <div class="avatar" style="background:#065f46">SC</div>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <button class="btn btn-accent" onclick="toast('Group created!')">+ New group</button>
+    </div>
+
+    <!-- ── Sync Setup ── -->
+    <div class="panel" id="panel-sync">
+      <div class="page-title">Sync Setup</div>
+      <div class="page-sub">Connect your university timetable</div>
+      <div class="setup-steps">
+        <div class="step done">
+          <div class="step-num">✓</div>
+          <div class="step-body">
+            <div class="step-title">University SSO connected</div>
+            <div class="step-desc">Your account is linked to liam@uni.edu via your university login.</div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-num">✓</div>
+          <div class="step-body">
+            <div class="step-title">iCal / timetable imported</div>
+            <div class="step-desc">3 courses loaded from your university student portal. Last synced today at 8:04 AM.</div>
+            <button class="btn btn-outline" onclick="toast('Syncing timetable…')">Sync now</button>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Link your iCal URL (optional)</div>
+            <div class="step-desc">Paste your university iCal URL below for automatic background updates whenever your timetable changes.</div>
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <input style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:.85rem;outline:none" placeholder="https://timetable.uni.edu/ical/..." />
+              <button class="btn btn-accent" onclick="toast('iCal URL saved and syncing!')">Connect</button>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Privacy settings</div>
+            <div class="step-desc">Control what friends can see — full schedule, busy/free only, or nothing.</div>
+            <button class="btn btn-outline" onclick="toast('Opening privacy settings…')">Manage privacy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Schedule data ──────────────────────────────────────────────────────────
+  const S = 8 * 60;   // day start: 8 AM in minutes
+  const E = 18 * 60;  // day end:  18 PM in minutes
+  const DPX = 1;      // day view: 1px per minute (60px/hr)
+  const WPX = 0.8;    // week view: 0.8px per minute (48px/hr)
+
+  const PEOPLE = [
+    { id:'liam',  name:'You',   initials:'LM', color:'#6c63ff', active:true  },
+    { id:'ava',   name:'Ava',   initials:'AK', color:'#a855f7', active:true  },
+    { id:'jake',  name:'Jake',  initials:'JR', color:'#0891b2', active:true  },
+    { id:'priya', name:'Priya', initials:'PS', color:'#d97706', active:false },
+    { id:'sam',   name:'Sam',   initials:'SC', color:'#16a34a', active:false },
+  ];
+
+  // Wednesday events (start/end = absolute minutes from midnight)
+  const DAY_EVENTS = {
+    liam:  [{l:'COMP3220',r:'G14',    s:540,e:630},{l:'MATH2010',r:'Rm 201',s:690,e:720},{l:'COMP3310',r:'Lab 3',  s:810,e:900}],
+    ava:   [{l:'COMP3220',r:'G14',    s:540,e:630},{l:'PSYC2100',r:'B12',   s:840,e:930}],
+    jake:  [{l:'MATH2010',r:'Rm 201', s:540,e:600},{l:'COMP3310',r:'Lab 3', s:810,e:900}],
+    priya: [{l:'STAT2050',r:'Rm 105', s:600,e:690}],
+    sam:   [{l:'COMP3220',r:'G14',    s:540,e:630},{l:'COMP3150',r:'Rm 302',s:720,e:780},{l:'COMP3310',r:'Lab 3',s:810,e:900}],
+  };
+
+  // Week events: indexed 0=Mon … 4=Fri
+  const WEEK_EVENTS = {
+    liam:  {0:[{l:'COMP3220',s:480,e:570},{l:'COMP3310',s:672,e:744}],     1:[{l:'MATH2010',s:576,e:648}],
+            2:[{l:'COMP3220',s:540,e:630},{l:'MATH2010',s:690,e:720},{l:'COMP3310',s:810,e:900}],
+            3:[{l:'COMP3310',s:480,e:528},{l:'COMP3220',s:624,e:714}],     4:[{l:'MATH2010',s:576,e:624}]},
+    ava:   {0:[{l:'COMP3220',s:480,e:570}], 1:[],
+            2:[{l:'COMP3220',s:540,e:630},{l:'PSYC2100',s:840,e:930}],
+            3:[{l:'PSYC2100',s:720,e:810}],                                 4:[{l:'COMP3220',s:480,e:570}]},
+    jake:  {0:[{l:'COMP3310',s:672,e:744}], 1:[{l:'MATH2010',s:480,e:540}],
+            2:[{l:'MATH2010',s:540,e:600},{l:'COMP3310',s:810,e:900}],
+            3:[{l:'COMP3310',s:480,e:528}],                                 4:[]},
+    priya: {0:[{l:'STAT2050',s:600,e:690}], 1:[{l:'STAT2050',s:480,e:570}],
+            2:[{l:'STAT2050',s:600,e:690}], 3:[],                           4:[{l:'STAT2050',s:576,e:666}]},
+    sam:   {0:[{l:'COMP3220',s:480,e:570},{l:'COMP3150',s:720,e:780}],      1:[{l:'COMP3150',s:576,e:636}],
+            2:[{l:'COMP3220',s:540,e:630},{l:'COMP3150',s:720,e:780},{l:'COMP3310',s:810,e:900}],
+            3:[{l:'COMP3310',s:480,e:528}],                                 4:[{l:'COMP3150',s:600,e:660}]},
+  };
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function fmt(min) {
+    const h = Math.floor(min / 60), m = min % 60;
+    return `${h > 12 ? h - 12 : h}:${String(m).padStart(2,'0')} ${h >= 12 ? 'PM' : 'AM'}`;
+  }
+
+  // Returns contiguous free bands (in minutes relative to S) where ALL active people are free
+  function freeBands(evMap, ids) {
+    const len = E - S;
+    const busy = new Uint8Array(len);
+    for (const id of ids)
+      for (const ev of (evMap[id] || []))
+        for (let m = Math.max(ev.s, S) - S; m < Math.min(ev.e, E) - S; m++) busy[m]++;
+    const bands = [];
+    let on = false, bs = 0;
+    for (let i = 0; i <= len; i++) {
+      const f = i < len && busy[i] === 0;
+      if (!on && f)          { on = true; bs = i; }
+      else if (on && !f)     { on = false; if (i - bs >= 15) bands.push([bs, i]); }
+    }
+    return bands;
+  }
+
+  // ── Calendar rendering ─────────────────────────────────────────────────────
+  function renderChips() {
+    document.getElementById('person-chips').innerHTML = PEOPLE.map((p, i) =>
+      `<div class="chip ${p.active ? 'on' : ''}" style="border-color:${p.color};color:${p.color}"
+            onclick="togglePerson(${i})">
+        <div class="chip-dot" style="background:${p.color}"></div>${p.name}
+      </div>`
+    ).join('');
+  }
+
+  function togglePerson(i) {
+    if (i === 0) return; // "You" is always visible
+    PEOPLE[i].active = !PEOPLE[i].active;
+    renderChips();
+    renderDayView();
+    renderWeekView();
+  }
+
+  function renderDayView() {
+    const active = PEOPLE.filter(p => p.active);
+    const ids = active.map(p => p.id);
+    const HOURS = (E - S) / 60;
+
+    // Time labels
+    document.getElementById('day-time-col').innerHTML =
+      Array.from({length: HOURS}, (_, i) => `<div class="cal-time-slot">${fmt(S + i * 60)}</div>`).join('');
+
+    // Lane headers
+    document.getElementById('day-lane-headers').innerHTML = active.map(p =>
+      `<div class="lane-head" style="color:${p.color}">
+        <div class="chip-dot" style="background:${p.color}"></div>${p.name}
+      </div>`
+    ).join('');
+
+    // Body
+    const body = document.getElementById('day-lanes-body');
+    body.style.height = (E - S) * DPX + 'px';
+
+    const bands = freeBands(DAY_EVENTS, ids);
+    let html = bands.map(([bs, be]) => {
+      const label = ids.length > 1
+        ? `<span class="free-band-label">${fmt(S + bs)}–${fmt(S + be)} · all free</span>` : '';
+      return `<div class="free-band" style="top:${bs * DPX}px;height:${(be - bs) * DPX}px">${label}</div>`;
+    }).join('');
+
+    for (const p of active) {
+      const evHtml = (DAY_EVENTS[p.id] || []).map(ev => {
+        const top = (ev.s - S) * DPX, h = (ev.e - ev.s) * DPX;
+        return `<div class="lane-event" style="top:${top}px;height:${h}px;background:${p.color}"
+                     onclick="toast('${ev.l} · ${ev.r} · ${p.name}')">
+          <div class="lane-ev-label">${ev.l}</div>
+          ${h >= 28 ? `<div class="lane-ev-sub">${fmt(ev.s)}–${fmt(ev.e)}</div>` : ''}
+        </div>`;
+      }).join('');
+      html += `<div class="lane">${evHtml}</div>`;
+    }
+    body.innerHTML = html;
+  }
+
+  function renderWeekView() {
+    const active = PEOPLE.filter(p => p.active);
+    const ids = active.map(p => p.id);
+    const DAYS = ['Mon','Tue','Wed','Thu','Fri'];
+    const DATES = [2, 3, 4, 5, 6];
+    const HOURS = (E - S) / 60;
+    const cols = `56px repeat(5, 1fr)`;
+
+    const timeCol = Array.from({length: HOURS}, (_, i) =>
+      `<div style="height:${48}px;display:flex;align-items:flex-start;padding-top:4px;font-size:.68rem;color:var(--muted)">${fmt(S + i * 60)}</div>`
+    ).join('');
+
+    let html = `
+      <div style="display:grid;grid-template-columns:${cols};margin-bottom:4px">
+        <div></div>
+        ${DAYS.map((d,i) => `<div class="week-col-label ${i===2?'today':''}">${d}<br><b>${DATES[i]}</b></div>`).join('')}
+      </div>
+      <div style="display:grid;grid-template-columns:${cols}">
+        <div>${timeCol}</div>`;
+
+    for (let d = 0; d < 5; d++) {
+      const evMap = Object.fromEntries(ids.map(id => [id, WEEK_EVENTS[id]?.[d] || []]));
+      const bands = freeBands(evMap, ids);
+
+      html += `<div class="week-day-col-v2 ${d===2?'today':''}">
+        <div class="week-hour-lines"></div>
+        ${bands.map(([bs, be]) =>
+          `<div class="week-free-band" style="top:${bs*WPX}px;height:${Math.max((be-bs)*WPX,2)}px"
+                title="${fmt(S+bs)}–${fmt(S+be)} · all free"></div>`
+        ).join('')}
+        ${active.map(p => {
+          const evs = evMap[p.id] || [];
+          return `<div class="week-lane">${evs.map(ev => {
+            const top = (ev.s - S) * WPX, h = Math.max((ev.e - ev.s) * WPX, 5);
+            return `<div class="week-lane-event" style="top:${top}px;height:${h}px;background:${p.color}"
+                         title="${p.name}: ${ev.l} ${fmt(ev.s)}–${fmt(ev.e)}"
+                         onclick="toast('${p.name}: ${ev.l} · ${fmt(ev.s)}–${fmt(ev.e)}')"></div>`;
+          }).join('')}</div>`;
+        }).join('')}
+      </div>`;
+    }
+
+    html += '</div>';
+    document.getElementById('week-grid').innerHTML = html;
+  }
+
+  // ── Navigation ─────────────────────────────────────────────────────────────
+  function goApp() {
+    document.getElementById('screen-login').classList.remove('active');
+    document.getElementById('screen-app').classList.add('active');
+    renderChips();
+    renderDayView();
+    renderWeekView();
+  }
+
+  function showPanel(name, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function switchTab(el, targetId) {
+    el.closest('.panel').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('day-view').style.display = targetId === 'day-view' ? 'block' : 'none';
+    document.getElementById('week-view').style.display = targetId === 'week-view' ? 'block' : 'none';
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+  }
+</script>
+</body>
+</html>
