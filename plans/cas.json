@@ -1,0 +1,1044 @@
+{
+  "VCALENDAR": [
+    {
+      "PRODID": "-//Allocate//iCal4j 1.0//EN",
+      "VERSION": "2.0",
+      "CALSCALE": "GREGORIAN",
+      "VTIMEZONE": [
+        {
+          "TZID": "Australia/Perth",
+          "LAST-MODIFIED": "20251211T094730Z",
+          "TZURL": "https://www.tzurl.org/zoneinfo-outlook/Australia/Perth",
+          "X-LIC-LOCATION": "Australia/Perth",
+          "STANDARD": [
+            {
+              "TZNAME": "AWST",
+              "TZOFFSETFROM": "+0800",
+              "TZOFFSETTO": "+0800",
+              "DTSTART": "19700101T000000"
+            }
+          ]
+        }
+      ],
+      "VEVENT": [
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260227T110000",
+          "DTEND;TZID=Australia/Perth": "20260227T130000",
+          "SUMMARY": "Data Structures and Algorithms\\, LecTut-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, LecTut-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "UID": "uid0"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260306T110000",
+          "DTEND;TZID=Australia/Perth": "20260306T130000",
+          "SUMMARY": "Data Structures and Algorithms\\, LecTut-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, LecTut-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "UID": "uid1"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260313T110000",
+          "DTEND;TZID=Australia/Perth": "20260313T130000",
+          "SUMMARY": "Data Structures and Algorithms\\, LecTut-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, LecTut-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "UID": "uid2"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260320T110000",
+          "DTEND;TZID=Australia/Perth": "20260320T130000",
+          "SUMMARY": "Data Structures and Algorithms\\, LecTut-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, LecTut-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "UID": "uid3"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260327T110000",
+          "DTEND;TZID=Australia/Perth": "20260327T130000",
+          "SUMMARY": "Data Structures and Algorithms\\, LecTut-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, LecTut-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "UID": "uid4"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260403T110000",
+          "DTEND;TZID=Australia/Perth": "20260403T130000",
+          "SUMMARY": "Data Structures and Algorithms\\, LecTut-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, LecTut-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "UID": "uid5"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260417T110000",
+          "DTEND;TZID=Australia/Perth": "20260417T130000",
+          "SUMMARY": "Data Structures and Algorithms\\, LecTut-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, LecTut-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "UID": "uid6"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260424T110000",
+          "DTEND;TZID=Australia/Perth": "20260424T130000",
+          "SUMMARY": "Data Structures and Algorithms\\, LecTut-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, LecTut-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "UID": "uid7"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260501T110000",
+          "DTEND;TZID=Australia/Perth": "20260501T130000",
+          "SUMMARY": "Data Structures and Algorithms\\, LecTut-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, LecTut-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "UID": "uid8"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260508T110000",
+          "DTEND;TZID=Australia/Perth": "20260508T130000",
+          "SUMMARY": "Data Structures and Algorithms\\, LecTut-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, LecTut-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "UID": "uid9"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260515T110000",
+          "DTEND;TZID=Australia/Perth": "20260515T130000",
+          "SUMMARY": "Data Structures and Algorithms\\, LecTut-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, LecTut-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "UID": "uid10"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260522T110000",
+          "DTEND;TZID=Australia/Perth": "20260522T130000",
+          "SUMMARY": "Data Structures and Algorithms\\, LecTut-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, LecTut-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (27/2-3/4\\, 17/4-22/5)\\, PHYS: [ 243] Clews Lecture Theatre (27/2-3/4\\, 17/4-22/5)",
+          "UID": "uid11"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260225T140000",
+          "DTEND;TZID=Australia/Perth": "20260225T150000",
+          "SUMMARY": "Data Structures and Algorithms\\, Lecture-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Lecture-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "UID": "uid12"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260304T140000",
+          "DTEND;TZID=Australia/Perth": "20260304T150000",
+          "SUMMARY": "Data Structures and Algorithms\\, Lecture-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Lecture-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "UID": "uid13"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260311T140000",
+          "DTEND;TZID=Australia/Perth": "20260311T150000",
+          "SUMMARY": "Data Structures and Algorithms\\, Lecture-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Lecture-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "UID": "uid14"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260318T140000",
+          "DTEND;TZID=Australia/Perth": "20260318T150000",
+          "SUMMARY": "Data Structures and Algorithms\\, Lecture-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Lecture-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "UID": "uid15"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260325T140000",
+          "DTEND;TZID=Australia/Perth": "20260325T150000",
+          "SUMMARY": "Data Structures and Algorithms\\, Lecture-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Lecture-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "UID": "uid16"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260401T140000",
+          "DTEND;TZID=Australia/Perth": "20260401T150000",
+          "SUMMARY": "Data Structures and Algorithms\\, Lecture-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Lecture-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "UID": "uid17"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260415T140000",
+          "DTEND;TZID=Australia/Perth": "20260415T150000",
+          "SUMMARY": "Data Structures and Algorithms\\, Lecture-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Lecture-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "UID": "uid18"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260422T140000",
+          "DTEND;TZID=Australia/Perth": "20260422T150000",
+          "SUMMARY": "Data Structures and Algorithms\\, Lecture-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Lecture-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "UID": "uid19"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260429T140000",
+          "DTEND;TZID=Australia/Perth": "20260429T150000",
+          "SUMMARY": "Data Structures and Algorithms\\, Lecture-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Lecture-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "UID": "uid20"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260506T140000",
+          "DTEND;TZID=Australia/Perth": "20260506T150000",
+          "SUMMARY": "Data Structures and Algorithms\\, Lecture-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Lecture-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "UID": "uid21"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260513T140000",
+          "DTEND;TZID=Australia/Perth": "20260513T150000",
+          "SUMMARY": "Data Structures and Algorithms\\, Lecture-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Lecture-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "UID": "uid22"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260520T140000",
+          "DTEND;TZID=Australia/Perth": "20260520T150000",
+          "SUMMARY": "Data Structures and Algorithms\\, Lecture-01",
+          "LOCATION": "PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Lecture-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: PHYS: [  G41] Ross Lecture Theatre (25/2-1/4\\, 15/4-20/5)\\, PHYS: [ 243] Clews Lecture Theatre (25/2-1/4\\, 15/4-20/5)",
+          "UID": "uid23"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260325T170000",
+          "DTEND;TZID=Australia/Perth": "20260325T190000",
+          "SUMMARY": "Data Structures and Algorithms\\, Test-01",
+          "LOCATION": "BUSN: [  G91] Wesfarmers Lecture Theatre (25/3)\\, ENCM: [  G04] Harold and Margaret Clough Engineering Lecture Theatre 2 (25/3)\\, MATH: [  G40] Weatherburn Lecture Theatre (25/3)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Test-01\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: BUSN: [  G91] Wesfarmers Lecture Theatre (25/3)\\, ENCM: [  G04] Harold and Margaret Clough Engineering Lecture Theatre 2 (25/3)\\, MATH: [  G40] Weatherburn Lecture Theatre (25/3)",
+          "UID": "uid24"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260429T170000",
+          "DTEND;TZID=Australia/Perth": "20260429T190000",
+          "SUMMARY": "Data Structures and Algorithms\\, Test-02",
+          "LOCATION": "BUSN: [  G91] Wesfarmers Lecture Theatre (29/4)\\, ENCM: [  G04] Harold and Margaret Clough Engineering Lecture Theatre 2 (29/4)\\, MATH: [  G40] Weatherburn Lecture Theatre (29/4)",
+          "DESCRIPTION": "CITS2200_SEM-1_CR\\, Test-02\\, 01\\nData Structures and Algorithms\\nStaff: -\\nLocation: BUSN: [  G91] Wesfarmers Lecture Theatre (29/4)\\, ENCM: [  G04] Harold and Margaret Clough Engineering Lecture Theatre 2 (29/4)\\, MATH: [  G40] Weatherburn Lecture Theatre (29/4)",
+          "UID": "uid25"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260305T120000",
+          "DTEND;TZID=Australia/Perth": "20260305T140000",
+          "SUMMARY": "Agile Web Development\\, Lab-01",
+          "LOCATION": "HACKH: [  G09] Fay Gale Studio",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lab-01\\, 04\\nAgile Web Development\\nStaff: -\\nLocation: HACKH: [  G09] Fay Gale Studio",
+          "UID": "uid26"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260326T120000",
+          "DTEND;TZID=Australia/Perth": "20260326T140000",
+          "SUMMARY": "Agile Web Development\\, Lab-02",
+          "LOCATION": "HACKH: [  G09] Fay Gale Studio",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lab-02\\, 04\\nAgile Web Development\\nStaff: -\\nLocation: HACKH: [  G09] Fay Gale Studio",
+          "UID": "uid27"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260423T120000",
+          "DTEND;TZID=Australia/Perth": "20260423T140000",
+          "SUMMARY": "Agile Web Development\\, Lab-03",
+          "LOCATION": "HACKH: [  G09] Fay Gale Studio",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lab-03\\, 04\\nAgile Web Development\\nStaff: -\\nLocation: HACKH: [  G09] Fay Gale Studio",
+          "UID": "uid28"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260227T100000",
+          "DTEND;TZID=Australia/Perth": "20260227T120000",
+          "SUMMARY": "Agile Web Development\\, LecTut-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, LecTut-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid29"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260306T100000",
+          "DTEND;TZID=Australia/Perth": "20260306T120000",
+          "SUMMARY": "Agile Web Development\\, LecTut-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, LecTut-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid30"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260313T100000",
+          "DTEND;TZID=Australia/Perth": "20260313T120000",
+          "SUMMARY": "Agile Web Development\\, LecTut-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, LecTut-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid31"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260320T100000",
+          "DTEND;TZID=Australia/Perth": "20260320T120000",
+          "SUMMARY": "Agile Web Development\\, LecTut-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, LecTut-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid32"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260327T100000",
+          "DTEND;TZID=Australia/Perth": "20260327T120000",
+          "SUMMARY": "Agile Web Development\\, LecTut-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, LecTut-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid33"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260403T100000",
+          "DTEND;TZID=Australia/Perth": "20260403T120000",
+          "SUMMARY": "Agile Web Development\\, LecTut-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, LecTut-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid34"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260417T100000",
+          "DTEND;TZID=Australia/Perth": "20260417T120000",
+          "SUMMARY": "Agile Web Development\\, LecTut-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, LecTut-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid35"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260424T100000",
+          "DTEND;TZID=Australia/Perth": "20260424T120000",
+          "SUMMARY": "Agile Web Development\\, LecTut-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, LecTut-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid36"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260501T100000",
+          "DTEND;TZID=Australia/Perth": "20260501T120000",
+          "SUMMARY": "Agile Web Development\\, LecTut-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, LecTut-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid37"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260508T100000",
+          "DTEND;TZID=Australia/Perth": "20260508T120000",
+          "SUMMARY": "Agile Web Development\\, LecTut-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, LecTut-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid38"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260515T100000",
+          "DTEND;TZID=Australia/Perth": "20260515T120000",
+          "SUMMARY": "Agile Web Development\\, LecTut-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, LecTut-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid39"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260522T100000",
+          "DTEND;TZID=Australia/Perth": "20260522T120000",
+          "SUMMARY": "Agile Web Development\\, LecTut-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, LecTut-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid40"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260225T160000",
+          "DTEND;TZID=Australia/Perth": "20260225T180000",
+          "SUMMARY": "Agile Web Development\\, Lecture-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lecture-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid41"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260304T160000",
+          "DTEND;TZID=Australia/Perth": "20260304T180000",
+          "SUMMARY": "Agile Web Development\\, Lecture-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lecture-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid42"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260311T160000",
+          "DTEND;TZID=Australia/Perth": "20260311T180000",
+          "SUMMARY": "Agile Web Development\\, Lecture-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lecture-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid43"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260318T160000",
+          "DTEND;TZID=Australia/Perth": "20260318T180000",
+          "SUMMARY": "Agile Web Development\\, Lecture-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lecture-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid44"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260325T160000",
+          "DTEND;TZID=Australia/Perth": "20260325T180000",
+          "SUMMARY": "Agile Web Development\\, Lecture-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lecture-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid45"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260401T160000",
+          "DTEND;TZID=Australia/Perth": "20260401T180000",
+          "SUMMARY": "Agile Web Development\\, Lecture-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lecture-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid46"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260415T160000",
+          "DTEND;TZID=Australia/Perth": "20260415T180000",
+          "SUMMARY": "Agile Web Development\\, Lecture-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lecture-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid47"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260422T160000",
+          "DTEND;TZID=Australia/Perth": "20260422T180000",
+          "SUMMARY": "Agile Web Development\\, Lecture-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lecture-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid48"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260429T160000",
+          "DTEND;TZID=Australia/Perth": "20260429T180000",
+          "SUMMARY": "Agile Web Development\\, Lecture-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lecture-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid49"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260506T160000",
+          "DTEND;TZID=Australia/Perth": "20260506T180000",
+          "SUMMARY": "Agile Web Development\\, Lecture-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lecture-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid50"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260513T160000",
+          "DTEND;TZID=Australia/Perth": "20260513T180000",
+          "SUMMARY": "Agile Web Development\\, Lecture-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lecture-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid51"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260520T160000",
+          "DTEND;TZID=Australia/Perth": "20260520T180000",
+          "SUMMARY": "Agile Web Development\\, Lecture-01",
+          "LOCATION": "Lecture recording available if unable to attend.",
+          "DESCRIPTION": "CITS3403_SEM-1_CR\\, Lecture-01\\, 01_Clashable\\nAgile Web Development\\nStaff: -\\nLocation: Lecture recording available if unable to attend.",
+          "UID": "uid52"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260225T150000",
+          "DTEND;TZID=Australia/Perth": "20260225T170000",
+          "SUMMARY": "Moral Theory\\, LecTut-01",
+          "LOCATION": "ARTS: [  G59] Fox Lecture Hall",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-01\\, 01\\nMoral Theory\\nStaff: -\\nLocation: ARTS: [  G59] Fox Lecture Hall",
+          "UID": "uid53"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260304T150000",
+          "DTEND;TZID=Australia/Perth": "20260304T170000",
+          "SUMMARY": "Moral Theory\\, LecTut-01",
+          "LOCATION": "ARTS: [  G59] Fox Lecture Hall",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-01\\, 01\\nMoral Theory\\nStaff: -\\nLocation: ARTS: [  G59] Fox Lecture Hall",
+          "UID": "uid54"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260311T150000",
+          "DTEND;TZID=Australia/Perth": "20260311T170000",
+          "SUMMARY": "Moral Theory\\, LecTut-01",
+          "LOCATION": "ARTS: [  G59] Fox Lecture Hall",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-01\\, 01\\nMoral Theory\\nStaff: -\\nLocation: ARTS: [  G59] Fox Lecture Hall",
+          "UID": "uid55"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260318T150000",
+          "DTEND;TZID=Australia/Perth": "20260318T170000",
+          "SUMMARY": "Moral Theory\\, LecTut-01",
+          "LOCATION": "ARTS: [  G59] Fox Lecture Hall",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-01\\, 01\\nMoral Theory\\nStaff: -\\nLocation: ARTS: [  G59] Fox Lecture Hall",
+          "UID": "uid56"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260325T150000",
+          "DTEND;TZID=Australia/Perth": "20260325T170000",
+          "SUMMARY": "Moral Theory\\, LecTut-01",
+          "LOCATION": "ARTS: [  G59] Fox Lecture Hall",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-01\\, 01\\nMoral Theory\\nStaff: -\\nLocation: ARTS: [  G59] Fox Lecture Hall",
+          "UID": "uid57"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260401T150000",
+          "DTEND;TZID=Australia/Perth": "20260401T170000",
+          "SUMMARY": "Moral Theory\\, LecTut-01",
+          "LOCATION": "ARTS: [  G59] Fox Lecture Hall",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-01\\, 01\\nMoral Theory\\nStaff: -\\nLocation: ARTS: [  G59] Fox Lecture Hall",
+          "UID": "uid58"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260415T150000",
+          "DTEND;TZID=Australia/Perth": "20260415T170000",
+          "SUMMARY": "Moral Theory\\, LecTut-01",
+          "LOCATION": "ARTS: [  G59] Fox Lecture Hall",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-01\\, 01\\nMoral Theory\\nStaff: -\\nLocation: ARTS: [  G59] Fox Lecture Hall",
+          "UID": "uid59"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260422T150000",
+          "DTEND;TZID=Australia/Perth": "20260422T170000",
+          "SUMMARY": "Moral Theory\\, LecTut-01",
+          "LOCATION": "ARTS: [  G59] Fox Lecture Hall",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-01\\, 01\\nMoral Theory\\nStaff: -\\nLocation: ARTS: [  G59] Fox Lecture Hall",
+          "UID": "uid60"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260429T150000",
+          "DTEND;TZID=Australia/Perth": "20260429T170000",
+          "SUMMARY": "Moral Theory\\, LecTut-01",
+          "LOCATION": "ARTS: [  G59] Fox Lecture Hall",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-01\\, 01\\nMoral Theory\\nStaff: -\\nLocation: ARTS: [  G59] Fox Lecture Hall",
+          "UID": "uid61"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260506T150000",
+          "DTEND;TZID=Australia/Perth": "20260506T170000",
+          "SUMMARY": "Moral Theory\\, LecTut-01",
+          "LOCATION": "ARTS: [  G59] Fox Lecture Hall",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-01\\, 01\\nMoral Theory\\nStaff: -\\nLocation: ARTS: [  G59] Fox Lecture Hall",
+          "UID": "uid62"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260513T150000",
+          "DTEND;TZID=Australia/Perth": "20260513T170000",
+          "SUMMARY": "Moral Theory\\, LecTut-01",
+          "LOCATION": "ARTS: [  G59] Fox Lecture Hall",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-01\\, 01\\nMoral Theory\\nStaff: -\\nLocation: ARTS: [  G59] Fox Lecture Hall",
+          "UID": "uid63"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260520T150000",
+          "DTEND;TZID=Australia/Perth": "20260520T170000",
+          "SUMMARY": "Moral Theory\\, LecTut-01",
+          "LOCATION": "ARTS: [  G59] Fox Lecture Hall",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-01\\, 01\\nMoral Theory\\nStaff: -\\nLocation: ARTS: [  G59] Fox Lecture Hall",
+          "UID": "uid64"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260223T160000",
+          "DTEND;TZID=Australia/Perth": "20260223T180000",
+          "SUMMARY": "Moral Theory\\, LecTut-02",
+          "LOCATION": "GGGL: [  G21] Webb Lecture Theatre",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-02\\, 01\\nMoral Theory\\nStaff: -\\nLocation: GGGL: [  G21] Webb Lecture Theatre",
+          "UID": "uid65"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260302T160000",
+          "DTEND;TZID=Australia/Perth": "20260302T180000",
+          "SUMMARY": "Moral Theory\\, LecTut-02",
+          "LOCATION": "GGGL: [  G21] Webb Lecture Theatre",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-02\\, 01\\nMoral Theory\\nStaff: -\\nLocation: GGGL: [  G21] Webb Lecture Theatre",
+          "UID": "uid66"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260309T160000",
+          "DTEND;TZID=Australia/Perth": "20260309T180000",
+          "SUMMARY": "Moral Theory\\, LecTut-02",
+          "LOCATION": "GGGL: [  G21] Webb Lecture Theatre",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-02\\, 01\\nMoral Theory\\nStaff: -\\nLocation: GGGL: [  G21] Webb Lecture Theatre",
+          "UID": "uid67"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260316T160000",
+          "DTEND;TZID=Australia/Perth": "20260316T180000",
+          "SUMMARY": "Moral Theory\\, LecTut-02",
+          "LOCATION": "GGGL: [  G21] Webb Lecture Theatre",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-02\\, 01\\nMoral Theory\\nStaff: -\\nLocation: GGGL: [  G21] Webb Lecture Theatre",
+          "UID": "uid68"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260323T160000",
+          "DTEND;TZID=Australia/Perth": "20260323T180000",
+          "SUMMARY": "Moral Theory\\, LecTut-02",
+          "LOCATION": "GGGL: [  G21] Webb Lecture Theatre",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-02\\, 01\\nMoral Theory\\nStaff: -\\nLocation: GGGL: [  G21] Webb Lecture Theatre",
+          "UID": "uid69"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260330T160000",
+          "DTEND;TZID=Australia/Perth": "20260330T180000",
+          "SUMMARY": "Moral Theory\\, LecTut-02",
+          "LOCATION": "GGGL: [  G21] Webb Lecture Theatre",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-02\\, 01\\nMoral Theory\\nStaff: -\\nLocation: GGGL: [  G21] Webb Lecture Theatre",
+          "UID": "uid70"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260413T160000",
+          "DTEND;TZID=Australia/Perth": "20260413T180000",
+          "SUMMARY": "Moral Theory\\, LecTut-02",
+          "LOCATION": "GGGL: [  G21] Webb Lecture Theatre",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-02\\, 01\\nMoral Theory\\nStaff: -\\nLocation: GGGL: [  G21] Webb Lecture Theatre",
+          "UID": "uid71"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260420T160000",
+          "DTEND;TZID=Australia/Perth": "20260420T180000",
+          "SUMMARY": "Moral Theory\\, LecTut-02",
+          "LOCATION": "GGGL: [  G21] Webb Lecture Theatre",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-02\\, 01\\nMoral Theory\\nStaff: -\\nLocation: GGGL: [  G21] Webb Lecture Theatre",
+          "UID": "uid72"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260427T160000",
+          "DTEND;TZID=Australia/Perth": "20260427T180000",
+          "SUMMARY": "Moral Theory\\, LecTut-02",
+          "LOCATION": "GGGL: [  G21] Webb Lecture Theatre",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-02\\, 01\\nMoral Theory\\nStaff: -\\nLocation: GGGL: [  G21] Webb Lecture Theatre",
+          "UID": "uid73"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260504T160000",
+          "DTEND;TZID=Australia/Perth": "20260504T180000",
+          "SUMMARY": "Moral Theory\\, LecTut-02",
+          "LOCATION": "GGGL: [  G21] Webb Lecture Theatre",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-02\\, 01\\nMoral Theory\\nStaff: -\\nLocation: GGGL: [  G21] Webb Lecture Theatre",
+          "UID": "uid74"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260511T160000",
+          "DTEND;TZID=Australia/Perth": "20260511T180000",
+          "SUMMARY": "Moral Theory\\, LecTut-02",
+          "LOCATION": "GGGL: [  G21] Webb Lecture Theatre",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-02\\, 01\\nMoral Theory\\nStaff: -\\nLocation: GGGL: [  G21] Webb Lecture Theatre",
+          "UID": "uid75"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260518T160000",
+          "DTEND;TZID=Australia/Perth": "20260518T180000",
+          "SUMMARY": "Moral Theory\\, LecTut-02",
+          "LOCATION": "GGGL: [  G21] Webb Lecture Theatre",
+          "DESCRIPTION": "PHIL3003_SEM-1_CR\\, LecTut-02\\, 01\\nMoral Theory\\nStaff: -\\nLocation: GGGL: [  G21] Webb Lecture Theatre",
+          "UID": "uid76"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260223T140000",
+          "DTEND;TZID=Australia/Perth": "20260223T150000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid77"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260302T140000",
+          "DTEND;TZID=Australia/Perth": "20260302T150000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid78"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260309T140000",
+          "DTEND;TZID=Australia/Perth": "20260309T150000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid79"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260316T140000",
+          "DTEND;TZID=Australia/Perth": "20260316T150000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid80"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260323T140000",
+          "DTEND;TZID=Australia/Perth": "20260323T150000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid81"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260330T140000",
+          "DTEND;TZID=Australia/Perth": "20260330T150000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid82"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260413T140000",
+          "DTEND;TZID=Australia/Perth": "20260413T150000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid83"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260420T140000",
+          "DTEND;TZID=Australia/Perth": "20260420T150000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid84"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260427T140000",
+          "DTEND;TZID=Australia/Perth": "20260427T150000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid85"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260504T140000",
+          "DTEND;TZID=Australia/Perth": "20260504T150000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid86"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260511T140000",
+          "DTEND;TZID=Australia/Perth": "20260511T150000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid87"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260518T140000",
+          "DTEND;TZID=Australia/Perth": "20260518T150000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid88"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260224T150000",
+          "DTEND;TZID=Australia/Perth": "20260224T160000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-02",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-02\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid89"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260303T150000",
+          "DTEND;TZID=Australia/Perth": "20260303T160000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-02",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-02\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid90"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260310T150000",
+          "DTEND;TZID=Australia/Perth": "20260310T160000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-02",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-02\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid91"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260317T150000",
+          "DTEND;TZID=Australia/Perth": "20260317T160000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-02",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-02\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid92"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260324T150000",
+          "DTEND;TZID=Australia/Perth": "20260324T160000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-02",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-02\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid93"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260331T150000",
+          "DTEND;TZID=Australia/Perth": "20260331T160000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-02",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-02\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid94"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260414T150000",
+          "DTEND;TZID=Australia/Perth": "20260414T160000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-02",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-02\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid95"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260421T150000",
+          "DTEND;TZID=Australia/Perth": "20260421T160000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-02",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-02\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid96"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260428T150000",
+          "DTEND;TZID=Australia/Perth": "20260428T160000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-02",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-02\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid97"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260505T150000",
+          "DTEND;TZID=Australia/Perth": "20260505T160000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-02",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-02\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid98"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260512T150000",
+          "DTEND;TZID=Australia/Perth": "20260512T160000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-02",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-02\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid99"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260519T150000",
+          "DTEND;TZID=Australia/Perth": "20260519T160000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Lecture-02",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Lecture-02\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid100"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260224T160000",
+          "DTEND;TZID=Australia/Perth": "20260224T180000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Tutorial-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Tutorial-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid101"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260303T160000",
+          "DTEND;TZID=Australia/Perth": "20260303T180000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Tutorial-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Tutorial-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid102"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260310T160000",
+          "DTEND;TZID=Australia/Perth": "20260310T180000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Tutorial-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Tutorial-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid103"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260317T160000",
+          "DTEND;TZID=Australia/Perth": "20260317T180000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Tutorial-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Tutorial-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid104"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260324T160000",
+          "DTEND;TZID=Australia/Perth": "20260324T180000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Tutorial-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Tutorial-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid105"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260331T160000",
+          "DTEND;TZID=Australia/Perth": "20260331T180000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Tutorial-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Tutorial-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid106"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260414T160000",
+          "DTEND;TZID=Australia/Perth": "20260414T180000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Tutorial-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Tutorial-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid107"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260421T160000",
+          "DTEND;TZID=Australia/Perth": "20260421T180000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Tutorial-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Tutorial-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid108"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260428T160000",
+          "DTEND;TZID=Australia/Perth": "20260428T180000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Tutorial-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Tutorial-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid109"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260505T160000",
+          "DTEND;TZID=Australia/Perth": "20260505T180000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Tutorial-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Tutorial-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid110"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260512T160000",
+          "DTEND;TZID=Australia/Perth": "20260512T180000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Tutorial-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Tutorial-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid111"
+        },
+        {
+          "DTSTAMP": "20260304T032752Z",
+          "DTSTART;TZID=Australia/Perth": "20260519T160000",
+          "DTEND;TZID=Australia/Perth": "20260519T180000",
+          "SUMMARY": "Continental Philosophy: The Origin and Influence of Phenomenology\\, Tutorial-01",
+          "LOCATION": "ARTS: [ 161] Arts Lecture Room 9",
+          "DESCRIPTION": "PHIL3005_SEM-1_CR\\, Tutorial-01\\, 01\\nContinental Philosophy: The Origin and Influence of Phenomenology\\nStaff: -\\nLocation: ARTS: [ 161] Arts Lecture Room 9",
+          "UID": "uid112"
+        }
+      ]
+    }
+  ]
+}
