@@ -13,15 +13,15 @@ A project by - UWA Agile Web 2026's 12:40pm Thursday Lab Group
 
 ------
 
-CASync aims to connect students and their schedules. Users create an account, add their cas ical link and connect with friends, join groups or create them. The primary feature is a comparitive schedule to show availability amongst multiple students. 
+CASync aims to connect students and their schedules. Users create an account, add their CAS (Class Allocation System) iCal link and connect with friends, join groups or create them. The primary feature is a comparitive schedule to show availability amongst multiple students. 
 
 **Tech Stack:**
 
-- Js
-- Css
-- Html
+- JavaScript
+- CSS
+- HTML
 - Tailwind
-- Jquery
-- SQLite
+- JQuery
+- SQLite (via. SQLAlchemy package)
 
 Use the planning dir for plans
