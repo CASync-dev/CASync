@@ -38,30 +38,32 @@ Ical info is our major data source. We can pull this via the cas ical link and c
   - Notes, ect
   - Users can mark of a whole day
 - Custom items:
-  - USers can add blocks of at uni time or busy time
+  - Users can add blocks of at uni time or busy time
     - Regular work hours
     - Stay at uni late days 
     - (Also reoccurring)
 - University club feature
-  - Clubs can make a group and add grou events. USers can subscribe.
+  - Clubs can make a group and add grou events. Users can subscribe.
   - This makes organising club events easy as they can see all members times
   - Can link to a post where users can find more info
-- Study group items. 
+- Study group functions. 
   - Users can 'vote' on creating a study sesh
-  - Can add detials, or propose changes, etc
+  - Can add details, or propose changes, etc
   - Can be reoccurring
+  - Add and remove people from the group 
+  - Public and private groups
 - Friends page:
   - Can see at a glance who is avialble now
   - Who is avialble soon
   - Busy or not on campus
   - Click on name to see full schedule
+  - Users can have different privacy settings for what amount of info is shows:
+      - Control what friends can see — full schedule, busy/free only, or nothing.
 - Groups view
   - At a glance see all groups
   - On click see group cal
   - Options for making events, study seshes
-- Pyblic and private groups
-  - Users can have different privacy settings for what amount of info is shows:
-    - Control what friends can see — full schedule, busy/free only, or nothing.
+
 
 ### If we have time
 
