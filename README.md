@@ -28,18 +28,26 @@ Use the planning dir for plans
 
 ## Getting started
 
-1. clone the project
+1. Clone the project
 
    ```bash
    git clone git@github.com:stoveup/AgileWeb2026.git
+   cd AgileWeb2026
    ```
 
 2. Install dependencies
 
-3. Tailwind cli can be helpfull:
-
    ```bash
-   npm install tailwindcss @tailwindcss/cli
+   npm install
    ```
 
-   
+3. Start the dev server (watches CSS + serves the app)
+
+   ```bash
+   npm run dev
+   ```
+
+   The app will be available at `http://localhost:8080`.
+
+> **Tip:** If you just want to build the CSS once without the live server, run `npm run build:css`.
+
