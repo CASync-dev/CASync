@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>CASync</title>
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="static/css/output.css" />
+
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <!-- Additional CSS goes here-->
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+      <!-- Left Sidebar Navigation: template code -->
+      <aside
+        id="sidebar"
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 md:static transition-transform duration-300 ease-in-out flex flex-col"
+      >
+        <!-- Logo/Brand: to be changed for sure-->
+        <div
+          class="flex items-center justify-between p-6 border-b border-gray-200"
+        >
+          <a href="dash.html" class="flex items-center space-x-2">
+            <i class="fas fa-calendar text-blue-600 text-2xl"></i>
+            <span class="text-xl font-bold text-gray-900">CASync</span>
+          </a>
+          <!-- Close button for mobile -->
+          <button
+            id="sidebar-close"
+            class="md:hidden text-gray-500 hover:text-gray-700"
+          >
+            <i class="fas fa-xmark text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+          <a
+            href="#"
+            data-page="dash.html"
+            class="nav-link flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group"
+          >
+            <i class="fas fa-house w-5 mr-3"></i>
+            <span class="font-medium">Dashboard</span>
+          </a>
+          <a
+            href="#"
+            data-page="schedule.html"
+            class="nav-link flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group"
+          >
+            <i class="fas fa-calendar-days w-5 mr-3"></i>
+            <span class="font-medium">Schedule</span>
+          </a>
+
+          <div class="pt-4 mt-4 border-t border-gray-200">
+            <a
+              href="#"
+              data-page="settings.html"
+              class="nav-link flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group"
+            >
+              <i class="fas fa-gear w-5 mr-3"></i>
+              <span class="font-medium">Settings</span>
+            </a>
+          </div>
+        </nav>
+
+        <!-- Logout at bottom -->
+        <div class="p-4 border-t border-gray-200">
+          <a
+            href="login.html"
+            class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-red-50 hover:text-red-600 transition group"
+          >
+            <i class="fas fa-right-from-bracket w-5 mr-3"></i>
+            <span class="font-medium">Logout</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top bar for mobile -->
+        <header class="md:hidden bg-white shadow-sm z-40">
+          <div class="flex items-center justify-between p-4">
+            <button
+              id="sidebar-open"
+              class="text-gray-700 hover:text-blue-600 focus:outline-none"
+            >
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+            <span class="text-lg font-bold text-gray-900">CASync</span>
+            <div class="w-6"></div>
+            <!-- Spacer for centering -->
+          </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <main class="flex-1 overflow-y-auto bg-gray-50">
+          <div
+            id="page-content"
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+          >
+            <!-- Loading indicator -->
+            <div id="loading" class="hidden text-center py-12">
+              <i class="fas fa-spinner fa-spin text-blue-600 text-5xl"></i>
+              <p class="mt-4 text-gray-600">Loading...</p>
+            </div>
+
+            <!-- Default content -->
+            <div id="default-content">
+              <h1 class="text-3xl font-bold text-gray-900 mb-4">
+                Welcome to CASync
+              </h1>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div
+      id="sidebar-overlay"
+      class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden"
+    ></div>
+
+    <!-- JavaScript -->
+    <script src="static/js/main.js"></script>
+
+    <!-- Sidebar Toggle Script -->
+    <script>
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebar-overlay');
+      const sidebarOpen = document.getElementById('sidebar-open');
+      const sidebarClose = document.getElementById('sidebar-close');
+
+      // Open sidebar
+      sidebarOpen.addEventListener('click', function () {
+        sidebar.classList.remove('-translate-x-full');
+        sidebarOverlay.classList.remove('hidden');
+      });
+
+      // Close sidebar
+      function closeSidebar() {
+        sidebar.classList.add('-translate-x-full');
+        sidebarOverlay.classList.add('hidden');
+      }
+
+      sidebarClose.addEventListener('click', closeSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+
+      // Map of page filenames to their dedicated JS files
+      const pageScripts = {
+        'schedule.html': 'static/js/schedule.js',
+      };
+
+      // Dynamic Page Loading
+      const pageContent = document.getElementById('page-content');
+      const loadingIndicator = document.getElementById('loading');
+      const defaultContent = document.getElementById('default-content');
+      const navLinks = document.querySelectorAll('.nav-link');
+
+      // Load page content
+      async function loadPage(page) {
+        try {
+          // Show loading
+          defaultContent.classList.add('hidden');
+          loadingIndicator.classList.remove('hidden');
+
+          // Fetch the page
+          const response = await fetch(`templates/${page}`);
+
+          if (!response.ok) {
+            throw new Error(`Page not found: ${page}`);
+          }
+
+          const html = await response.text();
+
+          // Hide loading
+          loadingIndicator.classList.add('hidden');
+
+          // Display content
+          pageContent.innerHTML = html;
+
+          // Load the page-specific JS file (external scripts added via
+          // createElement DO execute, unlike scripts set through innerHTML)
+          const existingPageScript = document.getElementById('page-script');
+          if (existingPageScript) existingPageScript.remove();
+
+          if (pageScripts[page]) {
+            const script = document.createElement('script');
+            script.id = 'page-script';
+            script.src = pageScripts[page];
+            document.body.appendChild(script);
+          }
+
+          // Close sidebar on mobile after navigation
+          if (window.innerWidth < 768) {
+            closeSidebar();
+          }
+        } catch (error) {
+          console.error('Error loading page:', error);
+          loadingIndicator.classList.add('hidden');
+        }
+      }
+
+      // Update active nav state
+      function setActiveNav(clickedLink) {
+        navLinks.forEach((link) => {
+          link.classList.remove('bg-blue-50', 'text-blue-600');
+        });
+        clickedLink.classList.add('bg-blue-50', 'text-blue-600');
+      }
+
+      // Add click handlers to nav links
+      navLinks.forEach((link) => {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          const page = this.getAttribute('data-page');
+          loadPage(page);
+          setActiveNav(this);
+        });
+      });
+
+      window.addEventListener('DOMContentLoaded', function () {
+        const dashboardLink = document.querySelector('[data-page="dash.html"]');
+        if (dashboardLink) {
+          loadPage('dash.html');
+          setActiveNav(dashboardLink);
+        }
+      });
+    </script>
+  </body>
+</html>

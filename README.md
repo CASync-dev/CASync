@@ -25,3 +25,21 @@ CASync aims to connect students and their schedules. Users create an account, ad
 - SQLite (via. SQLAlchemy package)
 
 Use the planning dir for plans
+
+## Getting started
+
+1. clone the project
+
+   ```bash
+   git clone git@github.com:stoveup/AgileWeb2026.git
+   ```
+
+2. Install dependencies
+
+3. Tailwind cli can be helpfull:
+
+   ```bash
+   npm install tailwindcss @tailwindcss/cli
+   ```
+
+   
