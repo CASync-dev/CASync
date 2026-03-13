@@ -1,0 +1,32 @@
+[
+  {
+    "id": "group-001",
+    "name": "Agile Web Study Group",
+    "role": "admin",
+    "members": [
+      { "id": "user-001", "username": "liam" },
+      { "id": "user-002", "username": "alice" },
+      { "id": "user-003", "username": "bob" }
+    ],
+    "events": [
+      {
+        "id": "grp-evt-1",
+        "title": "Group Study Session",
+        "date": "2026-03-05",
+        "startTime": "14:00",
+        "endTime": "16:00",
+        "location": "Reid Library — Study Room 3"
+      }
+    ]
+  },
+  {
+    "id": "group-002",
+    "name": "CITS2200 Help Desk",
+    "role": "member",
+    "members": [
+      { "id": "user-001", "username": "liam" },
+      { "id": "user-002", "username": "alice" }
+    ],
+    "events": []
+  }
+]

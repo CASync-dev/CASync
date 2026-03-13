@@ -1,13 +1,13 @@
 // Schedule page — sets dynamic dates and renders events into the weekly calendar grid
-
+//any libraries neededed:
 // ── Grid constants
 // These define the visible time range shown in the HTML grid.
-// The grid runs from 07:00 am to 06:00 pm — that's 12 one-hour slots.
-const GRID_START_HOUR = 7;
-const GRID_TOTAL_SLOTS = 12;
+// The grid runs from 07:00 am to 06:00 pm
+const GRID_START_HOUR = 7; // the first row of the grid is 7:00 am
+const GRID_TOTAL_SLOTS = 12; // the grid has 12 rows, so the last row starts at 6:00 pm
 
 // ── Color themes
-// Each event has a color name (e.g. "blue"). This maps that name to the three
+// Each event has a color. This maps that name to the three
 // Tailwind classes needed to style an event card: background, left border, text.
 const COLOR_MAP = {
   indigo: {
@@ -31,131 +31,23 @@ const COLOR_MAP = {
 
 // ── Event data
 // This is the list of events that get rendered onto the calendar.
-// Each event needs: id, title, date (YYYY-MM-DD), startTime, endTime (24h HH:MM), color.
-// Dates are generated relative to the current week so events always appear on load.
-/* 
-  Eventually this will be parsed from icals but that will need the backend server
-  This should be entirley overhauld, it works for testing visuals but doesnt actually handle the dates well
-    nor does it handle multiple events on the same day, or overlapping events, etc.
-  Colours should be defined dyunamicly based on subject in the futre
-*/
-const events = buildSampleEvents();
 
-function buildSampleEvents() {
-  // Find the Monday of the current week so we can anchor all event dates to it.
-  const today = new Date();
-  const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, ...
-  const daysFromMonday = currentDay === 0 ? -6 : 1 - currentDay;
-  const monday = new Date(today);
-  monday.setDate(today.getDate() + daysFromMonday);
-
-  // Helper: returns the ISO date string (YYYY-MM-DD) for a given offset from Monday.
-  // e.g. weekDate(0) = Monday, weekDate(2) = Wednesday
-  function weekDate(dayOffset) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + dayOffset);
-    return d.toISOString().slice(0, 10);
-  }
-
-  // Sample events mirriing my own schedlue for testin
-  // Each subject has a consistent color across the week:
-  return [
-    // Monday
-    {
-      id: 1,
-      title: 'Continental Philosophy',
-      date: weekDate(0),
-      startTime: '14:00',
-      endTime: '15:00',
-      color: 'rose',
-    },
-    {
-      id: 2,
-      title: 'Moral Theory',
-      date: weekDate(0),
-      startTime: '16:00',
-      endTime: '18:00',
-      color: 'amber',
-    },
-
-    // Tuesday
-    {
-      id: 3,
-      title: 'Continental Philosophy',
-      date: weekDate(1),
-      startTime: '15:00',
-      endTime: '16:00',
-      color: 'rose',
-    },
-    {
-      id: 4,
-      title: 'Continental Philosophy',
-      date: weekDate(1),
-      startTime: '16:00',
-      endTime: '18:00',
-      color: 'rose',
-    },
-
-    // Wednesday
-    {
-      id: 5,
-      title: 'Data Structures & Algorithms',
-      date: weekDate(2),
-      startTime: '14:00',
-      endTime: '15:00',
-      color: 'blue',
-    },
-    {
-      id: 6,
-      title: 'Moral Theory',
-      date: weekDate(2),
-      startTime: '15:00',
-      endTime: '17:00',
-      color: 'amber',
-    },
-    {
-      id: 7,
-      title: 'Agile Web Development',
-      date: weekDate(2),
-      startTime: '16:00',
-      endTime: '18:00',
-      color: 'green',
-    },
-
-    // Thursday
-    {
-      id: 8,
-      title: 'Agile Web Development',
-      date: weekDate(3),
-      startTime: '12:00',
-      endTime: '14:00',
-      color: 'green',
-    },
-
-    // Friday
-    {
-      id: 9,
-      title: 'Agile Web Development',
-      date: weekDate(4),
-      startTime: '10:00',
-      endTime: '12:00',
-      color: 'green',
-    },
-    {
-      id: 10,
-      title: 'Data Structures & Algorithms',
-      date: weekDate(4),
-      startTime: '11:00',
-      endTime: '13:00',
-      color: 'blue',
-    },
-  ];
-}
+// This sectionm is how i first simulate the data, to better simulate ap orper backend
+// i have a bunch of json files with calender data to simulate what a db would have.
+// It was created with cal to json parsing libraries that might be used in the bakcend in futre
+// now we call api.js that directs to the files in the static/data folder to get the data for the events.
+let events = [];
+api.getEvents().then((data) => {
+  events = data;
+  console.log(events);
+  renderDesktopEvents(); // call the render function after events are loaded
+});
+// originaly this was done with a hard coded list of events in this file
 
 // ── Time helpers
 
 // Converts a "HH:MM" string to total minutes from midnight.
-// Used to calculate event positions and durations numerically.
+// Used to calculate event positions and durations on the grid
 function parseTime(timeStr) {
   const [h, m] = timeStr.split(':').map(Number);
   return h * 60 + m;
@@ -179,7 +71,7 @@ function buildEventCard(event, heightPx) {
   const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`;
 
   // The card sits inside the grid cell using absolute positioning.
-  // A small inset (left-0.5 / right-0.5 / top-0.5) keeps grid lines visible around it.
+  // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
   const card = document.createElement('div');
   card.className = [
     'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
@@ -213,7 +105,6 @@ function buildEventCard(event, heightPx) {
 // inject an absolutely positioned card that spans the event's full duration.
 function renderDesktopEvents() {
   const grid = document.getElementById('desktop-grid');
-  if (!grid) return;
 
   const cells = Array.from(grid.children);
   const cellsPerRow = 6; // column 0 = time labels, columns 1–5 = Mon–Fri
@@ -277,18 +168,31 @@ function renderDesktopEvents() {
 // ── Date utility
 // Returns an array of 5 ISO date strings [Mon, Tue, Wed, Thu, Fri]
 // for the current calendar week.
+// initialy i did this with a dictionary of monday: date,
+// but this got annoying later so just 5 dates in an array is easier to work with.
 function getWeekDates() {
   const today = new Date();
   const currentDay = today.getDay();
-  const daysFromMonday = currentDay === 0 ? -6 : 1 - currentDay;
+  let daysFromMonday; //decalre empty
+  if (currentDay === 0) {
+    // Sunday is 0, so we need to go back 6 days to get to Monday
+    daysFromMonday = -6;
+  } else {
+    // For any other day, we calculate how many days to go back to get to Monday
+    daysFromMonday = 1 - currentDay;
+  }
   const monday = new Date(today);
-  monday.setDate(today.getDate() + daysFromMonday);
+  monday.setDate(today.getDate() + daysFromMonday); // Now we have the date for Monday of the current week
 
-  return Array.from({ length: 5 }, (_, i) => {
+  const weekDates = [];
+  for (let i = 0; i < 5; i++) {
+    // Loop from 0 to 4 to get dates for Monday through Friday
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
-    return d.toISOString().slice(0, 10);
-  });
+    weekDates.push(d.toISOString().slice(0, 10));
+  }
+  // console.log(weekDates); // Uncomment to see the generated week dates in the console
+  return weekDates;
 }
 
 // ── Set calendar header dates
@@ -297,26 +201,13 @@ function getWeekDates() {
 function setCalendarDates() {
   const today = new Date();
 
-  const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
   const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
   // Update the "Today, Day Month Date" title at the top of the page
   const titleElement = document.getElementById('calendar-title');
   if (titleElement) {
-    titleElement.textContent = `Today, ${dayNames[today.getDay() === 0 ? 6 : today.getDay() - 1]} ${monthNames[today.getMonth()]} ${today.getDate()}`;
+    // Format: "Today, {Day}, {Moth} {dd}"
+    titleElement.textContent = `Today, ${today.toLocaleString(undefined, { weekday: 'long' })}, ${today.toLocaleString(undefined, { month: 'long' })} ${today.getDate()}`;
   }
 
   // Update each of the five column header elements with the correct day and date.
@@ -334,7 +225,5 @@ function setCalendarDates() {
   });
 }
 
-// ── Initialise
-// Run everything in order: dates first so the grid is labelled, then events.
+// innit
 setCalendarDates();
-renderDesktopEvents();

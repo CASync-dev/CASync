@@ -49,5 +49,3 @@ Use the planning dir for plans
 
    The app will be available at `http://localhost:8080`.
 
-> **Tip:** If you just want to build the CSS once without the live server, run `npm run build:css`.
-
