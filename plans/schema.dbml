@@ -1,0 +1,69 @@
+Table users {
+  id UUID [primary key, unique, not null]
+  email varchar [not null, unique]
+  username varchar [unique, not null]
+  password_hash varchar [not null]
+  confirmed bool [default: false]
+  created_at timestamp
+}
+
+Table calendar_subscriptions {
+  id UUID [primary key]
+  user_id UUID [ref: > users.id]
+  url string //validated ical url
+  last_synced datetime 
+  status string 
+}
+
+Table calendar_events {
+  id UUID [primary key]
+  cal_id UUID [ref: > calendar_subscriptions.id]
+  event_uid string [unique] // item id from ical file
+  title varchar // ical summary field
+  description varchar //ical description field
+  start_time datetime
+  end_time datetime 
+  location string //ical location field
+}
+
+Table user_events {
+  id UUID [pk]
+  user_id UUID [ref: > users.id]
+  title varchar
+  description text
+  start_time datetime
+  end_time datetime
+  is_recurring bool [default: false]
+  recurrence_rule text // Store RRULE string for work hours
+  event_type varchar // 'busy', 'at_uni', 'social'
+  is_attending bool [default: true] // For marking synced classes as "not going"
+  original_event_id UUID [ref: > calendar_events.id, null] // Links to the ical event if this is an override
+}
+
+Table friendships {
+  id UUID [pk]
+  user_id UUID [ref: > users.id]     // The person who initiated
+  friend_id UUID [ref: > users.id]   // The person receiving
+  status varchar // 'pending', 'accepted', 'blocked'
+  created_at timestamp
+  updated_at timestamp
+
+  Note: 'Add a unique constraint on (user_id, friend_id) to prevent duplicates'
+}
+
+Table groups {
+  id uuid [pk]
+  name varchar
+}
+
+Table memberships {
+  user_id uuid [ref: > users.id]
+  group_id uuid [ref: > groups.id]
+  role varchar // 'admin', 'moderator', 'member'
+  joined_at timestamp
+  
+  indexes {
+    (user_id, group_id) [pk] // Prevents duplicate memberships
+  }
+}
+
