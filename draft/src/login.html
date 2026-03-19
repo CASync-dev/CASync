@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-    <!-- -->
+    <!-- TODO: Redesign, JS functionability-->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="./output.css" rel="stylesheet">
@@ -21,7 +21,20 @@
     </div>
 </header>
 <body class="antialiased bg-fuchsia-50 dark:bg-fuchsia-900">
-    <div class = "mx-auto">
-        <h1 class = "flex items-center justify-center text-center text-6xl py-4 px-5"> Log In </h1>
+    <div class = "login">
+        <form novalidate = "novalidate" method="post">
+            <div>
+                <label for = "user">Username:</label>
+                <input id="user" type="text" autocomplete="username" aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name="user">
+                <label for = "pw">Password:</label>
+                <input id="pw" type = "text" autocomplete="current-password" aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw">
+                <input type = "checkbox" id = "rme" name = "rme">
+                <label for="rme"> Remember me </label>
+                <a href = "./dashboard.html" class = "button"> Continue </a>
+            </div>
+        </form>
     </div>
 </body>
+</html>
+
+
