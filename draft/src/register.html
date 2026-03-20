@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html>
 <head>
     <!-- TODO: JS functionability, re-design-->
     <meta charset="UTF-8">
@@ -13,19 +14,50 @@
     </title>
 </head>
 <body>
-    <div class="mx-auto">
-        <h1 class = "flex items-center justify-center text-center text-6xl py-4 px-5"> Register </h1>
+    <header>
+    <div class = "mx-auto bg-fuchsia-800">
+        <br>
+        <br>
+        <br>
+        <h1 class = "flex items-center justify-center text-center text-4xl py-4 px-5"> Cas<strong>Sync</strong> </h1>
+        <br>
+        <br>
+        <br>
+    </div>
+</header>
+    <div class="mx-auto items-center text-center">
         <form>
-            <legend> Log In</legend>
-            <label for="user"> User: </label>
-            <input type="text" id="user" name = "user"> <br>
-            <label for="pw1"> Password: </label>
-            <input type="password" id = "pw1" name = "pw1"> <br>
-            <label for="pw2"> Reenter Password: </label>
-            <input type="password" id = "pw2" name = "pw2"> <br>
-            <input type = "checkbox" id = "rme" name = "rme">
-            <label for="rme"> Remember me </label>
-            <a href = "./dashboard.html" class = "button"> Log In </a>
+            <legend> <h3 class = "flex items-center justify-center text-center text-3xl py-4 px-5"> Register </h1> </legend>
+            <br>
+            <div>
+                <label for="email"> Email: </label>
+                <input id="email" type="text" autocomplete="email" aria-required="true" 
+                        aria-invalid="false" autofocus = "autofocus" size="30" name="email">
+                <br>
+                <br>
+                <label for = "user"> Username: </label>
+                <input id="user" type="text" autocomplete="username" aria-required="true" 
+                        aria-invalid="false" autofocus = "autofocus" size="30" name="user">
+                <br>
+                <br>
+                
+                <label for="pw1"> Password: </label>
+                <input id="pw1" type = "password" autocomplete="current-password" 
+                    aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw1">                
+                <br>
+                <br>
+                    <label for="pw2"> Reenter Password: </label>
+                <input id="pw" type = "password" autocomplete="current-password"  
+                    aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw">
+                <br>
+                <br>
+                <input type = "checkbox" id = "rme" name = "rme">
+                <label for="rme"> Remember me </label>
+                <br>
+                <br>
+                <br>
+                <a href = "./dashboard.html" class = "button"> Continue </a>
+            </div>
         </form>
     </div>
 </body>
