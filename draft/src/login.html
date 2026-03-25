@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     <script src = "login.js"> </script>
 
+
     <title>
         Log In - CasSync
     </title>
@@ -19,32 +20,35 @@
         <br>
         <br>
         <br>
+        <a href="./main.html"> 
         <h1 class = "flex items-center justify-center text-center text-4xl py-4 px-5"> Cas<strong>Sync</strong> </h1>
+        </a>
         <br>
         <br>
         <br>
     </div>
 </header>
 <body class="antialiased mx-auto bg-fuchsia-700 items-center text-center">
-    <div class = "login">
-        <form novalidate = "novalidate" method="post">
+    <div>
+        <form name = "login" novalidate = "novalidate" onsubmit = "return loginImplementation()" method="post">
             <div>
                 <label for = "user">Username:</label>
-                <input id="user" type="text" autocomplete="username" aria-required="true" 
+                <input id = "user" name="user" type="text" autocomplete="username" aria-required="true" 
                     aria-invalid="false" autofocus = "autofocus" size="30" name="user">
                 <br>
                 <br>
                 <br>
                 <label for = "pw">Password:</label>
-                <input id="pw" type = "password" autocomplete="current-password" 
-                    aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw">
+                <input id="pw" name = "pw" type = "password" autocomplete="current-password" 
+                    aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw" required>
                 <br>
                 <input type = "checkbox" id = "rme" name = "rme">
                 <label for="rme"> Remember me </label>
                 <br>
                 <br>
                 <br>
-                <input type = "submit" class = "button" value = "Log In" onclick = loginImplementation()>
+                <input id = "log" type = "submit" class = "button" value = "Log In">
+                
             </div>
         </form>
     </div>
