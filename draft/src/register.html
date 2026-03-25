@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-
+    <script src = "register.js"></script>
     <title>
         Register - CasSync
     </title>
@@ -19,35 +19,37 @@
         <br>
         <br>
         <br>
+        <a href="./main.html"> 
         <h1 class = "flex items-center justify-center text-center text-4xl py-4 px-5"> Cas<strong>Sync</strong> </h1>
+        </a>
         <br>
         <br>
         <br>
     </div>
 </header>
     <div class="mx-auto items-center text-center">
-        <form>
+        <form name = "register" novalidate = "novalidate" onsubmit = "return regValidation()" method = "post">
             <legend> <h3 class = "flex items-center justify-center text-center text-3xl py-4 px-5"> Register </h1> </legend>
             <br>
             <div>
                 <label for="email"> Email: </label>
-                <input id="email" type="email" autocomplete="email" aria-required="true" 
+                <input name = "mail" id="email" type="email" autocomplete="email" aria-required="true" 
                         aria-invalid="false" autofocus = "autofocus" size="30" name="email">
                 <br>
                 <br>
                 <label for = "user"> Username: </label>
-                <input id="user" type="text" autocomplete="username" aria-required="true" 
+                <input name = "user" id="user" type="text" autocomplete="username" aria-required="true" 
                         aria-invalid="false" autofocus = "autofocus" size="30" name="user">
                 <br>
                 <br>
                 
                 <label for="pw1"> Password: </label>
-                <input id="pw1" type = "password" autocomplete="current-password" 
+                <input name = "pw1" id="pw1" type = "password" autocomplete="current-password" 
                     aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw1">                
                 <br>
                 <br>
                     <label for="pw2"> Reenter Password: </label>
-                <input id="pw" type = "password" autocomplete="current-password"  
+                <input name = "pw2" id="pw" type = "password" autocomplete="current-password"  
                     aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw">
                 <br>
                 <br>
@@ -56,7 +58,7 @@
                 <br>
                 <br>
                 <br>
-                <a href = "./dashboard.html" class = "button"> Continue </a>
+                <input id = "reg" type = "submit" class = "button" value = "Register">
             </div>
         </form>
     </div>
