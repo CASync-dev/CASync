@@ -1,8 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from extensions import db
 from models import User, Event
 
 app = Flask(__name__)
+# Configure the database URI and initialize the database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 db.init_app(app)
 with app.app_context():
@@ -35,6 +36,20 @@ def friends():
 @app.route("/settings")
 def settings():
     return render_template("settings.html")
+
+# API routes - at the moment they retrun json responses but thats not long term
+@app.route("/api/events")
+def api_events():
+    events = Event.query.all()
+    return jsonify([e.to_dict() for e in events])
+
+@app.route("/api/user")
+def api_user():
+    user = User.query.first()
+    if not user:
+        return jsonify({}), 404
+    return jsonify({'id': user.id, 'username': user.username, 'email': user.email})
+
 
 # Error handling
 @app.errorhandler(404)
