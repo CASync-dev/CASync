@@ -1,4 +1,4 @@
-# This is an experimental draft of the possible webpages for CasSync.
+# This is an experimental draft of the possible webpages for CaSync.
 
 Please don't merge this as of yet, since all files are WIP and mainly used as practicing for Tailwind CSS.
 No dashboard since that's already done :)
