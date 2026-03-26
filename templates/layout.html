@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>CASync</title>
+    <!-- Tailwind CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/output.css') }}"
+    />
+
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <!-- Additional CSS goes here-->
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+      <!-- Left Sidebar Navigation: template code -->
+      <aside
+        id="sidebar"
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 md:static transition-transform duration-300 ease-in-out flex flex-col"
+      >
+        <!-- Logo/Brand: to be changed for sure-->
+        <div
+          class="flex items-center justify-between p-6 border-b border-gray-200"
+        >
+          <a href="/" class="flex items-center space-x-2">
+            <i class="fas fa-calendar text-blue-600 text-2xl"></i>
+            <span class="text-xl font-bold text-gray-900">CASync</span>
+          </a>
+          <!-- Close button for mobile -->
+          <button
+            id="sidebar-close"
+            class="md:hidden text-gray-500 hover:text-gray-700"
+          >
+            <i class="fas fa-xmark text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+          <a
+            href="{{ url_for('dash') }}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'dash' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+          >
+            <i class="fas fa-solid fa-table-columns w-5 mr-3"></i>
+            <span class="font-medium">Dashboard</span>
+          </a>
+          <a
+            href="{{ url_for('schedule') }}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'schedule' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+          >
+            <i class="fas fa-calendar-days w-5 mr-3"></i>
+            <span class="font-medium">Schedule</span>
+          </a>
+          <a
+            href="{{ url_for('groups') }}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'groups' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+          >
+            <i class="fas fa-solid fa-people-group w-5 mr-3"></i>
+            <span class="font-medium">Groups</span>
+          </a>
+          <a
+            href="{{ url_for('friends') }}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'friends' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+          >
+            <i class="fas fa-solid fa-user-group w-5 mr-3"></i>
+            <span class="font-medium">Friends</span>
+          </a>
+
+          <div class="pt-4 mt-4 border-t border-gray-200">
+            <a
+              href="{{ url_for('settings') }}"
+              class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'settings' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+            >
+              <i class="fas fa-gear w-5 mr-3"></i>
+              <span class="font-medium">Settings</span>
+            </a>
+          </div>
+        </nav>
+
+        <!-- Logout at bottom -->
+        <div class="p-4 border-t border-gray-200">
+          <a
+            href="/login"
+            class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-red-50 hover:text-red-600 transition group"
+          >
+            <i class="fas fa-right-from-bracket w-5 mr-3"></i>
+            <span class="font-medium">Logout</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top bar for mobile -->
+        <header class="md:hidden bg-white shadow-sm z-40">
+          <div class="flex items-center justify-between p-4">
+            <button
+              id="sidebar-open"
+              class="text-gray-700 hover:text-blue-600 focus:outline-none"
+            >
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+            <span class="text-lg font-bold text-gray-900">CASync</span>
+            <div class="w-6"></div>
+            <!-- Spacer for centering -->
+          </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <main class="flex-1 overflow-y-auto bg-gray-50">
+          {% block content %}{% endblock %}
+        </main>
+      </div>
+    </div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div
+      id="sidebar-overlay"
+      class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden"
+    ></div>
+
+    <!-- JavaScript -->
+    <!-- api.js is loaded globally so every page script can call api.* -->
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+
+    <!-- Sidebar Toggle Script -->
+    <script>
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebar-overlay');
+      const sidebarOpen = document.getElementById('sidebar-open');
+      const sidebarClose = document.getElementById('sidebar-close');
+
+      sidebarOpen.addEventListener('click', function () {
+        sidebar.classList.remove('-translate-x-full');
+        sidebarOverlay.classList.remove('hidden');
+      });
+
+      function closeSidebar() {
+        sidebar.classList.add('-translate-x-full');
+        sidebarOverlay.classList.add('hidden');
+      }
+
+      sidebarClose.addEventListener('click', closeSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+    </script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

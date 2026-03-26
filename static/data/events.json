@@ -1,0 +1,1132 @@
+[
+  {
+    "id": "uid0",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-02-27",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid1",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-03-06",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid2",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-03-13",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid3",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-03-20",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid4",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-03-27",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid5",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-04-03",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid6",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-04-17",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid7",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-04-24",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid8",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-05-01",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid9",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-05-08",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid10",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-05-15",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid11",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-05-22",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid12",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-02-25",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid13",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-03-04",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid14",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-03-11",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid15",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-03-18",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid16",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-03-25",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid17",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-04-01",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid18",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-04-15",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid19",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-04-22",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid20",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-04-29",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid21",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-05-06",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid22",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-05-13",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid23",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-05-20",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Ross Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid24",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-03-25",
+    "startTime": "17:00",
+    "endTime": "19:00",
+    "location": "Wesfarmers Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid25",
+    "title": "Data Structures and Algorithms",
+    "subject_code": "CITS2200",
+    "date": "2026-04-29",
+    "startTime": "17:00",
+    "endTime": "19:00",
+    "location": "Wesfarmers Lecture Theatre",
+    "color": "blue"
+  },
+  {
+    "id": "uid26",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-03-05",
+    "startTime": "12:00",
+    "endTime": "14:00",
+    "location": "Fay Gale Studio",
+    "color": "green"
+  },
+  {
+    "id": "uid27",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-03-26",
+    "startTime": "12:00",
+    "endTime": "14:00",
+    "location": "Fay Gale Studio",
+    "color": "green"
+  },
+  {
+    "id": "uid28",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-04-23",
+    "startTime": "12:00",
+    "endTime": "14:00",
+    "location": "Fay Gale Studio",
+    "color": "green"
+  },
+  {
+    "id": "uid29",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-02-27",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid30",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-03-06",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid31",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-03-13",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid32",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-03-20",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid33",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-03-27",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid34",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-04-03",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid35",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-04-17",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid36",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-04-24",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid37",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-05-01",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid38",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-05-08",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid39",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-05-15",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid40",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-05-22",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid41",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-02-25",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid42",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-03-04",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid43",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-03-11",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid44",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-03-18",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid45",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-03-25",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid46",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-04-01",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid47",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-04-15",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid48",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-04-22",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid49",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-04-29",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid50",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-05-06",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid51",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-05-13",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid52",
+    "title": "Agile Web Development",
+    "subject_code": "CITS3403",
+    "date": "2026-05-20",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Lecture recording available if unable to attend.",
+    "color": "green"
+  },
+  {
+    "id": "uid53",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-02-25",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "location": "Fox Lecture Hall",
+    "color": "amber"
+  },
+  {
+    "id": "uid54",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-03-04",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "location": "Fox Lecture Hall",
+    "color": "amber"
+  },
+  {
+    "id": "uid55",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-03-11",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "location": "Fox Lecture Hall",
+    "color": "amber"
+  },
+  {
+    "id": "uid56",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-03-18",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "location": "Fox Lecture Hall",
+    "color": "amber"
+  },
+  {
+    "id": "uid57",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-03-25",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "location": "Fox Lecture Hall",
+    "color": "amber"
+  },
+  {
+    "id": "uid58",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-04-01",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "location": "Fox Lecture Hall",
+    "color": "amber"
+  },
+  {
+    "id": "uid59",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-04-15",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "location": "Fox Lecture Hall",
+    "color": "amber"
+  },
+  {
+    "id": "uid60",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-04-22",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "location": "Fox Lecture Hall",
+    "color": "amber"
+  },
+  {
+    "id": "uid61",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-04-29",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "location": "Fox Lecture Hall",
+    "color": "amber"
+  },
+  {
+    "id": "uid62",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-05-06",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "location": "Fox Lecture Hall",
+    "color": "amber"
+  },
+  {
+    "id": "uid63",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-05-13",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "location": "Fox Lecture Hall",
+    "color": "amber"
+  },
+  {
+    "id": "uid64",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-05-20",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "location": "Fox Lecture Hall",
+    "color": "amber"
+  },
+  {
+    "id": "uid65",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-02-23",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Webb Lecture Theatre",
+    "color": "amber"
+  },
+  {
+    "id": "uid66",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-03-02",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Webb Lecture Theatre",
+    "color": "amber"
+  },
+  {
+    "id": "uid67",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-03-09",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Webb Lecture Theatre",
+    "color": "amber"
+  },
+  {
+    "id": "uid68",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-03-16",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Webb Lecture Theatre",
+    "color": "amber"
+  },
+  {
+    "id": "uid69",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-03-23",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Webb Lecture Theatre",
+    "color": "amber"
+  },
+  {
+    "id": "uid70",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-03-30",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Webb Lecture Theatre",
+    "color": "amber"
+  },
+  {
+    "id": "uid71",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-04-13",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Webb Lecture Theatre",
+    "color": "amber"
+  },
+  {
+    "id": "uid72",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-04-20",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Webb Lecture Theatre",
+    "color": "amber"
+  },
+  {
+    "id": "uid73",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-04-27",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Webb Lecture Theatre",
+    "color": "amber"
+  },
+  {
+    "id": "uid74",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-05-04",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Webb Lecture Theatre",
+    "color": "amber"
+  },
+  {
+    "id": "uid75",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-05-11",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Webb Lecture Theatre",
+    "color": "amber"
+  },
+  {
+    "id": "uid76",
+    "title": "Moral Theory",
+    "subject_code": "PHIL3003",
+    "date": "2026-05-18",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Webb Lecture Theatre",
+    "color": "amber"
+  },
+  {
+    "id": "uid77",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-02-23",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid78",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-02",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid79",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-09",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid80",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-16",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid81",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-23",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid82",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-30",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid83",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-04-13",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid84",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-04-20",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid85",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-04-27",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid86",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-05-04",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid87",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-05-11",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid88",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-05-18",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid89",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-02-24",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid90",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-03",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid91",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-10",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid92",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-17",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid93",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-24",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid94",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-31",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid95",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-04-14",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid96",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-04-21",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid97",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-04-28",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid98",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-05-05",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid99",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-05-12",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid100",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-05-19",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid101",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-02-24",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid102",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-03",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid103",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-10",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid104",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-17",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid105",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-24",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid106",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-03-31",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid107",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-04-14",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid108",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-04-21",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid109",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-04-28",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid110",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-05-05",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid111",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-05-12",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  },
+  {
+    "id": "uid112",
+    "title": "Continental Philosophy: The Origin and Influence of Phenomenology",
+    "subject_code": "PHIL3005",
+    "date": "2026-05-19",
+    "startTime": "16:00",
+    "endTime": "18:00",
+    "location": "Arts Lecture Room 9",
+    "color": "rose"
+  }
+]
