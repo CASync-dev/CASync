@@ -39,7 +39,7 @@ const COLOR_MAP = {
 let events = [];
 api.getEvents().then((data) => {
   events = data;
-  console.log(events);
+  // console.log(events);
   renderDesktopEvents(); // call the render function after events are loaded
 });
 // originaly this was done with a hard coded list of events in this file
@@ -87,8 +87,14 @@ function buildEventCard(event, heightPx) {
   title.textContent = event.title;
   card.appendChild(title);
 
-  // Time label — only shown if the card is tall enough to fit it
+  // Time label and Location - show only if card is big enough
   if (heightPx >= 40) {
+    // location
+    const location = document.createElement('p');
+    location.className = ` text-xs leading-tight px-1.5 text-bold ${colors.text} opacity-75`;
+    location.textContent = event.location;
+    card.appendChild(location);
+    // time label
     const time = document.createElement('p');
     time.className = `text-xs leading-tight px-1.5 ${colors.text} opacity-75`;
     time.textContent = timeLabel;
@@ -224,6 +230,12 @@ function setCalendarDates() {
     }
   });
 }
+
+//-- Playing around with button
+const new_eventbtn = document.getElementById('new-event-btn');
+new_eventbtn.addEventListener('click', () => {
+  alert('This button will open a form to create a new event. Coming soon!');
+});
 
 // innit
 setCalendarDates();
