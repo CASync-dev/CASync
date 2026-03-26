@@ -136,7 +136,7 @@ There is of course some more files in here than that do general project stuff.
 
 # The schedule Page
 
-This is where i have started playing with the tailwind and js. I grabbed a caldner tailwind template online and stripped it down. I made sure to hold onto the look they went for for their cevent item. In the js we:
+This is where i have started playing with the tailwind and js. I grabbed a caldner tailwind template online and stripped it down. I made sure to hold onto the look they went for for their event item. In the js we:
 
 1. Import the events from the json
 
@@ -162,13 +162,13 @@ This is where i have started playing with the tailwind and js. I grabbed a caldn
 
    c) sets the height of the box based on the duration we figured out earlier
 
-   5. Then we have a big `renderDesktopEvents()` function that:
+5. Then we have a big `renderDesktopEvents()` function that:
 
-      a) creates a cell map of the grid. This gives us a nice map that is effectily {row:column = div elemnt}
+   a) creates a cell map of the grid. This gives us a nice map that is effectily {row:column = div elemnt}
 
-      b) now for each element we: 
-      	i) check if the event is in this week
+   b) now for each element we: 
+   	i) check if the event is in this week
 
-      ​	ii) if it is we determine its location based on the time and date. 
+   ​	ii) if it is we determine its location based on the time and date. 
 
-      ​	iii) Call the build event function and insert it into the right grid  
+   ​	iii) Call the build event function and insert it into the right grid  
