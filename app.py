@@ -1,8 +1,14 @@
 from flask import Flask, render_template
+from extensions import db
+from models import User, Event
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+db.init_app(app)
+with app.app_context():
+    db.create_all()
 
-
+# Page routes
 @app.route("/")
 def index():
     return render_template("dash.html")
@@ -29,6 +35,12 @@ def friends():
 @app.route("/settings")
 def settings():
     return render_template("settings.html")
+
+# Error handling
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("errors/404.html"), 404
+
 
 
 if __name__ == "__main__":

@@ -49,3 +49,13 @@ Use the planning dir for plans
 
    The app will be available at `http://localhost:8080`.
 
+## How the Site Works
+
+Initially we started with a janky raw js page laoding solution but we are now using a flask setup closer to how the production site will run. 
+
+### The Structure:
+
+```txt
+
+```
+
