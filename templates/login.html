@@ -15,39 +15,39 @@
         Log In - CASync
     </title>
 </head>
-<header>
-    <div class = "mx-auto">
-        <br>
-        <br>
-        <br>
-        <a href="./homepage.html"> 
-        <h1 class = "flex items-center justify-center text-center text-4xl py-4 px-5"> CA<strong>Sync</strong> </h1>
-        </a>
-        <br>
-        <br>
-        <br>
-    </div>
-</header>
-<body class="antialiased mx-auto bg-white items-center text-center">
-    <div>
+<body>
+    <br>
+    <div class="antialiased mx-auto bg-white flex items-center justify-center text-center">
         <form name = "login" novalidate = "novalidate" onsubmit = "return loginImplementation()" method="post">
             <div>
-                <label for = "user">Username:</label>
+                <br>
+                <br>
+                <br>
+                <a href="./homepage.html"> 
+                <h1 class = "items-center justify-center text-center text-4xl py-4 px-5"> CA<strong>Sync</strong> </h1>
+                </a>
+                <br>
+                <br>
+                <br>
+            </div>
+            <div>
+                <label for = "user" class = "text-left">Username:</label> <br>
                 <input id = "user" name="user" type="text" autocomplete="username" aria-required="true" 
-                    aria-invalid="false" autofocus = "autofocus" size="30" name="user">
+                    aria-invalid="false" autofocus = "autofocus" size="30" name="user" class = "border">
                 <br>
                 <br>
                 <br>
-                <label for = "pw">Password:</label>
+                <label for = "pw" class = "text-left">Password:</label> <br>
                 <input id="pw" name = "pw" type = "password" autocomplete="current-password" 
-                    aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw" required>
+                    aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw" required class = "border">
+                <br>
                 <br>
                 <input type = "checkbox" id = "rme" name = "rme">
                 <label for="rme"> Remember me </label>
+                
                 <br>
                 <br>
-                <br>
-                <input id = "log" type = "submit" class = "button" value = "Log In">
+                <input id = "log" type = "submit" class = "button cursor-pointer text-4xl lg:text-5xl bg-fuchsia-900 text-white font-bold rounded-lg p-4 hover:bg-fuchsia-950" value = "Log In">
                 
             </div>
         </form>
