@@ -1,3 +1,6 @@
+// Right now the submit detection is implemented directly in the HTML, since authentication has not be implemented
+// This will change when we figure authentication out! :)
+
 function loginImplementation() {
     let user = document.forms["login"]["user"].value;
     let pw = document.forms["login"]["pw"].value;
