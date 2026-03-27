@@ -10,3 +10,5 @@ Includes currently:
 
 
 This note will be deleted prior to pull req/possible merging.
+
+Update: Updated files to HEAD to allow for seemless merging in the near future
