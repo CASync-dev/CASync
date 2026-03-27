@@ -1,3 +1,5 @@
+// Right now the submit detection is implemented directly in the HTML, since authentication has not be implemented
+// This will change when we figure authentication out! :)
 function regValidation() {
     let mail = document.forms["register"]["mail"].value;
     let user = document.forms["register"]["user"].value;
