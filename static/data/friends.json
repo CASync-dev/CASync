@@ -1,0 +1,68 @@
+[
+  {
+    "id": "user-002",
+    "username": "alice",
+    "email": "alice@student.uwa.edu.au",
+    "status": "at_uni",
+    "events": [
+      {
+        "id": "alice-evt-1",
+        "title": "Data Structures and Algorithms",
+        "subject_code": "CITS2200",
+        "date": "2026-02-27",
+        "startTime": "11:00",
+        "endTime": "13:00",
+        "location": "Ross Lecture Theatre",
+        "color": "blue"
+      },
+      {
+        "id": "alice-evt-2",
+        "title": "Agile Web Development",
+        "subject_code": "CITS3403",
+        "date": "2026-02-25",
+        "startTime": "16:00",
+        "endTime": "18:00",
+        "location": "CSSE Seminar Room",
+        "color": "green"
+      },
+      {
+        "id": "alice-evt-3",
+        "title": "Software Engineering",
+        "subject_code": "CITS3200",
+        "date": "2026-02-26",
+        "startTime": "09:00",
+        "endTime": "11:00",
+        "location": "Reid Library Building",
+        "color": "indigo"
+      }
+    ]
+  },
+  {
+    "id": "user-003",
+    "username": "bob",
+    "email": "bob@student.uwa.edu.au",
+    "status": "free",
+    "events": [
+      {
+        "id": "bob-evt-1",
+        "title": "Agile Web Development",
+        "subject_code": "CITS3403",
+        "date": "2026-02-25",
+        "startTime": "16:00",
+        "endTime": "18:00",
+        "location": "CSSE Seminar Room",
+        "color": "green"
+      },
+      {
+        "id": "bob-evt-2",
+        "title": "Computer Networks",
+        "subject_code": "CITS3002",
+        "date": "2026-02-27",
+        "startTime": "14:00",
+        "endTime": "16:00",
+        "location": "Engineering Building",
+        "color": "amber"
+      }
+    ]
+  }
+]
