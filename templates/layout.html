@@ -73,20 +73,17 @@
             <i class="fas fa-solid fa-user-group w-5 mr-3"></i>
             <span class="font-medium">Friends</span>
           </a>
-
-          <div class="pt-4 mt-4 border-t border-gray-200">
-            <a
-              href="{{ url_for('settings') }}"
-              class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'settings' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
-            >
-              <i class="fas fa-gear w-5 mr-3"></i>
-              <span class="font-medium">Settings</span>
-            </a>
-          </div>
         </nav>
-
-        <!-- Logout at bottom -->
-        <div class="p-4 border-t border-gray-200">
+        
+        <!-- Settings and Logout -->
+        <div class="space-y-2 px-4 py-4 border-t border-gray-200">
+          <a
+            href="{{ url_for('settings') }}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'settings' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+          >
+            <i class="fas fa-gear w-5 mr-3"></i>
+            <span class="font-medium">Settings</span>
+          </a>
           <a
             href="/login"
             class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-red-50 hover:text-red-600 transition group"
