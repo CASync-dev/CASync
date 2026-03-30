@@ -52,6 +52,22 @@
 
         <!-- Navigation Links -->
         <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+          <!-- Not Authed -->
+          <a
+            href="{{ url_for('home') }}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'dash' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+          >
+            <i class="fas fa-regular fa-house w-5 mr-3"></i>
+            <span class="font-medium">Home</span>
+          </a>
+          <a
+            href="{{ url_for('faq') }}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'faq' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+          >
+            <i class="fas fa-solid fa-circle-question w-5 mr-3"></i>
+            <span class="font-medium">FAQ</span>
+          </a>
+          <!-- Authed -->
           <a
             href="{{ url_for('dash') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'dash' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
@@ -81,14 +97,9 @@
             <span class="font-medium">Friends</span>
           </a>
 
+          <!-- Authentication Links/ settings -->
           <div class="pt-4 mt-4 border-t border-gray-200">
-            <a
-              href="{{ url_for('settings') }}"
-              class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'settings' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
-            >
-              <i class="fas fa-gear w-5 mr-3"></i>
-              <span class="font-medium">Settings</span>
-            </a>
+            <!-- Not Authenticated -->
             <a
               href="{{ url_for('register') }}"
               class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'register' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
@@ -102,6 +113,15 @@
             >
               <i class="fa-solid fa-user mr-3"></i>
               <span class="font-medium">Login</span>
+            </a>
+
+            <!-- authenticated -->
+            <a
+              href="{{ url_for('settings') }}"
+              class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'settings' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+            >
+              <i class="fas fa-gear w-5 mr-3"></i>
+              <span class="font-medium">Settings</span>
             </a>
           </div>
         </nav>
