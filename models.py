@@ -16,6 +16,8 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
+    # _repr__ is a special Python method that defines the string representation of an object, used for debugging.
+    # When you call repr(obj) or view an object in a Python shell/debugger, Python calls __repr__ to get a readable description.
 
 
 class Event(db.Model):
@@ -23,25 +25,41 @@ class Event(db.Model):
 
     id           = db.Column(db.Integer, primary_key=True)
     title        = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
     date         = db.Column(db.Date, nullable=False)
     start_time   = db.Column(db.Time, nullable=False)
     end_time     = db.Column(db.Time, nullable=False)
     location     = db.Column(db.String(200))                          # optional
     color        = db.Column(db.String(20), default='indigo')         # optional, falls back to indigo
     user_id      = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # links this event to its owner
+    ical_uid    = db.Column(db.String(200))                          # links event to its ical source. Optional since not all events will come from iCal feeds
 
     # Serialises the object to a plain dict — useful for returning JSON from a route
     # Note: date and time are converted to strings since JSON can't handle Python date/time objects
     def to_dict(self):
         return {
             'id':        self.id,
+            'user_id':   self.user_id,
             'title':     self.title,
+            'description': self.description,
             'date':      self.date.isoformat(),
             'startTime': self.start_time.strftime('%H:%M'),
             'endTime':   self.end_time.strftime('%H:%M'),
             'location':  self.location,
             'color':     self.color,
+            'ical_uid':  self.ical_uid,
         }
 
     def __repr__(self):
         return f'<Event {self.title} on {self.date}>'
+
+class Calendar(db.Model):
+    __tablename__ = 'calendars'
+
+    id         = db.Column(db.Integer, primary_key=True)
+    user_id    = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # links this calendar to its owner
+    ical_url   = db.Column(db.String(500), nullable=False)  # URL of the iCal feed
+    synced_at  = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))  # when this calendar was last synced
+
+    def __repr__(self):
+        return f'<Calendar {self.ical_url}>'
