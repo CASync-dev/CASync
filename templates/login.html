@@ -61,18 +61,22 @@
 
       <br />
       <br />
-      <input
+      <button
         id="log"
         type="submit"
         class="button cursor-pointer text-4xl lg:text-5xl bg-fuchsia-900 text-white font-bold rounded-lg p-4 hover:bg-fuchsia-950"
-        value="Log In"
-      />
+      >
+        Log In
+      </button>
 
       <br />
-      <h5 class="size-1">
-        Not a member yet? Register <a href="/register"> here. </a>
+      <h5 class="">
+        Not a member yet? Register
+        <a href="/register" class="underline"> here. </a>
       </h5>
     </div>
   </form>
 </div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
 {% endblock %}
