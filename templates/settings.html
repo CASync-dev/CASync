@@ -1,6 +1,49 @@
-{% extends "layout.html" %}
-{% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <h1 class="text-3xl font-bold text-gray-900">This is settings page</h1>
+{% extends "layout.html" %} {% block content %}
+<div class="max-w-2xl mx-auto p-8">
+  <h1 class="text-2xl font-bold text-gray-900 mb-8">Settings</h1>
+
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-800 mb-1">Import iCal</h2>
+    <p class="text-sm text-gray-500 mb-3">
+      Paste your iCal feed URL to import events.
+    </p>
+    <div class="flex gap-2">
+      <input
+        type="url"
+        id="ical_url"
+        placeholder="https://..."
+        class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+        onclick="importICal()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700"
+      >
+        Import
+      </button>
+    </div>
+    <p id="ical-message" class="mt-2 text-sm hidden"></p>
+  </section>
 </div>
+
+<script>
+  async function importICal() {
+    const msgEl = document.getElementById('ical-message');
+    const { id: user_id } = await (await fetch('/api/user')).json();
+    const res = await fetch('/api/import-ical', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: document.getElementById('ical_url').value,
+        user_id,
+      }),
+    });
+    const data = await res.json();
+    msgEl.className =
+      'mt-2 text-sm ' + (res.ok ? 'text-green-600' : 'text-red-600');
+    msgEl.textContent = res.ok
+      ? 'Import successful!'
+      : 'Error: ' + (data.error || 'Unknown error');
+    msgEl.classList.remove('hidden');
+  }
+</script>
 {% endblock %}
