@@ -1,60 +1,78 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <!-- TODO: Redesign, JS functionability-->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="../static/css/output.css" rel = "stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <script src = "../static/js/login.js"> </script>
+{% extends "layout.html" %} {% block content %}
 
-
-    <title>
-        Log In - CASync
-    </title>
-</head>
-<body>
-    <br>
-    <div class="antialiased mx-auto bg-white flex items-center justify-center text-center">
-        <form name = "login" novalidate = "novalidate" onsubmit = "return loginImplementation()" method="post">
-            <div>
-                <br>
-                <br>
-                <br>
-                <a href="/home"> 
-                <h1 class = "items-center justify-center text-center text-4xl py-4 px-5"> CA<strong>Sync</strong> </h1>
-                </a>
-                <br>
-                <br>
-                <br>
-            </div>
-            <div>
-                <label for = "user" class = "text-left">Username:</label> <br>
-                <input id = "user" name="user" type="text" autocomplete="username" aria-required="true" 
-                    aria-invalid="false" autofocus = "autofocus" size="30" name="user" class = "border">
-                <br>
-                <br>
-                <br>
-                <label for = "pw" class = "text-left">Password:</label> <br>
-                <input id="pw" name = "pw" type = "password" autocomplete="current-password" 
-                    aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw" required class = "border">
-                <br>
-                <br>
-                <input type = "checkbox" id = "rme" name = "rme">
-                <label for="rme"> Remember me </label>
-                
-                <br>
-                <br>
-                <input id = "log" type = "submit" class = "button cursor-pointer text-4xl lg:text-5xl bg-fuchsia-900 text-white font-bold rounded-lg p-4 hover:bg-fuchsia-950" value = "Log In">
-                
-                <br>
-                <h5 class = "size-1"> Not a member yet? Register <a href = "/register"> here. </a></h5>
-            </div>
-        </form>
+<br />
+<div
+  class="antialiased mx-auto bg-white flex items-center justify-center text-center"
+>
+  <form
+    name="login"
+    novalidate="novalidate"
+    onsubmit="return loginImplementation();"
+    method="post"
+  >
+    <div>
+      <br />
+      <br />
+      <br />
+      <a href="/home">
+        <h1 class="items-center justify-center text-center text-4xl py-4 px-5">
+          CA<strong>Sync</strong>
+        </h1>
+      </a>
+      <br />
+      <br />
+      <br />
     </div>
-</body>
-</html>
+    <div>
+      <label for="user" class="text-left">Username:</label> <br />
+      <input
+        id="user"
+        name="user"
+        type="text"
+        autocomplete="username"
+        aria-required="true"
+        aria-invalid="false"
+        autofocus="autofocus"
+        size="30"
+        name="user"
+        class="border"
+      />
+      <br />
+      <br />
+      <br />
+      <label for="pw" class="text-left">Password:</label> <br />
+      <input
+        id="pw"
+        name="pw"
+        type="password"
+        autocomplete="current-password"
+        aria-required="true"
+        aria-invalid="false"
+        autofocus="autofocus"
+        size="30"
+        name="pw"
+        required
+        class="border"
+      />
+      <br />
+      <br />
+      <input type="checkbox" id="rme" name="rme" />
+      <label for="rme"> Remember me </label>
 
+      <br />
+      <br />
+      <input
+        id="log"
+        type="submit"
+        class="button cursor-pointer text-4xl lg:text-5xl bg-fuchsia-900 text-white font-bold rounded-lg p-4 hover:bg-fuchsia-950"
+        value="Log In"
+      />
 
+      <br />
+      <h5 class="size-1">
+        Not a member yet? Register <a href="/register"> here. </a>
+      </h5>
+    </div>
+  </form>
+</div>
+{% endblock %}
