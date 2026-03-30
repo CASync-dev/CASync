@@ -37,7 +37,7 @@ def friends():
 def settings():
     return render_template("settings.html")
 
-# API routes - at the moment they retrun json responses but thats not long term
+# API routes - at the moment they return json responses but thats not long term
 @app.route("/api/events")
 def api_events():
     events = Event.query.all()
