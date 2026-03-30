@@ -37,6 +37,24 @@ def friends():
 def settings():
     return render_template("settings.html")
 
+# Login, register, homepage and faq currently have a different style from the other webpages.
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+@app.route("/register")
+def register():
+    return render_template("register.html")
+
+@app.route("/home")
+def home():
+    return render_template("homepage.html")
+
+@app.route("/faq")
+def faq():
+    return render_template("faq.html")
+
+
 # API routes - at the moment they return json responses but thats not long term
 @app.route("/api/events")
 def api_events():
