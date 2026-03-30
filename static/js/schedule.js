@@ -67,7 +67,7 @@ function formatTime(timeStr) {
 // The card is positioned absolutely inside its host cell and sized to span
 // the correct number of rows based on the event duration.
 function buildEventCard(event, heightPx) {
-  const colors = COLOR_MAP[event.color] || COLOR_MAP.indigo; // default to indigo if color not found
+  const colors = COLOR_MAP[event.color] || COLOR_MAP.indigo; // TODO: should color items dyanimcly based on matching title
   const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`; // e.g. "9:00 am – 10:30 am"
 
   // The card sits inside the grid cell using absolute positioning.
