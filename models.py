@@ -32,7 +32,8 @@ class Event(db.Model):
     location     = db.Column(db.String(200))                          # optional
     color        = db.Column(db.String(20), default='indigo')         # optional, falls back to indigo
     user_id      = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # links this event to its owner
-    ical_uid    = db.Column(db.String(200))                          # links event to its ical source. Optional since not all events will come from iCal feeds
+    ical_uid    = db.Column(db.String(200))   # is the uid of the event in the ical
+    ical_id    = db.Column(db.Integer, db.ForeignKey('calendars.id'))   # is the id of the calendar in the ical, we can use this to link events to a calendar and update them later if needed
 
     # Serialises the object to a plain dict — useful for returning JSON from a route
     # Note: date and time are converted to strings since JSON can't handle Python date/time objects
@@ -48,6 +49,7 @@ class Event(db.Model):
             'location':  self.location,
             'color':     self.color,
             'ical_uid':  self.ical_uid,
+            'ical_id':   self.ical_id,
         }
 
     def __repr__(self):
