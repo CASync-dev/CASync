@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block content %}
+    <br>
+    <div class="antialiased mx-auto bg-white flex items-center justify-center text-center">
+        <form name = "register" novalidate = "novalidate" onsubmit = "return regValidation()" method = "post">
+            <div>
+                <br>
+                <a href="/home"> 
+                <h1 class = "items-center justify-center text-center text-4xl py-4 px-5"> CA<strong>Sync</strong> </h1>
+                </a>
+                <br>
+                
+            </div>
+            <legend> <h3 class = "flex items-center justify-center text-center text-3xl py-4 px-5"> Register </h1> </legend>
+            <br>
+            <div>
+                <label for="email" class = "text-left"> Email: </label> <br>
+                <input name = "mail" id="email" type="email" autocomplete="email" aria-required="true" 
+                        aria-invalid="false" autofocus = "autofocus" size="30" name="email" class = "border">
+                <br>
+                <br>
+                <label for = "user" class = "text-left"> Username: </label> <br>
+                <input name = "user" id="user" type="text" autocomplete="username" aria-required="true" 
+                        aria-invalid="false" autofocus = "autofocus" size="30" name="user" class = "border">
+                <br>
+                <br>
+                
+                <label for="pw1" class = "text-left"> Password: </label> <br>
+                <input name = "pw1" id="pw1" type = "password" autocomplete="current-password" 
+                    aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw1" class = "border">                
+                <br>
+                <br>
+                    <label for="pw2" class = "text-left"> Reenter Password: </label> <br>
+                <input name = "pw2" id="pw" type = "password" autocomplete="current-password"  
+                    aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw" class = "border">
+                <br>
+                <br>
+                <input type = "checkbox" id = "rme" name = "rme">
+                <label for="rme"> Remember me </label>
+                <br>
+                <br>
+                <br>
+                <input id = "reg" type = "submit" class = "button cursor-pointer text-4xl lg:text-5xl bg-fuchsia-900 text-white font-bold rounded-lg p-4 hover:bg-fuchsia-950" value = "Register">
+
+                <br>
+                <h5 class = "size-1"> Already registered? Login <a href = "/login"> here. </a></h5>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/register.js') }}"></script>
+{% endblock %}
