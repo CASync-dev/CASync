@@ -62,8 +62,6 @@ def store_ical_url(url):
         db.session.add(calendar)
         has_calendar = False
     db.session.commit()
-    global calendar_id
-    calendar_id = calendar.id
     return has_calendar  # no error
 
 
@@ -225,7 +223,7 @@ def import_ical(url):
         return None, "No valid events could be parsed from the iCal feed."
 
     # 4. Save to the database
-    if has_calendar:
+    if has_calendar:  # if the user already had a calendar, we update existing events instead of creating new ones
         try:
             created_count, updated_count = update_events_in_db(parsed_events)
         except Exception as e:
