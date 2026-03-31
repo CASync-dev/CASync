@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify
+from flask_migrate import Migrate, upgrade
 from extensions import db
 from models import User, Event
 
@@ -6,8 +7,11 @@ app = Flask(__name__)
 # Configure the database URI and initialize the database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 db.init_app(app)
+migrate = Migrate(app, db)
+# Run the initial migration to create the database schema
 with app.app_context():
-    db.create_all()
+    upgrade()
+
 
 # Page routes
 @app.route("/")
