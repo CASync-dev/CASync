@@ -165,6 +165,34 @@ Each `db.Column` is a column in the table. The type (`Integer`, `String`, `DateT
 
 The `events` relationship is not a real column, it's a virtual link so you can do `user.events` to get all events for that user. `backref='owner'` means you can also go the other way: `event.owner` gives you the user. `lazy='dynamic'` means it returns a query object rather than loading everything immediately.
 
+## Migrations
+
+If you havnt run into migratione before, the quick summary is databses can get messy if you are jumping through branhces with different versions that have made alterations or removed thigns to the db schema. So migrations are like stepped through actions to get though to a certain state of the db. So if you started with what he had now, added a whole bunch off stuff, the migration would update the db. 
+
+The book wants us to use a more scirpt based migration method with the command `MigrateCommand`, but this was made obsolute. Now the aproach is to use the flask cli. 
+
+The process:
+```bash
+flask db init # initiliase the migration system
+flask db migrate -m "inital migration" # do the frist migration
+flask db upgrade # run the migration
+```
+
+So the flow from here will be:
+1. When you change a model (add a column, new table, etc.)
+```
+flask db migrate -m "describe what changed"
+```
+This auto-generates a new file in migrations/versions/. Its a good idea to review it to make sure it looks right.
+2. Apply the migration to the database
+```
+flask db upgrade
+```
+3. If you need to undo the last migration
+```
+flask db downgrade
+```
+
 ### API Routes
 
 *This is all a little janky right now, but it works and will be properly done later*
