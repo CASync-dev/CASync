@@ -120,7 +120,7 @@ layout.html -> schedule.html -> schedule.js
 
 This means all the js is attached directly to its accompanying html. Good for organisation and clarity. 
 
-## The Api
+## The Api / DB
 
 We use SQLite + SQLAlchemy for data storage, with Flask routes that return JSON to the frontend. `api.js` in `static/js` is a thin wrapper that the page scripts call — it just fetches from the Flask routes and returns the parsed JSON.
 
@@ -165,7 +165,7 @@ Each `db.Column` is a column in the table. The type (`Integer`, `String`, `DateT
 
 The `events` relationship is not a real column, it's a virtual link so you can do `user.events` to get all events for that user. `backref='owner'` means you can also go the other way: `event.owner` gives you the user. `lazy='dynamic'` means it returns a query object rather than loading everything immediately.
 
-## Migrations
+### Migrations
 
 If you havnt run into migratione before, the quick summary is databses can get messy if you are jumping through branhces with different versions that have made alterations or removed thigns to the db schema. So migrations are like stepped through actions to get though to a certain state of the db. So if you started with what he had now, added a whole bunch off stuff, the migration would update the db. 
 
@@ -192,10 +192,6 @@ flask db upgrade
 ```
 flask db downgrade
 ```
-
-**Please double check your migrations!**
-
-Flask migrate doesnt detect *every* change so its important to make sure something you changed is presant in the migrations. Otherwise things break quick.
 
 ### API Routes
 
@@ -253,6 +249,97 @@ if User.query.first():
     exit()
 ```
 
+## Testing
+
+### Setup
+
+The testing philsophy is defined well in the book in chapters 7 and 15. They reccomend using unittest. I like running the tests with pytest as it has a colored output :D. So we write the test in the unites style and run them with either.
+
+The app build has all been put into one function: `create_app()`. This funciton is handed a dev enviroment with different configs. 
+
+```python
+config = {
+    'development': DevelopmentConfig,
+    'production': ProductionConfig,
+    'testing': TestingConfig,
+    'default': DevelopmentConfig,
+}
+```
+
+These config options let us change things based on what the app is doing. The testing config is revent to us with the following parameter:
+
+```python
+class TestingConfig:
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+```
+
+We set the db to be temproary so we can run a bunch of test without messing up the dev db and so they run indepdnently.
+
+### Writing Tests
+
+Tests are written in python files in the tests directory
+
+```python
+tests/
+├── __init__.py # empyt, makes this dir a module
+├── __pycache__ # py env stuff
+│   ├── __init__.cpython-314.pyc
+│   ├── test_models.cpython-314-pytest-9.0.2.pyc
+│   └── test_models.cpython-314.pyc
+└── test_models.py # A test for the models
+```
+
+Its best to organise them. All the individual tests for db models go into the test_mdoels.py. All test files should start with test_.
+
+When wirting a test it must have at least the following:
+
+```python
+# dependencies: things you will import
+from app import create_app
+from models import User, Calendar, Event
+from extensions import db
+from datetime import date, time
+import unittest
+
+# Initialise a testing version of the app with the testing config
+app = create_app('testing')
+
+# A class for the model test (where all the individual tests will live)
+class ModelTestCase(unittest.TestCase):
+  # A set up function: This runs before each test
+    def setUp(self):
+        self.app = app
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        db.create_all()
+# A tear down function: This runs after each test
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+        
+# each test is then a class function:
+def test_user_creation(self):
+        # Create a user and verify it was saved correctly
+        user = User(username='testuser', email='test@example.com')
+        db.session.add(user)
+        db.session.commit()
+        self.assertEqual(User.query.count(), 1)
+        fetched = User.query.first()
+        # Verify the fields were saved correctly
+        self.assertEqual(fetched.username, 'testuser')
+        self.assertEqual(fetched.email, 'test@example.com')
+        self.assertIsNotNone(fetched.created_at)
+
+
+```
+
+It is pretty labourous to write a test for everything but im sure you see the value. We test what and input should be and what an output should be. This way when you change something else, you wont have 'regression'. Where new changes break older functionality. 
+
+For example if i change the suers table, my user model test wil lcatch anything that broke
+
 # Features
 
 ## Schedule Page
@@ -293,26 +380,3 @@ This is where i have started playing with the tailwind and js. I grabbed a caldn
    ​	ii) if it is we determine its location based on the time and date. 
 
    ​	iii) Call the build event function and insert it into the right grid  
-
-## ical Imports
-
-In `app.py` we register an endpoint called `/api/import-ical`. It expects a post request with json body content:
-
-```json
-{ "url": "<ical feed url>", "user_id": <user id> }
-```
-
-So the settings page takes the ical, and submits it to that endpoint. For now, it doenst do anything with user id as there is no auth as of time of writing. 
-
-The api endpoint passes the json to a seperate file `services/ical.py` to run the `import_ical()` function. This funcniton does 4 things:
-
-1. Validate the URL
-2. Fetch and parse the iCal feed
-3. Convert each event to our format
-4. Saves everything to the database 
-
-It returns a tuple: (result, error)
-
-- On success: `({'imported': <count>}, None)`
-- On failure:` (None, '<error message>')`
-

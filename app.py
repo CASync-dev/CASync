@@ -1,3 +1,5 @@
+import unittest
+
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from flask_migrate import Migrate, upgrade
 from extensions import db
@@ -5,7 +7,7 @@ from models import Calendar, User, Event
 from services.ical import import_ical
 from config import config
 
-# Factory function to create the Flask app with the appropriate configuration
+# This is the Factory function to create the Flask app with the appropriate configuration
 # Config can be set via the FLASK_CONFIG environment variable (e.g. "development", "production", "testing")
 # Configs are defined in config.py and include database settings, secret keys, etc.
 def create_app(config_name='default'):
@@ -15,9 +17,10 @@ def create_app(config_name='default'):
     #Initialize the database and migration extensions
     db.init_app(app)
     migrate = Migrate(app, db)
-    # Run database migrations on startup 
-    with app.app_context():
-        upgrade()
+    # Run database migrations on startup (skipped in testing: setUp uses db.create_all() instead)
+    if not app.config.get('TESTING'):
+        with app.app_context():
+            upgrade()
 
     # --- Session login logic | will be replaced with real auth later
     # for now we just use a simple session flag to simulate login/logout
