@@ -124,7 +124,7 @@ def parse_ical_event(component):
         "end_time":    end_time,
         "location":    str(component.get("LOCATION", "")) or None,
         "ical_uid":    str(component.get("UID", "")),
-        "ical_id":    calendar_id,  # link to the calendar this event came from
+        "ical_id":    Calendar.query.filter_by(user_id=user_id).first().id,  # link to the calendar this event came from
     }
 
 
