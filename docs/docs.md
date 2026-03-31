@@ -193,6 +193,10 @@ flask db upgrade
 flask db downgrade
 ```
 
+**Please double check your migrations!**
+
+Flask migrate doesnt detect *every* change so its important to make sure something you changed is presant in the migrations. Otherwise things break quick.
+
 ### API Routes
 
 *This is all a little janky right now, but it works and will be properly done later*
