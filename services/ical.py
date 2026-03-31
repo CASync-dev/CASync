@@ -1,25 +1,43 @@
 import requests
 from datetime import datetime, time
 from icalendar import Calendar as ICalendar
+import ipaddress, socket
+from urllib.parse import urlparse
 
 from extensions import db
 from models import Event
 
-
+#sanitise input and check that the URL is safe to fetch from.
+# prefevent ssrf attack : no funky ip stuff
+def _is_safe_url(url):
+    parsed = urlparse(url)
+    hostname = parsed.hostname
+    if not hostname:
+        return False
+    try:
+        ip = ipaddress.ip_address(socket.gethostbyname(hostname))
+        return ip.is_global and not ip.is_loopback and not ip.is_private
+    except (socket.gaierror, ValueError):
+        return False
+    
 # Validate the URL before doing anything
 
 def validate_url(url):
     """
-    Check that the URL is a non-empty string that starts with http or https.
+    Check that the URL is a non-empty string that starts with https://.
     Returns an error string if invalid, or None if the URL looks fine.
     """
     # Basic validation — we could be more strict 
     if not url or not isinstance(url, str):
         return "A URL is required."
 
-    # Must start with http:// or https://
-    if not url.startswith("http://") and not url.startswith("https://"):
-        return "URL must start with http:// or https://"
+    # Must start with https://
+    if not url.startswith("https://"):
+        return "URL must start with https://"
+
+    # Check if the URL is safe
+    if not _is_safe_url(url):
+        return "URL is not safe."
 
     return None  # no error
 
@@ -31,10 +49,15 @@ def fetch_ical_events(url):
     Download the iCal feed from the given URL and return a list of VEVENT components.
     Raises an exception if the request fails or the content cannot be parsed.
     """
+    # max size
+    MAX_BYTES = 10 * 1024 * 1024  # 10 MB can fit something like ~5,000–20,000 events.
     # Use requests to fetch the content. We set a timeout
     response = requests.get(url, timeout=10)
     # Check for HTTP errors
-    response.raise_for_status() 
+    response.raise_for_status()
+    # content too big
+    if response.headers.get('Content-Length') and int(response.headers['Content-Length']) > MAX_BYTES:
+        raise ValueError("The iCal feed is too large to process.")
     # Parse the iCal content using icalendar. This will give us a Calendar object with all the components.
     calendar = ICalendar.from_ical(response.content)
 
