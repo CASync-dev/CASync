@@ -16,6 +16,13 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
+    <!-- Google Fonts - from Sze-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Additional CSS goes here-->
   </head>
@@ -45,6 +52,25 @@
 
         <!-- Navigation Links -->
         <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+          <!-- Not Authed -->
+          {% if not logged_in %}
+          <a
+            href="{{ url_for('home') }}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'dash' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+          >
+            <i class="fas fa-regular fa-house w-5 mr-3"></i>
+            <span class="font-medium">Home</span>
+          </a>
+          <a
+            href="{{ url_for('faq') }}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'faq' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+          >
+            <i class="fas fa-solid fa-circle-question w-5 mr-3"></i>
+            <span class="font-medium">FAQ</span>
+          </a>
+          {% endif %}
+          <!-- Authed -->
+          {% if logged_in %}
           <a
             href="{{ url_for('dash') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'dash' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
@@ -73,25 +99,56 @@
             <i class="fas fa-solid fa-user-group w-5 mr-3"></i>
             <span class="font-medium">Friends</span>
           </a>
+          {% endif %}
+
+          <!-- Authentication Links/ settings -->
+          <div class="pt-4 mt-4 border-t border-gray-200">
+            <!-- Not Authenticated -->
+            {% if not logged_in %}
+            <a
+              href="{{ url_for('register') }}"
+              class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'register' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+            >
+              <i class="fa-regular fa-user mr-3"></i>
+              <span class="font-medium">Register</span>
+            </a>
+            <a
+              href="{{ url_for('login') }}"
+              class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'login' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+            >
+              <i class="fa-solid fa-user mr-3"></i>
+              <span class="font-medium">Login</span>
+            </a>
+            {% endif %}
+            <!-- Authed -->
+            {% if logged_in %}
+            <a
+              href="{{ url_for('settings') }}"
+              class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'settings' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+            >
+              <i class="fas fa-gear w-5 mr-3"></i>
+              <span class="font-medium">Settings</span>
+            </a>
+            {% endif %}
+          </div>
         </nav>
 
-        <!-- Settings and Logout -->
-        <div class="space-y-2 px-4 py-4 border-t border-gray-200">
+        <!-- Logout at bottom -->
+        {% if logged_in %}
+        <div class="p-4 border-t border-gray-200">
           <a
-            href="{{ url_for('settings') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'settings' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
-          >
-            <i class="fas fa-gear w-5 mr-3"></i>
-            <span class="font-medium">Settings</span>
-          </a>
-          <a
-            href="/login"
+            href="#"
+            onclick="
+              logoutImplementation();
+              return false;
+            "
             class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-red-50 hover:text-red-600 transition group"
           >
             <i class="fas fa-right-from-bracket w-5 mr-3"></i>
             <span class="font-medium">Logout</span>
           </a>
         </div>
+        {% endif %}
       </aside>
 
       <!-- Main Content Area -->
@@ -145,6 +202,10 @@
 
       sidebarClose.addEventListener('click', closeSidebar);
       sidebarOverlay.addEventListener('click', closeSidebar);
+
+      function logoutImplementation() {
+        window.location.href = '/dev/logout';
+      }
     </script>
     {% block scripts %}{% endblock %}
   </body>
