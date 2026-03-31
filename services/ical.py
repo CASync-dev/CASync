@@ -50,15 +50,21 @@ def store_ical_url(url):
     """
     Store the user's iCal feed URL in the database. This allows us to fetch and update events later.
     """
-    # Check if the user already has a calendar, for now we only support one calendar per user. If they do, update the URL. If not, create a new calendar entry.
+    # Check if the user already has a calendar, for now we only support one calendar per user. 
+    # If they do, update the URL if differnet
+    # if the url is the same, fetch the same url again but with an update
     calendar = Calendar.query.filter_by(user_id=user_id).first()
     if calendar:
         calendar.ical_url = url
+        has_calendar = True
     else:
         calendar = Calendar(user_id=user_id, ical_url=url)
         db.session.add(calendar)
+        has_calendar = False
     db.session.commit()
-    return None  # no error
+    global calendar_id
+    calendar_id = calendar.id
+    return has_calendar  # no error
 
 
 # Fetch the raw iCal data from the URL
@@ -120,6 +126,7 @@ def parse_ical_event(component):
         "end_time":    end_time,
         "location":    str(component.get("LOCATION", "")) or None,
         "ical_uid":    str(component.get("UID", "")),
+        "ical_id":    calendar_id,  # link to the calendar this event came from
     }
 
 
@@ -140,6 +147,38 @@ def save_events_to_db(parsed_events):
     db.session.commit()
     return len(parsed_events)
 
+# just update db events
+def update_events_in_db(parsed_events):
+    """
+    Update existing events in the database based on their ical_id. If an event with the same ical_id, user_id and ical_id exists, update its details. If not, create a new event.
+    Returns a tuple: (created_count, updated_count)
+    """
+    created_count = 0
+    updated_count = 0
+
+    for event_data in parsed_events:
+        existing_event = Event.query.filter_by(user_id=user_id, ical_id=event_data['ical_id'], ical_uid=event_data['ical_uid']).first()
+        if existing_event:
+            # Update the existing event's details
+            existing_event.title = event_data['title']
+            existing_event.description = event_data['description']
+            existing_event.date = event_data['date']
+            existing_event.start_time = event_data['start_time']
+            existing_event.end_time = event_data['end_time']
+            existing_event.location = event_data['location']
+            existing_event.color = event_data.get('color', 'indigo')
+            updated_count += 1
+        else:
+            # Create a new event
+            new_event = Event(user_id=user_id, **event_data)
+            db.session.add(new_event)
+            created_count += 1
+    
+    # Update the synced_at timestamp on the user's calendar
+    Calendar.query.filter_by(user_id=user_id).update({"synced_at": datetime.now()})
+
+    db.session.commit()
+    return created_count, updated_count
 
 # Main Function called by the API route
 
@@ -160,6 +199,7 @@ def import_ical(url):
     if url_error:
         return None, url_error
 
+    has_calendar = store_ical_url(url)  # store the URL and get whether it's a new calendar or an update
     # 2. Fetch iCal events from the URL
     try:
         ical_events = fetch_ical_events(url)
@@ -185,10 +225,15 @@ def import_ical(url):
         return None, "No valid events could be parsed from the iCal feed."
 
     # 4. Save to the database
-    try:
-        count = save_events_to_db(parsed_events)
-    except Exception as e:
-        return None, f"Failed to save events to the database: {e}"
-
-    # Return the count of imported events on success
-    return {"imported": count}, None
+    if has_calendar:
+        try:
+            created_count, updated_count = update_events_in_db(parsed_events)
+        except Exception as e:
+            return None, f"Failed to update events in the database: {e}"
+        return {"created": created_count, "updated": updated_count}, None
+    elif not has_calendar:
+        try:
+            count = save_events_to_db(parsed_events)
+        except Exception as e:
+            return None, f"Failed to save events to the database: {e}"
+        return {"imported": count}, None

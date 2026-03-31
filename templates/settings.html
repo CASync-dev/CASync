@@ -29,26 +29,34 @@
   async function importICal() {
     // Clear previous message
     const msgEl = document.getElementById('ical-message');
-    // Get the current user's ID
-    const { id: user_id } = await (await fetch('/api/user')).json();
     // Send the iCal URL to the server for processing
     const res = await fetch('/api/import-ical', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         url: document.getElementById('ical_url').value,
-        user_id,
       }),
     });
     // Show success or error message based on response
     const data = await res.json();
+    if (res.ok) {
+      // If import was successful
+      // if the data contains created and updated counts, show them in the message
+      // if it contains just a count of created events, show that instead
+      if (data.created !== undefined && data.updated !== undefined) {
+        msgEl.textContent = `Successfully imported ${data.created} new events and updated ${data.updated} existing events.`;
+      } else if (data.created !== undefined) {
+        msgEl.textContent = `Successfully imported ${data.created} new events.`;
+      } else {
+        msgEl.textContent = 'iCal imported successfully.';
+      }
+    } else {
+      // If there was an error
+      msgEl.textContent = 'Error: ' + (data.error || 'Unknown error');
+    }
     msgEl.className =
       'mt-2 text-sm ' + (res.ok ? 'text-green-600' : 'text-red-600');
-    msgEl.textContent = res.ok
-      ? 'Import successful!'
-      : 'Error: ' + (data.error || 'Unknown error');
     msgEl.classList.remove('hidden');
-    alert(msgEl.textContent);
   }
 </script>
 {% endblock %}
