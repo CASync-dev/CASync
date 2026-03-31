@@ -27,8 +27,11 @@
 
 <script>
   async function importICal() {
+    // Clear previous message
     const msgEl = document.getElementById('ical-message');
+    // Get the current user's ID
     const { id: user_id } = await (await fetch('/api/user')).json();
+    // Send the iCal URL to the server for processing
     const res = await fetch('/api/import-ical', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -37,6 +40,7 @@
         user_id,
       }),
     });
+    // Show success or error message based on response
     const data = await res.json();
     msgEl.className =
       'mt-2 text-sm ' + (res.ok ? 'text-green-600' : 'text-red-600');
@@ -44,6 +48,7 @@
       ? 'Import successful!'
       : 'Error: ' + (data.error || 'Unknown error');
     msgEl.classList.remove('hidden');
+    alert(msgEl.textContent);
   }
 </script>
 {% endblock %}

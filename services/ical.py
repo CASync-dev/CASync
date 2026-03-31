@@ -5,7 +5,11 @@ import ipaddress, socket
 from urllib.parse import urlparse
 
 from extensions import db
-from models import Event
+from models import Event, Calendar
+# For now we just use the first user in the database. 
+# When we have session/auth context, we'll use that instead.
+user_id = 1 # TODO: replace with session user
+
 
 #sanitise input and check that the URL is safe to fetch from.
 # prefevent ssrf attack : no funky ip stuff
@@ -41,8 +45,23 @@ def validate_url(url):
 
     return None  # no error
 
+# store the users ical feed URL in the database 
+def store_ical_url(url):
+    """
+    Store the user's iCal feed URL in the database. This allows us to fetch and update events later.
+    """
+    # Check if the user already has a calendar, for now we only support one calendar per user. If they do, update the URL. If not, create a new calendar entry.
+    calendar = Calendar.query.filter_by(user_id=user_id).first()
+    if calendar:
+        calendar.ical_url = url
+    else:
+        calendar = Calendar(user_id=user_id, ical_url=url)
+        db.session.add(calendar)
+    db.session.commit()
+    return None  # no error
 
-# Step 2 — Fetch the raw iCal data from the URL
+
+# Fetch the raw iCal data from the URL
 
 def fetch_ical_events(url):
     """
@@ -65,7 +84,7 @@ def fetch_ical_events(url):
     return [component for component in calendar.walk() if component.name == "VEVENT"]
 
 
-# Step 3 — Convert a single VEVENT into a plain dict
+# Convert a single VEVENT into a plain dict
 
 def parse_ical_event(component):
     """
@@ -104,9 +123,9 @@ def parse_ical_event(component):
     }
 
 
-# Step 4 — Persist the parsed events to the database
+# Persist the parsed events to the database
 
-def save_events_to_db(parsed_events, user_id):
+def save_events_to_db(parsed_events):
     """
     Save a list of parsed event dicts to the database, linked to the given user.
     Returns the number of events saved.
@@ -114,6 +133,9 @@ def save_events_to_db(parsed_events, user_id):
     for event_data in parsed_events:
         event = Event(user_id=user_id, **event_data)
         db.session.add(event)
+    
+    # Update the synced_at timestamp on the user's calendar
+    Calendar.query.filter_by(user_id=user_id).update({"synced_at": datetime.now()})
 
     db.session.commit()
     return len(parsed_events)
@@ -121,7 +143,7 @@ def save_events_to_db(parsed_events, user_id):
 
 # Main Function called by the API route
 
-def import_ical(url, user_id):
+def import_ical(url):
     """
     Orchestrates the full import pipeline:
       1. Validate the URL
@@ -133,14 +155,10 @@ def import_ical(url, user_id):
       - On success: ({'imported': <count>}, None)
       - On failure: (None, '<error message>')
     """
-
     # 1. Validate inputs
     url_error = validate_url(url)
     if url_error:
         return None, url_error
-
-    if not user_id:
-        return None, "A user_id is required."
 
     # 2. Fetch iCal events from the URL
     try:
@@ -168,7 +186,7 @@ def import_ical(url, user_id):
 
     # 4. Save to the database
     try:
-        count = save_events_to_db(parsed_events, user_id)
+        count = save_events_to_db(parsed_events)
     except Exception as e:
         return None, f"Failed to save events to the database: {e}"
 
