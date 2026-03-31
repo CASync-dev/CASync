@@ -56,7 +56,7 @@ class Event(db.Model):
 class Calendar(db.Model):
     __tablename__ = 'calendars'
 
-    id         = db.Column(db.Integer, primary_key=True)
+    id         = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id    = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # links this calendar to its owner
     ical_url   = db.Column(db.String(500), nullable=False)  # URL of the iCal feed
     synced_at  = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))  # when this calendar was last synced

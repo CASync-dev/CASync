@@ -64,7 +64,7 @@ def api_calendars():
 def api_import_ical():
     """
     POST /api/import-ical
-    Body: { "url": "<ical feed url>", "user_id": <user id> }
+    Body: { "url": "<ical feed url>" }
 
     Passes the URL and user to services/ical.py which validates, fetches,
     parses, and saves the events. Returns 200 on success or 400 on failure.
@@ -77,7 +77,7 @@ def api_import_ical():
         return jsonify({"error": "Request body must be JSON."}), 400
 
     # Call the main import function in services/ical.py, which returns (result, error)
-    result, error = import_ical(data.get("url"), data.get("user_id"))
+    result, error = import_ical(data.get("url"))
 
     if error:
         # If there was an error during import, return it with a 400 status code
