@@ -35,13 +35,14 @@ const COLOR_MAP = {
 // This sectionm is how i first simulate the data, to better simulate ap orper backend
 // i have a bunch of json files with calender data to simulate what a db would have.
 // It was created with cal to json parsing libraries that might be used in the bakcend in futre
-// now we call api.js that directs to the files in the static/data folder to get the data for the events.
+// now we call api routes established in app.py to fetch the data from the db.
 let events = [];
-api.getEvents().then((data) => {
-  events = data;
-  // console.log(events);
-  renderDesktopEvents(); // call the render function after events are loaded
-});
+fetch('api/events')
+  .then((response) => response.json())
+  .then((data) => {
+    events = data;
+    renderDesktopEvents();
+  });
 // originaly this was done with a hard coded list of events in this file
 
 // ── Time helpers
