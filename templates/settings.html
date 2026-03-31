@@ -45,7 +45,7 @@
       // if it contains just a count of created events, show that instead
       if (data.created !== undefined && data.updated !== undefined) {
         msgEl.textContent = `Successfully imported ${data.created} new events and updated ${data.updated} existing events.`;
-      } else if (data.created !== undefined) {
+      } else if (data.created !== undefined && data.updated === undefined) {
         msgEl.textContent = `Successfully imported ${data.created} new events.`;
       } else {
         msgEl.textContent = 'iCal imported successfully.';
