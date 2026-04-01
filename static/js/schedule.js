@@ -6,29 +6,6 @@
 const GRID_START_HOUR = 7; // the first row of the grid is 7:00 am
 const GRID_TOTAL_SLOTS = 12; // the grid has 12 rows, so the last row starts at 6:00 pm
 
-// ── Color themes
-// Each event has a color. This maps that name to the three
-// Tailwind classes needed to style an event card: background, left border, text.
-const COLOR_MAP = {
-  indigo: {
-    bg: 'bg-indigo-100',
-    border: 'border-indigo-500',
-    text: 'text-indigo-800',
-  },
-  blue: { bg: 'bg-blue-100', border: 'border-blue-500', text: 'text-blue-800' },
-  green: {
-    bg: 'bg-green-100',
-    border: 'border-green-500',
-    text: 'text-green-800',
-  },
-  rose: { bg: 'bg-rose-100', border: 'border-rose-500', text: 'text-rose-800' },
-  amber: {
-    bg: 'bg-amber-100',
-    border: 'border-amber-500',
-    text: 'text-amber-800',
-  },
-};
-
 // ── Event data
 // This is the list of events that get rendered onto the calendar.
 
@@ -62,17 +39,67 @@ function formatTime(timeStr) {
   return `${hour}:${String(m).padStart(2, '0')} ${period}`;
 }
 
+// ── Color themes
+// Each event has a color. This maps that name to the three
+// Tailwind classes needed to style an event card: background, left border, text.
+const COLOR_MAP = {
+  indigo: {
+    bg: 'bg-indigo-100',
+    border: 'border-indigo-500',
+    text: 'text-indigo-800',
+  },
+  blue: { bg: 'bg-blue-100', border: 'border-blue-500', text: 'text-blue-800' },
+  green: {
+    bg: 'bg-green-100',
+    border: 'border-green-500',
+    text: 'text-green-800',
+  },
+  rose: { bg: 'bg-rose-100', border: 'border-rose-500', text: 'text-rose-800' },
+  amber: {
+    bg: 'bg-amber-100',
+    border: 'border-amber-500',
+    text: 'text-amber-800',
+  },
+  orange: {
+    bg: 'bg-orange-100',
+    border: 'border-orange-500',
+    text: 'text-orange-800',
+  },
+  red: { bg: 'bg-red-100', border: 'border-red-500', text: 'text-red-800' },
+  purple: {
+    bg: 'bg-purple-100',
+    border: 'border-purple-500',
+    text: 'text-purple-800',
+  },
+  gray: { bg: 'bg-gray-100', border: 'border-gray-500', text: 'text-gray-800' },
+};
+
+// instead of hardcoding the colors in the event data, we assighn a color dyanmicly based on the
+// class name. The uwa ical gives us a title of: 1	Data Structures and Algorithms, LecTut-01.
+// this looks to be {class name}, {event type} so we can split on the comma and get the class name to assign a color to.
+event_color_map = {};
+
 // ── Event card builder
 // Creates and returns a styled event card DOM element.
 // The card is positioned absolutely inside its host cell and sized to span
 // the correct number of rows based on the event duration.
 function buildEventCard(event, heightPx) {
-  const colors = COLOR_MAP[event.color] || COLOR_MAP.indigo; // default to indigo if color not found
+  event_class = event.title.split(',')[0].toLowerCase(); // get the first part of the title as the class (e.g. "CS 101, Lecture" → "cs 101")
+  if (!event_color_map[event_class]) {
+    // If this class doesn't have a color assigned yet, assign the next available color from COLOR_MAP
+    const usedColors = new Set(Object.values(event_color_map));
+    const availableColors = Object.keys(COLOR_MAP).filter(
+      // find the first color in COLOR_MAP that hasn't been used yet
+      (color) => !usedColors.has(color),
+    );
+    event_color_map[event_class] = availableColors[0] || 'gray'; // default to gray if we run out of colors, later we can do generating new colors
+  }
   const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`; // e.g. "9:00 am – 10:30 am"
 
   // The card sits inside the grid cell using absolute positioning.
   // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
   const card = document.createElement('div');
+  colors = COLOR_MAP[event_color_map[event_class]];
   card.className = [
     'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
     'cursor-pointer transition-shadow hover:shadow-md select-none z-10', // TODO: we should add some on hover info here in futre
