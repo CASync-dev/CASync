@@ -2,6 +2,7 @@
 //any libraries neededed:
 // ── Grid constants
 // These define the visible time range shown in the HTML grid.
+
 // The grid runs from 07:00 am to 06:00 pm
 const GRID_START_HOUR = 7; // the first row of the grid is 7:00 am
 const GRID_TOTAL_SLOTS = 12; // the grid has 12 rows, so the last row starts at 6:00 pm
@@ -83,7 +84,7 @@ event_color_map = {};
 // Creates and returns a styled event card DOM element.
 // The card is positioned absolutely inside its host cell and sized to span
 // the correct number of rows based on the event duration.
-function buildEventCard(event, heightPx) {
+function buildEventCard(event, heightPx, id) {
   event_class = event.title.split(',')[0].toLowerCase(); // get the first part of the title as the class (e.g. "CS 101, Lecture" → "cs 101")
   if (!event_color_map[event_class]) {
     // If this class doesn't have a color assigned yet, assign the next available color from COLOR_MAP
@@ -99,6 +100,7 @@ function buildEventCard(event, heightPx) {
   // The card sits inside the grid cell using absolute positioning.
   // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
   const card = document.createElement('div');
+  card.id = id;
   colors = COLOR_MAP[event_color_map[event_class]];
   card.className = [
     'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
@@ -107,25 +109,24 @@ function buildEventCard(event, heightPx) {
     colors.border,
   ].join(' ');
   card.style.height = `${heightPx - 4}px`; // subtract 4px to account for the top inset (otherwise overflows down to next grid)
-
   // Event title — always shown
   const title = document.createElement('p');
   title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
   title.textContent = event.title;
   card.appendChild(title);
 
-  // Time label and Location - show only if card is big enough
-  if (heightPx >= 40) {
+  const time = document.createElement('p');
+  time.className = `text-xs leading-tight px-1.5 ${colors.text} opacity-75`;
+  time.textContent = timeLabel;
+  card.appendChild(time);
+  // Location - show only if card is big enough, or if the location is exceptionay large, requrie an even bigger card
+  if ((heightPx >= 75 && event.location.length <= 50) || heightPx >= 100) {
+    console.log(event.title, heightPx, event.location.length);
     // location
     const location = document.createElement('p');
     location.className = ` text-xs leading-tight px-1.5 text-bold ${colors.text} opacity-75`;
     location.textContent = event.location;
     card.appendChild(location);
-    // time label
-    const time = document.createElement('p');
-    time.className = `text-xs leading-tight px-1.5 ${colors.text} opacity-75`;
-    time.textContent = timeLabel;
-    card.appendChild(time);
   }
 
   return card;
@@ -170,6 +171,11 @@ function renderDesktopEvents() {
   // Used to check which column each event belongs in.
   const weekDates = getWeekDates();
 
+  // we initialise some counters to store all the elements we have placed
+  // so we can check if they overlapp
+  number_of_events_counter = 0;
+  const placed_cards = [];
+
   // Place each event into the grid
   events.forEach((event) => {
     // Find which day column this event belongs to (0 = Mon … 4 = Fri)
@@ -184,7 +190,7 @@ function renderDesktopEvents() {
 
     //target cell is the cell that matches the indexs we just calculated
     const cell = cellMap[`${dayIndex}-${hourIndex}`];
-    if (!cell) return;
+    if (!cell) return; // something went wrong with our cell mapping
 
     // Calculate card height: duration in hours × height of one cell in pixels
     const durationHours = (endMinutes - startMinutes) / 60;
@@ -194,7 +200,38 @@ function renderDesktopEvents() {
     cell.style.position = 'relative';
     cell.style.overflow = 'visible'; // allow the card to overflow into rows below
 
-    cell.appendChild(buildEventCard(event, cardHeight));
+    // Create and insert the event card into the cell
+    card = buildEventCard(
+      event,
+      cardHeight,
+      `event-${number_of_events_counter}`,
+    );
+    cell.appendChild(card);
+
+    // add them to the counters for second pass
+    placed_cards.push({ card, dayIndex, startMinutes, endMinutes });
+    number_of_events_counter++;
+  });
+
+  // Second Pass:
+  // Check if the event has an item underneath it, if so we pad to the left slightly
+  placed_cards.forEach(({ card, dayIndex, startMinutes }) => {
+    const hasOverlapFromAbove = placed_cards.some((other) => {
+      const isSameDay = other.dayIndex === dayIndex; // only check events in the same column
+      const isDifferentCard = other.card !== card; // skip self
+      const otherStartedFirst = other.startMinutes < startMinutes; // only check events that start above this one
+      const otherStillActiveAtStart = other.endMinutes > startMinutes; // only check events that are still active when this one start
+      // check all of the above conditisons
+      return (
+        isDifferentCard &&
+        isSameDay &&
+        otherStartedFirst &&
+        otherStillActiveAtStart
+      );
+    });
+    if (hasOverlapFromAbove) {
+      card.style.left = '0.5rem'; // push this card right so the card behind it is visible
+    }
   });
 }
 
