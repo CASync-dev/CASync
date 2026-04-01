@@ -121,7 +121,6 @@ function buildEventCard(event, heightPx, id) {
   card.appendChild(time);
   // Location - show only if card is big enough, or if the location is exceptionay large, requrie an even bigger card
   if ((heightPx >= 75 && event.location.length <= 50) || heightPx >= 100) {
-    console.log(event.title, heightPx, event.location.length);
     // location
     const location = document.createElement('p');
     location.className = ` text-xs leading-tight px-1.5 text-bold ${colors.text} opacity-75`;
@@ -139,6 +138,9 @@ function buildEventCard(event, heightPx, id) {
 // inject an absolutely positioned card that spans the event's full duration.
 function renderDesktopEvents() {
   const grid = document.getElementById('desktop-grid');
+
+  // Clear any previously rendered event cards before re-rendering
+  grid.querySelectorAll('[id^="event-"]').forEach((item) => item.remove());
 
   const cells = Array.from(grid.children);
   const cellsPerRow = 6; // column 0 = time labels, columns 1–5 = Mon–Fri
@@ -240,26 +242,32 @@ function renderDesktopEvents() {
 // for the current calendar week.
 // initialy i did this with a dictionary of monday: date,
 // but this got annoying later so just 5 dates in an array is easier to work with.
-function getWeekDates() {
-  const today = new Date();
-  const currentDay = today.getDay();
-  let daysFromMonday; //decalre empty
-  if (currentDay === 0) {
-    // Sunday is 0, so we need to go back 6 days to get to Monday
-    daysFromMonday = -6;
-  } else {
-    // For any other day, we calculate how many days to go back to get to Monday
-    daysFromMonday = 1 - currentDay;
-  }
-  const monday = new Date(today);
-  monday.setDate(today.getDate() + daysFromMonday); // Now we have the date for Monday of the current week
+// Tracks how many weeks we are offset from the real current week.
+// 0 = this week, -1 = last week, +1 = next week, etc.
+let weekOffset = 0;
 
+function getWeekDates() {
+  // Always start from the real current date so navigation never accumulates errors
+  const base = new Date();
+  const currentDay = base.getDay();
+  // Calculate how many days to shift back to get to Monday (or forward if it's Sunday)
+  const daysFromMonday = currentDay === 0 ? -6 : 1 - currentDay;
+
+  // Find Monday of the real current week, then shift by weekOffset weeks
+  const monday = new Date(base);
+  monday.setDate(base.getDate() + daysFromMonday + weekOffset * 7);
+
+  // Generate ISO date strings for Monday through Friday of this week
   const weekDates = [];
   for (let i = 0; i < 5; i++) {
     // Loop from 0 to 4 to get dates for Monday through Friday
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
-    weekDates.push(d.toISOString().slice(0, 10));
+    // Use local date parts to avoid UTC timezone shifting the date
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    weekDates.push(`${year}-${month}-${day}`);
   }
   // console.log(weekDates); // Uncomment to see the generated week dates in the console
   return weekDates;
@@ -269,15 +277,43 @@ function getWeekDates() {
 // Updates the page title ("Today, Wed March 11") and the five column headers
 // (Mon 9, Tue 10, …). Today's column is highlighted in indigo.
 function setCalendarDates() {
-  const today = new Date();
+  const now = new Date(); // real current date, for the title and today-highlight
 
   const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
   // Update the "Today, Day Month Date" title at the top of the page
   const titleElement = document.getElementById('calendar-title');
-  if (titleElement) {
-    // Format: "Today, {Day}, {Moth} {dd}"
-    titleElement.textContent = `Today, ${today.toLocaleString(undefined, { weekday: 'long' })}, ${today.toLocaleString(undefined, { month: 'long' })} ${today.getDate()}`;
+
+  // Helper function to format a date as "Day Month Date" with customizable month style
+  const fmt = (date, monthStyle) =>
+    // e.g. "Wednesday March 11" or "Wed Mar 11"
+    `${dayNames[date.getDay() - 1]} ${date.toLocaleString('default', { month: monthStyle })} ${date.getDate()}`;
+
+  // Shorter format for column headers, e.g. "Mar 11"
+  const fmtShort = (date) =>
+    // e.g. "Mar 11"
+    `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`;
+
+  // Helper to get a date offset by a certain number of days
+  // from toda. used for the title when showing last/next week
+  const offsetDate = (days) => {
+    const d = new Date(now);
+    d.setDate(now.getDate() + days);
+    return d;
+  };
+
+  // Show relative week label for ±1 week, or a date range for anything further
+  if (weekOffset === 0) {
+    titleElement.textContent = `Today, ${fmt(now, 'long')}`;
+  } else if (weekOffset === -1) {
+    titleElement.textContent = `Last Week, ${fmt(offsetDate(-7), 'long')}`;
+  } else if (weekOffset === 1) {
+    titleElement.textContent = `Next Week, ${fmt(offsetDate(7), 'long')}`;
+  } else {
+    const weekDates = getWeekDates();
+    const startDate = new Date(weekDates[0]);
+    const endDate = new Date(weekDates[4]);
+    titleElement.textContent = `${fmtShort(startDate)} - ${fmtShort(endDate)}`;
   }
 
   // Update each of the five column header elements with the correct day and date.
@@ -288,7 +324,8 @@ function setCalendarDates() {
     const columnElement = document.getElementById(`date-col-${i}`);
     if (columnElement) {
       columnElement.textContent = `${dayNames[i]} ${columnDate.getDate()}`;
-      const isToday = dateStr === today.toISOString().slice(0, 10);
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const isToday = dateStr === todayStr;
       columnElement.classList.toggle('text-indigo-600', isToday);
       columnElement.classList.toggle('text-gray-900', !isToday);
     }
@@ -296,9 +333,30 @@ function setCalendarDates() {
 }
 
 //-- Playing around with button
-const new_eventbtn = document.getElementById('new-event-btn');
-new_eventbtn.addEventListener('click', () => {
+document.getElementById('new-event-btn').addEventListener('click', () => {
   alert('This button will open a form to create a new event. Coming soon!');
+});
+
+document.getElementById('btn-last-week').addEventListener('click', () => {
+  weekOffset--;
+  setCalendarDates();
+  renderDesktopEvents();
+  document.getElementById('btn-today').classList.remove('hidden'); // show the today button
+});
+
+function todayButton() {
+  weekOffset = 0;
+  setCalendarDates();
+  renderDesktopEvents();
+  document.getElementById('btn-today')?.classList.add('bg-indigo-600');
+  document.getElementById('btn-today').classList.add('hidden'); // hide the today button
+}
+
+document.getElementById('btn-next-week').addEventListener('click', () => {
+  weekOffset++;
+  setCalendarDates();
+  renderDesktopEvents();
+  document.getElementById('btn-today').classList.remove('hidden'); // show the today button
 });
 
 // innit
