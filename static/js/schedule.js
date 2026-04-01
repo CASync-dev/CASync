@@ -348,7 +348,6 @@ document.getElementById('btn-today').addEventListener('click', () => {
   weekOffset = 0;
   setCalendarDates();
   renderDesktopEvents();
-  document.getElementById('btn-today')?.classList.add('bg-indigo-600');
   document.getElementById('btn-today').classList.add('hidden'); // hide the today button
 });
 
