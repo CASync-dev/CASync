@@ -344,13 +344,13 @@ document.getElementById('btn-last-week').addEventListener('click', () => {
   document.getElementById('btn-today').classList.remove('hidden'); // show the today button
 });
 
-function todayButton() {
+document.getElementById('btn-today').addEventListener('click', () => {
   weekOffset = 0;
   setCalendarDates();
   renderDesktopEvents();
   document.getElementById('btn-today')?.classList.add('bg-indigo-600');
   document.getElementById('btn-today').classList.add('hidden'); // hide the today button
-}
+});
 
 document.getElementById('btn-next-week').addEventListener('click', () => {
   weekOffset++;
