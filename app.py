@@ -12,9 +12,6 @@ app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')  # swap for real env 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 db.init_app(app)
 migrate = Migrate(app, db)
-# Run the initial migration to create the database schema
-with app.app_context():
-    upgrade()
 
 
 # --- Session login logic

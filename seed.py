@@ -14,8 +14,6 @@ def parse_time(s):
 
 
 with app.app_context():
-    db.create_all()
-
     # Skip if already seeded
     if User.query.first():
         print('DB already seeded, skipping.')
