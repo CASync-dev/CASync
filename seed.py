@@ -21,25 +21,38 @@ with app.app_context():
         print('DB already seeded, skipping.')
         exit()
 
-    # Create the test user
-    liam = User(username='liam', email='liam@student.uwa.edu.au')
-    db.session.add(liam)
-    db.session.flush()  # gives liam an id before attaching events
+    # Create the test users
+    users = []
+    liam = User(username='liam', email='24083063@student.uwa.edu.au')
+    sze = User(username='sze', email='24214052@student.uwa.edu.au')
+    kelly = User(username='kelly', email='24540356@student.uwa.edu.au')
+    tehei = User(username='tehei', email='24467332@student.uwa.edu.au')
+    users.extend([liam, sze, kelly, tehei])
+    for user in users:
+        db.session.add(user)
+    # we have to sort of 'stage' the users before we can add events for them
+    db.session.flush()  # gives users ids before attaching events
 
     # Load events from the mock data file and insert them
     with open('static/data/events.json') as f:
         events = json.load(f)
 
+    
     for e in events:
-        db.session.add(Event(
-            title      = e['title'],
-            date       = parse_date(e['date']),
-            start_time = parse_time(e['startTime']),
-            end_time   = parse_time(e['endTime']),
-            location   = e.get('location'),
-            color      = e.get('color', 'indigo'),
-            user_id    = liam.id,
+        for user in users:
+
+            db.session.add(Event(
+                title      = e['title'],
+                date       = parse_date(e['date']),
+                start_time = parse_time(e['startTime']),
+                end_time   = parse_time(e['endTime']),
+                location   = e.get('location'),
+                color      = e.get('color', 'indigo'),
+                user_id    = user.id,
         ))
 
     db.session.commit()
-    print(f'Seeded {len(events)} events for user "{liam.username}".')
+    users_list = []
+    for user in users:
+        users_list.append(user.username)
+    print(f'Seeded {len(users)} users: {", ".join(users_list)}' + f'with {len(events)} events each.')
