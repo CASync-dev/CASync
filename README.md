@@ -51,7 +51,8 @@ Use the planning dir for plans
 4. Run any database migrations
 
    ```bash
-   flask db migrate
+   flask db upgrade # for going up a version
+   flask db downgrade # for going down a version (regressing changes)
    ```
 
    This creates the db and applies any changes.

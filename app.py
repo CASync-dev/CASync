@@ -1,6 +1,5 @@
 import os
 from flask import Flask, render_template, jsonify, session, redirect, url_for
-from flask_migrate import Migrate, upgrade
 from extensions import db
 from models import User, Event
 
@@ -10,11 +9,6 @@ app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')  # swap for real env 
 # Configure the database URI and initialize the database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 db.init_app(app)
-migrate = Migrate(app, db)
-# Run the initial migration to create the database schema
-with app.app_context():
-    upgrade()
-
 
 # --- Session login logic
 @app.context_processor
