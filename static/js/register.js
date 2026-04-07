@@ -1,5 +1,14 @@
 // Right now the submit detection is implemented directly in the HTML, since authentication has not be implemented
 // This will change when we figure authentication out! :)
+const f = document.getElementById("register");
+f.addEventListener("submit", function(event) {
+    event.preventDefault();
+  // To prevent auto-reload upon submission.
+    regValidation();
+    return false;
+});
+const errormsg = document.getElementById("field-error");
+
 function regValidation() {
     let mail = document.forms["register"]["mail"].value;
     let user = document.forms["register"]["user"].value;
@@ -10,7 +19,7 @@ function regValidation() {
     if (!check(user, "username")) { return false;}
     if (!check(p1, "password")) { return false;}
     if (p1 != p2) {
-        alert("Passwords don't match; Please try again.");
+        errormsg.innerText = "Passwords don't match; Please try again.";
         return false;
     }
     
@@ -20,7 +29,8 @@ function regValidation() {
 
 function check(x, y) {
     if (x == "") {
-        alert("Please enter a " + y + ".");
+        let msg = "Please enter a " + y + ".";
+        errormsg.innerText = msg;
         return false;
     }
     return true;
