@@ -5,96 +5,136 @@
   <section class="mb-8">
     <h2 class="text-lg font-semibold text-gray-800 mb-1">Import iCal</h2>
     <form>
-    <p class="text-sm text-gray-500 mb-3">
-      Paste your iCal feed URL to import events.
-    </p>
-    <div class="flex gap-2">
-      <input
-        type="url"
-        id="ical_url"
-        placeholder="https://..."
-        class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      <button
-        onclick="importICal()"
-        class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700"
-      >
-        Import
-      </button>
-      <button
-        class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white inset-ring-1 inset-ring-white/5 hover:bg-white/20"
-      >
-        Options
-        <svg
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          data-slot="icon"
-          aria-hidden="true"
-          class="-mr-1 size-5 text-gray-400"
-        >
-      </button>
+      <p class="text-sm text-gray-500 mb-3">
+        Paste your iCal feed URL to import events.
+      </p>
+      <div class="flex">
+        <input
+          type="url"
+          id="ical_url"
+          placeholder="https://..."
+          class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <div class="flex ml-4">
+          <el-dropdown class="inline-block">
+            <button
+              class="inline-flex w-full justify-center rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring-1 inset-ring-gray-300 hover:bg-gray-50"
+            >
+              Users
+              <i class="py-1 pl-2 fas fa-chevron-down text-xs"></i>
+            </button>
 
-      <el-dropdown class="inline-block">
-        <button class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring-1 inset-ring-gray-300 hover:bg-gray-50">
-          Options
-          <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="-mr-1 size-5 text-gray-400">
-            <path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
-          </svg>
-        </button>
-
-        <el-menu anchor="bottom end" popover class="w-56 origin-top-right rounded-md bg-white shadow-lg outline-1 outline-black/5 transition transition-discrete [--anchor-gap:--spacing(2)] data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in">
-          <div class="py-1">
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden">1 - Liam</a>
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden">2 - Support</a>
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden">3 - License</a>
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden">4 - Documentation</a>
-          </div>
-        </el-menu>
-      </el-dropdown>
-
-    </div>
-    <p id="ical-message" class="mt-2 text-sm hidden"></p>
+            <el-menu
+              anchor="bottom end"
+              popover
+              class="rounded-md bg-white shadow-lg outline-1 outline-black/5 [--anchor-gap:--spacing(2)]"
+            >
+              <div id="dropdown-menu-1" class="py-1"></div>
+            </el-menu>
+            <!-- Options get inserted here -->
+          </el-dropdown>
+          <button
+            onclick="importICal()"
+            class="bg-blue-600 text-white px-4 ml-2 py-2 rounded-md text-sm hover:bg-blue-700 shadow-xs inset-ring-1 inset-ring-gray-300"
+          >
+            Import
+          </button>
+        </div>
+      </div>
+      <p id="ical-message" class="mt-2 text-sm hidden"></p>
     </form>
-
   </section>
 </div>
 
-{% endblock %}
-{% block scripts %}
-  <script>
-    async function importICal() {
-      // Clear previous message
-      const msgEl = document.getElementById('ical-message');
-      // Send the iCal URL to the server for processing
-      const res = await fetch('/api/import-ical', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url: document.getElementById('ical_url').value,
-          accountId: '{{ account_id }}',
-        }),
-      });
-      // Show success or error message based on response
-      const data = await res.json();
-      if (res.ok) {
-        // If import was successful
-        // if the data contains created and updated counts, show them in the message
-        // if it contains just a count of created events, show that instead
-        if (data.created !== undefined && data.updated !== undefined) {
-          msgEl.textContent = `Successfully imported ${data.created} new events and updated ${data.updated} existing events.`;
-        } else if (data.created !== undefined && data.updated === undefined) {
-          msgEl.textContent = `Successfully imported ${data.created} new events.`;
-        } else {
-          msgEl.textContent = 'iCal imported successfully.';
-        }
-      } else {
-        // If there was an error
-        msgEl.textContent = 'Error: ' + (data.error || 'Unknown error');
-      }
-      msgEl.className =
-        'mt-2 text-sm ' + (res.ok ? 'text-green-600' : 'text-red-600');
-      msgEl.classList.remove('hidden');
+{% endblock %} {% block scripts %}
+<script>
+  // TODO: This will get replaced with a user session deteciton system later
+  // Jquery  for adding user options to the dropdown (replace with actual user data)
+  function addUserOptions(user) {
+    const a = document.createElement('a');
+    a.href = '#';
+    a.className =
+      'block px-4 py-2 text-sm text-gray-700 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden';
+    a.textContent = user.username;
+    a.dataset.userId = user.id; // Store user id in data attribute for later use
+    $('#dropdown-menu-1').append(a);
+  }
+  // Get Users
+  async function getUsers() {
+    const res = await fetch('/api/users');
+    const users = await res.json();
+    users.forEach(addUserOptions);
+  }
+  getUsers();
+
+  let selectedUserId = null;
+
+  // Function to show success or error messages after importing iCal
+  function showMsg(text, ok) {
+    $('#ical-message')
+      .text(text)
+      .removeClass('hidden text-red-600 text-green-600')
+      .addClass(ok ? 'text-green-600' : 'text-red-600');
+  }
+
+  // On Selection Of User From Dropdown, set selectedUserId
+  $(document).on('click', '#dropdown-menu-1 a', function () {
+    // Set selected user ID based on clicked option
+    selectedUserId = $(this).data('userId');
+    // Update dropdown button text to show selected user
+    $('#menu-button-1').html(
+      $(this).text() + ' <i class="py-1 pl-2 fas fa-chevron-down text-xs"></i>',
+    );
+  });
+
+  async function importICal() {
+    // Get the iCal URL from the input field
+    const url = $('#ical_url').val().trim();
+
+    // Basic validation
+    if (!selectedUserId) {
+      showMsg('Please select a user to import the calendar for.', false);
+      return;
     }
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
+    if (!url) {
+      showMsg('Please enter an iCal URL.', false);
+      return;
+    }
+    // Send the URL and selected user ID to the server for processing
+    const res = await fetch(`/api/import-ical/${selectedUserId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: url,
+        userId: selectedUserId,
+      }),
+    });
+    // Handle the response and show appropriate messages
+    const data = await res.json();
+
+    if (res.ok) {
+      // Show success message with details if available
+      if (data.created !== undefined && data.updated !== undefined) {
+        showMsg(
+          `Successfully imported ${data.created} new events and updated ${data.updated} existing events.`,
+          true,
+        );
+      } else if (data.created !== undefined) {
+        // For backward compatibility if only created count is returned
+        showMsg(`Successfully imported ${data.created} new events.`, true);
+      } else {
+        // Generic success message if no details provided
+        showMsg('iCal imported successfully.', true);
+      }
+    } else {
+      // Show error message with details if available
+      showMsg('Error: ' + (data.error || 'Unknown error'), false);
+    }
+  }
+</script>
+<!-- Tailwind Elements -->
+<script
+  src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"
+  type="module"
+></script>
 {% endblock %}

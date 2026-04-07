@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 import os
 from flask import Flask, render_template, jsonify, session, redirect, url_for
+from flask_migrate import Migrate
 from extensions import db
 from models import Calendar, User, Event
 from services.ical import import_ical
@@ -11,6 +12,8 @@ app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')  # swap for real env 
 # Configure the database URI and initialize the database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 db.init_app(app)
+migrate = Migrate(app, db)
+
 
 # --- Session login logic
 @app.context_processor
@@ -115,10 +118,10 @@ def api_calendars():
     calendars = Calendar.query.all()
     return jsonify([c.to_dict() for c in calendars])
 
-@app.route("/api/import-ical", methods=["POST"])
-def api_import_ical():
+@app.route("/api/import-ical/<int:user_id>", methods=["POST"])
+def api_import_ical(user_id):
     """
-    POST /api/import-ical
+    POST /api/import-ical/<user_id>
     Body: { "url": "<ical feed url>" }
 
     Passes the URL and user to services/ical.py which validates, fetches,
@@ -132,7 +135,7 @@ def api_import_ical():
         return jsonify({"error": "Request body must be JSON."}), 400
 
     # Call the main import function in services/ical.py, which returns (result, error)
-    result, error = import_ical(data.get("url"))
+    result, error = import_ical(data.get('url'), user_id)
 
     if error:
         # If there was an error during import, return it with a 400 status code
