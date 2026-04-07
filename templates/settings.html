@@ -4,6 +4,7 @@
 
   <section class="mb-8">
     <h2 class="text-lg font-semibold text-gray-800 mb-1">Import iCal</h2>
+    <form>
     <p class="text-sm text-gray-500 mb-3">
       Paste your iCal feed URL to import events.
     </p>
@@ -20,43 +21,80 @@
       >
         Import
       </button>
+      <button
+        class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white inset-ring-1 inset-ring-white/5 hover:bg-white/20"
+      >
+        Options
+        <svg
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          data-slot="icon"
+          aria-hidden="true"
+          class="-mr-1 size-5 text-gray-400"
+        >
+      </button>
+
+      <el-dropdown class="inline-block">
+        <button class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring-1 inset-ring-gray-300 hover:bg-gray-50">
+          Options
+          <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="-mr-1 size-5 text-gray-400">
+            <path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+          </svg>
+        </button>
+
+        <el-menu anchor="bottom end" popover class="w-56 origin-top-right rounded-md bg-white shadow-lg outline-1 outline-black/5 transition transition-discrete [--anchor-gap:--spacing(2)] data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in">
+          <div class="py-1">
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden">1 - Liam</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden">2 - Support</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden">3 - License</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden">4 - Documentation</a>
+          </div>
+        </el-menu>
+      </el-dropdown>
+
     </div>
     <p id="ical-message" class="mt-2 text-sm hidden"></p>
+    </form>
+
   </section>
 </div>
 
-<script>
-  async function importICal() {
-    // Clear previous message
-    const msgEl = document.getElementById('ical-message');
-    // Send the iCal URL to the server for processing
-    const res = await fetch('/api/import-ical', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        url: document.getElementById('ical_url').value,
-      }),
-    });
-    // Show success or error message based on response
-    const data = await res.json();
-    if (res.ok) {
-      // If import was successful
-      // if the data contains created and updated counts, show them in the message
-      // if it contains just a count of created events, show that instead
-      if (data.created !== undefined && data.updated !== undefined) {
-        msgEl.textContent = `Successfully imported ${data.created} new events and updated ${data.updated} existing events.`;
-      } else if (data.created !== undefined && data.updated === undefined) {
-        msgEl.textContent = `Successfully imported ${data.created} new events.`;
+{% endblock %}
+{% block scripts %}
+  <script>
+    async function importICal() {
+      // Clear previous message
+      const msgEl = document.getElementById('ical-message');
+      // Send the iCal URL to the server for processing
+      const res = await fetch('/api/import-ical', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: document.getElementById('ical_url').value,
+          accountId: '{{ account_id }}',
+        }),
+      });
+      // Show success or error message based on response
+      const data = await res.json();
+      if (res.ok) {
+        // If import was successful
+        // if the data contains created and updated counts, show them in the message
+        // if it contains just a count of created events, show that instead
+        if (data.created !== undefined && data.updated !== undefined) {
+          msgEl.textContent = `Successfully imported ${data.created} new events and updated ${data.updated} existing events.`;
+        } else if (data.created !== undefined && data.updated === undefined) {
+          msgEl.textContent = `Successfully imported ${data.created} new events.`;
+        } else {
+          msgEl.textContent = 'iCal imported successfully.';
+        }
       } else {
-        msgEl.textContent = 'iCal imported successfully.';
+        // If there was an error
+        msgEl.textContent = 'Error: ' + (data.error || 'Unknown error');
       }
-    } else {
-      // If there was an error
-      msgEl.textContent = 'Error: ' + (data.error || 'Unknown error');
+      msgEl.className =
+        'mt-2 text-sm ' + (res.ok ? 'text-green-600' : 'text-red-600');
+      msgEl.classList.remove('hidden');
     }
-    msgEl.className =
-      'mt-2 text-sm ' + (res.ok ? 'text-green-600' : 'text-red-600');
-    msgEl.classList.remove('hidden');
-  }
-</script>
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
 {% endblock %}

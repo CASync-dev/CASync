@@ -19,6 +19,15 @@ class User(db.Model):
     # _repr__ is a special Python method that defines the string representation of an object, used for debugging.
     # When you call repr(obj) or view an object in a Python shell/debugger, Python calls __repr__ to get a readable description.
 
+    # to_dict is a custom method we define to convert our User object into a plain dictionary
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'created_at': self.created_at.isoformat(),
+        }
+
 
 class Event(db.Model):
     __tablename__ = 'events'

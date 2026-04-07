@@ -142,6 +142,12 @@ def api_import_ical():
     return jsonify(result), 200
 
 
+# This is just a test route to get a list of users
+@app.route("/api/users", methods=["get"])
+def api_users():
+    users = User.query.all()
+    return jsonify([u.to_dict() for u in users])
+
 
 # Error handling
 @app.errorhandler(404)
