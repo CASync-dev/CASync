@@ -48,15 +48,24 @@ Use the planning dir for plans
    npm install
    ```
 
-4. Seed the database with mock data (run once)
+4. Run any database migrations
 
    ```bash
-   python seed.py
+   flask db upgrade # for going up a version
+   flask db downgrade # for going down a version (regressing changes)
    ```
 
-   This creates `instance/app.db` and populates it with a test user and events from `static/data/events.json`. It is safe to run again — it skips seeding if the database already has data.
+   This creates the db and applies any changes.
 
-5. Start the app
+5. Run the seeding script
+
+    ```bash
+    python seed.py
+    ```
+    This 'seeds' your database with a bunch of fake data and users to use in dev.
+    Should only really need to run once. 
+
+6. Start the app
 
    In one terminal, watch for Tailwind CSS changes:
 
@@ -71,6 +80,7 @@ Use the planning dir for plans
    ```
 
    The app will be available at `http://localhost:8080`.
+
 
 ## Docs
 
