@@ -98,9 +98,13 @@ def dev_logout():
     session.clear()
     return redirect(url_for('home'))
 
-@app.route("/api/events")
-def api_events():
-    events = Event.query.all()
+# API route to get all events for a user - this is used by the schedule page to load the events onto the calendar
+# it accpets the user id as a parameter and returns a list of events for that user in json format
+# not sure if asking for the user id in the url is the best way to do this
+# but it works for now, we can change it later if we want to use a different auth system or something
+@app.route("/api/events/<int:user_id>")
+def api_events(user_id):
+    events = Event.query.where(Event.user_id == user_id).all()
     return jsonify([e.to_dict() for e in events])
 
 @app.route("/api/user")
