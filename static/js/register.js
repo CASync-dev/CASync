@@ -1,5 +1,5 @@
-// Right now the submit detection is implemented directly in the HTML, since authentication has not be implemented
-// This will change when we figure authentication out! :)
+//TODO: authentication into server
+
 const f = document.getElementById("register");
 f.addEventListener("submit", function(event) {
     event.preventDefault();
