@@ -35,13 +35,14 @@ const COLOR_MAP = {
 // This sectionm is how i first simulate the data, to better simulate ap orper backend
 // i have a bunch of json files with calender data to simulate what a db would have.
 // It was created with cal to json parsing libraries that might be used in the bakcend in futre
-// now we call api.js that directs to the files in the static/data folder to get the data for the events.
+// now we call api routes established in app.py to fetch the data from the db.
 let events = [];
-api.getEvents().then((data) => {
-  events = data;
-  // console.log(events);
-  renderDesktopEvents(); // call the render function after events are loaded
-});
+fetch('api/events')
+  .then((response) => response.json())
+  .then((data) => {
+    events = data;
+    renderDesktopEvents();
+  });
 // originaly this was done with a hard coded list of events in this file
 
 // ── Time helpers
@@ -67,7 +68,7 @@ function formatTime(timeStr) {
 // The card is positioned absolutely inside its host cell and sized to span
 // the correct number of rows based on the event duration.
 function buildEventCard(event, heightPx) {
-  const colors = COLOR_MAP[event.color] || COLOR_MAP.indigo; // default to indigo if color not found
+  const colors = COLOR_MAP[event.color] || COLOR_MAP.indigo; // TODO: should color items dyanimcly based on matching title
   const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`; // e.g. "9:00 am – 10:30 am"
 
   // The card sits inside the grid cell using absolute positioning.
