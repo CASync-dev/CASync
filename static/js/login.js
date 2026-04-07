@@ -1,16 +1,25 @@
 // Right now the submit detection is implemented directly in the HTML, since authentication has not be implemented
 // This will change when we figure authentication out! :)
+const f = document.getElementById("login");
+f.addEventListener("submit", function(event) {
+  event.preventDefault();
+  // To prevent auto-reload upon submission.
+  loginImplementation();
+  return false;
+})
+
+const errormsg = document.getElementById("field-error");
 
 function loginImplementation() {
   let user = document.forms['login']['user'].value;
   let pw = document.forms['login']['pw'].value;
 
   if (user == '') {
-    alert('Please enter your username.');
+    errormsg.innerText = 'Please enter your username.';
     return false;
   }
   if (pw == '') {
-    alert('Please enter your password.');
+    errormsg.innerText = 'Please enter your password.';
     return false;
   }
   window.location.href = '/dev/login';

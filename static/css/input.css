@@ -1,2 +1,7 @@
 @import "tailwindcss";
 
+@layer base {
+    #field-error {
+        color: red;
+    }
+}
