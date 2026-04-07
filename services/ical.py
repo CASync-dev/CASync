@@ -1,16 +1,11 @@
-import requests
-from datetime import datetime, time
-from icalendar import Calendar as ICalendar
-import ipaddress, socket
-from urllib.parse import urlparse
+import requests # for fetching the iCal feed from the URL
+from datetime import datetime, time # for handling date and time fields
+from icalendar import Calendar as ICalendar # for parsing iCal data
+import ipaddress, socket # for URL safety checks
+from urllib.parse import urlparse # for URL parsing
 
 from extensions import db
 from models import Event, Calendar
-# For now we just use the first user in the database. 
-# When we have session/auth context, we'll use that instead.
-user_id = 1 # TODO: replace with session user
-
-
 #sanitise input and check that the URL is safe to fetch from.
 # prefevent ssrf attack : no funky ip stuff
 def _is_safe_url(url):
@@ -46,11 +41,11 @@ def validate_url(url):
     return None  # no error
 
 # store the users ical feed URL in the database 
-def store_ical_url(url):
+def store_ical_url(url, user_id):
     """
     Store the user's iCal feed URL in the database. This allows us to fetch and update events later.
     """
-    # Check if the user already has a calendar, for now we only support one calendar per user. 
+    # Check if the user already has a calendar, for now we only support one calendar per user.
     # If they do, update the URL if differnet
     # if the url is the same, fetch the same url again but with an update
     calendar = Calendar.query.filter_by(user_id=user_id).first()
@@ -90,9 +85,10 @@ def fetch_ical_events(url):
 
 # Convert a single VEVENT into a plain dict
 
-def parse_ical_event(component):
+def parse_ical_event(component, user_id):
     """
     Convert one iCal VEVENT component into a dict matching our Event model's fields.
+    Heavily utilises icalnder package
 
     iCal DTSTART/DTEND values can be either a date or a datetime.
     - If it's a datetime, we split it into date + time.
@@ -130,7 +126,7 @@ def parse_ical_event(component):
 
 # Persist the parsed events to the database
 
-def save_events_to_db(parsed_events):
+def save_events_to_db(parsed_events, user_id):
     """
     Save a list of parsed event dicts to the database, linked to the given user.
     Returns the number of events saved.
@@ -146,7 +142,7 @@ def save_events_to_db(parsed_events):
     return len(parsed_events)
 
 # just update db events
-def update_events_in_db(parsed_events):
+def update_events_in_db(parsed_events, user_id):
     """
     Update existing events in the database based on their ical_id. If an event with the same ical_id, user_id and ical_id exists, update its details. If not, create a new event.
     Returns a tuple: (created_count, updated_count)
@@ -180,7 +176,7 @@ def update_events_in_db(parsed_events):
 
 # Main Function called by the API route
 
-def import_ical(url):
+def import_ical(url, user_id):
     """
     Orchestrates the full import pipeline:
       1. Validate the URL
@@ -197,7 +193,7 @@ def import_ical(url):
     if url_error:
         return None, url_error
 
-    has_calendar = store_ical_url(url)  # store the URL and get whether it's a new calendar or an update
+    has_calendar = store_ical_url(url, user_id)  # store the URL and get whether it's a new calendar or an update
     # 2. Fetch iCal events from the URL
     try:
         ical_events = fetch_ical_events(url)
@@ -215,7 +211,7 @@ def import_ical(url):
     parsed_events = []
     for component in ical_events:
         try:
-            parsed_events.append(parse_ical_event(component))
+            parsed_events.append(parse_ical_event(component, user_id))
         except Exception:
             continue  # skip this event and move on
 
@@ -225,13 +221,13 @@ def import_ical(url):
     # 4. Save to the database
     if has_calendar:  # if the user already had a calendar, we update existing events instead of creating new ones
         try:
-            created_count, updated_count = update_events_in_db(parsed_events)
+            created_count, updated_count = update_events_in_db(parsed_events, user_id)
         except Exception as e:
             return None, f"Failed to update events in the database: {e}"
         return {"created": created_count, "updated": updated_count}, None
     elif not has_calendar:
         try:
-            count = save_events_to_db(parsed_events)
+            count = save_events_to_db(parsed_events, user_id)
         except Exception as e:
             return None, f"Failed to save events to the database: {e}"
         return {"imported": count}, None
