@@ -51,9 +51,94 @@ Initially we started with a janky raw JS page loading solution but we are now us
 
 ```
 
+## Tailwind (Initial) Setup
+
+(This is basically documentation for me to understand how the files and folders came to be.)
+
+When starting up a project for Tailwind, the first code that needs to be run is:
+
+```bash
+npm init -y
+```
+
+which will quickly create a `package.json` file with default settings (`-y` skips all the questions and uses default values).
+
+Then, we install **Tailwind** and its dependencies. In this case, we installed Tailwind v4 via the CLI (Installation guide can be found in the [official website](https://tailwindcss.com/docs/installation/tailwind-cli)).
+
+```bash
+npm install tailwindcss @tailwindcss/cli
+```
+
+While running this command (or any `npm install` command really), a `node_modules` folder will be created (or updated), which is a folder that stores all the packages/dependencies the app uses.
+
+Instead of the usual `./src/input.css`, we put the `input.css` in `static/css/input.css`, which will contain the following line to pull the entire Tailwind CSS framework into our stylesheet:
+
+```css
+@import "tailwindcss";
+```
+
+(*Note: Since we are using Tailwind v4, ignore the old v3 style if ever encountered online when learning how to use Tailwind.
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+)
+
+After that, run this command: 
+
+<a id="tailwind-run"></a>
+
+```bash
+npx @tailwindcss/cli -i ./static/css/input.css -o ./static/css/output.css --watch
+```
+
+which will generate an `output.css` file, which will be the main file that our HTML will use when linking it to a stylesheet (If you go to `/templates/layout`, you can find this under `<!-- Tailwind CSS -->`). 
+
+After all of that, Tailwind can now be used in our HTML :D.
+
+### Dependencies
+
+If you notice under the `package.json` file, there are two types of dependencies: `"dependencies: {}"` and `"devDependencies: {}"`.
+
+- `dependencies` are packages that our app needs to run in **production** (required at runtime)
+- `devDependencies` are packages that are only needed during **development/build time**
+
+Adding new packages/dependencies just requires running either of these commands:
+
+```bash
+npm install <package-name>     # runtime dependency
+npm install -D <package-name>  # dev dependency
+```
+
+Some dependencies that have been added to our app are:
+
+- `date-fns`: A Javascript library for dates and times for ease of manipulating, formatting, and calculating dates
+- `concurrently`: A development tool that can run multiple commands at the same time in a single terminal
+- `live-server`: An HTTP server that reloads automatically when files change
+
+### Scripts
+
+`"scripts": {}` is a section in `package.json` that defines shortcut commands for the app. By default, the only script that is included when `npm init -y` is run is the `"test"` placeholder script.
+
+Currently, we have these scripts in the `package.json` file:
+
+- `"build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css"`
+- `"watch:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch"`
+- `"serve": "live-server --port=8080 --entry-file=templates/layout.html"`
+- `"dev": "concurrently \"npm run watch:css\" \"npm run serve\" --names \"CSS,SERVER\" --prefix-colors \"blue,green\""`
+
+In `watch:css`, the flag `--watch` makes Tailwind stay running in the terminal and watches the `input.css` and `output.css` for changes, so that every time a file is saved, it will automatically rebuild the `output.css` (similar to live-server but for Tailwind). This is also just basically [this](#tailwind-run) command that was referred to in the previous section. This is why in the `README.md` we run the command:
+
+```bash
+npm run watch:css
+```
+
 ## The Flask Setup
 
-Its a great idea to check out `Flask Web Development 2nd Edition, by Michael Grinberg` as that is the source for the uni and what our project is based on. Think of  `app.py` as the central command section. It does the imports, defines and connects to the db and then defines our routes. 
+It's a great idea to check out `Flask Web Development 2nd Edition, by Michael Grinberg` as that is the source for the uni and what our project is based on. Think of  `app.py` as the central command section. It does the imports, defines and connects to the db and then defines our routes.
 
 ### Template Rendering
 
