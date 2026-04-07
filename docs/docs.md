@@ -193,6 +193,10 @@ flask db upgrade
 flask db downgrade
 ```
 
+**Please double check your migrations!**
+
+Flask migrate doesnt detect *every* change so its important to make sure something you changed is presant in the migrations. Otherwise things break quick.
+
 ### API Routes
 
 *This is all a little janky right now, but it works and will be properly done later*
@@ -289,3 +293,26 @@ This is where i have started playing with the tailwind and js. I grabbed a caldn
    ​	ii) if it is we determine its location based on the time and date. 
 
    ​	iii) Call the build event function and insert it into the right grid  
+
+## ical Imports
+
+In `app.py` we register an endpoint called `/api/import-ical`. It expects a post request with json body content:
+
+```json
+{ "url": "<ical feed url>", "user_id": <user id> }
+```
+
+So the settings page takes the ical, and submits it to that endpoint. For now, it doenst do anything with user id as there is no auth as of time of writing. 
+
+The api endpoint passes the json to a seperate file `services/ical.py` to run the `import_ical()` function. This funcniton does 4 things:
+
+1. Validate the URL
+2. Fetch and parse the iCal feed
+3. Convert each event to our format
+4. Saves everything to the database 
+
+It returns a tuple: (result, error)
+
+- On success: `({'imported': <count>}, None)`
+- On failure:` (None, '<error message>')`
+

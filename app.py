@@ -1,7 +1,9 @@
+from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 import os
 from flask import Flask, render_template, jsonify, session, redirect, url_for
 from extensions import db
-from models import User, Event
+from models import Calendar, User, Event
+from services.ical import import_ical
 
 app = Flask(__name__)
 # Secret key for session logic
@@ -103,6 +105,38 @@ def api_user():
     if not user:
         return jsonify({}), 404
     return jsonify({'id': user.id, 'username': user.username, 'email': user.email})
+
+@app.route("/api/calendars")
+def api_calendars():
+    calendars = Calendar.query.all()
+    return jsonify([c.to_dict() for c in calendars])
+
+@app.route("/api/import-ical", methods=["POST"])
+def api_import_ical():
+    """
+    POST /api/import-ical
+    Body: { "url": "<ical feed url>" }
+
+    Passes the URL and user to services/ical.py which validates, fetches,
+    parses, and saves the events. Returns 200 on success or 400 on failure.
+    """
+    # Get JSON data from the request body
+    data = request.get_json(silent=True)
+
+    if not data:
+        # If the body isn't valid JSON, get_json returns None. silent=True prevents it from raising an error.
+        return jsonify({"error": "Request body must be JSON."}), 400
+
+    # Call the main import function in services/ical.py, which returns (result, error)
+    result, error = import_ical(data.get("url"))
+
+    if error:
+        # If there was an error during import, return it with a 400 status code
+        return jsonify({"error": error}), 400
+
+    # On success, return the result (e.g. number of events imported) with a 200 status code
+    return jsonify(result), 200
+
 
 
 # Error handling

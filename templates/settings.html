@@ -1,6 +1,62 @@
-{% extends "layout.html" %}
-{% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <h1 class="text-3xl font-bold text-gray-900">This is settings page</h1>
+{% extends "layout.html" %} {% block content %}
+<div class="max-w-2xl mx-auto p-8">
+  <h1 class="text-2xl font-bold text-gray-900 mb-8">Settings</h1>
+
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-800 mb-1">Import iCal</h2>
+    <p class="text-sm text-gray-500 mb-3">
+      Paste your iCal feed URL to import events.
+    </p>
+    <div class="flex gap-2">
+      <input
+        type="url"
+        id="ical_url"
+        placeholder="https://..."
+        class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+        onclick="importICal()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700"
+      >
+        Import
+      </button>
+    </div>
+    <p id="ical-message" class="mt-2 text-sm hidden"></p>
+  </section>
 </div>
+
+<script>
+  async function importICal() {
+    // Clear previous message
+    const msgEl = document.getElementById('ical-message');
+    // Send the iCal URL to the server for processing
+    const res = await fetch('/api/import-ical', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: document.getElementById('ical_url').value,
+      }),
+    });
+    // Show success or error message based on response
+    const data = await res.json();
+    if (res.ok) {
+      // If import was successful
+      // if the data contains created and updated counts, show them in the message
+      // if it contains just a count of created events, show that instead
+      if (data.created !== undefined && data.updated !== undefined) {
+        msgEl.textContent = `Successfully imported ${data.created} new events and updated ${data.updated} existing events.`;
+      } else if (data.created !== undefined && data.updated === undefined) {
+        msgEl.textContent = `Successfully imported ${data.created} new events.`;
+      } else {
+        msgEl.textContent = 'iCal imported successfully.';
+      }
+    } else {
+      // If there was an error
+      msgEl.textContent = 'Error: ' + (data.error || 'Unknown error');
+    }
+    msgEl.className =
+      'mt-2 text-sm ' + (res.ok ? 'text-green-600' : 'text-red-600');
+    msgEl.classList.remove('hidden');
+  }
+</script>
 {% endblock %}
