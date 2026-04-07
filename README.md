@@ -64,7 +64,8 @@ Use the planning dir for plans
     ```
     This 'seeds' your database with a bunch of fake data and users to use in dev.
     Should only really need to run once. 
-
+    Optionily you can add the flag 'seed:events' to add a number of fake events based on one ical file.
+    Otherwise use the settings display to import an ical.
 6. Start the app
 
    In one terminal, watch for Tailwind CSS changes:
