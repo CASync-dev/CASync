@@ -368,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
       card.style.right = '';
       card.style.transform = '';
       details.classList.add('hidden');
+      card.children[0].classList.remove('text-wrap');
     } else {
       // Expand: auto height (but never shrink below collapsed size), fixed width anchored left or right based on column
       card.classList.add('expanded', 'shadow-lg', 'z-20');
@@ -376,6 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
       card.style.minHeight = card.dataset.collapsedHeight;
       card.style.height = 'auto';
       card.style.width = '280px';
+      card.children[0].classList.add('text-wrap');
       // Use the stored day index to determine expand direction:
       //   if it's in the right-side columns, we anchor to the right edge and expand leftward,
       //   if it's in the left-side columns,
