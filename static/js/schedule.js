@@ -44,8 +44,10 @@ event_color_map = {};
 // This is the list of events that get rendered onto the calendar.
 // At the moment we just call the API to get all events and render them
 // Should be smarter later, idk if here or in the api request
-
-fetch('/api/events')
+// We
+let user_id = 1; // TODO: get this from the server or auth context instead of hardcoding
+// Will also have to change it to retrieve other users events when we have that functionality
+fetch(`/api/events/${user_id}`)
   .then((response) => response.json())
   .then((data) => {
     events = data;
@@ -136,9 +138,9 @@ function buildEventCard(event, heightPx, id) {
     colors.border,
   ].join(' ');
   card.style.height = `${heightPx - 4}px`;
-  // Store the collapsed height in a data attribute so we can restore it when collapsing
+  // we can store the caluclated hight in a data attribute on the div so we can restore it on collapsed behvaiour later
   card.dataset.collapsedHeight = `${heightPx - 4}px`;
-  // Event title — always shown
+  // Store the collapsed height in a data attribute so we can restore it when collapsing  // Event title — always shown
   const title = document.createElement('p');
   title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
   title.textContent = event.title;
@@ -160,7 +162,7 @@ function buildEventCard(event, heightPx, id) {
   const details = document.createElement('div');
   details.className = 'event-details hidden mt-1 px-1.5 pb-1 ';
   details.innerHTML = `
-    <p class="text-xs ${colors.text} opacity-60 font-mono">${event.subject_code}</p>
+    <p class="text-xs ${colors.text} opacity-60 font-mono">This is where there will be some more info about the event like who else is in class.</p>
   `;
   card.appendChild(details);
 
@@ -244,6 +246,8 @@ function renderDesktopEvents() {
       cardHeight,
       `event-${number_of_events_counter}`,
     );
+    // Store the day index in a data attribute on the card for later use when expanding
+    card.dataset.col = dayIndex; // 0=Mon … 4=Fri
     cell.appendChild(card);
 
     // add them to the counters for second pass
@@ -254,12 +258,13 @@ function renderDesktopEvents() {
   // Second Pass:
   // Check if the event has an item underneath it, if so we pad to the left slightly
   placed_cards.forEach(({ card, dayIndex, startMinutes }) => {
+    // we check if there is any other card that starts above this one, but ends after this one starts (i.e. overlaps from above)
     const hasOverlapFromAbove = placed_cards.some((other) => {
       const isSameDay = other.dayIndex === dayIndex; // only check events in the same column
       const isDifferentCard = other.card !== card; // skip self
       const otherStartedFirst = other.startMinutes < startMinutes; // only check events that start above this one
       const otherStillActiveAtStart = other.endMinutes > startMinutes; // only check events that are still active when this one start
-      // check all of the above conditisons
+      // check all of the above conditions
       return (
         isDifferentCard &&
         isSameDay &&
@@ -342,26 +347,55 @@ function setCalendarDates() {
 // -- Expand Event Items
 // When content is loaded, ad a click lisnter that listens for clicks on any event card.
 document.addEventListener('DOMContentLoaded', () => {
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', (event) => {
     // Check if the id is event-#. All event have an id and a unique number
-    const card = e.target.closest('[id^="event-"]');
+    const card = event.target.closest('[id^="event-"]');
     if (!card) return;
 
-    // we track if the card is expended by the 'expanded' class.
+    //
     const isExpanded = card.classList.contains('expanded');
     const details = card.querySelector('.event-details');
 
     if (isExpanded) {
-      card.classList.remove('expanded', 'overflow-visible', 'shadow-lg');
+      // Collapse: restore original size and position
+      card.classList.remove('expanded', 'shadow-lg', 'z-20');
       card.classList.add('overflow-hidden');
       card.style.height = card.dataset.collapsedHeight;
-      card.style.zIndex = '';
+      // reset any style tags
+      card.style.minHeight = '';
+      card.style.width = '';
+      card.style.left = '';
+      card.style.right = '';
+      card.style.transform = '';
       details.classList.add('hidden');
     } else {
-      card.classList.add('expanded', 'overflow-visible', 'shadow-lg');
+      // Expand: auto height (but never shrink below collapsed size), fixed width anchored left or right based on column
+      card.classList.add('expanded', 'shadow-lg', 'z-20');
       card.classList.remove('overflow-hidden');
+      // Ensure the card doesn't shrink below its original height when expanding
+      card.style.minHeight = card.dataset.collapsedHeight;
       card.style.height = 'auto';
-      card.style.zIndex = '50';
+      card.style.width = '280px';
+      // Use the stored day index to determine expand direction:
+      //   if it's in the right-side columns, we anchor to the right edge and expand leftward,
+      //   if it's in the left-side columns,
+      //   we anchor to the left edge and expand rightward.
+      const col = parseInt(card.dataset.col ?? '0');
+      if (1 <= col && col <= 3) {
+        // middle columns 1,2,3
+        // middle column: expand centered form the middle, with some padding on both sides
+        card.style.left = '50%';
+        card.style.transform = 'translateX(-50%)';
+        card.style.right = '';
+      } else if (col >= 3) {
+        // right-side columns: expand leftward'
+        card.style.right = '2px';
+        card.style.left = 'auto';
+      } else {
+        // left-side columns: expand rightward
+        card.style.left = '2px';
+        card.style.right = 'auto';
+      }
       details.classList.remove('hidden');
     }
   });
