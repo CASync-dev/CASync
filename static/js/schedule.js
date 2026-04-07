@@ -1,45 +1,9 @@
 // Schedule page — sets dynamic dates and renders events into the weekly calendar grid
-//any libraries neededed:
-// ── Grid constants
-// These define the visible time range shown in the HTML grid.
+// ── Constants
 
-// The grid runs from 07:00 am to 06:00 pm
+// Grid Constants: adjust these if you change the grid layout in the HTML/CSS (maybe dynamic later)
 const GRID_START_HOUR = 7; // the first row of the grid is 7:00 am
 const GRID_TOTAL_SLOTS = 12; // the grid has 12 rows, so the last row starts at 6:00 pm
-
-// ── Event data
-// This is the list of events that get rendered onto the calendar.
-
-// This sectionm is how i first simulate the data, to better simulate ap orper backend
-// i have a bunch of json files with calender data to simulate what a db would have.
-// It was created with cal to json parsing libraries that might be used in the bakcend in futre
-// now we call api.js that directs to the files in the static/data folder to get the data for the events.
-let events = [];
-api.getEvents().then((data) => {
-  events = data;
-  // console.log(events);
-  renderDesktopEvents(); // call the render function after events are loaded
-});
-// originaly this was done with a hard coded list of events in this file
-
-// ── Time helpers
-
-// Converts a "HH:MM" string to total minutes from midnight.
-// Used to calculate event positions and durations on the grid
-function parseTime(timeStr) {
-  const [h, m] = timeStr.split(':').map(Number);
-  return h * 60 + m;
-}
-
-// Converts a "HH:MM" 24h string to a readable label like "9:00 am" or "2:30 pm".
-// Used in the event card time display.
-function formatTime(timeStr) {
-  const [h, m] = timeStr.split(':').map(Number);
-  const period = h < 12 ? 'am' : 'pm';
-  const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, '0')} ${period}`;
-}
-
 // ── Color themes
 // Each event has a color. This maps that name to the three
 // Tailwind classes needed to style an event card: background, left border, text.
@@ -74,11 +38,74 @@ const COLOR_MAP = {
   },
   gray: { bg: 'bg-gray-100', border: 'border-gray-500', text: 'text-gray-800' },
 };
-
-// instead of hardcoding the colors in the event data, we assighn a color dyanmicly based on the
-// class name. The uwa ical gives us a title of: 1	Data Structures and Algorithms, LecTut-01.
-// this looks to be {class name}, {event type} so we can split on the comma and get the class name to assign a color to.
 event_color_map = {};
+
+// ── Event data
+// This is the list of events that get rendered onto the calendar.
+// At the moment we just call the API to get all events and render them
+// Should be smarter later, idk if here or in the api request
+
+fetch('/api/events')
+  .then((response) => response.json())
+  .then((data) => {
+    events = data;
+    renderDesktopEvents(); // render events after loading
+  })
+  .catch((error) => {
+    console.error('Error loading events:', error);
+  });
+
+// ── Time helpers
+// Converts a "HH:MM" string to total minutes from midnight.
+// Used to calculate event positions and durations on the grid
+function parseTime(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  return h * 60 + m;
+}
+
+// Converts a "HH:MM" 24h string to a readable label like "9:00 am" or "2:30 pm".
+// Used in the event card time display.
+function formatTime(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  const period = h < 12 ? 'am' : 'pm';
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+}
+
+// Get a list of ISO date strings for Monday through Friday of the current week, adjusted by weekOffset.
+function getWeekDates() {
+  // Always start from the real current date so navigation never accumulates errors
+  const base = new Date();
+  const currentDay = base.getDay();
+  // Calculate how many days to shift back to get to Monday (or forward if it's Sunday)
+  const daysFromMonday = currentDay === 0 ? -6 : 1 - currentDay;
+
+  // Find Monday of the real current week, then shift by weekOffset weeks
+  const monday = new Date(base);
+  monday.setDate(base.getDate() + daysFromMonday + weekOffset * 7);
+
+  // Generate ISO date strings for Monday through Friday of this week
+  const weekDates = [];
+  for (let i = 0; i < 5; i++) {
+    // Loop from 0 to 4 to get dates for Monday through Friday
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    // Use local date parts to avoid UTC timezone shifting the date
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    weekDates.push(`${year}-${month}-${day}`);
+  }
+  // console.log(weekDates); // Uncomment to see the generated week dates in the console
+  return weekDates;
+}
+
+// -- State tracker
+// A var to track how many week are offset from the real current week.
+let weekOffset = 0;
+// The list of events loaded from the API. Each event should have at least:
+// { title, date (ISO string), startTime ("HH:MM"), endTime ("HH:MM"), location, subject_code }
+let events = [];
 
 // ── Event card builder
 // Creates and returns a styled event card DOM element.
@@ -108,7 +135,9 @@ function buildEventCard(event, heightPx, id) {
     colors.bg,
     colors.border,
   ].join(' ');
-  card.style.height = `${heightPx - 4}px`; // subtract 4px to account for the top inset (otherwise overflows down to next grid)
+  card.style.height = `${heightPx - 4}px`;
+  // Store the collapsed height in a data attribute so we can restore it when collapsing
+  card.dataset.collapsedHeight = `${heightPx - 4}px`;
   // Event title — always shown
   const title = document.createElement('p');
   title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
@@ -121,12 +150,19 @@ function buildEventCard(event, heightPx, id) {
   card.appendChild(time);
   // Location - show only if card is big enough, or if the location is exceptionay large, requrie an even bigger card
   if ((heightPx >= 75 && event.location.length <= 50) || heightPx >= 100) {
-    // location
     const location = document.createElement('p');
-    location.className = ` text-xs leading-tight px-1.5 text-bold ${colors.text} opacity-75`;
+    location.className = `text-xs leading-tight px-1.5 text-bold ${colors.text} opacity-75`;
     location.textContent = event.location;
     card.appendChild(location);
   }
+
+  // Extra details — hidden until the card is expanded
+  const details = document.createElement('div');
+  details.className = 'event-details hidden mt-1 px-1.5 pb-1 ';
+  details.innerHTML = `
+    <p class="text-xs ${colors.text} opacity-60 font-mono">${event.subject_code}</p>
+  `;
+  card.appendChild(details);
 
   return card;
 }
@@ -237,46 +273,13 @@ function renderDesktopEvents() {
   });
 }
 
-// ── Date utility
-// Returns an array of 5 ISO date strings [Mon, Tue, Wed, Thu, Fri]
-// for the current calendar week.
-// initialy i did this with a dictionary of monday: date,
-// but this got annoying later so just 5 dates in an array is easier to work with.
-// Tracks how many weeks we are offset from the real current week.
-// 0 = this week, -1 = last week, +1 = next week, etc.
-let weekOffset = 0;
-
-function getWeekDates() {
-  // Always start from the real current date so navigation never accumulates errors
-  const base = new Date();
-  const currentDay = base.getDay();
-  // Calculate how many days to shift back to get to Monday (or forward if it's Sunday)
-  const daysFromMonday = currentDay === 0 ? -6 : 1 - currentDay;
-
-  // Find Monday of the real current week, then shift by weekOffset weeks
-  const monday = new Date(base);
-  monday.setDate(base.getDate() + daysFromMonday + weekOffset * 7);
-
-  // Generate ISO date strings for Monday through Friday of this week
-  const weekDates = [];
-  for (let i = 0; i < 5; i++) {
-    // Loop from 0 to 4 to get dates for Monday through Friday
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    // Use local date parts to avoid UTC timezone shifting the date
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    weekDates.push(`${year}-${month}-${day}`);
-  }
-  // console.log(weekDates); // Uncomment to see the generated week dates in the console
-  return weekDates;
-}
-
 // ── Set calendar header dates
 // Updates the page title ("Today, Wed March 11") and the five column headers
 // (Mon 9, Tue 10, …). Today's column is highlighted in indigo.
 function setCalendarDates() {
+  /*
+    
+  */
   const now = new Date(); // real current date, for the title and today-highlight
 
   const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
@@ -304,12 +307,16 @@ function setCalendarDates() {
 
   // Show relative week label for ±1 week, or a date range for anything further
   if (weekOffset === 0) {
+    // if on the current week, show "Today, Month D"
     titleElement.textContent = `Today, ${fmt(now, 'long')}`;
   } else if (weekOffset === -1) {
+    // if on the previous week, show "Last Week, Mon D"
     titleElement.textContent = `Last Week, ${fmt(offsetDate(-7), 'long')}`;
   } else if (weekOffset === 1) {
+    // if on the next week, show "Next Week, Mon D"
     titleElement.textContent = `Next Week, ${fmt(offsetDate(7), 'long')}`;
   } else {
+    // if on any other week, show a date range like "Mar 1 - Mar 5"
     const weekDates = getWeekDates();
     const startDate = new Date(weekDates[0]);
     const endDate = new Date(weekDates[4]);
@@ -332,30 +339,66 @@ function setCalendarDates() {
   });
 }
 
+// -- Expand Event Items
+// When content is loaded, ad a click lisnter that listens for clicks on any event card.
+document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click', (e) => {
+    // Check if the id is event-#. All event have an id and a unique number
+    const card = e.target.closest('[id^="event-"]');
+    if (!card) return;
+
+    // we track if the card is expended by the 'expanded' class.
+    const isExpanded = card.classList.contains('expanded');
+    const details = card.querySelector('.event-details');
+
+    if (isExpanded) {
+      card.classList.remove('expanded', 'overflow-visible', 'shadow-lg');
+      card.classList.add('overflow-hidden');
+      card.style.height = card.dataset.collapsedHeight;
+      card.style.zIndex = '';
+      details.classList.add('hidden');
+    } else {
+      card.classList.add('expanded', 'overflow-visible', 'shadow-lg');
+      card.classList.remove('overflow-hidden');
+      card.style.height = 'auto';
+      card.style.zIndex = '50';
+      details.classList.remove('hidden');
+    }
+  });
+});
 //-- Playing around with button
 document.getElementById('new-event-btn').addEventListener('click', () => {
   alert('This button will open a form to create a new event. Coming soon!');
 });
 
+function updateTodayButton() {
+  // Hide the "Today" button if we're already on the current week, show it otherwise
+  if (weekOffset === 0) {
+    document.getElementById('btn-today').classList.add('hidden');
+  } else {
+    document.getElementById('btn-today').classList.remove('hidden');
+  }
+}
+
 document.getElementById('btn-last-week').addEventListener('click', () => {
   weekOffset--;
   setCalendarDates();
   renderDesktopEvents();
-  document.getElementById('btn-today').classList.remove('hidden'); // show the today button
+  updateTodayButton();
 });
 
 document.getElementById('btn-today').addEventListener('click', () => {
   weekOffset = 0;
   setCalendarDates();
   renderDesktopEvents();
-  document.getElementById('btn-today').classList.add('hidden'); // hide the today button
+  updateTodayButton();
 });
 
 document.getElementById('btn-next-week').addEventListener('click', () => {
   weekOffset++;
   setCalendarDates();
   renderDesktopEvents();
-  document.getElementById('btn-today').classList.remove('hidden'); // show the today button
+  updateTodayButton();
 });
 
 // innit
