@@ -5,10 +5,8 @@
   class="antialiased mx-auto bg-white flex items-center justify-center text-center"
 >
   <form
-    name="login"
+    id="login"
     novalidate="novalidate"
-    onsubmit="return loginImplementation();"
-    method="post"
   >
     <div>
       <br />
@@ -58,8 +56,8 @@
       <br />
       <input type="checkbox" id="rme" name="rme" />
       <label for="rme"> Remember me </label>
-
       <br />
+      <span id = "field-error"> </span>
       <br />
       <button
         id="log"
