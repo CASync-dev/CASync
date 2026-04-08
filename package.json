@@ -1,17 +1,14 @@
 {
   "dependencies": {
-    "@tailwindcss/cli": "^4.2.1",
-    "date-fns": "^4.1.0",
-    "tailwind": "^4.0.0"
+    "date-fns": "^4.1.0"
   },
   "name": "casync",
   "version": "1.0.0",
   "description": "A platform for connecting timetables",
   "main": "index.js",
   "devDependencies": {
-    "concurrently": "^9.2.1",
-    "live-server": "^1.2.2",
-    "tailwindcss": "^4.2.1"
+    "@tailwindcss/cli": "^4.2.1",
+    "concurrently": "^9.2.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
