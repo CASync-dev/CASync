@@ -2,7 +2,7 @@
 {% block content %}
     <br>
     <div class="antialiased mx-auto bg-white flex items-center justify-center text-center">
-        <form name = "register" novalidate = "novalidate" onsubmit = "return regValidation()" method = "post">
+        <form id = "register" novalidate = "novalidate">
             <div>
                 <br>
                 <a href="/home"> 
@@ -38,16 +38,15 @@
                 <input type = "checkbox" id = "rme" name = "rme">
                 <label for="rme"> Remember me </label>
                 <br>
-                <br>
+                <span id = "field-error"> </span>
                 <br>
                 <input id = "reg" type = "submit" class = "button cursor-pointer text-4xl lg:text-5xl bg-fuchsia-900 text-white font-bold rounded-lg p-4 hover:bg-fuchsia-950" value = "Register">
-
                 <br>
-                <h5 class = "size-1"> Already registered? Login <a href = "/login"> here. </a></h5>
+                <h5 class = ""> Already registered? Login <a href = "/login"> here. </a></h5>
             </div>
         </form>
     </div>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/register.js') }}"></script>
+<script src="{{ url_for('static', filename='js/register.js') }}"></script>  
 {% endblock %}
