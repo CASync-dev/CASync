@@ -122,7 +122,7 @@ def api_create_event():
         "start_time": "14:00",
         "end_time": "15:00",
         "user_id": 1
-    }   
+    }
     """
     data = request.get_json()
     # We should add some validation here to make sure the data is in the right format and all required fields are present, but for now we'll just assume it's correct
@@ -139,7 +139,6 @@ def api_create_event():
     db.session.add(event)
     db.session.commit()
     return jsonify(event.to_dict()), 201
-
 
 @app.route("/api/user")
 def api_user():
