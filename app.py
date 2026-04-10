@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
-from flask_migrate import Migrate, upgrade
+from flask_migrate import Migrate
 import os
 from extensions import db
 from models import Calendar, User, Event
