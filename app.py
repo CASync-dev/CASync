@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 import os
 from flask import Flask, render_template, jsonify, session, redirect, url_for
@@ -105,6 +107,36 @@ def dev_logout():
 def api_events(user_id):
     events = Event.query.where(Event.user_id == user_id).all()
     return jsonify([e.to_dict() for e in events])
+
+# create event API route - accepts a POST request with the event details in the body and creates a new event for the user
+@app.route("/api/events", methods=["POST"])
+def api_create_event():
+    """
+        Expects a JSON body like this:
+    {
+        "title": "Event Title",
+        "description": "Event Description",
+        "date": "2024-07-01",
+        "start_time": "14:00",
+        "end_time": "15:00",
+        "user_id": 1
+    }   
+    """
+    data = request.get_json()
+    # We should add some validation here to make sure the data is in the right format and all required fields are present, but for now we'll just assume it's correct
+    event = Event(
+        title=data['title'],
+        description=data.get('description', ''),
+        date=datetime.strptime(data['date'], '%Y-%m-%d').date(),
+        start_time=datetime.strptime(data['start_time'], '%H:%M').time(),
+        end_time=datetime.strptime(data['end_time'], '%H:%M').time(),
+        location=data.get('location'),
+        color=data.get('color', 'indigo'),
+        user_id=data['user_id']
+    )
+    db.session.add(event)
+    db.session.commit()
+    return jsonify(event.to_dict()), 201
 
 
 @app.route("/api/user")

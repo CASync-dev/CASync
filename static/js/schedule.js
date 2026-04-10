@@ -327,6 +327,56 @@ function renderDesktopEvents() {
   });
 }
 
+// -- Add event form handler
+document.getElementById('add-event-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  // Get form values
+  const title = document.getElementById('event-title').value;
+  const date = document.getElementById('event-date').value;
+  const start_time = document.getElementById('event-time-start').value;
+  const end_time = document.getElementById('event-time-end').value;
+  const location = document.getElementById('event-location').value;
+  const user_id = document.getElementById('user-id').value;
+  errorElement = document.getElementById('form-message');
+  // Basic validation
+  if (!title || !date || !start_time || !end_time) {
+    errorElement.textContent = 'Please fill in all required fields.';
+    errorElement.classList.remove('hidden');
+    return;
+  }
+  // end time must be after start time
+  if (parseTime(end_time) <= parseTime(start_time)) {
+    errorElement.textContent = 'End time must be after start time.';
+    errorElement.classList.remove('hidden');
+    return;
+  }
+
+  // Create event object in json format expected by the API
+  const newEvent = {
+    title: title,
+    date: date,
+    start_time: start_time,
+    end_time: end_time,
+    location: location,
+    user_id: user_id,
+  };
+
+  // Send POST request to API to create the event
+  fetch('/api/events', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newEvent),
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error('Failed to create event');
+    }
+    console.log('Event created successfully');
+    return response.json();
+  });
+  // .then((createdEvent) => {
+  //   // logic for after creation
+});
+
 // ── Set calendar header dates
 // Updates the page title ("Today, Wed March 11") and the five column headers
 // (Mon 9, Tue 10, …). Today's column is highlighted in indigo.
@@ -427,3 +477,4 @@ document.getElementById('btn-next-week').addEventListener('click', () => {
 
 // innit
 setCalendarDates();
+updateTodayButton();
