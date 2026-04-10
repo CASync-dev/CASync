@@ -122,6 +122,7 @@ def api_create_event():
         "start_time": "14:00",
         "end_time": "15:00",
         "user_id": 1
+<<<<<<< HEAD
     }
     """
     data = request.get_json()
