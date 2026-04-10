@@ -166,6 +166,55 @@ function buildEventCard(event, heightPx, id) {
   `;
   card.appendChild(details);
 
+  card.addEventListener('click', () => {
+    const isExpanded = card.classList.contains('expanded');
+
+    if (isExpanded) {
+      // Collapse: restore original size and position
+      card.classList.remove('expanded', 'shadow-lg', 'z-20');
+      card.classList.add('overflow-hidden');
+      card.style.height = card.dataset.collapsedHeight;
+      // reset any style tags
+      card.style.minHeight = '';
+      card.style.width = '';
+      card.style.left = '';
+      card.style.right = '';
+      card.style.transform = '';
+      details.classList.add('hidden');
+      card.children[0].classList.remove('text-wrap');
+    } else {
+      // Expand: auto height (but never shrink below collapsed size), fixed width anchored left or right based on column
+      card.classList.add('expanded', 'shadow-lg', 'z-20');
+      card.classList.remove('overflow-hidden');
+      // Ensure the card doesn't shrink below its original height when expanding
+      card.style.minHeight = card.dataset.collapsedHeight;
+      card.style.height = 'auto';
+      card.style.width = '280px';
+      card.children[0].classList.add('text-wrap');
+      // Use the stored day index to determine expand direction:
+      //   if it's in the right-side columns, we anchor to the right edge and expand leftward,
+      //   if it's in the left-side columns,
+      //   we anchor to the left edge and expand rightward.
+      const col = parseInt(card.dataset.col ?? '0');
+      if (1 <= col && col <= 3) {
+        // middle columns 1,2,3
+        // middle column: expand centered form the middle, with some padding on both sides
+        card.style.left = '50%';
+        card.style.transform = 'translateX(-50%)';
+        card.style.right = '';
+      } else if (col >= 3) {
+        // right-side columns: expand leftward'
+        card.style.right = '2px';
+        card.style.left = 'auto';
+      } else {
+        // left-side columns: expand rightward
+        card.style.left = '2px';
+        card.style.right = 'auto';
+      }
+      details.classList.remove('hidden');
+    }
+  });
+
   return card;
 }
 
@@ -344,68 +393,7 @@ function setCalendarDates() {
   });
 }
 
-// -- Expand Event Items
-// When content is loaded, ad a click lisnter that listens for clicks on any event card.
-document.addEventListener('DOMContentLoaded', () => {
-  document.addEventListener('click', (event) => {
-    // Check if the id is event-#. All event have an id and a unique number
-    const card = event.target.closest('[id^="event-"]');
-    if (!card) return;
-
-    //
-    const isExpanded = card.classList.contains('expanded');
-    const details = card.querySelector('.event-details');
-
-    if (isExpanded) {
-      // Collapse: restore original size and position
-      card.classList.remove('expanded', 'shadow-lg', 'z-20');
-      card.classList.add('overflow-hidden');
-      card.style.height = card.dataset.collapsedHeight;
-      // reset any style tags
-      card.style.minHeight = '';
-      card.style.width = '';
-      card.style.left = '';
-      card.style.right = '';
-      card.style.transform = '';
-      details.classList.add('hidden');
-      card.children[0].classList.remove('text-wrap');
-    } else {
-      // Expand: auto height (but never shrink below collapsed size), fixed width anchored left or right based on column
-      card.classList.add('expanded', 'shadow-lg', 'z-20');
-      card.classList.remove('overflow-hidden');
-      // Ensure the card doesn't shrink below its original height when expanding
-      card.style.minHeight = card.dataset.collapsedHeight;
-      card.style.height = 'auto';
-      card.style.width = '280px';
-      card.children[0].classList.add('text-wrap');
-      // Use the stored day index to determine expand direction:
-      //   if it's in the right-side columns, we anchor to the right edge and expand leftward,
-      //   if it's in the left-side columns,
-      //   we anchor to the left edge and expand rightward.
-      const col = parseInt(card.dataset.col ?? '0');
-      if (1 <= col && col <= 3) {
-        // middle columns 1,2,3
-        // middle column: expand centered form the middle, with some padding on both sides
-        card.style.left = '50%';
-        card.style.transform = 'translateX(-50%)';
-        card.style.right = '';
-      } else if (col >= 3) {
-        // right-side columns: expand leftward'
-        card.style.right = '2px';
-        card.style.left = 'auto';
-      } else {
-        // left-side columns: expand rightward
-        card.style.left = '2px';
-        card.style.right = 'auto';
-      }
-      details.classList.remove('hidden');
-    }
-  });
-});
 //-- Playing around with button
-document.getElementById('new-event-btn').addEventListener('click', () => {
-  alert('This button will open a form to create a new event. Coming soon!');
-});
 
 function updateTodayButton() {
   // Hide the "Today" button if we're already on the current week, show it otherwise
