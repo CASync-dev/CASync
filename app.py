@@ -106,6 +106,7 @@ def api_events(user_id):
     events = Event.query.where(Event.user_id == user_id).all()
     return jsonify([e.to_dict() for e in events])
 
+
 @app.route("/api/user")
 def api_user():
     user = User.query.first()

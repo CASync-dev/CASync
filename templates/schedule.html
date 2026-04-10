@@ -383,26 +383,26 @@
         class="absolute inset-0 pl-10 focus:outline-none sm:pl-16"
       >
         <el-dialog-panel
-          class="group/dialog-panel relative ml-auto block size-full max-w-md transform transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700"
+          class="group/dialog-panel relative ml-auto block size-full max-w-md transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700"
         >
           <!-- Close button, show/hide based on slide-over state. -->
           <div
-            class="absolute top-0 left-0 -ml-8 flex pt-4 pr-2 duration-500 ease-in-out group-data-closed/dialog-panel:opacity-0 sm:-ml-10 sm:pr-4"
+            class="absolute -ml-8 flex pt-4 pr-2 duration-500 ease-in-out group-data-closed/dialog-panel:opacity-0 sm:pr-4"
           >
             <button
               type="button"
               command="close"
               commandfor="drawer"
-              class="relative rounded-md text-gray-400 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+              class="rounded-md text-gray-400 hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
             >
-              <span class="absolute -inset-2.5"></span>
+              <span class="absolute"></span>
               <span class="sr-only">Close panel</span>
               <i class="fa-solid fa-xmark text-2xl"></i>
             </button>
           </div>
 
           <div
-            class="relative flex h-full flex-col overflow-y-aut bg-white py-6 shadow-xl after:absolute after:inset-y-0 after:left-0 after:w-px after:bg-white/10"
+            class="relative flex h-full flex-col overflow-y-auto bg-gray-100 py-6 shadow-xl after:absolute"
           >
             <div class="px-4 sm:px-6">
               <h2
@@ -412,51 +412,94 @@
                 Create New Event
               </h2>
             </div>
-            <div class="relative mt-6  px-4 sm:px-6">
+            <div class="relative mt-6 px-4 sm:px-6">
               <form>
                 <div class="">
-                  <div>
-                    <label
-                      for="event-title"
-                      class="block text-sm font-medium"
-                    >
+                  <div class="mb-3">
+                    <label for="event-title" class="block text-sm font-medium">
                       Event Title
                     </label>
                     <input
                       type="text"
                       id="event-title"
                       name="event-title"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm  focus:ring-indigo-500 sm:text-sm"
+                      class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm"
                     />
                   </div>
-                  <div>
-                    <label
-                      for="event-date"
-                      class="block text-sm font-medium"
-                    >
-                      Date & Time
+                  <div class="mb-3">
+                    <label for="event-date" class="block text-sm font-medium">
+                      Date
                     </label>
                     <input
-                      type="datetime-local"
+                      type="date"
                       id="event-date"
                       name="event-date"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     />
                   </div>
-                  <div>
+                  <div class="mb-3">
+                    <label for="event-time" class="block text-sm font-medium">
+                      Time
+                    </label>
+                    <div class="flex">
+                      <input
+                        type="time"
+                        id="event-time-start"
+                        name="event-time-start"
+                        class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      />
+                      <p class="mx-2">-</p>
+                      <input
+                        type="time"
+                        id="event-time-end"
+                        name="event-time-end"
+                        class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-3">
                     <label
-                      for="event-description"
+                      for="event-location"
                       class="block text-sm font-medium"
                     >
+                      Location
+                    </label>
+                    <input
+                      type="text"
+                      id="event-location"
+                      name="event-location"
+                      class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="event-description" class="text-sm font-medium">
                       Description
                     </label>
                     <textarea
                       id="event-description"
                       name="event-description"
                       rows="3"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     ></textarea>
                   </div>
+                  <!-- Submit Button -->
+                  <div class="mt-6">
+                    <button
+                      type="submit"
+                      class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                      Create Event
+                    </button>
+                    <button
+                      type="button"
+                      command="close"
+                      commandfor="drawer"
+                      class="ml-3 inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
               </form>
             </div>
           </div>
