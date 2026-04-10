@@ -9,4 +9,4 @@ __pycache__/
 .env
 instance/
 .claude/
-**/output.css
+static/css/output.css
