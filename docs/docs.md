@@ -353,43 +353,52 @@ if User.query.first():
 
 ## Schedule Page
 
-This is where I have started playing with the tailwind and js. I grabbed a calendar tailwind template online and stripped it down. I made sure to hold onto the look they went for for their event item. In the js we:
+The weekly calendar view. Started from a Tailwind template and stripped it back, keeping the look of the event cards. All the logic lives in `schedule.js`.
 
-1. Import the events from the json
+### How it loads
 
-2. Get the current day and populate the correct date on the today title and the day header columns
+On page load, it hits `GET /api/events/{user_id}` to pull down all events for the user, then calls `renderDesktopEvents()`. The `user_id` is currently hardcoded to `1`,  that'll need to change once auth is in.
 
-   a) I do this by figuring out how far away the current day is from the most recent Monday.
+### Week navigation
 
-   b) Then we retun an array of 5 dates for each day in the cal
+A `weekOffset` variable tracks how far we are from the current week (0 = this week, -1 = last week, etc.). The back/forward buttons just increment or decrement that offset and re-render. The "Today" button resets it to 0 and hides itself when you're already on the current week.
 
-   c) We set them as the column headers and hilight the one that is today.
+The `getWeekDates()` function always calculates from the real current date rather than accumulating offsets, so navigation can't drift over time. It returns ISO date strings for Monday through Friday of the target week.
 
-3. We have a number of time formatting helper functions that figure out:
+The calendar title updates based on how far out you are:
+- Offset 0: `"Today, Wednesday April 12"`
+- Offset ±1: `"Last Week, ..."` / `"Next Week, ..."`
+- Anything further: a date range like `"Mar 1 - Mar 5"`
 
-   a) How many minutes until midnight (sets the location and length of an event item)
+Today's column header is highlighted in indigo.
 
-   b) Converts the time to a nice a.m. p.m. format.
+### Rendering events
 
-4. We have a function that builds an event html element
+`renderDesktopEvents()` does the heavy lifting:
 
-   a) it creates a standard div with themeing
+1. Builds a `cellMap`, a lookup table of `"dayIndex-hourIndex" → DOM element` from the flat CSS grid. Day 0 is Monday, hour 0 is 7:00 am.
 
-   b) it sets the color based on the event data {color:}
+2. For each event, finds which column (day) and row (hour) it belongs to, then calculates the card height in pixels based on event duration × the measured height of one grid cell.
 
-   c) sets the height of the box based on the duration we figured out earlier
+3. Calls `buildEventCard()` to create the card element and drops it into the right cell using absolute positioning. The card overflows downward into adjacent rows to span its full duration.
 
-5. Then we have a big `renderDesktopEvents()` function that:
+4. **Second pass:** checks for overlapping events in the same column. If a card has an event starting above it that hasn't ended yet, it gets nudged right slightly (`left: 0.5rem`) so both cards remain visible.
 
-   a) creates a cell map of the grid. This gives us a nice map that is effectily {row:column = div elemnt}
+### Event cards
 
-   b) now for each element we:
+Each card shows the event title, time range, and location (location is only shown if the card is tall enough). Colors are assigned per-class; the first part of the event title before the comma (e.g. `"CS 101, Lecture"` → `"cs 101"`) is used as the key. The first time a class is seen it gets the next available color from `COLOR_MAP`. If the event has a `color` field set explicitly, that takes priority.
 
-    i) check if the event is in this week
+Clicking a card expands it to show extra details and auto-sizes to fit the content. Clicking again collapses it back. Expanded cards get a fixed width of 280px and expand leftward, rightward, or centered depending on which column they're in so they don't clip off the edge of the grid.
 
-   ​ii) if it is, we determine its location based on the time and date.
+### Adding events
 
-   ​iii) Call the build event function and insert it into the right grid  
+There's a tailwind drawer (dialog element with id `drawer`) that contains the add event form. On submit it:
+
+1. Validates that title, date, start time, and end time are all filled in, and that end time is after start time.
+2. POSTs to `/api/events` with the event data as JSON.
+3. On success: closes the drawer, resets the form, pushes the new event into the local `events` array, and re-renders the grid.
+
+The color picker in the form is a row of colored buttons. Clicking one calls `selectColor()`, which updates the hidden `event-color` input and adds a ring to the selected button to indicate its selected. 
 
 ## ical Imports
 

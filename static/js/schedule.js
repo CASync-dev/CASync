@@ -135,6 +135,7 @@ function buildEventCard(event, heightPx, id) {
   // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
   const card = document.createElement('div');
   card.id = id;
+  // If the event doesn't have a color, use the color mapped to its class. If it has an invalid color, default to gray.
   if (!event.color) {
     colors = COLOR_MAP[event_color_map[event_class]];
   } else if (event.color && COLOR_MAP[event.color]) {
