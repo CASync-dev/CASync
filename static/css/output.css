@@ -353,10 +353,6 @@
   .table {
     display: table;
   }
-  .size-1 {
-    width: calc(var(--spacing) * 1);
-    height: calc(var(--spacing) * 1);
-  }
   .h-24 {
     height: calc(var(--spacing) * 24);
   }
@@ -1053,6 +1049,11 @@
       font-size: var(--text-7xl);
       line-height: var(--tw-leading, var(--text-7xl--line-height));
     }
+  }
+}
+@layer base {
+  #field-error {
+    color: red;
   }
 }
 @property --tw-translate-x {
