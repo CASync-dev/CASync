@@ -16,9 +16,6 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 
-migrate = Migrate(app, db)
-
-
 # --- Session login logic
 @app.context_processor
 # This function injects the 'logged_in' variable into all tempaltes
