@@ -495,6 +495,66 @@
                       class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     />
                   </div>
+                  <!-- color picker -->
+                  <div>
+                    <label for="event-color" class="text-sm font-medium">
+                      Event Color
+                    </label>
+                    <div class="flex">
+                      <!-- red -->
+                      <button
+                        type="button"
+                        class="mt-1 block w-16 h-8 rounded-md bg-red-500 border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        onclick="
+                          document.getElementById('event-color').value =
+                            '#ef4444'
+                        "
+                      ></button>
+                      <!-- orange -->
+                      <button
+                        type="button"
+                        class="mt-1 block w-16 h-8 rounded-md bg-orange-500 border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        onclick="
+                          document.getElementById('event-color').value =
+                            '#f97316'
+                        "
+                      ></button>
+                      <!-- yellow -->
+                      <button
+                        type="button"
+                        class="mt-1 block w-16 h-8 rounded-md bg-yellow-500 border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        onclick="
+                          document.getElementById('event-color').value =
+                            '#eab308'
+                        "
+                      ></button>
+                      <!-- green -->
+                      <button
+                        type="button"
+                        class="mt-1 block w-16 h-8 rounded-md bg-green-500 border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        onclick="
+                          document.getElementById('event-color').value =
+                            '#22c55e'
+                        "
+                      ></button>
+                      <!-- blue -->
+                      <button
+                        type="button"
+                        class="mt-1 block w-16 h-8 rounded-md bg-blue-500 border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        onclick="
+                          document.getElementById('event-color').value =
+                            '#3b82f6'
+                        "
+                      ></button>
+                    </div>
+                    <!-- custom color -->
+                    <input
+                      type="color"
+                      id="event-color"
+                      name="event-color"
+                      class="mt-1 block w-16 h-8 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
                   <!-- Form Messages -->
                   <div>
                     <p
