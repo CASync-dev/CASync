@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from flask_migrate import Migrate
-import os
+import os 
+from flask_migrate import Migrate
 from extensions import db
 from models import Calendar, User, Event
 from services.ical import import_ical
@@ -97,9 +98,13 @@ def dev_logout():
     session.clear()
     return redirect(url_for('home'))
 
-@app.route("/api/events")
-def api_events():
-    events = Event.query.all()
+# API route to get all events for a user - this is used by the schedule page to load the events onto the calendar
+# it accpets the user id as a parameter and returns a list of events for that user in json format
+# not sure if asking for the user id in the url is the best way to do this
+# but it works for now, we can change it later if we want to use a different auth system or something
+@app.route("/api/events/<int:user_id>")
+def api_events(user_id):
+    events = Event.query.where(Event.user_id == user_id).all()
     return jsonify([e.to_dict() for e in events])
 
 @app.route("/api/user")
@@ -114,10 +119,10 @@ def api_calendars():
     calendars = Calendar.query.all()
     return jsonify([c.to_dict() for c in calendars])
 
-@app.route("/api/import-ical", methods=["POST"])
-def api_import_ical():
+@app.route("/api/import-ical/<int:user_id>", methods=["POST"])
+def api_import_ical(user_id):
     """
-    POST /api/import-ical
+    POST /api/import-ical/<user_id>
     Body: { "url": "<ical feed url>" }
 
     Passes the URL and user to services/ical.py which validates, fetches,
@@ -131,7 +136,7 @@ def api_import_ical():
         return jsonify({"error": "Request body must be JSON."}), 400
 
     # Call the main import function in services/ical.py, which returns (result, error)
-    result, error = import_ical(data.get("url"))
+    result, error = import_ical(data.get('url'), user_id)
 
     if error:
         # If there was an error during import, return it with a 400 status code
@@ -140,6 +145,12 @@ def api_import_ical():
     # On success, return the result (e.g. number of events imported) with a 200 status code
     return jsonify(result), 200
 
+
+# This is just a test route to get a list of users
+@app.route("/api/users", methods=["get"])
+def api_users():
+    users = User.query.all()
+    return jsonify([u.to_dict() for u in users])
 
 
 # Error handling
