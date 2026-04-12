@@ -8,16 +8,12 @@
   "main": "index.js",
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.1",
-    "concurrently": "^9.2.1",
-    "tailwindcss": "^4.2.1",
-    "live-server": "^1.2.2"
+    "concurrently": "^9.2.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css",
+    "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify",
     "watch:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
-    "serve": "live-server --port=8080 --entry-file=templates/layout.html",
-    "dev": "concurrently \"npm run watch:css\" \"npm run serve\" --names \"CSS,SERVER\" --prefix-colors \"blue,green\""
+    "dev": "concurrently \"npm run watch:css\" \"python app.py\""
   },
   "repository": {
     "type": "git",
