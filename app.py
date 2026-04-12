@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
-import os
-from flask import Flask, render_template, jsonify, session, redirect, url_for
+from flask_migrate import Migrate
+import os 
 from flask_migrate import Migrate
 from extensions import db
 from models import Calendar, User, Event
@@ -12,6 +12,7 @@ app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')  # swap for real env 
 # Configure the database URI and initialize the database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 db.init_app(app)
+
 migrate = Migrate(app, db)
 
 
