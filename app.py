@@ -122,6 +122,8 @@ def api_create_event():
         "start_time": "14:00",
         "end_time": "15:00",
         "user_id": 1
+        "location": "Event Location",
+        "color": "indigo"  # optional, defaults to indigo if not provided
 <<<<<<< HEAD
     }
     """

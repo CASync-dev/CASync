@@ -39,7 +39,7 @@ class Event(db.Model):
     start_time   = db.Column(db.Time, nullable=False)
     end_time     = db.Column(db.Time, nullable=False)
     location     = db.Column(db.String(200))                          # optional
-    color        = db.Column(db.String(20), default='indigo')         # optional, falls back to indigo
+    color        = db.Column(db.String(20))         # optional, used for calendar display (e.g. "indigo", "red", etc.)
     user_id      = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # links this event to its owner
     ical_uid    = db.Column(db.String(200))   # is the uid of the event in the ical
     ical_id    = db.Column(db.Integer, db.ForeignKey('calendars.id'))   # is the id of the calendar in the ical, we can use this to link events to a calendar and update them later if needed
