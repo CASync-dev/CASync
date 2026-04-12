@@ -427,7 +427,10 @@ function setCalendarDates() {
   */
   const now = new Date(); // real current date, for the title and today-highlight
 
-  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  // Indexed by getDay(): 0=Sun, 1=Mon, …, 6=Sat
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  // Mon–Fri labels for the five column headers (getDay() 1–5)
+  const weekdayNames = dayNames.slice(1, 6);
 
   // Update the "Today, Day Month Date" title at the top of the page
   const titleElement = document.getElementById('calendar-title');
@@ -435,7 +438,7 @@ function setCalendarDates() {
   // Helper function to format a date as "Day Month Date" with customizable month style
   const fmt = (date, monthStyle) =>
     // e.g. "Wednesday March 11" or "Wed Mar 11"
-    `${dayNames[date.getDay() - 1]} ${date.toLocaleString('default', { month: monthStyle })} ${date.getDate()}`;
+    `${dayNames[date.getDay()]} ${date.toLocaleString('default', { month: monthStyle })} ${date.getDate()}`;
 
   // Shorter format for column headers, e.g. "Mar 11"
   const fmtShort = (date) =>
@@ -467,7 +470,6 @@ function setCalendarDates() {
     const endDate = new Date(weekDates[4]);
     titleElement.textContent = `${fmtShort(startDate)} - ${fmtShort(endDate)}`;
   }
-
   // Update each of the five column header elements with the correct day and date.
   // Highlight today's column with indigo text.
   const weekDates = getWeekDates();
@@ -475,7 +477,7 @@ function setCalendarDates() {
     const columnDate = new Date(dateStr);
     const columnElement = document.getElementById(`date-col-${i}`);
     if (columnElement) {
-      columnElement.textContent = `${dayNames[i]} ${columnDate.getDate()}`;
+      columnElement.textContent = `${weekdayNames[i]} ${columnDate.getDate()}`;
       const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       const isToday = dateStr === todayStr;
       columnElement.classList.toggle('text-indigo-600', isToday);
