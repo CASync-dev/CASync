@@ -2,7 +2,7 @@ import json
 from datetime import date, time
 from app import app, db
 from models import User, Event
-
+import sys
 
 def parse_date(s):
     return date.fromisoformat(s)  # "2026-03-26" -> date object
@@ -17,7 +17,7 @@ with app.app_context():
     # Skip if already seeded
     if User.query.first():
         print('DB already seeded, skipping.')
-        exit()
+        exit(0)
 
     # Create the test users
     users = []
@@ -35,19 +35,25 @@ with app.app_context():
     with open('static/data/events.json') as f:
         events = json.load(f)
 
-    
-    for e in events:
-        for user in users:
+    # if the script is run with the argument 'seed:events':
+    #   it will also seed events for each user. Otherwise,
+    #   it will just seed the users without any events.
+    if len(sys.argv) > 1 and sys.argv[1] == 'seed:events':
+        print('Seeding User Events: ')
+        for e in events:
+            for user in users:
 
-            db.session.add(Event(
-                title      = e['title'],
-                date       = parse_date(e['date']),
-                start_time = parse_time(e['startTime']),
-                end_time   = parse_time(e['endTime']),
-                location   = e.get('location'),
-                color      = e.get('color', 'indigo'),
-                user_id    = user.id,
-        ))
+                db.session.add(Event(
+                    title      = e['title'],
+                    date       = parse_date(e['date']),
+                    start_time = parse_time(e['startTime']),
+                    end_time   = parse_time(e['endTime']),
+                    location   = e.get('location'),
+                    color      = e.get('color', 'indigo'),
+                    user_id    = user.id,
+            ))
+    else:
+        print('Seeding without events (users only).')
 
     db.session.commit()
     users_list = []

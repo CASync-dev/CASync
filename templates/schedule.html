@@ -5,7 +5,7 @@
   <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
     <!-- Calendar Header: Contains title, view selector, and new activity button -->
     <div
-      class="flex flex-col md:flex-row max-md:gap-3 items-center justify-between mb-5"
+      class="flex flex-col md:flex-row max-md:gap-3 items-center justify-between"
     >
       <!-- Calendar Icon and Current Date Display -->
       <div class="flex items-center gap-4">
@@ -55,6 +55,26 @@
 
     <!-- Calendar Grid Container -->
     <div class="relative">
+      <div class="flex justify-between p-2">
+        <button
+          id="btn-last-week"
+          class="p-2 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+        >
+          < last week
+        </button>
+        <button
+          id="btn-today"
+          class="hidden bg-emerald-500 p-2 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+        >
+          today
+        </button>
+        <button
+          id="btn-next-week"
+          class="p-2 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+        >
+          next week >
+        </button>
+      </div>
       <!-- Week Header Row: Monday-Friday work week -->
       <div
         class="grid grid-cols-6 border-t border-gray-200 sticky top-0 left-0 w-full"
@@ -370,7 +390,6 @@
     </div>
   </div>
 </section>
-{% endblock %}
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/schedule.js') }}"></script>
 {% endblock %}
