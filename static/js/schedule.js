@@ -172,11 +172,31 @@ function buildEventCard(event, heightPx, id) {
 
   // Extra details — hidden until the card is expanded
   const details = document.createElement('div');
-  details.className = 'event-details hidden mt-1 px-1.5 pb-1 ';
+  details.className = 'event-details hidden flex mt-1 px-1.5 pb-1 ';
   details.innerHTML = `
     <p class="text-xs ${colors.text} opacity-60 font-mono">This is where there will be some more info about the event like who else is in class.</p>
+
   `;
   card.appendChild(details);
+
+  // if the event has no ical_id, it means it was created by the user and can be edited/deleted
+  if (event.ical_id === null) {
+    // we add a little badge to the top right corner to indicate it is a custom event
+    const badge = document.createElement('span');
+    badge.className = 'inline-block w-2 h-2 bg-blue-500 rounded-full ml-2';
+    badge.title = 'User-created event';
+    card.children[0].appendChild(badge);
+
+    // delete + edit btns stacked vertically
+    details.innerHTML += `<div class="flex flex-col gap-1 ml-auto">
+      <button class="bg-red-500 text-white rounded p-1 hover:bg-red-600" onclick="deleteEvent('${event.id}')">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+      <button class="bg-blue-500 text-white rounded p-1 hover:bg-blue-600" onclick="editEvent('${event.id}')">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </button>
+    </div>`;
+  }
 
   card.addEventListener('click', () => {
     const isExpanded = card.classList.contains('expanded');
@@ -419,6 +439,32 @@ function selectColor(btn, color) {
   btn.classList.add('ring-2', 'ring-offset-2', 'ring-black');
 }
 
+// -- Delete event handler
+let pendingDeleteId = null;
+
+// When the user clicks the delete button on an event card
+// we store the event ID and show the confirmation dialog
+// If they confirm, we send a DELETE request to the API and remove the event from our local list and re-render.
+function deleteEvent(eventId) {
+  pendingDeleteId = eventId;
+  document.getElementById('delete-confirmation').showModal();
+}
+
+document.getElementById('confirm-delete-btn').addEventListener('click', () => {
+  // If there's no pending delete ID for some reason, just return early
+  if (pendingDeleteId === null) return;
+  const id = pendingDeleteId;
+  pendingDeleteId = null;
+
+  // Send DELETE request to the API to delete the event
+  fetch(`/api/events/${id}`, { method: 'DELETE' }) //TODO: implement this endpoint in the backend
+    .then((response) => {
+      if (!response.ok) throw new Error('Failed to delete');
+      events = events.filter((e) => e.id !== id);
+      renderDesktopEvents();
+    })
+    .catch((err) => console.error('Error deleting event:', err));
+});
 // ── Set calendar header dates
 // Updates the page title ("Today, Wed March 11") and the five column headers
 // (Mon 9, Tue 10, …). Today's column is highlighted in indigo.
