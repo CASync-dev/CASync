@@ -366,15 +366,29 @@ document.getElementById('add-event-form').addEventListener('submit', (e) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(newEvent),
-  }).then((response) => {
-    if (!response.ok) {
-      throw new Error('Failed to create event');
-    }
-    console.log('Event created successfully');
-    return response.json();
-  });
-  // .then((createdEvent) => {
-  //   // logic for after creation
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to create event');
+      }
+      console.log('Event created successfully');
+      return response.json();
+    })
+    .then((createdEvent) => {
+      // close the modal, reset form and render events
+      document.getElementById('add-event-form').reset();
+      const dialog = document.querySelector('#drawer');
+      dialog.close();
+
+      events.push(createdEvent); // add the new event to our local list
+      renderDesktopEvents(); // re-render the grid with the new event
+    })
+    .catch((error) => {
+      console.error('Error creating event:', error);
+      errorElement.textContent = 'Error creating event. Please try again.';
+      errorElement.classList.remove('hidden');
+      console.error('Error creating event:', error);
+    });
 });
 
 // ── Set calendar header dates
