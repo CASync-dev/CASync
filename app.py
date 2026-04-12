@@ -123,8 +123,7 @@ def api_create_event():
         "end_time": "15:00",
         "user_id": 1
         "location": "Event Location",
-        "color": "indigo"  # optional, defaults to indigo if not provided
-<<<<<<< HEAD
+        "color": "indigo"  
     }
     """
     data = request.get_json()
