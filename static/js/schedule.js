@@ -37,6 +37,11 @@ const COLOR_MAP = {
     text: 'text-purple-800',
   },
   gray: { bg: 'bg-gray-100', border: 'border-gray-500', text: 'text-gray-800' },
+  yellow: {
+    bg: 'bg-yellow-100',
+    border: 'border-yellow-500',
+    text: 'text-yellow-800',
+  },
 };
 event_color_map = {};
 
@@ -130,7 +135,13 @@ function buildEventCard(event, heightPx, id) {
   // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
   const card = document.createElement('div');
   card.id = id;
-  colors = COLOR_MAP[event_color_map[event_class]];
+  if (!event.color) {
+    colors = COLOR_MAP[event_color_map[event_class]];
+  } else if (event.color && COLOR_MAP[event.color]) {
+    colors = COLOR_MAP[event.color];
+  } else {
+    colors = COLOR_MAP['gray']; // default to gray if the event has an invalid color
+  }
   card.className = [
     'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
     'cursor-pointer transition-shadow hover:shadow-md select-none z-10', // TODO: we should add some on hover info here in futre
@@ -337,6 +348,7 @@ document.getElementById('add-event-form').addEventListener('submit', (e) => {
   const end_time = document.getElementById('event-time-end').value;
   const location = document.getElementById('event-location').value;
   const user_id = document.getElementById('user-id').value;
+  const color = document.getElementById('event-color').value;
   errorElement = document.getElementById('form-message');
   // Basic validation
   if (!title || !date || !start_time || !end_time) {
@@ -359,6 +371,7 @@ document.getElementById('add-event-form').addEventListener('submit', (e) => {
     end_time: end_time,
     location: location,
     user_id: user_id,
+    color: color,
   };
 
   // Send POST request to API to create the event
@@ -377,6 +390,10 @@ document.getElementById('add-event-form').addEventListener('submit', (e) => {
     .then((createdEvent) => {
       // close the modal, reset form and render events
       document.getElementById('add-event-form').reset();
+      selectColor(
+        document.querySelector('#color-picker-buttons button'),
+        'indigo',
+      );
       const dialog = document.querySelector('#drawer');
       dialog.close();
 
@@ -390,6 +407,16 @@ document.getElementById('add-event-form').addEventListener('submit', (e) => {
       console.error('Error creating event:', error);
     });
 });
+
+// When the user clicks a color button in the add event form, we update the hidden input value and add a ring around the selected button.
+function selectColor(btn, color) {
+  document.getElementById('event-color').value = color;
+  // Remove the ring from all buttons, then add it to the selected button
+  document.querySelectorAll('#color-picker-buttons button').forEach((b) => {
+    b.classList.remove('ring-2', 'ring-offset-2', 'ring-black');
+  });
+  btn.classList.add('ring-2', 'ring-offset-2', 'ring-black');
+}
 
 // ── Set calendar header dates
 // Updates the page title ("Today, Wed March 11") and the five column headers

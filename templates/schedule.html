@@ -495,65 +495,51 @@
                       class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     />
                   </div>
-                  <!-- color picker -->
+                  <!-- color picker - these colors are defined in schedule.js/COLOR_MAP -->
                   <div>
                     <label for="event-color" class="text-sm font-medium">
                       Event Color
                     </label>
-                    <div class="flex">
+                    <!-- hidden input to store the selected color -->
+                    <input type="hidden" id="event-color" value="indigo" />
+                    <div class="flex gap-1" id="color-picker-buttons">
+                      <!-- indigo -->
+                      <button
+                        type="button"
+                        class="mt-1 block w-16 h-8 rounded-md bg-indigo-500 border border-gray-300 shadow-sm sm:text-sm ring-2 ring-offset-2 ring-black"
+                        onclick="selectColor(this, 'indigo')"
+                      ></button>
                       <!-- red -->
                       <button
                         type="button"
-                        class="mt-1 block w-16 h-8 rounded-md bg-red-500 border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        onclick="
-                          document.getElementById('event-color').value =
-                            '#ef4444'
-                        "
+                        class="mt-1 block w-16 h-8 rounded-md bg-red-500 border border-gray-300 shadow-sm sm:text-sm"
+                        onclick="selectColor(this, 'red')"
                       ></button>
                       <!-- orange -->
                       <button
                         type="button"
-                        class="mt-1 block w-16 h-8 rounded-md bg-orange-500 border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        onclick="
-                          document.getElementById('event-color').value =
-                            '#f97316'
-                        "
+                        class="mt-1 block w-16 h-8 rounded-md bg-orange-500 border border-gray-300 shadow-sm sm:text-sm"
+                        onclick="selectColor(this, 'orange')"
                       ></button>
                       <!-- yellow -->
                       <button
                         type="button"
-                        class="mt-1 block w-16 h-8 rounded-md bg-yellow-500 border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        onclick="
-                          document.getElementById('event-color').value =
-                            '#eab308'
-                        "
+                        class="mt-1 block w-16 h-8 rounded-md bg-yellow-500 border border-gray-300 shadow-sm sm:text-sm"
+                        onclick="selectColor(this, 'yellow')"
                       ></button>
                       <!-- green -->
                       <button
                         type="button"
-                        class="mt-1 block w-16 h-8 rounded-md bg-green-500 border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        onclick="
-                          document.getElementById('event-color').value =
-                            '#22c55e'
-                        "
+                        class="mt-1 block w-16 h-8 rounded-md bg-green-500 border border-gray-300 shadow-sm sm:text-sm"
+                        onclick="selectColor(this, 'green')"
                       ></button>
                       <!-- blue -->
                       <button
                         type="button"
-                        class="mt-1 block w-16 h-8 rounded-md bg-blue-500 border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        onclick="
-                          document.getElementById('event-color').value =
-                            '#3b82f6'
-                        "
+                        class="mt-1 block w-16 h-8 rounded-md bg-blue-500 border border-gray-300 shadow-sm sm:text-sm"
+                        onclick="selectColor(this, 'blue')"
                       ></button>
                     </div>
-                    <!-- custom color -->
-                    <input
-                      type="color"
-                      id="event-color"
-                      name="event-color"
-                      class="mt-1 block w-16 h-8 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
                   </div>
                   <!-- Form Messages -->
                   <div>
