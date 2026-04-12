@@ -5,3 +5,11 @@
         color: red;
     }
 }
+
+@theme {
+    --color-primary: #4741f7;
+    --color-dark: #686b74;
+    --color-midgray: #eff0f1;
+    --color-nearwhite: #fefffe;
+    --color-lightgray: #f9f9f8;
+}
