@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang = "en">
+    <!-- TODO: Fix Mobile Menu :')-->
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>CASync</title>
+        <!-- Tailwind CSS-->
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/output.css') }}"
+        />
+        <!-- Temporary link to output.css and js  to allow for individual work on html for now, to remove pre-pull req-->
+        <link rel = "stylesheet" href="../../static/css/output.css"> 
+        <script src = "../../static/js/log-out-layout.js"></script>
+
+        <!-- Icons from Liam -->
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        />
+
+        <!-- JQuery CDN, in case anyone wants to use JQuery -->
+         <script
+          src="https://code.jquery.com/jquery-4.0.0.js"
+          integrity="sha256-9fsHeVnKBvqh3FB2HYu7g2xseAZ5MlN6Kz/qnkASV8U="
+          crossorigin="anonymous"
+        ></script>
+
+        <!-- Additional CSS goes here-->
+    </head>
+    <body class="bg-lightgray min-h-screen">
+        <header class = "bg-primary sticky drop-shadow-2xl shadow">
+            <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
+                <div class="flex lg:flex-1">
+                    <a href="#" class = "-m-1.5 p-1.5 text-2xl text-nearwhite max-sm:hidden">
+                        <i class="fas fa-calendar text-nearwhite text-2xl"></i>
+                    CASync
+                    </a>
+                </div>
+                <div class = "xl:hidden sm:hidden ">
+                    <!-- Button for opening menu on mobile, TODO: Allow button to open popover element-->
+                    <button id = "mobile-menu-button-open" type="button" class="">                
+                        <span class = "text-midgray size-1">
+                            Menu 
+                        </span>
+                    </button>
+                </div>
+                <a href = "#" class = "text-1xl font-semibold text-nearwhite max-sm:hidden"> Login </a>
+            </nav>
+            <dialog id = "mobile-menu" popover="auto" class = "backdrop:bg-transparent lg:hidden">
+                <div tabindex="0" class = "fixed inset-0 focus:outline-none">
+                    <div class = "flex items-center justify-between bg-primary">
+                        <a href="#" class = "-m-1.5 p-1.5 text-2xl text-nearwhite font-bold">
+                            CASync
+                        </a>
+                        <button id = "mobile-menu-button-open" type = "button" class = "-m-2.5 rounded-md p-2.5 text-dark">
+                            Close
+                        </button>
+                    </div>
+                    <div class = "mt-6 flow-root">
+                        <div class = "-my-6 divide-y divide-dark">
+                            <div class = "-mx-3">
+                                <a href = "#" class = "text-1xl font-semibold text-nearwhite"> Login </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </dialog>
+        </header>
+        <body>
+
+
+        </body>
+</html>
