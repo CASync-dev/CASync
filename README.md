@@ -79,6 +79,12 @@ Use the planning dir for plans
    python app.py
    ```
 
+   Alternatively, you can run:
+   ```bash
+   npm run dev
+   ```
+   To run them both in one terminal.
+
    The app will be available at `http://localhost:8080`.
 
 
