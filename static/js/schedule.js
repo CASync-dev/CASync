@@ -504,6 +504,38 @@ function editEvent(eventId) {
     ),
     event.color,
   );
+  // When the user submits the edit form, we gather the updated details and send a PUT request to the API
+  document.getElementById('save-edit-btn').onclick = (e) => {
+    document.getElementById('edit-event-modal').close();
+    // We prevent the default form submission behavior
+    e.preventDefault();
+    // We gather the updated event details from the form inputs as JSON
+    const updatedEvent = {
+      title: document.getElementById('edit-event-title').value,
+      description: document.getElementById('edit-event-description').value,
+      date: document.getElementById('edit-event-date').value,
+      start_time: document.getElementById('edit-event-time-start').value,
+      end_time: document.getElementById('edit-event-time-end').value,
+      location: document.getElementById('edit-event-location').value,
+      user_id: document.getElementById('edit-user-id').value,
+      color: document.getElementById('edit-event-color').value,
+    };
+    // We send a PUT request to the API to update the event with the new details
+    fetch(`/api/events/${eventId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedEvent),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('Failed to update event');
+        // On success, update the event in our local list and re-render
+        const index = events.findIndex((e) => e.id === eventId);
+        // We merge the updated details into the existing event object to preserve any unchanged fields (like ical_id)
+        events[index] = { ...events[index], ...updatedEvent };
+        renderDesktopEvents();
+      })
+      .catch((err) => console.error('Error updating event:', err));
+  };
 }
 
 // ── Set calendar header dates
