@@ -174,7 +174,7 @@ function buildEventCard(event, heightPx, id) {
   const details = document.createElement('div');
   details.className = 'event-details hidden flex mt-1 px-1.5 pb-1 ';
   details.innerHTML = `
-    <p class="text-xs ${colors.text} opacity-60 font-mono">This is where there will be some more info about the event like who else is in class.</p>
+    <p class="text-xs ${colors.text} opacity-60 font-mono">${event.description}</p>
 
   `;
   card.appendChild(details);
