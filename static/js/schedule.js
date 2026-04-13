@@ -431,6 +431,7 @@ document.getElementById('add-event-form').addEventListener('submit', (e) => {
 
 // When the user clicks a color button in the add event form, we update the hidden input value and add a ring around the selected button.
 function selectColor(btn, color) {
+  // expects the button element and the color name as defined in COLOR_MAP (e.g. "indigo", "red", etc.)
   document.getElementById('event-color').value = color;
   // Remove the ring from all buttons, then add it to the selected button
   document.querySelectorAll('#color-picker-buttons button').forEach((b) => {
@@ -439,7 +440,20 @@ function selectColor(btn, color) {
   btn.classList.add('ring-2', 'ring-offset-2', 'ring-black');
 }
 
-// -- Delete event handler
+// Same as selectColor but for the edit event form, we update the hidden input value and add a ring around the selected button.
+function editColor(btn, color) {
+  // expects the button element and the color name as defined in COLOR_MAP (e.g. "indigo", "red", etc.)
+  document.getElementById('edit-event-color').value = color;
+  // Remove the ring from all buttons, then add it to the selected button
+  document
+    .querySelectorAll('#edit-color-picker-buttons button')
+    .forEach((b) => {
+      b.classList.remove('ring-2', 'ring-offset-2', 'ring-black');
+    });
+  btn.classList.add('ring-2', 'ring-offset-2', 'ring-black');
+}
+
+// -- Custom Event Action Handlers
 let pendingDeleteId = null;
 
 // When the user clicks the delete button on an event card
@@ -466,6 +480,32 @@ document.getElementById('confirm-delete-btn').addEventListener('click', () => {
     })
     .catch((err) => console.error('Error deleting event:', err));
 });
+
+// Edit Buton
+// When the user clicks the edit button on an event card, we bring up a edit event modal pre-filled with the event's current details.
+// When they submit, we send a PUT request to the API to update the event, then update our local list and re-render.
+function editEvent(eventId) {
+  eventId = Number(eventId);
+  // Open the edit modal and pre-fill the form with the event's current details
+  const event = events.find((e) => e.id === eventId);
+  if (!event) return;
+  console.log('Editing event:', event);
+  document.getElementById('edit-event-modal').showModal();
+  document.getElementById('edit-event-title').value = event.title;
+  document.getElementById('edit-event-description').value = event.description;
+  document.getElementById('edit-event-date').value = event.date;
+  document.getElementById('edit-event-time-start').value = event.startTime;
+  document.getElementById('edit-event-time-end').value = event.endTime;
+  document.getElementById('edit-event-location').value = event.location || '';
+  document.getElementById('edit-user-id').value = event.user_id;
+  selectColor(
+    document.querySelector(
+      `#edit-color-picker-buttons #${event.color}-color-btn`,
+    ),
+    event.color,
+  );
+}
+
 // ── Set calendar header dates
 // Updates the page title ("Today, Wed March 11") and the five column headers
 // (Mon 9, Tue 10, …). Today's column is highlighted in indigo.
