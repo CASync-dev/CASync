@@ -139,6 +139,21 @@ def api_create_event():
     db.session.commit()
     return jsonify(event.to_dict()), 201
 
+# API route to delete an event - accepts a DELETE request with the event id in the url and deletes the event from the database
+@app.route("/api/events/<int:event_id>", methods=["DELETE"])
+def api_delete_event(event_id):
+    event = Event.query.get(event_id)
+    # check event belongs to user - we should get the user id from the session or something instead of passing it in the url, but for now we'll just assume it's correct
+    # check if it exists
+    if not event:
+        return jsonify({"error": "Event not found"}), 404
+    # check if event is custom (not imported from ical) - we don't want to allow deletion of imported events through this route
+    if event.ical_id:
+        return jsonify({"error": "Cannot delete imported events"}), 400
+    db.session.delete(event)
+    db.session.commit()
+    return jsonify({"message": "Event deleted"}), 200
+
 @app.route("/api/user")
 def api_user():
     user = User.query.first()

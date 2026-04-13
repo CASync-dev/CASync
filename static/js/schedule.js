@@ -457,10 +457,11 @@ document.getElementById('confirm-delete-btn').addEventListener('click', () => {
   pendingDeleteId = null;
 
   // Send DELETE request to the API to delete the event
-  fetch(`/api/events/${id}`, { method: 'DELETE' }) //TODO: implement this endpoint in the backend
+  fetch(`/api/events/${id}`, { method: 'DELETE' })
     .then((response) => {
       if (!response.ok) throw new Error('Failed to delete');
-      events = events.filter((e) => e.id !== id);
+      // On success, remove the event from our local list and re-render
+      events.pop(events.findIndex((e) => e.id === id));
       renderDesktopEvents();
     })
     .catch((err) => console.error('Error deleting event:', err));
