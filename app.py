@@ -98,6 +98,8 @@ def dev_logout():
     session.clear()
     return redirect(url_for('home'))
 
+# -- API EVENT ROUTES
+
 # API route to get all events for a user - this is used by the schedule page to load the events onto the calendar
 # it accpets the user id as a parameter and returns a list of events for that user in json format
 # not sure if asking for the user id in the url is the best way to do this
@@ -153,6 +155,30 @@ def api_delete_event(event_id):
     db.session.delete(event)
     db.session.commit()
     return jsonify({"message": "Event deleted"}), 200
+
+# API route to edit an event - accepts a PUT request with the event id in the url and the updated event details in the body, and updates the event in the database
+@app.route("/api/events/<int:event_id>", methods=["PUT"])
+def api_edit_event(event_id):
+    event = Event.query.get(event_id)
+    if not event:
+        return jsonify({"error": "Event not found"}), 404
+    # check if event is custom (not imported from ical) - we don't want to allow editing of imported events through this route
+    if event.ical_id:
+        return jsonify({"error": "Cannot edit imported events"}), 400
+    data = request.get_json()
+    # update the event details - again we should add some validation here but we'll assume the data is correct for now
+    event.title = data['title']
+    event.description = data.get('description', '')
+    event.date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+    event.start_time = datetime.strptime(data['start_time'], '%H:%M').time()
+    event.end_time = datetime.strptime(data['end_time'], '%H:%M').time()
+    event.location = data.get('location')
+    event.color = data.get('color', 'indigo')
+    db.session.commit()
+    return jsonify(event.to_dict()), 200
+
+
+# -- OTHER API ROUTES
 
 @app.route("/api/user")
 def api_user():
