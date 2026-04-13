@@ -209,7 +209,7 @@ function buildEventCard(event, heightPx, id) {
       // reset any style tags
       card.style.minHeight = '';
       card.style.width = '';
-      card.style.left = '';
+      card.style.left = card.dataset.overlapLeft ?? '';
       card.style.right = '';
       card.style.transform = '';
       details.classList.add('hidden');
@@ -336,16 +336,19 @@ function renderDesktopEvents() {
     number_of_events_counter++;
   });
 
-  // Second Pass:
-  // Check if the event has an item underneath it, if so we pad to the left slightly
+  // Second Pass: apply overlap offsets
+  applyOverlapOffsets(placed_cards);
+}
+
+// For each card, if another card in the same column started earlier and is still active,
+// push it right so the card behind it remains visible.
+function applyOverlapOffsets(placed_cards) {
   placed_cards.forEach(({ card, dayIndex, startMinutes }) => {
-    // we check if there is any other card that starts above this one, but ends after this one starts (i.e. overlaps from above)
     const hasOverlapFromAbove = placed_cards.some((other) => {
-      const isSameDay = other.dayIndex === dayIndex; // only check events in the same column
-      const isDifferentCard = other.card !== card; // skip self
-      const otherStartedFirst = other.startMinutes < startMinutes; // only check events that start above this one
-      const otherStillActiveAtStart = other.endMinutes > startMinutes; // only check events that are still active when this one start
-      // check all of the above conditions
+      const isSameDay = other.dayIndex === dayIndex;
+      const isDifferentCard = other.card !== card;
+      const otherStartedFirst = other.startMinutes < startMinutes;
+      const otherStillActiveAtStart = other.endMinutes > startMinutes;
       return (
         isDifferentCard &&
         isSameDay &&
@@ -353,9 +356,9 @@ function renderDesktopEvents() {
         otherStillActiveAtStart
       );
     });
-    if (hasOverlapFromAbove) {
-      card.style.left = '0.5rem'; // push this card right so the card behind it is visible
-    }
+    const offset = hasOverlapFromAbove ? '0.5rem' : '';
+    card.style.left = offset;
+    card.dataset.overlapLeft = offset; // persist so collapse can restore it
   });
 }
 
