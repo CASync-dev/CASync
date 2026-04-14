@@ -1,94 +1,108 @@
-{% extends "layout.html" %} {% block content %}
-<!-- TODO: To finish main page, re-design, JS functionability-->
-<!-- Header stuff moved to the sidebar -->
-<main>
-  <section
-    id="main"
-    class="relative bg-cover min-h-96 max-h-fit text-white flex items-center justify-center text-center"
-    style="background-image: url({{ url_for('static', filename='images/bg.jpg') }}) !important"
-  >
-    <div class="absolute inset-0 z-0 bg-gray-800/40"></div>
-    <div class="container relative z-10">
-      <h1 class="text-6xl xl:text-7xl font-black md:block">
-        Timetable Sharing Made Easy
-      </h1>
-      <h2 class="text-3xl xl:text-4xl mb-8">
-        Never struggle to meet up again.
-      </h2>
-      <a
-        href="/register"
-        class="text-4xl lg:text-5xl bg-fuchsia-900 text-fuchsia-100 font-bold rounded-lg p-4 hover:bg-fuchsia-950"
-      >
-        Sign Up Now
-      </a>
+{% extends "log-out-layout.html" %} {% block content %}
+        <!-- Note that the below will be moved to homepage.html; just here for debugging purposes-->
+         <main>
+            <section class = "flex flex-col py-8">
+                <div class = "flex flex-col mt-16 w-full">
+                    <div class = "flex flex-row items-center content-center justify-between mx-auto">
+                        <div class = "flex flex-col gap-6 justify-center px-32">
+                            <h1 class = "text-5xl">
+                                The All in One
+                                <br>
+                                Timetable that 
+                                <br>
+                                You Need
+                            </h1>
+                            <br>
+                        <p class = "block">
+                            Share your timetable with your friends today.
+                        </p>
+                        <div class = "">
+                            <a class = "inline-flex items-center mx-1 my-1 rounded-2xl bg-primary hover:bg-indigo-800 shadow-black text-nearwhite
+                                p-5 text-1xl" 
+                                href = "{{ url_for('register') }}">
+                                Sign Up Now!
+                            </a>
+                        </div>
+                    </div>
+                        <div class = "aspect-square items-center">
+                            <div class = "relative w-full h-full ">
+                                <!-- Not sure if thats the way to import images, check later?-->
+                                <img src = "{{ url_for('static', filename='images/promo.png') }}" class = "h-96 w-96 object-cover max-sm:hidden" alt="Promo picture of a timetable in the app">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <br>
+            <br>
+            <!-- This section gives a brief summary on the app-->
+            <div class = "flex flex-row  py-52 mx-auto">
+                <div class = "items-center ">
+                    <!-- Currently using a temporary image; Image to be changed-->
+                     <img src = "{{ url_for('static', filename='images/temp01.png') }}" class = "h-max w-96 object-cover max-sm:hidden" alt = "Promo picture of two timetables"> 
+                </div>
+                <div class = "flex flex-col gap-6 justify-center">
+                    <h1 class = "text-5xl text-right">
+                        Sync your friends
+                    </h1>
+                    <p class = "text-2xl text-right block">
+                        Lorem ipsum dolor sit amet, 
+                        <br>
+                        consectetur adipiscing elit.
+                        <br>
+                         Cras a elit elementum, placerat
+                         <br>
+                          dolor a, hendrerit dui.
+                         <br>
+                          Aliquam viverra purus vitae 
+                          <br>
+                          pharetra ultricies. Suspendisse 
+                          <br>
+                          magna purus, vulputate vitae gravida
+                          <br>
+                           ut, semper sit amet ipsum.
+                          <br>
+                           Integer orci enim, tincidunt eu enim
+                           <br>
+                            non, pulvinar congue nibh.
+                           <br>
+                            Nullam eu lorem non risus blandit 
+                            <br>
+                            pretium. Aliquam fringilla 
+                            <br>
+                            convallis rhoncus. 
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+        
+
+    <!-- Footer; To be used in all (logged-out) webpages -->
+    <div id = "foot" class = "bg-primary">
+        <div class = "flex flex-col py-24 justify-center items-center">
+            <div class = "flex flex-row mx-auto">
+                <div class = "px-6 max-sm:px-3">
+                    <a href = "#" class = "text-nearwhite text-2xl">
+                        Contact us
+                    </a>
+                </div>
+                <div class = "px-6 max-sm:px-3">
+                    <a href = "#" class = "text-nearwhite text-2xl">
+                        FAQ
+                    </a>
+                </div>
+                <div class = "px-6 max-sm:px-3">
+                    <a href = "https://github.com/stoveup/AgileWeb2026" class = "text-nearwhite text-2xl">
+                        Github
+                    </a>
+                </div>
+                
+            </div>
+            <div class = "flex pt-36">
+                <span class = "text-xs text-right block text-nearwhite">
+                    © Copyright UWA Agile Web 2026's 12:40pm Thursday 1st week Lab Group 
+                </span>
+            </div>
+        </div>
     </div>
-  </section>
-  <!-- Flask mae=kes us keep all statioanry files that will be referenced in the /static folder. 
-            Flask hosts the images and CSS files from there, and we can reference them in our HTML 
-            using url_for('static', filename='path/to/file')
-      -->
-</main>
-<section
-  id="about"
-  class="relative bg-cover min-h-96 flex items-center sm:block"
->
-  <div class="relative container z-10">
-    <h1 class="text-6xl xl:text-6xl font-black">
-      The Ultimate Student Sharing Timetable
-    </h1>
-    <br />
-    <p class="text-2xl">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut rutrum sit
-      amet turpis sed pulvinar. Maecenas et pulvinar ligula. Sed facilisis
-      lacinia bibendum. In ullamcorper orci at tellus consequat, id iaculis
-      neque sodales. Sed blandit nibh eu nunc lobortis, sit amet viverra lectus
-      consectetur.
-    </p>
-  </div>
-</section>
-
-<section
-  id="about"
-  class="relative bg-cover min-h-96 flex items-center sm:block"
->
-  <div class="relative container z-10">
-    <h1 class="text-6xl xl:text-6xl font-black">
-      The Ultimate Student Sharing Timetable
-    </h1>
-    <br />
-    <p class="text-2xl">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut rutrum sit
-      amet turpis sed pulvinar. Maecenas et pulvinar ligula. Sed facilisis
-      lacinia bibendum. In ullamcorper orci at tellus consequat, id iaculis
-      neque sodales. Sed blandit nibh eu nunc lobortis, sit amet viverra lectus
-      consectetur.
-    </p>
-  </div>
-</section>
-
-<section
-  id="about"
-  class="relative bg-cover min-h-96 flex items-center sm:block"
->
-  <div class="relative container z-10">
-    <h1 class="text-6xl xl:text-6xl font-black">
-      The Ultimate Student Sharing Timetable
-    </h1>
-    <br />
-    <p class="text-2xl">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut rutrum sit
-      amet turpis sed pulvinar. Maecenas et pulvinar ligula. Sed facilisis
-      lacinia bibendum. In ullamcorper orci at tellus consequat, id iaculis
-      neque sodales. Sed blandit nibh eu nunc lobortis, sit amet viverra lectus
-      consectetur.
-    </p>
-  </div>
-</section>
-
-<footer>
-  <div class="grid-cols-4 items-center-safe text-center">
-    Hello! I am a footer with random text for now; I will soon have awesome
-    text!
-  </div>
-</footer>
 {% endblock %}
