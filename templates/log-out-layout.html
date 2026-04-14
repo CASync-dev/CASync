@@ -52,10 +52,10 @@
             
         </header>
         <body>
-            <dialog id = "mobile-menu" popover="auto" class = "backdrop:bg-transparent bg-primary lg:hidden transform -translate-x-full md:translate-x-0 md:static transition-transform duration-300 ease-in-out">
+            <dialog id = "mobile-menu" popover="auto" class = "backdrop:bg-transparent bg-primary lg:hidden transform transition -translate-x-full duration-300 ease-in-out md:translate-x-0 md:static">
                 <div tabindex="0" class = "fixed inset-0 focus:outline-none flex-col bg-primary">
                     <div class = "mx-auto flex max-w-7xl items-center justify-between p-6">
-                        <a href="#" class = "-m-1 p-1 text-2xl text-nearwhite font-bold">
+                        <a href="{{ url_for('home') }}" class = "-m-1 p-1 text-2xl text-nearwhite font-bold">
                             <img src="{{url_for('static', filename='images/w-logo.png')}}" class = "max-h-28 max-w-28 py-0.5">
                         </a>
                         <button id = "mobile-menu-button-close" type = "button" class = "" onclick = "closeMobileMenu()">
