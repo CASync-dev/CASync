@@ -4,13 +4,15 @@
 // Loads the mobile sidebar
 function mobileMenu() {
     const popout = document.getElementById("mobile-menu");
-    popout.style.display = "block";
+    popout.classList.remove("-translate-x-full");
+    popout.style.display = "block";    
 
 }
 
 // Unloads mobile sidebar
 function closeMobileMenu() {
     const popout = document.getElementById("mobile-menu");
+    popout.classList.add('-translate-x-full');
     popout.style.display = "none";
 
 }
