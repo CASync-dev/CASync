@@ -81,6 +81,10 @@ def home():
 def faq():
     return render_template("faq.html")
 
+@app.route("/contactus")
+def contactus():
+    return render_template("contact-us.html")
+
 
 #--- API routes - at the moment they return json responses but thats not long term
 
