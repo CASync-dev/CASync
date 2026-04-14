@@ -1,38 +1,47 @@
-{% extends "layout.html" %}
-{% block content %}
-<!-- TODO: The webpage T-T -->
-    <!-- Header stuff moved to the sidebar -->
-    
-    <div class = "container py-6">
-    <h1 class="text-6xl xl:text-7xl font-black md:block"> Frequently Asked Questions </h1>
-    <br>
-
-    <h2 class="text-5xl xl:text-6xl font-black md:block"> What is the meaning of life? </h2>
-    <br>
-    <p> Uhh...to use CASync B)</p>
-    <br>
-    <br>
-    <br>
-    <br>
-    <h1 class="text-5xl xl:text-6xl font-black md:block"> Why is this website kinda unpolished? </h2>
-    <br>
-    <p> Because tailwind is awful XPXPXP</p>
-    <br>
-    <br>
-    <br>
-    <br>
-    <h2 class="text-5xl xl:text-6xl font-black md:block"> Is this design permanent? </h2>
-    <br>
-    <p> No (someone please help with the design graphic design is not my passion)</p>
-    <br>
-    <br><br>
-    <br>
-    
-    </div>
-
-    <footer>
-        <div class = "grid-cols-4 items-center-safe text-center">
-            Hello! I am a footer with random text for now; I will soon have awesome text!
+{% extends "log-out-layout.html" %} {% block content %}
+<main>
+    <section class = "flex flex-row py-8">
+        <h1 class = "text-5xl block font-bold">
+            Why is registration not working?
+        </h1>
+        <p class = "block">
+            Currently registration has not been implemented, but is planned for the future. Stay tune!
+        </p>
+        <br>
+        <h1 class = "text-5xl block font-bold">
+            Why don't the timetables show when uploading iCal links for other users?
+        </h1>
+        <p class = "block">
+            Authentication has not been implemented so there is no current way to change timetables based on user. Stay tune!
+        </p>
+    </section>
+</main>
+<!-- Footer; To be used in all (logged-out) webpages -->
+    <div id = "foot" class = "bg-primary">
+        <div class = "flex flex-col py-24 justify-center items-center">
+            <div class = "flex flex-row mx-auto">
+                <div class = "px-6 max-sm:px-3">
+                    <a href = "#" class = "text-nearwhite text-2xl">
+                        Contact us
+                    </a>
+                </div>
+                <div class = "px-6 max-sm:px-3">
+                    <a href = "#" class = "text-nearwhite text-2xl">
+                        FAQ
+                    </a>
+                </div>
+                <div class = "px-6 max-sm:px-3">
+                    <a href = "https://github.com/stoveup/AgileWeb2026" class = "text-nearwhite text-2xl">
+                        Github
+                    </a>
+                </div>
+                
+            </div>
+            <div class = "flex pt-36">
+                <span class = "text-xs text-right block text-nearwhite">
+                    © Copyright UWA Agile Web 2026's 12:40pm Thursday 1st week Lab Group 
+                </span>
+            </div>
         </div>
-</footer>
+    </div>
 {% endblock %}
