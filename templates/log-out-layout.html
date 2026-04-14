@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang = "en">
+    <!-- TODO: Animation for sidebar transition?-->
+    <head>
+        {% block head %}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>CASync</title>
+        <!-- Tailwind CSS-->
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/output.css') }}"
+        />
+
+        <!-- Icons from Liam -->
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        />
+
+        <!-- JQuery CDN, in case anyone wants to use JQuery -->
+         <script
+          src="https://code.jquery.com/jquery-4.0.0.js"
+          integrity="sha256-9fsHeVnKBvqh3FB2HYu7g2xseAZ5MlN6Kz/qnkASV8U="
+          crossorigin="anonymous"
+        ></script>
+        <!-- Layout's JS for sidebar functionability-->
+        <script src = "{{url_for('static', filename='js/log-out-layout.js')}}"></script>
+
+        <!-- Additional CSS goes here-->
+        {% endblock %}
+    </head>
+    <body class="bg-lightgray min-h-screen">
+        <header class = "bg-primary sticky drop-shadow-2xl shadow">
+            <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
+                <div class="flex lg:flex-1">
+                    <a href="#" class = "-m-1 p-1 text-2xl text-nearwhite">
+                        <img src="{{url_for('static', filename='images/w-logo.png')}}" class = "max-h-28 max-w-28 py-0.5">
+                    </a>
+                </div>
+                <div class = "xl:hidden sm:hidden ">
+                    <!-- Button for opening menu on mobile, TODO: Allow button to open popover element-->
+                    <button id = "mobile-menu-button-open" type="button" class="" onclick = "mobileMenu()">                
+                        <span class = "text-midgray size-1">
+                            <i class="fa-solid fa-bars" style="color: white;"></i>
+                        </span>
+                    </button>
+                </div>
+                <a href = "{{ url_for('login') }}" class = "text-1xl font-semibold text-nearwhite max-sm:hidden"> Login </a>
+            </nav>
+            
+        </header>
+        <body>
+            <dialog id = "mobile-menu" popover="auto" class = "backdrop:bg-transparent bg-primary lg:hidden transform -translate-x-full md:translate-x-0 md:static transition-transform duration-300 ease-in-out">
+                <div tabindex="0" class = "fixed inset-0 focus:outline-none flex-col bg-primary">
+                    <div class = "mx-auto flex max-w-7xl items-center justify-between p-6">
+                        <a href="#" class = "-m-1 p-1 text-2xl text-nearwhite font-bold">
+                            <img src="{{url_for('static', filename='images/w-logo.png')}}" class = "max-h-28 max-w-28 py-0.5">
+                        </a>
+                        <button id = "mobile-menu-button-close" type = "button" class = "" onclick = "closeMobileMenu()">
+                            <span class = "size-1">
+                                <i class="fas fa-xmark text-xl" style="color:white;"></i>
+                            </span>
+                        </button>
+                    </div>
+                    <div class = "mt-6 flow-root px-2">
+                        <div class = "-my-6 divide-y divide-dark py-4">
+                            <div class = "">
+                                <a href = "{{ url_for('login') }}" class = "text-1xl font-semibold text-nearwhite "> Login </a>
+                            </div>
+                            <div class = "">
+                                <a href = "#" class = "text-1xl font-semibold text-nearwhite "> FAQ </a>
+                            </div>
+                            <div class = "">
+                                <a href = "#" class = "text-1xl font-semibold text-nearwhite "> Contact Us </a>
+                            </div>
+                            <div class = "">
+                                <a href = "https://github.com/stoveup/AgileWeb2026" class = "text-1xl font-semibold text-nearwhite "> Github </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </dialog>
+            <div id="content">{% block content %}{% endblock %}</div>
+            {% block scripts %}{% endblock %}
+        </body>
+</html>
