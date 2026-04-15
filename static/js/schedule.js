@@ -37,6 +37,11 @@ const COLOR_MAP = {
     text: 'text-purple-800',
   },
   gray: { bg: 'bg-gray-100', border: 'border-gray-500', text: 'text-gray-800' },
+  yellow: {
+    bg: 'bg-yellow-100',
+    border: 'border-yellow-500',
+    text: 'text-yellow-800',
+  },
 };
 event_color_map = {};
 
@@ -130,7 +135,14 @@ function buildEventCard(event, heightPx, id) {
   // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
   const card = document.createElement('div');
   card.id = id;
-  colors = COLOR_MAP[event_color_map[event_class]];
+  // If the event doesn't have a color, use the color mapped to its class. If it has an invalid color, default to gray.
+  if (!event.color) {
+    colors = COLOR_MAP[event_color_map[event_class]];
+  } else if (event.color && COLOR_MAP[event.color]) {
+    colors = COLOR_MAP[event.color];
+  } else {
+    colors = COLOR_MAP['gray']; // default to gray if the event has an invalid color
+  }
   card.className = [
     'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
     'cursor-pointer transition-shadow hover:shadow-md select-none z-10', // TODO: we should add some on hover info here in futre
@@ -160,11 +172,80 @@ function buildEventCard(event, heightPx, id) {
 
   // Extra details — hidden until the card is expanded
   const details = document.createElement('div');
-  details.className = 'event-details hidden mt-1 px-1.5 pb-1 ';
+  details.className = 'event-details hidden flex mt-1 px-1.5 pb-1 ';
   details.innerHTML = `
-    <p class="text-xs ${colors.text} opacity-60 font-mono">This is where there will be some more info about the event like who else is in class.</p>
+    <p class="text-xs ${colors.text} opacity-60 font-mono">${event.description}</p>
+
   `;
   card.appendChild(details);
+
+  // if the event has no ical_id, it means it was created by the user and can be edited/deleted
+  if (event.ical_id === null) {
+    // we add a little badge to the top right corner to indicate it is a custom event
+    const badge = document.createElement('span');
+    badge.className = 'inline-block w-2 h-2 bg-blue-500 rounded-full ml-2';
+    badge.title = 'User-created event';
+    card.children[0].appendChild(badge);
+
+    // delete + edit btns stacked vertically
+    details.innerHTML += `<div class="flex flex-col gap-1 ml-auto">
+      <button class="bg-red-500 text-white rounded p-1 hover:bg-red-600" onclick="deleteEvent('${event.id}')">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+      <button class="bg-blue-500 text-white rounded p-1 hover:bg-blue-600" onclick="editEvent('${event.id}')">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </button>
+    </div>`;
+  }
+
+  card.addEventListener('click', () => {
+    const isExpanded = card.classList.contains('expanded');
+
+    if (isExpanded) {
+      // Collapse: restore original size and position
+      card.classList.remove('expanded', 'shadow-lg', 'z-20');
+      card.classList.add('overflow-hidden');
+      card.style.height = card.dataset.collapsedHeight;
+      // reset any style tags
+      card.style.minHeight = '';
+      card.style.width = '';
+      card.style.left = card.dataset.overlapLeft ?? '';
+      card.style.right = '';
+      card.style.transform = '';
+      details.classList.add('hidden');
+      card.children[0].classList.remove('text-wrap');
+    } else {
+      // Expand: auto height (but never shrink below collapsed size), fixed width anchored left or right based on column
+      card.classList.add('expanded', 'shadow-lg', 'z-20');
+      card.classList.remove('overflow-hidden');
+      // Ensure the card doesn't shrink below its original height when expanding
+      card.style.minHeight = card.dataset.collapsedHeight;
+      card.style.height = 'auto';
+      card.style.width = '280px';
+      card.children[0].classList.add('text-wrap');
+      // Use the stored day index to determine expand direction:
+      //   if it's in the right-side columns, we anchor to the right edge and expand leftward,
+      //   if it's in the left-side columns,
+      //   we anchor to the left edge and expand rightward.
+      const col = parseInt(card.dataset.col ?? '0');
+      if (1 <= col && col <= 3) {
+        // middle columns 1,2,3
+        // middle column: expand centered form the middle, with some padding on both sides
+        card.style.left = '50%';
+        card.style.transform = 'translateX(-50%)';
+        card.style.right = '';
+      } else if (col >= 3) {
+        // right-side columns: expand leftward'
+        card.style.right = '2px';
+        card.style.left = 'auto';
+      } else {
+        // left-side columns: expand rightward
+        card.style.left = '2px';
+        card.style.right = 'auto';
+      }
+      details.classList.remove('hidden');
+    }
+  });
 
   return card;
 }
@@ -255,16 +336,19 @@ function renderDesktopEvents() {
     number_of_events_counter++;
   });
 
-  // Second Pass:
-  // Check if the event has an item underneath it, if so we pad to the left slightly
+  // Second Pass: apply overlap offsets
+  applyOverlapOffsets(placed_cards);
+}
+
+// For each card, if another card in the same column started earlier and is still active,
+// push it right so the card behind it remains visible.
+function applyOverlapOffsets(placed_cards) {
   placed_cards.forEach(({ card, dayIndex, startMinutes }) => {
-    // we check if there is any other card that starts above this one, but ends after this one starts (i.e. overlaps from above)
     const hasOverlapFromAbove = placed_cards.some((other) => {
-      const isSameDay = other.dayIndex === dayIndex; // only check events in the same column
-      const isDifferentCard = other.card !== card; // skip self
-      const otherStartedFirst = other.startMinutes < startMinutes; // only check events that start above this one
-      const otherStillActiveAtStart = other.endMinutes > startMinutes; // only check events that are still active when this one start
-      // check all of the above conditions
+      const isSameDay = other.dayIndex === dayIndex;
+      const isDifferentCard = other.card !== card;
+      const otherStartedFirst = other.startMinutes < startMinutes;
+      const otherStillActiveAtStart = other.endMinutes > startMinutes;
       return (
         isDifferentCard &&
         isSameDay &&
@@ -272,10 +356,189 @@ function renderDesktopEvents() {
         otherStillActiveAtStart
       );
     });
-    if (hasOverlapFromAbove) {
-      card.style.left = '0.5rem'; // push this card right so the card behind it is visible
-    }
+    const offset = hasOverlapFromAbove ? '0.5rem' : '';
+    card.style.left = offset;
+    card.dataset.overlapLeft = offset; // persist so collapse can restore it
   });
+}
+
+// -- Add event form handler
+document.getElementById('add-event-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  // Get form values
+  const title = document.getElementById('event-title').value;
+  const date = document.getElementById('event-date').value;
+  const start_time = document.getElementById('event-time-start').value;
+  const end_time = document.getElementById('event-time-end').value;
+  const location = document.getElementById('event-location').value;
+  const user_id = document.getElementById('user-id').value;
+  const color = document.getElementById('event-color').value;
+  errorElement = document.getElementById('form-message');
+  // Basic validation
+  if (!title || !date || !start_time || !end_time) {
+    errorElement.textContent = 'Please fill in all required fields.';
+    errorElement.classList.remove('hidden');
+    return;
+  }
+  // end time must be after start time
+  if (parseTime(end_time) <= parseTime(start_time)) {
+    errorElement.textContent = 'End time must be after start time.';
+    errorElement.classList.remove('hidden');
+    return;
+  }
+
+  // Create event object in json format expected by the API
+  const newEvent = {
+    title: title,
+    date: date,
+    start_time: start_time,
+    end_time: end_time,
+    location: location,
+    user_id: user_id,
+    color: color,
+  };
+
+  // Send POST request to API to create the event
+  fetch('/api/events', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newEvent),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to create event');
+      }
+      console.log('Event created successfully');
+      return response.json();
+    })
+    .then((createdEvent) => {
+      // close the modal, reset form and render events
+      document.getElementById('add-event-form').reset();
+      selectColor(
+        document.querySelector('#color-picker-buttons button'),
+        'indigo',
+      );
+      const dialog = document.querySelector('#drawer');
+      dialog.close();
+
+      events.push(createdEvent); // add the new event to our local list
+      renderDesktopEvents(); // re-render the grid with the new event
+    })
+    .catch((error) => {
+      console.error('Error creating event:', error);
+      errorElement.textContent = 'Error creating event. Please try again.';
+      errorElement.classList.remove('hidden');
+      console.error('Error creating event:', error);
+    });
+});
+
+// When the user clicks a color button in the add event form, we update the hidden input value and add a ring around the selected button.
+function selectColor(btn, color) {
+  // expects the button element and the color name as defined in COLOR_MAP (e.g. "indigo", "red", etc.)
+  document.getElementById('event-color').value = color;
+  // Remove the ring from all buttons, then add it to the selected button
+  document.querySelectorAll('#color-picker-buttons button').forEach((b) => {
+    b.classList.remove('ring-2', 'ring-offset-2', 'ring-black');
+  });
+  btn.classList.add('ring-2', 'ring-offset-2', 'ring-black');
+}
+
+// Same as selectColor but for the edit event form, we update the hidden input value and add a ring around the selected button.
+function editColor(btn, color) {
+  // expects the button element and the color name as defined in COLOR_MAP (e.g. "indigo", "red", etc.)
+  document.getElementById('edit-event-color').value = color;
+  // Remove the ring from all buttons, then add it to the selected button
+  document
+    .querySelectorAll('#edit-color-picker-buttons button')
+    .forEach((b) => {
+      b.classList.remove('ring-2', 'ring-offset-2', 'ring-black');
+    });
+  btn.classList.add('ring-2', 'ring-offset-2', 'ring-black');
+}
+
+// -- Custom Event Action Handlers
+let pendingDeleteId = null;
+
+// When the user clicks the delete button on an event card
+// we store the event ID and show the confirmation dialog
+// If they confirm, we send a DELETE request to the API and remove the event from our local list and re-render.
+function deleteEvent(eventId) {
+  pendingDeleteId = eventId;
+  document.getElementById('delete-confirmation').showModal();
+}
+
+document.getElementById('confirm-delete-btn').addEventListener('click', () => {
+  // If there's no pending delete ID for some reason, just return early
+  if (pendingDeleteId === null) return;
+  const id = pendingDeleteId;
+  pendingDeleteId = null;
+
+  // Send DELETE request to the API to delete the event
+  fetch(`/api/events/${id}`, { method: 'DELETE' })
+    .then((response) => {
+      if (!response.ok) throw new Error('Failed to delete');
+      // On success, remove the event from our local list and re-render
+      events.pop(events.findIndex((e) => e.id === id));
+      renderDesktopEvents();
+    })
+    .catch((err) => console.error('Error deleting event:', err));
+});
+
+// Edit Buton
+// When the user clicks the edit button on an event card, we bring up a edit event modal pre-filled with the event's current details.
+// When they submit, we send a PUT request to the API to update the event, then update our local list and re-render.
+function editEvent(eventId) {
+  eventId = Number(eventId);
+  // Open the edit modal and pre-fill the form with the event's current details
+  const event = events.find((e) => e.id === eventId);
+  if (!event) return;
+  console.log('Editing event:', event);
+  document.getElementById('edit-event-modal').showModal();
+  document.getElementById('edit-event-title').value = event.title;
+  document.getElementById('edit-event-description').value = event.description;
+  document.getElementById('edit-event-date').value = event.date;
+  document.getElementById('edit-event-time-start').value = event.startTime;
+  document.getElementById('edit-event-time-end').value = event.endTime;
+  document.getElementById('edit-event-location').value = event.location || '';
+  document.getElementById('edit-user-id').value = event.user_id;
+  selectColor(
+    document.querySelector(
+      `#edit-color-picker-buttons #${event.color}-color-btn`,
+    ),
+    event.color,
+  );
+  // When the user submits the edit form, we gather the updated details and send a PUT request to the API
+  document.getElementById('save-edit-btn').onclick = (e) => {
+    document.getElementById('edit-event-modal').close();
+    // We prevent the default form submission behavior
+    e.preventDefault();
+    // We gather the updated event details from the form inputs as JSON
+    const updatedEvent = {
+      title: document.getElementById('edit-event-title').value,
+      description: document.getElementById('edit-event-description').value,
+      date: document.getElementById('edit-event-date').value,
+      start_time: document.getElementById('edit-event-time-start').value,
+      end_time: document.getElementById('edit-event-time-end').value,
+      location: document.getElementById('edit-event-location').value,
+      user_id: document.getElementById('edit-user-id').value,
+      color: document.getElementById('edit-event-color').value,
+    };
+    // We send a PUT request to the API to update the event with the new details
+    fetch(`/api/events/${eventId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedEvent),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('Failed to update event');
+        // On success, update the event in our local list and re-render
+        const index = events.findIndex((e) => e.id === eventId);
+        // We merge the updated details into the existing event object to preserve any unchanged fields (like ical_id)
+        events[index] = { ...events[index], ...updatedEvent };
+        renderDesktopEvents();
+      })
+      .catch((err) => console.error('Error updating event:', err));
+  };
 }
 
 // ── Set calendar header dates
@@ -287,7 +550,10 @@ function setCalendarDates() {
   */
   const now = new Date(); // real current date, for the title and today-highlight
 
-  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  // Indexed by getDay(): 0=Sun, 1=Mon, …, 6=Sat
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  // Mon–Fri labels for the five column headers (getDay() 1–5)
+  const weekdayNames = dayNames.slice(1, 6);
 
   // Update the "Today, Day Month Date" title at the top of the page
   const titleElement = document.getElementById('calendar-title');
@@ -295,7 +561,7 @@ function setCalendarDates() {
   // Helper function to format a date as "Day Month Date" with customizable month style
   const fmt = (date, monthStyle) =>
     // e.g. "Wednesday March 11" or "Wed Mar 11"
-    `${dayNames[date.getDay() - 1]} ${date.toLocaleString('default', { month: monthStyle })} ${date.getDate()}`;
+    `${dayNames[date.getDay()]} ${date.toLocaleString('default', { month: monthStyle })} ${date.getDate()}`;
 
   // Shorter format for column headers, e.g. "Mar 11"
   const fmtShort = (date) =>
@@ -327,7 +593,6 @@ function setCalendarDates() {
     const endDate = new Date(weekDates[4]);
     titleElement.textContent = `${fmtShort(startDate)} - ${fmtShort(endDate)}`;
   }
-
   // Update each of the five column header elements with the correct day and date.
   // Highlight today's column with indigo text.
   const weekDates = getWeekDates();
@@ -335,7 +600,7 @@ function setCalendarDates() {
     const columnDate = new Date(dateStr);
     const columnElement = document.getElementById(`date-col-${i}`);
     if (columnElement) {
-      columnElement.textContent = `${dayNames[i]} ${columnDate.getDate()}`;
+      columnElement.textContent = `${weekdayNames[i]} ${columnDate.getDate()}`;
       const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       const isToday = dateStr === todayStr;
       columnElement.classList.toggle('text-indigo-600', isToday);
@@ -344,68 +609,7 @@ function setCalendarDates() {
   });
 }
 
-// -- Expand Event Items
-// When content is loaded, ad a click lisnter that listens for clicks on any event card.
-document.addEventListener('DOMContentLoaded', () => {
-  document.addEventListener('click', (event) => {
-    // Check if the id is event-#. All event have an id and a unique number
-    const card = event.target.closest('[id^="event-"]');
-    if (!card) return;
-
-    //
-    const isExpanded = card.classList.contains('expanded');
-    const details = card.querySelector('.event-details');
-
-    if (isExpanded) {
-      // Collapse: restore original size and position
-      card.classList.remove('expanded', 'shadow-lg', 'z-20');
-      card.classList.add('overflow-hidden');
-      card.style.height = card.dataset.collapsedHeight;
-      // reset any style tags
-      card.style.minHeight = '';
-      card.style.width = '';
-      card.style.left = '';
-      card.style.right = '';
-      card.style.transform = '';
-      details.classList.add('hidden');
-      card.children[0].classList.remove('text-wrap');
-    } else {
-      // Expand: auto height (but never shrink below collapsed size), fixed width anchored left or right based on column
-      card.classList.add('expanded', 'shadow-lg', 'z-20');
-      card.classList.remove('overflow-hidden');
-      // Ensure the card doesn't shrink below its original height when expanding
-      card.style.minHeight = card.dataset.collapsedHeight;
-      card.style.height = 'auto';
-      card.style.width = '280px';
-      card.children[0].classList.add('text-wrap');
-      // Use the stored day index to determine expand direction:
-      //   if it's in the right-side columns, we anchor to the right edge and expand leftward,
-      //   if it's in the left-side columns,
-      //   we anchor to the left edge and expand rightward.
-      const col = parseInt(card.dataset.col ?? '0');
-      if (1 <= col && col <= 3) {
-        // middle columns 1,2,3
-        // middle column: expand centered form the middle, with some padding on both sides
-        card.style.left = '50%';
-        card.style.transform = 'translateX(-50%)';
-        card.style.right = '';
-      } else if (col >= 3) {
-        // right-side columns: expand leftward'
-        card.style.right = '2px';
-        card.style.left = 'auto';
-      } else {
-        // left-side columns: expand rightward
-        card.style.left = '2px';
-        card.style.right = 'auto';
-      }
-      details.classList.remove('hidden');
-    }
-  });
-});
 //-- Playing around with button
-document.getElementById('new-event-btn').addEventListener('click', () => {
-  alert('This button will open a form to create a new event. Coming soon!');
-});
 
 function updateTodayButton() {
   // Hide the "Today" button if we're already on the current week, show it otherwise
@@ -439,3 +643,4 @@ document.getElementById('btn-next-week').addEventListener('click', () => {
 
 // innit
 setCalendarDates();
+updateTodayButton();
