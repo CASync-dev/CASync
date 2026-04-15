@@ -1,18 +1,25 @@
 {% extends "layout.html" %} {% block content %}
 <div class="max-w-2xl mx-auto p-8">
-  <h1
-    id="settings-title"
-    class="text-2xl font-bold text-gray-900 mb-8 select-none"
-  >
-    Settings
-  </h1>
+  <h1 class="text-2xl font-bold text-gray-900 mb-8">Settings</h1>
 
   <section class="mb-8">
-    <h2 class="text-lg font-semibold text-gray-800 mb-1">Import iCal</h2>
+    <div class="flex">
+      <h2 class="text-lg font-semibold text-gray-800 mb-1">Import iCal</h2>
+      <button
+        id="sync-button"
+        class="hidden bg-blue-600 text-white ml-auto py-2 px-2 rounded-md text-sm hover:bg-blue-700"
+        type="button"
+        title="Sync Existing Calenders"
+        onclick="syncCal()"
+      >
+        <i class="fa-solid fa-rotate"></i> Sync
+      </button>
+    </div>
     <form>
       <p class="text-sm text-gray-500 mb-3">
         Paste your iCal feed URL to import events.
       </p>
+
       <div class="flex">
         <input
           type="url"
@@ -91,6 +98,7 @@
     $('#menu-button-1').html(
       $(this).text() + ' <i class="py-1 pl-2 fas fa-chevron-down text-xs"></i>',
     );
+    checkForExistingCalendars(); // Check if the selected user has existing calendars to determine whether to show sync button
   });
 
   async function importICal() {
@@ -137,46 +145,54 @@
       showMsg('Error: ' + (data.error || 'Unknown error'), false);
     }
   }
+
+  function checkForExistingCalendars() {
+    /*
+    Check if a selected user has any calender in the system. If they do
+    show the sync button with the number of existing calenders, 
+    if not hide the sync button since there is nothing to sync with
+    */
+    if (!selectedUserId) {
+      $('#sync-button').addClass('hidden');
+      return;
+    }
+    // Check if the user has any calendars
+    fetch(`/api/calendars/${selectedUserId}`)
+      .then((res) => res.json())
+      .then((calendars) => {
+        if (calendars.length > 0) {
+          $('#sync-button').removeClass('hidden');
+          $('#sync-button').html(
+            `<i class="fa-solid fa-rotate"></i> Sync (${calendars.length}) cals`,
+          );
+        } else {
+          $('#sync-button').addClass('hidden');
+        }
+      });
+  }
+
+  async function syncCal() {
+    if (!selectedUserId) {
+      showMsg('Please select a user to sync the calendar for.', false);
+      return;
+    }
+    const res = await fetch(`/api/sync-cal/${selectedUserId}`, {
+      method: 'POST',
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showMsg(
+        `Successfully synced calendar. ${data.created} events created, ${data.updated} events updated.`,
+        true,
+      );
+    } else {
+      showMsg('Error: ' + (data.error || 'Unknown error'), false);
+    }
+  }
 </script>
 <!-- Tailwind Elements -->
 <script
   src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"
   type="module"
 ></script>
-<!-- secret -->
-<script>
-  (function () {
-    let clickCount = 0;
-    let toadCursorUrl = null;
-    let toadActive = false;
-
-    // Creates a canvas-based cursor with a toad emoji and returns its data URL
-    function makeToadCursor() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 32;
-      canvas.height = 32;
-      const ctx = canvas.getContext('2d');
-      ctx.font = '26px serif';
-      ctx.textBaseline = 'top';
-      ctx.fillText('🐸', 0, 2);
-      return canvas.toDataURL();
-    }
-
-    // Add click listener to the settings title to toggle the toad cursor every 3 clicks
-    document
-      .getElementById('settings-title')
-      .addEventListener('click', function () {
-        clickCount++;
-        if (clickCount % 3 === 0) {
-          toadActive = !toadActive;
-          if (toadActive) {
-            if (!toadCursorUrl) toadCursorUrl = makeToadCursor();
-            document.body.style.cursor = `url(${toadCursorUrl}) 16 16, auto`;
-          } else {
-            document.body.style.cursor = '';
-          }
-        }
-      });
-  })();
-</script>
 {% endblock %}
