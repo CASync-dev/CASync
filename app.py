@@ -64,7 +64,7 @@ def settings():
     if guard: return guard
     return render_template("settings.html")
 
-# Login, register, homepage and faq currently have a different style from the other webpages.
+# Login, register, homepage and faq ( + contact us) currently have a different style from the other webpages.
 @app.route("/login")
 def login():
     return render_template("login.html")
