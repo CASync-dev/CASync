@@ -2,26 +2,15 @@
 {% extends "layout.html" %} {% block content %}
 <!-- Main Calendar Section Container -->
 <section class="relative bg-stone-50">
-  <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+  <div class="w-full max-w-7xl mx-auto px-6 lg:px-8">
     <!-- Calendar Header: Contains title, view selector, and new activity button -->
     <div
       class="flex flex-col md:flex-row max-md:gap-3 items-center justify-between"
     >
       <!-- Calendar Icon and Current Date Display -->
       <div class="flex items-center gap-4">
-        <!-- Calendar Icon (SVG) -->
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-        >
-          <path
-            d="M17 4.50001L17 5.15001L17 4.50001ZM6.99999 4.50002L6.99999 3.85002L6.99999 4.50002ZM8.05078 14.65C8.40977 14.65 8.70078 14.359 8.70078 14C8.70078 13.641 8.40977 13.35 8.05078 13.35V14.65ZM8.00078 13.35C7.6418 13.35 7.35078 13.641 7.35078 14C7.35078 14.359 7.6418 14.65 8.00078 14.65V13.35ZM8.05078 17.65C8.40977 17.65 8.70078 17.359 8.70078 17C8.70078 16.641 8.40977 16.35 8.05078 16.35V17.65ZM8.00078 16.35C7.6418 16.35 7.35078 16.641 7.35078 17C7.35078 17.359 7.6418 17.65 8.00078 17.65V16.35ZM12.0508 14.65C12.4098 14.65 12.7008 14.359 12.7008 14C12.7008 13.641 12.4098 13.35 12.0508 13.35V14.65ZM12.0008 13.35C11.6418 13.35 11.3508 13.641 11.3508 14C11.3508 14.359 11.6418 14.65 12.0008 14.65V13.35ZM12.0508 17.65C12.4098 17.65 12.7008 17.359 12.7008 17C12.7008 16.641 12.4098 16.35 12.0508 16.35V17.65ZM12.0008 16.35C11.6418 16.35 11.3508 16.641 11.3508 17C11.3508 17.359 11.6418 17.65 12.0008 17.65V16.35ZM16.0508 14.65C16.4098 14.65 16.7008 14.359 16.7008 14C16.7008 13.641 16.4098 13.35 16.0508 13.35V14.65ZM16.0008 13.35C15.6418 13.35 15.3508 13.641 15.3508 14C15.3508 14.359 15.6418 14.65 16.0008 14.65V13.35ZM16.0508 17.65C16.4098 17.65 16.7008 17.359 16.7008 17C16.7008 16.641 16.4098 16.35 16.0508 16.35V17.65ZM16.0008 16.35C15.6418 16.35 15.3508 16.641 15.3508 17C15.3508 17.359 15.6418 17.65 16.0008 17.65V16.35ZM8.65 3C8.65 2.64101 8.35898 2.35 8 2.35C7.64102 2.35 7.35 2.64101 7.35 3H8.65ZM7.35 6C7.35 6.35899 7.64102 6.65 8 6.65C8.35898 6.65 8.65 6.35899 8.65 6H7.35ZM16.65 3C16.65 2.64101 16.359 2.35 16 2.35C15.641 2.35 15.35 2.64101 15.35 3H16.65ZM15.35 6C15.35 6.35899 15.641 6.65 16 6.65C16.359 6.65 16.65 6.35899 16.65 6H15.35ZM6.99999 5.15002L17 5.15001L17 3.85001L6.99999 3.85002L6.99999 5.15002ZM20.35 8.50001V17H21.65V8.50001H20.35ZM17 20.35H7V21.65H17V20.35ZM3.65 17V8.50002H2.35V17H3.65ZM7 20.35C6.03882 20.35 5.38332 20.3486 4.89207 20.2826C4.41952 20.2191 4.1974 20.1066 4.04541 19.9546L3.12617 20.8739C3.55996 21.3077 4.10214 21.4881 4.71885 21.571C5.31685 21.6514 6.07557 21.65 7 21.65V20.35ZM2.35 17C2.35 17.9245 2.34862 18.6832 2.42902 19.2812C2.51193 19.8979 2.69237 20.4401 3.12617 20.8739L4.04541 19.9546C3.89341 19.8026 3.78096 19.5805 3.71743 19.108C3.65138 18.6167 3.65 17.9612 3.65 17H2.35ZM20.35 17C20.35 17.9612 20.3486 18.6167 20.2826 19.108C20.219 19.5805 20.1066 19.8026 19.9546 19.9546L20.8738 20.8739C21.3076 20.4401 21.4881 19.8979 21.571 19.2812C21.6514 18.6832 21.65 17.9245 21.65 17H20.35ZM17 21.65C17.9244 21.65 18.6831 21.6514 19.2812 21.571C19.8979 21.4881 20.44 21.3077 20.8738 20.8739L19.9546 19.9546C19.8026 20.1066 19.5805 20.2191 19.1079 20.2826C18.6167 20.3486 17.9612 20.35 17 20.35V21.65ZM17 5.15001C17.9612 5.15 18.6167 5.15138 19.1079 5.21743C19.5805 5.28096 19.8026 5.39341 19.9546 5.54541L20.8738 4.62617C20.44 4.19238 19.8979 4.01194 19.2812 3.92902C18.6831 3.84862 17.9244 3.85001 17 3.85001L17 5.15001ZM21.65 8.50001C21.65 7.57557 21.6514 6.81686 21.571 6.21885C21.4881 5.60214 21.3076 5.05996 20.8738 4.62617L19.9546 5.54541C20.1066 5.6974 20.219 5.91952 20.2826 6.39207C20.3486 6.88332 20.35 7.53882 20.35 8.50001H21.65ZM6.99999 3.85002C6.07556 3.85002 5.31685 3.84865 4.71884 3.92905C4.10214 4.01196 3.55996 4.1924 3.12617 4.62619L4.04541 5.54543C4.1974 5.39344 4.41952 5.28099 4.89207 5.21745C5.38331 5.15141 6.03881 5.15002 6.99999 5.15002L6.99999 3.85002ZM3.65 8.50002C3.65 7.53884 3.65138 6.88334 3.71743 6.39209C3.78096 5.91954 3.89341 5.69743 4.04541 5.54543L3.12617 4.62619C2.69237 5.05999 2.51193 5.60217 2.42902 6.21887C2.34862 6.81688 2.35 7.57559 2.35 8.50002H3.65ZM3 10.65H21V9.35H3V10.65ZM8.05078 13.35H8.00078V14.65H8.05078V13.35ZM8.05078 16.35H8.00078V17.65H8.05078V16.35ZM12.0508 13.35H12.0008V14.65H12.0508V13.35ZM12.0508 16.35H12.0008V17.65H12.0508V16.35ZM16.0508 13.35H16.0008V14.65H16.0508V13.35ZM16.0508 16.35H16.0008V17.65H16.0508V16.35ZM7.35 3V6H8.65V3H7.35ZM15.35 3V6H16.65V3H15.35Z"
-            fill="#111827"
-          ></path>
-        </svg>
+        <!-- Calendar Icon  -->
+        <i class="fa-solid fa-calendar-days text-gray-400 text-2xl"></i>
         <!-- Current date will be dynamically updated by JavaScript -->
         <h6
           id="calendar-title"
@@ -32,24 +21,21 @@
       </div>
       <!-- New Activity Button -->
       <button
-        class="py-2.5 pr-7 pl-5 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+        class="hidden md:block p-2 m-2 bg-indigo-600 rounded-xl flex items-center gap-2 font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
         id="new-event-btn"
+        command="show-modal"
+        commandfor="drawer"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 20 20"
-          fill="none"
-        >
-          <path
-            d="M10 5V15M15 10H5"
-            stroke="white"
-            stroke-width="1.6"
-            stroke-linecap="round"
-          ></path>
-        </svg>
+        <i class="fa-solid fa-plus text-sm"></i>
         New Activity
+      </button>
+      <button
+        class="block md:hidden fixed right-0 bottom-0 m-3 w-12 h-12 z-50 font-semibold rounded-full bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700"
+        id="new-event-btn"
+        command="show-modal"
+        commandfor="drawer"
+      >
+        <i class="fa-solid fa-plus text-sm"></i>
       </button>
     </div>
 
@@ -75,321 +61,818 @@
           next week >
         </button>
       </div>
-      <!-- Week Header Row: Monday-Friday work week -->
-      <div
-        class="grid grid-cols-6 border-t border-gray-200 sticky top-0 left-0 w-full"
-      >
-        <!-- Empty corner cell for time column -->
-        <div
-          class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
-        ></div>
-        <!-- Day columns - dates and day names will be dynamically set by JavaScript -->
-        <div
-          id="date-col-0"
-          class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
-        >
-          Mon
+      <!-- Scrollable calendar content -->
+      <div class="overflow-x-auto">
+        <!-- Week Header Row: Monday-Friday work week -->
+        <div class="grid grid-cols-6 border-t border-gray-200 w-full min-w-150">
+          <!-- Empty corner cell for time column -->
+          <div
+            class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
+          ></div>
+          <!-- Day columns - dates and day names will be dynamically set by JavaScript -->
+          <div
+            id="date-col-0"
+            class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
+          >
+            Mon
+          </div>
+          <div
+            id="date-col-1"
+            class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
+          >
+            Tue
+          </div>
+          <div
+            id="date-col-2"
+            class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
+          >
+            Wed
+          </div>
+          <div
+            id="date-col-3"
+            class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
+          >
+            Thu
+          </div>
+          <div
+            id="date-col-4"
+            class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
+          >
+            Fri
+          </div>
         </div>
-        <div
-          id="date-col-1"
-          class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
-        >
-          Tue
-        </div>
-        <div
-          id="date-col-2"
-          class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
-        >
-          Wed
-        </div>
-        <div
-          id="date-col-3"
-          class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
-        >
-          Thu
-        </div>
-        <div
-          id="date-col-4"
-          class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
-        >
-          Fri
+
+        <!--  Calendar Grid -->
+        <!-- Grid structure: 6 columns (time + 5 weekdays), multiple rows for time slots -->
+        <!-- Time range: 07:00 am to 06:00 pm -->
+        <div id="desktop-grid" class="grid grid-cols-6 min-w-150">
+          <!-- 07:00 AM time slot -->
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+          >
+            <span class="text-xs font-semibold text-gray-400">07:00 am</span>
+          </div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+
+          <!-- 08:00 AM time slot -->
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+          >
+            <span class="text-xs font-semibold text-gray-400">08:00 am</span>
+          </div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+
+          <!-- 09:00 AM time slot -->
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+          >
+            <span class="text-xs font-semibold text-gray-400">09:00 am</span>
+          </div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+
+          <!-- 10:00 AM time slot -->
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+          >
+            <span class="text-xs font-semibold text-gray-400">10:00 am</span>
+          </div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+
+          <!-- 11:00 AM time slot -->
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+          >
+            <span class="text-xs font-semibold text-gray-400">11:00 am</span>
+          </div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+
+          <!-- 12:00 PM time slot -->
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+          >
+            <span class="text-xs font-semibold text-gray-400">12:00 pm</span>
+          </div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+
+          <!-- 01:00 PM time slot -->
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+          >
+            <span class="text-xs font-semibold text-gray-400">01:00 pm</span>
+          </div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+
+          <!-- 02:00 PM time slot -->
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+          >
+            <span class="text-xs font-semibold text-gray-400">02:00 pm</span>
+          </div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+
+          <!-- 03:00 PM time slot -->
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+          >
+            <span class="text-xs font-semibold text-gray-400">03:00 pm</span>
+          </div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+
+          <!-- 04:00 PM time slot -->
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+          >
+            <span class="text-xs font-semibold text-gray-400">04:00 pm</span>
+          </div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+
+          <!-- 05:00 PM time slot -->
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+          >
+            <span class="text-xs font-semibold text-gray-400">05:00 pm</span>
+          </div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+
+          <!-- 06:00 PM time slot -->
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+          >
+            <span class="text-xs font-semibold text-gray-400">06:00 pm</span>
+          </div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
+          <div
+            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
+          ></div>
         </div>
       </div>
-
-      <!-- Desktop Calendar Grid (hidden on mobile, shown on sm+ screens) -->
-      <!-- Grid structure: 6 columns (time + 5 weekdays), multiple rows for time slots -->
-      <!-- Time range: 07:00 am to 06:00 pm -->
-      <div
-        id="desktop-grid"
-        class="hidden grid-cols-6 sm:grid w-full overflow-x-auto"
-      >
-        <!-- 07:00 AM time slot -->
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-        >
-          <span class="text-xs font-semibold text-gray-400">07:00 am</span>
-        </div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-
-        <!-- 08:00 AM time slot -->
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-        >
-          <span class="text-xs font-semibold text-gray-400">08:00 am</span>
-        </div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-
-        <!-- 09:00 AM time slot -->
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-        >
-          <span class="text-xs font-semibold text-gray-400">09:00 am</span>
-        </div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-
-        <!-- 10:00 AM time slot -->
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-        >
-          <span class="text-xs font-semibold text-gray-400">10:00 am</span>
-        </div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-
-        <!-- 11:00 AM time slot -->
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-        >
-          <span class="text-xs font-semibold text-gray-400">11:00 am</span>
-        </div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-
-        <!-- 12:00 PM time slot -->
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-        >
-          <span class="text-xs font-semibold text-gray-400">12:00 pm</span>
-        </div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-
-        <!-- 01:00 PM time slot -->
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-        >
-          <span class="text-xs font-semibold text-gray-400">01:00 pm</span>
-        </div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-
-        <!-- 02:00 PM time slot -->
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-        >
-          <span class="text-xs font-semibold text-gray-400">02:00 pm</span>
-        </div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-
-        <!-- 03:00 PM time slot -->
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-        >
-          <span class="text-xs font-semibold text-gray-400">03:00 pm</span>
-        </div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-
-        <!-- 04:00 PM time slot -->
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-        >
-          <span class="text-xs font-semibold text-gray-400">04:00 pm</span>
-        </div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-
-        <!-- 05:00 PM time slot -->
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-        >
-          <span class="text-xs font-semibold text-gray-400">05:00 pm</span>
-        </div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-
-        <!-- 06:00 PM time slot -->
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-        >
-          <span class="text-xs font-semibold text-gray-400">06:00 pm</span>
-        </div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-        <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-        ></div>
-      </div>
+      <!-- end scrollable calendar content -->
     </div>
   </div>
+
+  <!-- Add Event Drawer-->
+  <el-dialog>
+    <dialog
+      id="drawer"
+      class="fixed inset-0 size-auto max-h-none max-w-none overflow-hidden bg-transparent not-open:hidden backdrop:bg-transparent"
+    >
+      <el-dialog-backdrop
+        class="absolute inset-0 transition-opacity duration-500 ease-in-out data-closed:opacity-0"
+      ></el-dialog-backdrop>
+
+      <div
+        tabindex="0"
+        class="absolute inset-0 pl-10 focus:outline-none sm:pl-16"
+      >
+        <el-dialog-panel
+          class="group/dialog-panel relative ml-auto block size-full max-w-md transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700"
+        >
+          <!-- Close button, show/hide based on slide-over state. -->
+          <div
+            class="absolute -ml-8 flex pt-4 pr-2 duration-500 ease-in-out group-data-closed/dialog-panel:opacity-0 sm:pr-4"
+          >
+            <button
+              type="button"
+              command="close"
+              commandfor="drawer"
+              class="rounded-md text-gray-400 hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+            >
+              <span class="absolute"></span>
+              <span class="sr-only">Close panel</span>
+              <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
+          </div>
+
+          <div
+            class="relative flex h-full flex-col overflow-y-auto bg-gray-100 py-6 shadow-xl after:absolute"
+          >
+            <div class="px-4 sm:px-6">
+              <h2
+                id="drawer-title"
+                class="text-base font-semibold border-b border-gray-700 pb-4"
+              >
+                Create New Event
+              </h2>
+            </div>
+            <div class="relative mt-6 px-4 sm:px-6">
+              <form id="add-event-form">
+                <div class="">
+                  <div class="mb-3">
+                    <label for="event-title" class="block text-sm font-medium">
+                      Event Title
+                    </label>
+                    <input
+                      type="text"
+                      id="event-title"
+                      name="event-title"
+                      class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="event-date" class="block text-sm font-medium">
+                      Date
+                    </label>
+                    <input
+                      type="date"
+                      id="event-date"
+                      name="event-date"
+                      class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="event-time" class="block text-sm font-medium">
+                      Time
+                    </label>
+                    <div class="flex">
+                      <input
+                        type="time"
+                        id="event-time-start"
+                        name="event-time-start"
+                        class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      />
+                      <p class="mx-2">-</p>
+                      <input
+                        type="time"
+                        id="event-time-end"
+                        name="event-time-end"
+                        class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label
+                      for="event-location"
+                      class="block text-sm font-medium"
+                    >
+                      Location
+                    </label>
+                    <input
+                      type="text"
+                      id="event-location"
+                      name="event-location"
+                      class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="event-description" class="text-sm font-medium">
+                      Description
+                    </label>
+                    <textarea
+                      id="event-description"
+                      name="event-description"
+                      rows="3"
+                      class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    ></textarea>
+                  </div>
+                  <!-- TODO: Temporary user selection. will be based on session later -->
+                  <div class="mb-3">
+                    <label for="event-users" class="text-sm font-medium">
+                      User ID
+                    </label>
+                    <input
+                      type="text"
+                      id="user-id"
+                      name="user-id"
+                      placeholder="1..."
+                      class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <!-- color picker - these colors are defined in schedule.js/COLOR_MAP -->
+                  <div>
+                    <label for="event-color" class="text-sm font-medium">
+                      Event Color
+                    </label>
+                    <!-- hidden input to store the selected color -->
+                    <input type="hidden" id="event-color" value="indigo" />
+                    <div class="flex gap-1" id="color-picker-buttons">
+                      <!-- indigo -->
+                      <button
+                        type="button"
+                        class="mt-1 block w-16 h-8 rounded-md bg-indigo-500 border border-gray-300 shadow-sm sm:text-sm ring-2 ring-offset-2 ring-black"
+                        onclick="selectColor(this, 'indigo')"
+                      ></button>
+                      <!-- red -->
+                      <button
+                        type="button"
+                        class="mt-1 block w-16 h-8 rounded-md bg-red-500 border border-gray-300 shadow-sm sm:text-sm"
+                        onclick="selectColor(this, 'red')"
+                      ></button>
+                      <!-- orange -->
+                      <button
+                        type="button"
+                        class="mt-1 block w-16 h-8 rounded-md bg-orange-500 border border-gray-300 shadow-sm sm:text-sm"
+                        onclick="selectColor(this, 'orange')"
+                      ></button>
+                      <!-- yellow -->
+                      <button
+                        type="button"
+                        class="mt-1 block w-16 h-8 rounded-md bg-yellow-500 border border-gray-300 shadow-sm sm:text-sm"
+                        onclick="selectColor(this, 'yellow')"
+                      ></button>
+                      <!-- green -->
+                      <button
+                        type="button"
+                        class="mt-1 block w-16 h-8 rounded-md bg-green-500 border border-gray-300 shadow-sm sm:text-sm"
+                        onclick="selectColor(this, 'green')"
+                      ></button>
+                      <!-- blue -->
+                      <button
+                        type="button"
+                        class="mt-1 block w-16 h-8 rounded-md bg-blue-500 border border-gray-300 shadow-sm sm:text-sm"
+                        onclick="selectColor(this, 'blue')"
+                      ></button>
+                    </div>
+                  </div>
+                  <!-- Form Messages -->
+                  <div>
+                    <p
+                      id="form-message"
+                      class="text-sm text-red-500 hidden"
+                    ></p>
+                  </div>
+                  <!-- Submit Button -->
+                  <div class="mt-6">
+                    <button
+                      type="submit"
+                      class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                      Create Event
+                    </button>
+                    <button
+                      type="button"
+                      command="close"
+                      commandfor="drawer"
+                      class="ml-3 inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </el-dialog-panel>
+      </div>
+    </dialog>
+  </el-dialog>
+
+  <!-- Delete Item Confirmation Modal-->
+  <el-dialog>
+    <dialog
+      id="delete-confirmation"
+      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+    >
+      <el-dialog-backdrop
+        class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+      ></el-dialog-backdrop>
+
+      <div
+        tabindex="0"
+        class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+      >
+        <el-dialog-panel
+          class="relative transform overflow-hidden rounded-lg bg-gray-800 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        >
+          <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div
+                class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-500/10 sm:mx-0 sm:size-10"
+              >
+                <i
+                  class="fa-solid fa-triangle-exclamation text-red-500 text-lg"
+                ></i>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3
+                  id="dialog-title"
+                  class="text-base font-semibold text-white"
+                >
+                  Delete Event
+                </h3>
+                <div class="mt-2">
+                  <p class="text-sm text-gray-400">
+                    Are you sure you want to delete this event? This action
+                    cannot be undone.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="bg-gray-700/25 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+          >
+            <button
+              id="confirm-delete-btn"
+              type="button"
+              command="close"
+              commandfor="delete-confirmation"
+              class="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 sm:ml-3 sm:w-auto"
+            >
+              Delete Event
+            </button>
+            <button
+              id="cancel-delete-btn"
+              type="button"
+              command="close"
+              commandfor="delete-confirmation"
+              class="mt-3 inline-flex w-full justify-center rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white inset-ring inset-ring-white/5 hover:bg-white/20 sm:mt-0 sm:w-auto"
+            >
+              Cancel
+            </button>
+          </div>
+        </el-dialog-panel>
+      </div>
+    </dialog>
+  </el-dialog>
+
+  <!-- Edit Event Modal -->
+  <el-dialog>
+    <dialog
+      id="edit-event-modal"
+      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+    >
+      <el-dialog-backdrop
+        class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+      ></el-dialog-backdrop>
+
+      <div
+        tabindex="0"
+        class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+      >
+        <el-dialog-panel
+          class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        >
+          <form id="edit-event-form">
+            <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div class="sm:flex sm:items-start">
+                <div
+                  class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-blue-500/10 sm:mx-0 sm:size-10"
+                >
+                  <i
+                    class="fa-solid fa-pen-to-square text-blue-500 text-lg"
+                  ></i>
+                </div>
+                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                  <h3
+                    id="dialog-title"
+                    class="text-base font-semibold text-black"
+                  >
+                    Edit Event
+                  </h3>
+                  <div class="mt-2">
+                    <div class="mb-3">
+                      <label
+                        for="edit-event-title"
+                        class="block text-sm font-medium"
+                      >
+                        Event Title
+                      </label>
+                      <input
+                        type="text"
+                        id="edit-event-title"
+                        name="event-title"
+                        class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label
+                        for="edit-event-date"
+                        class="block text-sm font-medium"
+                      >
+                        Date
+                      </label>
+                      <input
+                        type="date"
+                        id="edit-event-date"
+                        name="event-date"
+                        class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label
+                        for="edit-event-time-start"
+                        class="block text-sm font-medium"
+                      >
+                        Time
+                      </label>
+                      <div class="flex">
+                        <input
+                          type="time"
+                          id="edit-event-time-start"
+                          name="event-time-start"
+                          class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        />
+                        <p class="mx-2">-</p>
+                        <input
+                          type="time"
+                          id="edit-event-time-end"
+                          name="event-time-end"
+                          class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        />
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label
+                        for="edit-event-location"
+                        class="block text-sm font-medium"
+                      >
+                        Location
+                      </label>
+                      <input
+                        type="text"
+                        id="edit-event-location"
+                        name="event-location"
+                        class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label
+                        for="edit-event-description"
+                        class="block text-sm font-medium"
+                      >
+                        Description
+                      </label>
+                      <textarea
+                        id="edit-event-description"
+                        name="event-description"
+                        rows="3"
+                        class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      ></textarea>
+                    </div>
+                    <!-- TODO: Temporary user selection. will be based on session later -->
+                    <div class="mb-3">
+                      <label for="user-id" class="block text-sm font-medium">
+                        User ID
+                      </label>
+                      <input
+                        type="text"
+                        id="edit-user-id"
+                        name="user-id"
+                        placeholder="1..."
+                        class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      />
+                    </div>
+                    <!-- color picker - these colors are defined in schedule.js/COLOR_MAP -->
+                    <div class="mb-3">
+                      <label
+                        for="event-color"
+                        class="block text-sm font-medium"
+                      >
+                        Event Color
+                      </label>
+                      <input
+                        type="hidden"
+                        id="edit-event-color"
+                        value="indigo"
+                      />
+                      <div
+                        class="flex gap-1 mt-1"
+                        id="edit-color-picker-buttons"
+                      >
+                        <button
+                          id="indigo-color-btn"
+                          type="button"
+                          class="w-16 h-8 rounded-md bg-indigo-500 border border-gray-300 shadow-sm"
+                          onclick="editColor(this, 'indigo')"
+                        ></button>
+                        <button
+                          id="red-color-btn"
+                          type="button"
+                          class="w-16 h-8 rounded-md bg-red-500 border border-gray-300 shadow-sm"
+                          onclick="editColor(this, 'red')"
+                        ></button>
+                        <button
+                          id="orange-color-btn"
+                          type="button"
+                          class="w-16 h-8 rounded-md bg-orange-500 border border-gray-300 shadow-sm"
+                          onclick="editColor(this, 'orange')"
+                        ></button>
+                        <button
+                          id="yellow-color-btn"
+                          type="button"
+                          class="w-16 h-8 rounded-md bg-yellow-500 border border-gray-300 shadow-sm"
+                          onclick="editColor(this, 'yellow')"
+                        ></button>
+                        <button
+                          id="green-color-btn"
+                          type="button"
+                          class="w-16 h-8 rounded-md bg-green-500 border border-gray-300 shadow-sm"
+                          onclick="editColor(this, 'green')"
+                        ></button>
+                        <button
+                          id="blue-color-btn"
+                          type="button"
+                          class="w-16 h-8 rounded-md bg-blue-500 border border-gray-300 shadow-sm"
+                          onclick="editColor(this, 'blue')"
+                        ></button>
+                      </div>
+                    </div>
+                    <p
+                      id="form-message"
+                      class="text-sm text-red-500 hidden"
+                    ></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="bg-gray-700/25 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+            >
+              <button
+                id="save-edit-btn"
+                type="button"
+                command="close"
+                commandfor="edit-event-modal"
+                class="inline-flex w-full justify-center rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-400 sm:ml-3 sm:w-auto"
+              >
+                Save Changes
+              </button>
+              <button
+                id="cancel-edit-btn"
+                type="button"
+                command="close"
+                commandfor="edit-event-modal"
+                class="mt-3 inline-flex w-full justify-center rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white inset-ring inset-ring-white/5 hover:bg-white/20 sm:mt-0 sm:w-auto"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </el-dialog-panel>
+      </div>
+    </dialog>
+  </el-dialog>
 </section>
 {% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/schedule.js') }}"></script>
+<!-- tailwind js -->
+<script
+  src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"
+  type="module"
+></script>
 {% endblock %}
