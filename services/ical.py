@@ -160,7 +160,7 @@ def update_events_in_db(parsed_events, user_id):
             existing_event.start_time = event_data['start_time']
             existing_event.end_time = event_data['end_time']
             existing_event.location = event_data['location']
-            existing_event.color = event_data.get('color', 'indigo')
+            existing_event.color = event_data.get('color', None)  # optional, default to None if not provided
             updated_count += 1
         else:
             # Create a new event

@@ -1,6 +1,11 @@
 {% extends "layout.html" %} {% block content %}
 <div class="max-w-2xl mx-auto p-8">
-  <h1 class="text-2xl font-bold text-gray-900 mb-8">Settings</h1>
+  <h1
+    id="settings-title"
+    class="text-2xl font-bold text-gray-900 mb-8 select-none"
+  >
+    Settings
+  </h1>
 
   <section class="mb-8">
     <h2 class="text-lg font-semibold text-gray-800 mb-1">Import iCal</h2>
@@ -138,4 +143,40 @@
   src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"
   type="module"
 ></script>
+<!-- secret -->
+<script>
+  (function () {
+    let clickCount = 0;
+    let toadCursorUrl = null;
+    let toadActive = false;
+
+    // Creates a canvas-based cursor with a toad emoji and returns its data URL
+    function makeToadCursor() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 32;
+      canvas.height = 32;
+      const ctx = canvas.getContext('2d');
+      ctx.font = '26px serif';
+      ctx.textBaseline = 'top';
+      ctx.fillText('🐸', 0, 2);
+      return canvas.toDataURL();
+    }
+
+    // Add click listener to the settings title to toggle the toad cursor every 3 clicks
+    document
+      .getElementById('settings-title')
+      .addEventListener('click', function () {
+        clickCount++;
+        if (clickCount % 3 === 0) {
+          toadActive = !toadActive;
+          if (toadActive) {
+            if (!toadCursorUrl) toadCursorUrl = makeToadCursor();
+            document.body.style.cursor = `url(${toadCursorUrl}) 16 16, auto`;
+          } else {
+            document.body.style.cursor = '';
+          }
+        }
+      });
+  })();
+</script>
 {% endblock %}
