@@ -178,19 +178,11 @@ def api_edit_event(event_id):
     return jsonify(event.to_dict()), 200
 
 
-# -- OTHER API ROUTES
-
-@app.route("/api/user")
-def api_user():
-    user = User.query.first()
-    if not user:
-        return jsonify({}), 404
-    return jsonify({'id': user.id, 'username': user.username, 'email': user.email})
-
-@app.route("/api/calendars")
-def api_calendars():
-    calendars = Calendar.query.all()
-    return jsonify([c.to_dict() for c in calendars])
+# -- API CALENDAR ROUTES
+@app.route("/api/calendars/<int:user_id>")
+def api_calendars(user_id):
+    calendars = Calendar.query.where(Calendar.user_id == user_id).all()
+    return jsonify([{"id": c.id, "ical_url": c.ical_url, "synced_at": c.synced_at.isoformat()} for c in calendars])
 
 @app.route("/api/import-ical/<int:user_id>", methods=["POST"])
 def api_import_ical(user_id):
@@ -218,6 +210,38 @@ def api_import_ical(user_id):
     # On success, return the result (e.g. number of events imported) with a 200 status code
     return jsonify(result), 200
 
+@app.route("/api/sync-cal/<int:user_id>", methods=["POST"])
+def api_sync_cal(user_id):
+    """
+    POST /api/sync-cal/<user_id>
+
+    Gets all calendars for the user, then for each calendar fetches the latest events from the iCal 
+    feed and updates the database accordingly. This allows us to keep imported events up to date 
+    with any changes in the original calendar.
+    """
+    calendars = Calendar.query.where(Calendar.user_id == user_id).all()
+    total_created = 0
+    total_updated = 0
+    errors = []
+    for cal in calendars:
+        result, error = import_ical(cal.ical_url, user_id)
+        if error:
+            errors.append({"calendar_id": cal.id, "error": error})
+        else:
+            total_created += result.get("created", 0)
+            total_updated += result.get("updated", 0)
+    if errors and not (total_created or total_updated):
+        return jsonify({"error": errors[0]["error"]}), 400
+    return jsonify({"created": total_created, "updated": total_updated}), 200
+
+# -- OTHER API ROUTES
+
+@app.route("/api/user")
+def api_user():
+    user = User.query.first()
+    if not user:
+        return jsonify({}), 404
+    return jsonify({'id': user.id, 'username': user.username, 'email': user.email})
 
 # This is just a test route to get a list of users
 @app.route("/api/users", methods=["get"])
@@ -225,8 +249,7 @@ def api_users():
     users = User.query.all()
     return jsonify([u.to_dict() for u in users])
 
-
-# Error handling
+# -- Error handling
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("errors/404.html"), 404
