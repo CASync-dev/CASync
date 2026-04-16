@@ -54,6 +54,10 @@
 
 {% endblock %} {% block scripts %}
 <script>
+  function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]').content;
+  }
+
   // TODO: This will get replaced with a user session deteciton system later
   // Jquery  for adding user options to the dropdown (replace with actual user data)
   function addUserOptions(user) {
@@ -109,7 +113,7 @@
     // Send the URL and selected user ID to the server for processing
     const res = await fetch(`/api/import-ical/${selectedUserId}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
       body: JSON.stringify({
         url: url,
         userId: selectedUserId,

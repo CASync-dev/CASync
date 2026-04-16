@@ -1,4 +1,9 @@
 // Schedule page — sets dynamic dates and renders events into the weekly calendar grid
+
+function getCsrfToken() {
+  return document.querySelector('meta[name="csrf-token"]').content;
+}
+
 // ── Constants
 
 // Grid Constants: adjust these if you change the grid layout in the HTML/CSS (maybe dynamic later)
@@ -401,7 +406,7 @@ document.getElementById('add-event-form').addEventListener('submit', (e) => {
   // Send POST request to API to create the event
   fetch('/api/events', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
     body: JSON.stringify(newEvent),
   })
     .then((response) => {
@@ -474,7 +479,7 @@ document.getElementById('confirm-delete-btn').addEventListener('click', () => {
   pendingDeleteId = null;
 
   // Send DELETE request to the API to delete the event
-  fetch(`/api/events/${id}`, { method: 'DELETE' })
+  fetch(`/api/events/${id}`, { method: 'DELETE', headers: { 'X-CSRFToken': getCsrfToken() } })
     .then((response) => {
       if (!response.ok) throw new Error('Failed to delete');
       // On success, remove the event from our local list and re-render
@@ -526,7 +531,7 @@ function editEvent(eventId) {
     // We send a PUT request to the API to update the event with the new details
     fetch(`/api/events/${eventId}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
       body: JSON.stringify(updatedEvent),
     })
       .then((response) => {
