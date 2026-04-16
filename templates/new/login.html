@@ -29,6 +29,79 @@
         <!-- Additional CSS goes here-->
     </head>
     <body>
-        
+        <br />
+            <div
+            class="antialiased mx-auto bg-white flex items-center justify-center text-center"
+            >
+            <form
+                id="login"
+                novalidate="novalidate"
+                class = "bg-primary p-6 m-6 border-8 rounded-3xl border-primary "
+            >
+                <div>
+                <a href="/home">
+                    <h1 class="items-center justify-center text-center text-4xl py-4 px-5 text-nearwhite">
+                    CA<strong>Sync</strong>
+                    </h1>
+                </a>
+                <br />
+                <br />
+                </div>
+                <div>
+                <label for="user" class="text-left text-nearwhite">Username:</label> <br />
+                <input
+                    id="user"
+                    name="user"
+                    type="text"
+                    autocomplete="username"
+                    aria-required="true"
+                    aria-invalid="false"
+                    autofocus="autofocus"
+                    size="30"
+                    name="user"
+                    class="border"
+                />
+                <br />
+                <br />
+                <br />
+                <label for="pw" class="text-left">Password:</label> <br />
+                <input
+                    id="pw"
+                    name="pw"
+                    type="password"
+                    autocomplete="current-password"
+                    aria-required="true"
+                    aria-invalid="false"
+                    autofocus="autofocus"
+                    size="30"
+                    name="pw"
+                    required
+                    class="border"
+                />
+                <br />
+                <br />
+                <input type="checkbox" id="rme" name="rme" />
+                <label for="rme"> Remember me </label>
+                <br />
+                <span id = "field-error"> </span>
+                <br />
+                <button
+                    id="log"
+                    type="submit"
+                    class="button cursor-pointer items-center mx-1 rounded-2xl bg-primary hover:bg-indigo-800 shadow-black text-nearwhite
+                    p-5 text-1xl" 
+                >
+                    Log In
+                </button>
+
+                <br />
+                <h5 class="">
+                    Not a member yet? Register
+                    <a href="/register" class="underline"> here. </a>
+                </h5>
+                </div>
+            </form>
+            </div>
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>        
     </body>
 </html>
