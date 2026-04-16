@@ -7,6 +7,7 @@ import os
 from extensions import db
 from models import Calendar, User, Event
 from services.ical import import_ical
+from forms import EventForm, ICalImportForm
 
 app = Flask(__name__)
 # Secret key for session logic
@@ -43,7 +44,7 @@ def dash():
 def schedule():
     guard = require_login()
     if guard: return guard
-    return render_template("schedule.html")
+    return render_template("schedule.html", form=EventForm())
 
 
 @app.route("/groups")
@@ -64,7 +65,7 @@ def friends():
 def settings():
     guard = require_login()
     if guard: return guard
-    return render_template("settings.html")
+    return render_template("settings.html", form=ICalImportForm())
 
 # Login, register, homepage and faq currently have a different style from the other webpages.
 @app.route("/login")
