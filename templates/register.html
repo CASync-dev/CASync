@@ -29,12 +29,14 @@
         <!-- Additional CSS goes here-->
     </head>
     <body>
-        <div class="antialiased mx-auto bg-white flex items-center justify-center text-center">
-            <form id = "register" novalidate = "novalidate" class = "bg-primary p-6 m-6 border-8 rounded-3xl border-primary drop-shadow-2xl shadow">
+        <div class="antialiased mx-auto bg-white flex items-center justify-center text-center ">
+            <form id = "register" novalidate = "novalidate" class = "bg-primary p-6 m-6 border-8 rounded-3xl border-primary drop-shadow-2xl shadow text-align">
                 <div>
-                    <a href="{{ url_for('home') }}" class = "-m-1 p-1 text-2xl text-nearwhite mx-auto">
-                    <img src="{{url_for('static', filename='images/w-logo.png')}}" class = "max-h-28 max-w-28 py-0.5">
-                    </a>                  
+                    <a href="{{ url_for('home') }}" class = "-m-1 text-2xl text-nearwhite mx-auto">
+                    <strong>CAS</strong>ync
+                </a> 
+                <br>         
+                <br>        
                 </div>
                 <legend> <h3 class = "flex items-center justify-center text-center text-xl px-5 text-nearwhite"> Register </h1> </legend>
                 <br>
@@ -68,7 +70,7 @@
                     <button
                         id="log"
                         type="submit"
-                        class="button cursor-pointer items-center mx-1 rounded-2xl bg-nearwhite hover:bg-indigo-800 shadow-black text-primary
+                        class="button cursor-pointer items-center mx-1 rounded-2xl bg-nearwhite hover:bg-midgray shadow-black text-primary
                         p-5 text-1xl" 
                     >
                         Continue
@@ -78,5 +80,6 @@
                 </div>
             </form>
         </div>
+        <script src="{{ url_for('static', filename='js/register.js') }}"></script>   
     </body>
 </html>
