@@ -36,13 +36,11 @@
             <form
                 id="login"
                 novalidate="novalidate"
-                class = "bg-primary p-6 m-6 border-8 rounded-3xl border-primary "
+                class = "bg-primary p-6 m-6 border-8 rounded-3xl border-primary drop-shadow-2xl shadow"
             >
                 <div>
-                <a href="/home">
-                    <h1 class="items-center justify-center text-center text-4xl py-4 px-5 text-nearwhite">
-                    CA<strong>Sync</strong>
-                    </h1>
+                <a href="{{ url_for('home') }}" class = "-m-1 p-1 text-2xl text-nearwhite mx-auto">
+                        <img src="{{url_for('static', filename='images/w-logo.png')}}" class = "max-h-28 max-w-28 py-0.5">
                 </a>
                 <br />
                 <br />
@@ -59,12 +57,12 @@
                     autofocus="autofocus"
                     size="30"
                     name="user"
-                    class="border"
+                    class="border bg-nearwhite"
                 />
                 <br />
                 <br />
                 <br />
-                <label for="pw" class="text-left">Password:</label> <br />
+                <label for="pw" class="text-left text-nearwhite">Password:</label> <br />
                 <input
                     id="pw"
                     name="pw"
@@ -76,26 +74,26 @@
                     size="30"
                     name="pw"
                     required
-                    class="border"
+                    class="border bg-nearwhite"
                 />
                 <br />
                 <br />
                 <input type="checkbox" id="rme" name="rme" />
-                <label for="rme"> Remember me </label>
+                <label for="rme" class = "text-nearwhite"> Remember me </label>
                 <br />
                 <span id = "field-error"> </span>
                 <br />
                 <button
                     id="log"
                     type="submit"
-                    class="button cursor-pointer items-center mx-1 rounded-2xl bg-primary hover:bg-indigo-800 shadow-black text-nearwhite
+                    class="button cursor-pointer items-center mx-1 rounded-2xl bg-nearwhite hover:bg-indigo-800 shadow-black text-primary
                     p-5 text-1xl" 
                 >
-                    Log In
+                    Continue
                 </button>
 
                 <br />
-                <h5 class="">
+                <h5 class="text-nearwhite text-xs pt-5">
                     Not a member yet? Register
                     <a href="/register" class="underline"> here. </a>
                 </h5>
