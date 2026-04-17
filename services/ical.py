@@ -151,17 +151,29 @@ def update_events_in_db(parsed_events, user_id):
     updated_count = 0
 
     for event_data in parsed_events:
+        # Try to find an existing event with the same user_id, ical_id and ical_uid
         existing_event = Event.query.filter_by(user_id=user_id, ical_id=event_data['ical_id'], ical_uid=event_data['ical_uid']).first()
         if existing_event:
-            # Update the existing event's details
-            existing_event.title = event_data['title']
-            existing_event.description = event_data['description']
-            existing_event.date = event_data['date']
-            existing_event.start_time = event_data['start_time']
-            existing_event.end_time = event_data['end_time']
-            existing_event.location = event_data['location']
-            existing_event.color = event_data.get('color', None)  # optional, default to None if not provided
-            updated_count += 1
+            # If the event already exists, we check if any of the details have changed. If they have, we update the existing event.
+            new_color = event_data.get('color', None)
+            if ( # we only update if something has actually changed, to avoid unnecessary database writes
+                existing_event.title != event_data['title']
+                or existing_event.description != event_data['description']
+                or existing_event.date != event_data['date']
+                or existing_event.start_time != event_data['start_time']
+                or existing_event.end_time != event_data['end_time']
+                or existing_event.location != event_data['location']
+                or existing_event.color != new_color
+            ):
+                # Update the existing event with the new details
+                existing_event.title = event_data['title']
+                existing_event.description = event_data['description']
+                existing_event.date = event_data['date']
+                existing_event.start_time = event_data['start_time']
+                existing_event.end_time = event_data['end_time']
+                existing_event.location = event_data['location']
+                existing_event.color = new_color
+                updated_count += 1
         else:
             # Create a new event
             new_event = Event(user_id=user_id, **event_data)
