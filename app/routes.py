@@ -1,23 +1,9 @@
-import os
 from datetime import datetime
-
-from flask import Flask, render_template, jsonify, request, session, redirect, url_for, flash
-from flask_migrate import Migrate
-from flask_wtf.csrf import CSRFProtect
-from extensions import db
-from models import Calendar, User, Event
+from app import app, db
+from flask import render_template, jsonify, request, session, redirect, url_for, flash
+from app.form import EventForm, IcalImportForm
+from app.models import Calendar, User, Event
 from services.ical import import_ical
-from form import EventForm, IcalImportForm
-
-
-app = Flask(__name__)
-# Secret key for session logic
-app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')  # swap for real env var later
-# Configure the database URI and initialize the database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-db.init_app(app)
-migrate = Migrate(app, db)
-csrf = CSRFProtect(app)
 
 
 # --- Session login logic
@@ -273,12 +259,3 @@ def api_users():
     users = User.query.all()
     return jsonify([u.to_dict() for u in users])
 
-# -- Error handling
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template("errors/404.html"), 404
-
-
-
-if __name__ == "__main__":
-    app.run(debug=True, port=8080)

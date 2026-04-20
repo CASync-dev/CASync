@@ -15,3 +15,5 @@ class EventForm(FlaskForm):
     location = StringField()
     description = StringField()
     color = StringField()
+
+# TODO: Login Form, Registtration form.

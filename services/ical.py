@@ -4,8 +4,8 @@ from icalendar import Calendar as ICalendar # for parsing iCal data
 import ipaddress, socket # for URL safety checks
 from urllib.parse import urlparse # for URL parsing
 
-from extensions import db
-from models import Event, Calendar
+from app import db
+from app.models import Event, Calendar
 #sanitise input and check that the URL is safe to fetch from.
 # prefevent ssrf attack : no funky ip stuff
 def _is_safe_url(url):
