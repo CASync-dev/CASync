@@ -64,14 +64,15 @@ def settings():
     if guard: return guard
     return render_template("loggedin/settings.html")
 
+# -- Unprotected routes
 # Login, register, homepage and faq ( + contact us) currently have a different style from the other webpages.
 @app.route("/login")
 def login():
-    return render_template("login.html")
+    return render_template("loggedout/login.html")
 
 @app.route("/register")
 def register():
-    return render_template("register.html")
+    return render_template("loggedout/register.html")
 
 @app.route("/home")
 def home():
