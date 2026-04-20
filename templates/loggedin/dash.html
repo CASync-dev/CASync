@@ -1,0 +1,35 @@
+{% extends "loggedin/layout.html" %} {% block content %}
+<div class="max-w-2xl mx-auto p-8">
+  <h1
+    id="settings-title"
+    class="text-2xl font-bold text-gray-900 mb-8 select-none"
+  >
+    Hello, {{username}}!
+  </h1>
+    <br>
+    <h2 class="text-3xl text-dark">
+        Summary 
+    </h2>
+    <br>
+    <div class = "flex flex-row">
+        <h3 class = "text-2xl text-dark"> 
+            Friends available now:
+        </h3>
+        <div class = "bg-dark border border-solid border-dark rounded-2xl items-center mx-auto">
+            Friend<!-- Here would be where the profiles of the friends would show, but gotta figure that out ...-->
+        </div>
+    </div>
+    <br>
+    <!-- Would fetch the next event's time and calculate time left till event -->
+    <h3 class = "text-2xl text-dark">
+        Your next event: in [time left] (time)
+    </h3>
+    <!-- Here would be where the events would show up; dynamically updated via js/jinja (?)-->
+    <div class = "flex flex-col">
+
+    </div>
+</div>
+<footer class = "items-center text-center text-xl">
+    <h3> That's all for today! </h3>
+</footer>
+{% endblock %}

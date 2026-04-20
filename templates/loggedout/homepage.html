@@ -1,0 +1,78 @@
+{% extends "loggedout/log-out-layout.html" %} {% block content %}
+        <!-- Note that the below will be moved to homepage.html; just here for debugging purposes-->
+         <main>
+            <section class = "flex flex-col py-8">
+                <div class = "flex flex-col mt-16 w-full">
+                    <div class = "flex flex-row items-center content-center justify-between mx-auto">
+                        <div class = "flex flex-col gap-6 justify-center px-32">
+                            <h1 class = "text-5xl">
+                                The All in One
+                                <br>
+                                Timetable that 
+                                <br>
+                                You Need
+                            </h1>
+                            <br>
+                        <p class = "block">
+                            Share your timetable with your friends today.
+                        </p>
+                        <div class = "">
+                            <a class = "inline-flex items-center mx-1 my-1 rounded-2xl bg-primary hover:bg-indigo-800 shadow-black text-nearwhite
+                                p-5 text-1xl" 
+                                href = "{{ url_for('register') }}">
+                                Sign Up Now!
+                            </a>
+                        </div>
+                    </div>
+                        <div class = "aspect-square items-center">
+                            <div class = "relative w-full h-full ">
+                                <!-- Not sure if thats the way to import images, check later?-->
+                                <img src = "{{ url_for('static', filename='images/promo.png') }}" class = "h-96 w-96 md:h-56 md:w-56 object-cover max-sm:hidden" alt="Promo picture of a timetable in the app">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <br>
+            <br>
+            <!-- This section gives a brief summary on the app-->
+            <div class = "flex flex-row  py-52 mx-auto">
+                <div class = "items-center ">
+                    <!-- Currently using a temporary image; Image to be changed-->
+                     <img src = "{{ url_for('static', filename='images/temp01.png') }}" class = "h-max w-96 md:h-56 md:w-56 object-cover max-sm:hidden" alt = "Promo picture of two timetables"> 
+                </div>
+                <div class = "flex flex-col gap-6 justify-center">
+                    <h1 class = "text-5xl text-right">
+                        Sync your friends
+                    </h1>
+                    <p class = "text-2xl text-right block">
+                        Lorem ipsum dolor sit amet, 
+                        <br>
+                        consectetur adipiscing elit.
+                        <br>
+                         Cras a elit elementum, placerat
+                         <br>
+                          dolor a, hendrerit dui.
+                         <br>
+                          Aliquam viverra purus vitae 
+                          <br>
+                          pharetra ultricies. Suspendisse 
+                          <br>
+                          magna purus, vulputate vitae gravida
+                          <br>
+                           ut, semper sit amet ipsum.
+                          <br>
+                           Integer orci enim, tincidunt eu enim
+                           <br>
+                            non, pulvinar congue nibh.
+                           <br>
+                            Nullam eu lorem non risus blandit 
+                            <br>
+                            pretium. Aliquam fringilla 
+                            <br>
+                            convallis rhoncus. 
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock %}
