@@ -81,7 +81,7 @@ def settings():
             updated = result.get('updated', 0)
             flash(f"Imported {imported} events, updated {updated}.", "success")
 
-    return render_template("settings.html", form=form)
+    return render_template("loggedin/settings.html", form=form)
 
 # -- Unprotected routes
 # Login, register, homepage and faq ( + contact us) currently have a different style from the other webpages.
