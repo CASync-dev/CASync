@@ -60,9 +60,9 @@ def friends():
     guard = require_login()
     if guard: return guard
     dev_friends = [
-        {"username": "John Doe", "avatar_url": "https://placehold.co/20x20", "next_class": "10:00 AM - Math"},
-        {"username": "Jane Smith", "avatar_url": "https://placehold.co/20x20", "next_class": "11:00 AM - English"},
-        {"username": "Alice Johnson", "avatar_url": "https://placehold.co/20x20", "next_class": "12:00 PM - Science"},
+        {"username": "John Doe", "avatar_url": "https://placehold.co/200x200", "next_class": "10:00 AM - Math"},
+        {"username": "Jane Smith", "avatar_url": "https://placehold.co/200x200", "next_class": "11:00 AM - English"},
+        {"username": "Alice Johnson", "avatar_url": "https://placehold.co/200x200", "next_class": "12:00 PM - Science"},
     ]
     return render_template("loggedin/friends.html", friends=dev_friends)
 
