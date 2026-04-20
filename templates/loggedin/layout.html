@@ -82,28 +82,28 @@
           {% if logged_in %}
           <a
             href="{{ url_for('dash') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'dash' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'dash' %}bg-primary-light text-primary{% else %}text-gray-700{% endif %}"
           >
             <i class="fas fa-solid fa-table-columns w-5 mr-3"></i>
             <span class="font-medium">Dashboard</span>
           </a>
           <a
             href="{{ url_for('schedule') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'schedule' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'schedule' %}bg-primary-light text-primary{% else %}text-gray-700{% endif %}"
           >
             <i class="fas fa-calendar-days w-5 mr-3"></i>
             <span class="font-medium">Schedule</span>
           </a>
           <a
             href="{{ url_for('groups') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'groups' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'groups' %}bg-primary-light text-primary{% else %}text-gray-700{% endif %}"
           >
             <i class="fas fa-solid fa-people-group w-5 mr-3"></i>
             <span class="font-medium">Groups</span>
           </a>
           <a
             href="{{ url_for('friends') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'friends' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'friends' %}bg-primary-light text-primary{% else %}text-gray-700{% endif %}"
           >
             <i class="fas fa-solid fa-user-group w-5 mr-3"></i>
             <span class="font-medium">Friends</span>
@@ -133,7 +133,7 @@
             {% if logged_in %}
             <a
               href="{{ url_for('settings') }}"
-              class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'settings' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
+              class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'settings' %}bg-primary-light text-primary{% else %}text-gray-700{% endif %}"
             >
               <i class="fas fa-gear w-5 mr-3"></i>
               <span class="font-medium">Settings</span>
