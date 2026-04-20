@@ -15,19 +15,17 @@
         <i class="fa-solid fa-rotate"></i> Sync
       </button>
     </div>
-    <form>
+    <form method="post" action="/settings">
+      {{ form.hidden_tag() }}
       <p class="text-sm text-gray-500 mb-3">
         Paste your iCal feed URL to import events.
       </p>
 
       <div class="flex">
-        <input
-          type="url"
-          id="ical_url"
-          placeholder="https://..."
-          class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        {{ form.ical_url( id="ical_url", placeholder="https://...",
+        class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm" ) }}
         <div class="flex ml-4">
+          {{ form.user_id(type="hidden") }}
           <el-dropdown class="inline-block">
             <button
               class="inline-flex w-full justify-center rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring-1 inset-ring-gray-300 hover:bg-gray-50"
@@ -45,16 +43,18 @@
             </el-menu>
             <!-- Options get inserted here -->
           </el-dropdown>
-          <button
-            type="button"
-            onclick="importICal()"
-            class="bg-blue-600 text-white px-4 ml-2 py-2 rounded-md text-sm hover:bg-blue-700 shadow-xs inset-ring-1 inset-ring-gray-300"
-          >
-            Import
-          </button>
+          {{ form.submit(class="ml-4 bg-green-600 text-white py-2 px-4
+          rounded-md text-sm hover:bg-green-700") }}
         </div>
       </div>
-      <p id="ical-message" class="mt-2 text-sm hidden"></p>
+      {% with messages = get_flashed_messages(with_categories=true) %} {% for
+      category, message in messages %}
+      <p
+        class="{{ 'text-green-600' if category == 'success' else 'text-red-600' }} text-sm"
+      >
+        {{ message }}
+      </p>
+      {% endfor %} {% endwith %}
     </form>
   </section>
 </div>
@@ -81,15 +81,6 @@
   getUsers();
 
   let selectedUserId = null;
-
-  // Function to show success or error messages after importing iCal
-  function showMsg(text, ok) {
-    $('#ical-message')
-      .text(text)
-      .removeClass('hidden text-red-600 text-green-600')
-      .addClass(ok ? 'text-green-600' : 'text-red-600');
-  }
-
   // On Selection Of User From Dropdown, set selectedUserId
   $(document).on('click', '#dropdown-menu-1 a', function () {
     // Set selected user ID based on clicked option
@@ -98,53 +89,9 @@
     $('#menu-button-1').html(
       $(this).text() + ' <i class="py-1 pl-2 fas fa-chevron-down text-xs"></i>',
     );
+    $('[name="user_id"]').val(selectedUserId);
     checkForExistingCalendars(); // Check if the selected user has existing calendars to determine whether to show sync button
   });
-
-  async function importICal() {
-    // Get the iCal URL from the input field
-    const url = $('#ical_url').val().trim();
-
-    // Basic validation
-    if (!selectedUserId) {
-      showMsg('Please select a user to import the calendar for.', false);
-      return;
-    }
-    if (!url) {
-      showMsg('Please enter an iCal URL.', false);
-      return;
-    }
-    // Send the URL and selected user ID to the server for processing
-    const res = await fetch(`/api/import-ical/${selectedUserId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        url: url,
-        userId: selectedUserId,
-      }),
-    });
-    // Handle the response and show appropriate messages
-    const data = await res.json();
-
-    if (res.ok) {
-      // Show success message with details if available
-      if (data.created !== undefined && data.updated !== undefined) {
-        showMsg(
-          `Successfully imported ${data.created} new events and updated ${data.updated} existing events.`,
-          true,
-        );
-      } else if (data.created !== undefined) {
-        // For backward compatibility if only created count is returned
-        showMsg(`Successfully imported ${data.created} new events.`, true);
-      } else {
-        // Generic success message if no details provided
-        showMsg('iCal imported successfully.', true);
-      }
-    } else {
-      // Show error message with details if available
-      showMsg('Error: ' + (data.error || 'Unknown error'), false);
-    }
-  }
 
   function checkForExistingCalendars() {
     /*
@@ -169,6 +116,16 @@
           $('#sync-button').addClass('hidden');
         }
       });
+  }
+
+  function showMsg(msg, isSuccess) {
+    const msgEl = document.createElement('p');
+    msgEl.className = `${isSuccess ? 'text-green-600' : 'text-red-600'} text-sm mt-2`;
+    msgEl.textContent = msg;
+    document.querySelector('form').appendChild(msgEl);
+    setTimeout(() => {
+      msgEl.remove();
+    }, 5000);
   }
 
   async function syncCal() {

@@ -1,11 +1,13 @@
 from datetime import datetime
 
-from flask import Flask, render_template, jsonify, request, session, redirect, url_for
+from flask import Flask, render_template, jsonify, request, session, redirect, url_for, flash
 from flask_migrate import Migrate
 import os
 from extensions import db
 from models import Calendar, User, Event
 from services.ical import import_ical
+from form import IcalImportForm
+
 
 app = Flask(__name__)
 # Secret key for session logic
@@ -58,11 +60,26 @@ def friends():
     return render_template("friends.html")
 
 
-@app.route("/settings")
+@app.route("/settings", methods=['GET', 'POST'])
 def settings():
+    # login protection
     guard = require_login()
     if guard: return guard
-    return render_template("settings.html")
+    # ical submit form
+    form = IcalImportForm()
+    if form.validate_on_submit():
+        url = form.ical_url.data
+        user_id = int(form.user_id.data)
+        # Process the iCal import logic here
+        result, error = import_ical(url, user_id)
+        if error:
+            flash(f"Error importing iCal: {error}", "error")
+        else:
+            imported = result.get('imported') or result.get('created', 0)
+            updated = result.get('updated', 0)
+            flash(f"Imported {imported} events, updated {updated}.", "success")
+
+    return render_template("settings.html", form=form)
 
 # Login, register, homepage and faq currently have a different style from the other webpages.
 @app.route("/login")
