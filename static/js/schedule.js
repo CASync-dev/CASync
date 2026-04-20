@@ -45,6 +45,9 @@ const COLOR_MAP = {
 };
 event_color_map = {};
 
+// CSRF token for API requests, we read it from the meta tag that the server renders into the page
+const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+
 // ── Event data
 // This is the list of events that get rendered onto the calendar.
 // At the moment we just call the API to get all events and render them
@@ -371,6 +374,7 @@ document.getElementById('add-event-form').addEventListener('submit', (e) => {
   const start_time = document.getElementById('event-time-start').value;
   const end_time = document.getElementById('event-time-end').value;
   const location = document.getElementById('event-location').value;
+  const description = document.getElementById('event-description').value;
   const user_id = document.getElementById('user-id').value;
   const color = document.getElementById('event-color').value;
   errorElement = document.getElementById('form-message');
@@ -394,6 +398,7 @@ document.getElementById('add-event-form').addEventListener('submit', (e) => {
     start_time: start_time,
     end_time: end_time,
     location: location,
+    description: description,
     user_id: user_id,
     color: color,
   };
@@ -401,7 +406,7 @@ document.getElementById('add-event-form').addEventListener('submit', (e) => {
   // Send POST request to API to create the event
   fetch('/api/events', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
     body: JSON.stringify(newEvent),
   })
     .then((response) => {
@@ -474,7 +479,12 @@ document.getElementById('confirm-delete-btn').addEventListener('click', () => {
   pendingDeleteId = null;
 
   // Send DELETE request to the API to delete the event
-  fetch(`/api/events/${id}`, { method: 'DELETE' })
+  fetch(`/api/events/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'X-CSRFToken': CSRF,
+    },
+  })
     .then((response) => {
       if (!response.ok) throw new Error('Failed to delete');
       // On success, remove the event from our local list and re-render
@@ -526,7 +536,7 @@ function editEvent(eventId) {
     // We send a PUT request to the API to update the event with the new details
     fetch(`/api/events/${eventId}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
       body: JSON.stringify(updatedEvent),
     })
       .then((response) => {

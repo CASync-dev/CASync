@@ -34,7 +34,7 @@ def validate_url(url):
     if not url.startswith("https://"):
         return "URL must start with https://"
 
-    # Check if the URL is safe
+    # Check if the URL is safe: we don't want to allow fetching from private IPs or localhost, to prevent SSRF attacks.
     if not _is_safe_url(url):
         return "URL is not safe."
 
