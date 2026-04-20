@@ -29,40 +29,40 @@ def require_login():
 # --- Page routes
 @app.route("/")
 def index():
-    return render_template("homepage.html")
+    return render_template('loggedout/homepage.html')
 
 @app.route("/dash")
 def dash():
     guard = require_login()
     if guard: return guard
-    return render_template("dash.html")
+    return render_template("loggedin/dash.html")
 
 @app.route("/schedule")
 def schedule():
     guard = require_login()
     if guard: return guard
-    return render_template("schedule.html")
+    return render_template("loggedin/schedule.html")
 
 
 @app.route("/groups")
 def groups():
     guard = require_login()
     if guard: return guard
-    return render_template("groups.html")
+    return render_template("loggedin/groups.html")
 
 
 @app.route("/friends")
 def friends():
     guard = require_login()
     if guard: return guard
-    return render_template("friends.html")
+    return render_template("loggedin/friends.html")
 
 
 @app.route("/settings")
 def settings():
     guard = require_login()
     if guard: return guard
-    return render_template("settings.html")
+    return render_template("loggedin/settings.html")
 
 # Login, register, homepage and faq ( + contact us) currently have a different style from the other webpages.
 @app.route("/login")
@@ -75,15 +75,15 @@ def register():
 
 @app.route("/home")
 def home():
-    return render_template("homepage.html")
+    return render_template("loggedout/homepage.html")
 
 @app.route("/faq")
 def faq():
-    return render_template("faq.html")
+    return render_template("loggedout/faq.html")
 
 @app.route("/contactus")
 def contactus():
-    return render_template("contact-us.html")
+    return render_template("loggedout/contact-us.html")
 
 
 #--- API routes - at the moment they return json responses but thats not long term
