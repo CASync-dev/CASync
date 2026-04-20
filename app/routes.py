@@ -69,8 +69,6 @@ def settings():
 
     return render_template("loggedin/settings.html", form=form)
 
-# -- Unprotected routes
-# Login, register, homepage and faq ( + contact us) currently have a different style from the other webpages.
 @app.route("/login")
 def login():
     return render_template("loggedout/login.html")
