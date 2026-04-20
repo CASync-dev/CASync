@@ -13,7 +13,7 @@
   "scripts": {
     "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify",
     "watch:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
-    "dev": "concurrently \"npm run watch:css\" \"python app.py\""
+    "dev": "concurrently \"npm run watch:css\" \"flask run --debug\""
   },
   "repository": {
     "type": "git",
