@@ -55,7 +55,7 @@ def groups():
     return render_template("loggedin/groups.html")
 
 
-@app.route("/friends")
+@app.route("/friends" )
 def friends():
     guard = require_login()
     if guard: return guard
