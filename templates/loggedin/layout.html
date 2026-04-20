@@ -11,7 +11,7 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/font.css')}}"
     />
-    
+
     <!-- Tailwind CSS -->
     <link
       rel="stylesheet"
@@ -192,26 +192,26 @@
 
     <!-- Sidebar Toggle Script -->
     <script>
-      const sidebar = document.getElementById('sidebar');
-      const sidebarOverlay = document.getElementById('sidebar-overlay');
-      const sidebarOpen = document.getElementById('sidebar-open');
-      const sidebarClose = document.getElementById('sidebar-close');
+      const sidebar = document.getElementById("sidebar");
+      const sidebarOverlay = document.getElementById("sidebar-overlay");
+      const sidebarOpen = document.getElementById("sidebar-open");
+      const sidebarClose = document.getElementById("sidebar-close");
 
-      sidebarOpen.addEventListener('click', function () {
-        sidebar.classList.remove('-translate-x-full');
-        sidebarOverlay.classList.remove('hidden');
+      sidebarOpen.addEventListener("click", function () {
+        sidebar.classList.remove("-translate-x-full");
+        sidebarOverlay.classList.remove("hidden");
       });
 
       function closeSidebar() {
-        sidebar.classList.add('-translate-x-full');
-        sidebarOverlay.classList.add('hidden');
+        sidebar.classList.add("-translate-x-full");
+        sidebarOverlay.classList.add("hidden");
       }
 
-      sidebarClose.addEventListener('click', closeSidebar);
-      sidebarOverlay.addEventListener('click', closeSidebar);
+      sidebarClose.addEventListener("click", closeSidebar);
+      sidebarOverlay.addEventListener("click", closeSidebar);
 
       function logoutImplementation() {
-        window.location.href = '/dev/logout';
+        window.location.href = "/dev/logout";
       }
     </script>
     {% block scripts %}{% endblock %}

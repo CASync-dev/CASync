@@ -64,17 +64,17 @@
   // TODO: This will get replaced with a user session deteciton system later
   // Jquery  for adding user options to the dropdown (replace with actual user data)
   function addUserOptions(user) {
-    const a = document.createElement('a');
-    a.href = '#';
+    const a = document.createElement("a");
+    a.href = "#";
     a.className =
-      'block px-4 py-2 text-sm text-gray-700 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden';
+      "block px-4 py-2 text-sm text-gray-700 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden";
     a.textContent = user.username;
     a.dataset.userId = user.id; // Store user id in data attribute for later use
-    $('#dropdown-menu-1').append(a);
+    $("#dropdown-menu-1").append(a);
   }
   // Get Users
   async function getUsers() {
-    const res = await fetch('/api/users');
+    const res = await fetch("/api/users");
     const users = await res.json();
     users.forEach(addUserOptions);
   }
@@ -82,11 +82,11 @@
 
   let selectedUserId = null;
   // On Selection Of User From Dropdown, set selectedUserId
-  $(document).on('click', '#dropdown-menu-1 a', function () {
+  $(document).on("click", "#dropdown-menu-1 a", function () {
     // Set selected user ID based on clicked option
-    selectedUserId = $(this).data('userId');
+    selectedUserId = $(this).data("userId");
     // Update dropdown button text to show selected user
-    $('#menu-button-1').html(
+    $("#menu-button-1").html(
       $(this).text() + ' <i class="py-1 pl-2 fas fa-chevron-down text-xs"></i>',
     );
     $('[name="user_id"]').val(selectedUserId);
@@ -100,7 +100,7 @@
     if not hide the sync button since there is nothing to sync with
     */
     if (!selectedUserId) {
-      $('#sync-button').addClass('hidden');
+      $("#sync-button").addClass("hidden");
       return;
     }
     // Check if the user has any calendars
@@ -108,21 +108,21 @@
       .then((res) => res.json())
       .then((calendars) => {
         if (calendars.length > 0) {
-          $('#sync-button').removeClass('hidden');
-          $('#sync-button').html(
+          $("#sync-button").removeClass("hidden");
+          $("#sync-button").html(
             `<i class="fa-solid fa-rotate"></i> Sync (${calendars.length}) cals`,
           );
         } else {
-          $('#sync-button').addClass('hidden');
+          $("#sync-button").addClass("hidden");
         }
       });
   }
 
   function showMsg(msg, isSuccess) {
-    const msgEl = document.createElement('p');
-    msgEl.className = `${isSuccess ? 'text-green-600' : 'text-red-600'} text-sm mt-2`;
+    const msgEl = document.createElement("p");
+    msgEl.className = `${isSuccess ? "text-green-600" : "text-red-600"} text-sm mt-2`;
     msgEl.textContent = msg;
-    document.querySelector('form').appendChild(msgEl);
+    document.querySelector("form").appendChild(msgEl);
     setTimeout(() => {
       msgEl.remove();
     }, 5000);
@@ -130,11 +130,11 @@
 
   async function syncCal() {
     if (!selectedUserId) {
-      showMsg('Please select a user to sync the calendar for.', false);
+      showMsg("Please select a user to sync the calendar for.", false);
       return;
     }
     const res = await fetch(`/api/sync-cal/${selectedUserId}`, {
-      method: 'POST',
+      method: "POST",
     });
     const data = await res.json();
     if (res.ok) {
@@ -143,7 +143,7 @@
         true,
       );
     } else {
-      showMsg('Error: ' + (data.error || 'Unknown error'), false);
+      showMsg("Error: " + (data.error || "Unknown error"), false);
     }
   }
 </script>

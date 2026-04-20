@@ -126,19 +126,19 @@
 {% endblock %} {% block scripts %}
 <script>
   function addFriend() {
-    alert('Add Friend functionality is not implemented yet.');
+    alert("Add Friend functionality is not implemented yet.");
   }
 
   const DEV_USERS = [
-    'alice_wonder',
-    'bob_builder',
-    'charlie_chaplin',
-    'diana_prince',
-    'eve_online',
+    "alice_wonder",
+    "bob_builder",
+    "charlie_chaplin",
+    "diana_prince",
+    "eve_online",
   ];
 
   function searchFriends() {
-    const list = document.getElementById('friend-search-list');
+    const list = document.getElementById("friend-search-list");
     list.innerHTML = DEV_USERS.map(
       (u) => `
       <li class="flex items-center justify-between py-2 px-4 hover:bg-gray-100 rounded-md">
@@ -148,8 +148,8 @@
         </div>
         <button onclick="addFriend()" class="text-sm bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">Add</button>
       </li>`,
-    ).join('');
-    document.getElementById('friend-search-results').classList.remove('hidden');
+    ).join("");
+    document.getElementById("friend-search-results").classList.remove("hidden");
   }
 </script>
 <!-- tailwind js -->
