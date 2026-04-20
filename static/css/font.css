@@ -1,0 +1,14 @@
+@font-face {
+    font-family: RobotoRegular;
+    src: url("../font/robotoregular.ttf");
+}
+
+@font-face {
+    font-family: RobotoItalics;
+    src: url("../font/roboto-italics.ttf");
+}
+
+* {
+    font-family: RobotoRegular, sans-serif;
+    letter-spacing: 1px;
+}
