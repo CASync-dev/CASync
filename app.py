@@ -1,12 +1,13 @@
+import os
 from datetime import datetime
 
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for, flash
 from flask_migrate import Migrate
-import os
+from flask_wtf.csrf import CSRFProtect
 from extensions import db
 from models import Calendar, User, Event
 from services.ical import import_ical
-from form import IcalImportForm
+from form import EventForm, IcalImportForm
 
 
 app = Flask(__name__)
@@ -16,6 +17,7 @@ app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')  # swap for real env 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 db.init_app(app)
 migrate = Migrate(app, db)
+csrf = CSRFProtect(app)
 
 
 # --- Session login logic
