@@ -1,9 +1,10 @@
+{% extends "loggedin/layout.html" %}
 {% block head %}
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 {% endblock %}
 
 <!-- This is template cal from https://pagedone.io/tailwind-blocks/application/calendar -->
-{% extends "layout.html" %} {% block content %}
+{% block content %}
 
 <!-- Main Calendar Section Container -->
 <section class="relative bg-stone-50">
