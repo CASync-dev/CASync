@@ -2,7 +2,7 @@ import os
 
 class Config:
     # Secret key for session logic
-    secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')  # swap for real env var later
+    SECRET_KEY = os.getenv('SECRET_KEY') or 'dev-secret-key' # swap for real env var later
     # Configure the database URI and initialize the database
     SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
 
