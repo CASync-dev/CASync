@@ -67,18 +67,26 @@
             </span>
           </button>
         </div>
+        <div class = "flex max-sm:hidden">
+          <a
+          href="{{ url_for('register') }}"
+          class="text-1xl font-semibold text-nearwhite max-sm:hidden px-2"
+        >
+          Register
+        </a>
         <a
           href="{{ url_for('loggedout.login') }}"
-          class="text-1xl font-semibold text-nearwhite max-sm:hidden"
+          class="text-1xl font-semibold text-nearwhite max-sm:hidden px-2"
         >
           Login
         </a>
+        </div>
       </nav>
     </header>
     <dialog
       id="mobile-menu"
       popover="auto"
-      class="fixed inset-y-0 left-0 backdrop:bg-transparent bg-primary lg:hidden transform transition -translate-x-full duration-300 ease-in-out md:translate-x-0 md:static"
+      class="fixed inset-y-0 z-50 left-0 backdrop:bg-transparent bg-primary lg:hidden transform transition -translate-x-full duration-300 ease-in-out md:translate-x-0 md:static"
     >
       <div
         tabindex="0"
@@ -119,6 +127,18 @@
             </div>
             <div class="">
               <br />
+
+              <a
+                href="{{ url_for('register') }}"
+                class="text-1xl font-semibold text-nearwhite"
+              >
+                Register
+              </a>
+              <br />
+              <br />
+            </div>
+            <div class="">
+              <br />
               <a
                 href="{{ url_for('loggedout.faq') }}"
                 class="text-1xl font-semibold text-nearwhite"
@@ -144,6 +164,7 @@
               <a
                 href="https://github.com/stoveup/AgileWeb2026"
                 class="text-1xl font-semibold text-nearwhite"
+                target="_blank"
               >
                 Github
               </a>
@@ -179,6 +200,7 @@
             <a
               href="https://github.com/stoveup/AgileWeb2026"
               class="text-nearwhite text-2xl"
+              target="_blank"
             >
               Github
             </a>
