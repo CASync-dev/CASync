@@ -10,4 +10,4 @@ db = SQLAlchemy(app=app)
 migrate = Migrate(app, db)
 csrf = CSRFProtect(app)
 
-from app import routes, models, error
+from app import models, error, routes
