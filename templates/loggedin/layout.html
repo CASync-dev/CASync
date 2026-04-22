@@ -62,14 +62,14 @@
           <!-- Not Authed -->
           {% if not logged_in %}
           <a
-            href="{{ url_for('home') }}"
+            href="{{ url_for('loggedout.home') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'dash' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
           >
             <i class="fas fa-regular fa-house w-5 mr-3"></i>
             <span class="font-medium">Home</span>
           </a>
           <a
-            href="{{ url_for('faq') }}"
+            href="{{ url_for('loggedout.faq') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'faq' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
           >
             <i class="fas fa-solid fa-circle-question w-5 mr-3"></i>
@@ -79,28 +79,28 @@
           <!-- Authed -->
           {% if logged_in %}
           <a
-            href="{{ url_for('dash') }}"
+            href="{{ url_for('loggedin.dash') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'dash' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
           >
             <i class="fas fa-solid fa-table-columns w-5 mr-3"></i>
             <span class="font-medium">Dashboard</span>
           </a>
           <a
-            href="{{ url_for('schedule') }}"
+            href="{{ url_for('loggedin.schedule') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'schedule' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
           >
             <i class="fas fa-calendar-days w-5 mr-3"></i>
             <span class="font-medium">Schedule</span>
           </a>
           <a
-            href="{{ url_for('groups') }}"
+            href="{{ url_for('loggedin.groups') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'groups' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
           >
             <i class="fas fa-solid fa-people-group w-5 mr-3"></i>
             <span class="font-medium">Groups</span>
           </a>
           <a
-            href="{{ url_for('friends') }}"
+            href="{{ url_for('loggedin.friends') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'friends' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
           >
             <i class="fas fa-solid fa-user-group w-5 mr-3"></i>
@@ -113,14 +113,14 @@
             <!-- Not Authenticated -->
             {% if not logged_in %}
             <a
-              href="{{ url_for('register') }}"
+              href="{{ url_for('loggedout.register') }}"
               class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'register' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
             >
               <i class="fa-regular fa-user mr-3"></i>
               <span class="font-medium">Register</span>
             </a>
             <a
-              href="{{ url_for('login') }}"
+              href="{{ url_for('loggedout.login') }}"
               class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'login' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
             >
               <i class="fa-solid fa-user mr-3"></i>
@@ -130,7 +130,7 @@
             <!-- Authed -->
             {% if logged_in %}
             <a
-              href="{{ url_for('settings') }}"
+              href="{{ url_for('loggedin.settings') }}"
               class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition group {% if request.endpoint == 'settings' %}bg-blue-50 text-blue-600{% else %}text-gray-700{% endif %}"
             >
               <i class="fas fa-gear w-5 mr-3"></i>
