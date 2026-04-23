@@ -1,8 +1,9 @@
 {% extends "loggedout/log-out-layout.html" %} {% block content %}
 <!-- Note that the below will be moved to homepage.html; just here for debugging purposes-->
 <main>
-  <section class="flex flex-col py-8">
-    <div class="flex flex-col mt-16 px-4 md:px-12 lg:px-24 w-full">
+  <section class="flex flex-col">
+    <!-- This section introduces the app -->
+    <div class="flex flex-col my-16 px-4 md:px-12 lg:px-24 w-full">
       <div
         class="flex flex-col md:flex-row items-center justify-between mx-auto w-full max-w-7xl"
       >
@@ -43,44 +44,31 @@
     <br />
     <br />
     <!-- This section gives a brief summary on the app-->
-    <div class="flex flex-row py-52 mx-auto">
-      <div class="items-center">
-        <!-- Currently using a temporary image; Image to be changed-->
-        <img
-          src="{{ url_for('static', filename='images/temp01.png') }}"
-          class="h-max w-96 md:h-56 md:w-56 object-cover max-md:hidden"
-          alt="Promo picture of two timetables"
-        />
-      </div>
-      <div class="flex flex-col gap-6 justify-center">
-        <h1 class="text-5xl text-right">Sync your friends</h1>
-        <p class="text-2xl text-right block">
-          Lorem ipsum dolor sit amet,
-          <br>
-          consectetur adipiscing elit.
-          <br>
-          Cras a elit elementum, placerat
-          <br>
-          dolor a, hendrerit dui.
-          <br>
-          Aliquam viverra purus vitae
-          <br>
-          pharetra ultricies. Suspendisse
-          <br>
-          magna purus, vulputate vitae gravida
-          <br>
-          ut, semper sit amet ipsum.
-          <br>
-          Integer orci enim, tincidunt eu enim
-          <br>
-          non, pulvinar congue nibh.
-          <br>
-          Nullam eu lorem non risus blandit
-          <br>
-          pretium. Aliquam fringilla
-          <br>
-          convallis rhoncus.
-        </p>
+    <div class="bg-midgray w-full">
+      <div class="flex flex-col mt-16 mb-32 px-4 md:px-12 lg:px-24 w-full">
+        <div class="flex flex-col md:flex-row items-center justify-between mx-auto w-full max-w-7xl">
+      
+          <!-- Currently using a temporary image; Image to be changed-->
+          <div class="flex justify-center lg:justify-start md:w-1/2 mt-8 md:mt-0">
+            <img
+              src="{{ url_for('static', filename='images/temp01.png') }}"
+              class="sm:w-80 md:w-96 object-cover max-md:block"
+              alt="Promo picture of two timetables"
+            />
+          </div>
+          <!-- Text content for summary -->
+          <div class="flex flex-col gap-6 md:w-1/2">
+            <h1 class="text-5xl text-right">Sync With Your Friends</h1>
+            <br />
+            <p class="text-base text-right">
+              With CASync, you can easily share your timetable with your friends and see their schedules in one place.
+              No more back-and-forth messages trying to figure out when everyone is free,
+              simply add your friends and see their availability at a glance.
+              You can also create groups to share your timetable with specific friends,
+              making it even easier to plan meetups and stay connected with your friends.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
