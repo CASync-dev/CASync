@@ -59,18 +59,14 @@
         <br />
         <span id="field-error"> </span>
         <br />
-        <button
-          id="log"
-          type="submit"
-          class="button cursor-pointer btn-white"
-        >
+        <button id="log" type="submit" class="button cursor-pointer btn-white">
           Continue
         </button>
 
         <br />
         <h5 class="text-nearwhite text-xs pt-5">
           Not a member yet? Register
-          <a href="/register" class="underline"> here. </a>
+          <a href="{{ url_for('loggedout.register') }}" class="underline"> here. </a>
         </h5>
       </div>
     </form>
