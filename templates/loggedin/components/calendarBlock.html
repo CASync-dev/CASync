@@ -1,0 +1,335 @@
+<!-- If you have heard of or used js frameowkrs like vue, they have a concept called a component. 
+A component is a reusable piece of code that can be used to create a specific UI element or functionality.
+ In this case, I am creating a calendar block component that can be used to display a calendar with a specific
+  number of days and time range. It will also accept an events block and render dyanicly based on the number of events
+-->
+<!-- Accepts:
+- days: an array of day names (e.g. ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
+- timeRange: a range of time in 24 hour digits (e.g. '8, 18' for 8am to 6pm)
+- includeNav: a boolean that determines whether to include navigation buttons for switching between weeks
+- events: an array of event objects with the following properties:
+  - title: the name of the event
+  - start: the start time of the event
+  - end: the end time of the event
+  -->
+
+{% extends "loggedin/layout.html" %} {% block head %}
+<meta name="csrf-token" content="{{ csrf_token() }}" />
+{% endblock %} {% macro calendarBlock(days, timeRange, events=[]) -%}
+<div class="w-full max-w-7xl mx-auto px-6 lg:px-8">
+  <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
+  <div class="sticky top-0 z-20 bg-stone-50">
+    <!-- Calendar Header: Contains title and new activity button -->
+    <div
+      class="flex flex-col md:flex-row max-md:gap-3 items-center justify-between py-4"
+    >
+      <!-- Calendar Icon and Current Date Display -->
+      <div class="flex items-center gap-4">
+        <i class="fa-solid fa-calendar-days text-gray-400 text-2xl"></i>
+        <h6
+          id="calendar-title"
+          class="text-xl leading-8 font-semibold text-gray-900"
+        >
+          Today, Month YYYY
+        </h6>
+      </div>
+      <!-- New Activity Button -->
+      <button
+        class="hidden md:block p-2 m-2 bg-indigo-600 rounded-xl flex items-center gap-2 font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+        id="new-event-btn"
+        command="show-modal"
+        commandfor="drawer"
+      >
+        <i class="fa-solid fa-plus text-sm"></i>
+        New Activity
+      </button>
+      <button
+        class="block md:hidden fixed right-0 bottom-0 m-3 w-12 h-12 z-10 font-semibold rounded-full bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700"
+        id="new-event-btn"
+        command="show-modal"
+        commandfor="drawer"
+      >
+        <i class="fa-solid fa-plus text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Week navigation buttons -->
+    <div class="flex justify-between p-2">
+      <button
+        id="btn-last-week"
+        class="p-2 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+      >
+        < last week
+      </button>
+      <button
+        id="btn-today"
+        class="hidden bg-emerald-500 p-2 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+      >
+        today
+      </button>
+      <button
+        id="btn-next-week"
+        class="p-2 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+      >
+        next week >
+      </button>
+    </div>
+
+    <!-- Week Header Row: outside overflow-x-auto so it sticks; JS syncs horizontal scroll -->
+    <div id="day-headers-scroll" class="overflow-x-hidden">
+      <div class="grid grid-cols-6 border-t border-gray-200 w-full min-w-150">
+        <div
+          class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
+        ></div>
+        {% for day in days %}
+        <div
+          id="date-col-{{ loop.index0 }}"
+          class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
+        >
+          {{ day }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Grid Container -->
+  <div class="relative">
+    <div id="grid-scroll" class="overflow-x-auto">
+      <!--  Calendar Grid -->
+      <!-- Grid structure: 6 columns (time + 5 weekdays), multiple rows for time slots -->
+      <!-- Time range: 07:00 am to 06:00 pm -->
+      <div id="desktop-grid" class="grid grid-cols-6 min-w-150">
+        {% for hour in timeRange %}
+        <div
+          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+        >
+          <span class="text-xs font-semibold text-gray-400">
+            {{ (hour ~ ':00 am') if hour < 12 else ('12:00 pm' if hour == 12
+            else ((hour - 12) ~ ':00 pm')) }}
+          </span>
+        </div>
+        {% for day in range(5) %}
+        <div
+          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t {{ 'border-r' if day < 4 }} border-gray-200 transition-all hover:bg-stone-100"
+        ></div>
+        {% endfor %} {% endfor %}
+      </div>
+    </div>
+    <!-- end scrollable calendar content -->
+  </div>
+</div>
+<script>
+      // Grid Constants: these are parsed from the macro args
+      const GRID_START_HOUR = {{ timeRange[0] }}; // the grid start (7am = 7)
+      const GRID_TOTAL_SLOTS = {{ timeRange|length }}; // total number of hour slots in the grid (7am-6pm = 11)
+
+      // ── Color themes
+      // Each event has a color. This maps that name to the three
+      // Tailwind classes needed to style an event card: background, left border, text.
+      let COLOR_MAP = {
+        indigo: {
+          bg: 'bg-indigo-100',
+          border: 'border-indigo-500',
+          text: 'text-indigo-800',
+        },
+        blue: {
+          bg: 'bg-blue-100',
+          border: 'border-blue-500',
+          text: 'text-blue-800',
+        },
+        green: {
+          bg: 'bg-green-100',
+          border: 'border-green-500',
+          text: 'text-green-800',
+        },
+        rose: {
+          bg: 'bg-rose-100',
+          border: 'border-rose-500',
+          text: 'text-rose-800',
+        },
+        amber: {
+          bg: 'bg-amber-100',
+          border: 'border-amber-500',
+          text: 'text-amber-800',
+        },
+        orange: {
+          bg: 'bg-orange-100',
+          border: 'border-orange-500',
+          text: 'text-orange-800',
+        },
+        red: { bg: 'bg-red-100', border: 'border-red-500', text: 'text-red-800' },
+        purple: {
+          bg: 'bg-purple-100',
+          border: 'border-purple-500',
+          text: 'text-purple-800',
+        },
+        gray: {
+          bg: 'bg-gray-100',
+          border: 'border-gray-500',
+          text: 'text-gray-800',
+        },
+        yellow: {
+          bg: 'bg-yellow-100',
+          border: 'border-yellow-500',
+          text: 'text-yellow-800',
+        },
+      };
+      event_color_map = {};
+
+    // CSRF token for API requests, we read it from the meta tag that the server renders into the page
+    const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+
+    // A var to track how many week are offset from the real current week.
+    let weekOffset = 0;
+
+
+    // -- Time Helper Functions --
+    // ── Time helpers
+      // Converts a "HH:MM" string to total minutes from midnight.
+      // Used to calculate event positions and durations on the grid
+      function parseTime(timeStr) {
+      const [h, m] = timeStr.split(':').map(Number);
+      return h * 60 + m;
+      }
+
+      // Converts a "HH:MM" 24h string to a readable label like "9:00 am" or "2:30 pm".
+      // Used in the event card time display.
+      function formatTime(timeStr) {
+      const [h, m] = timeStr.split(':').map(Number);
+      const period = h < 12 ? 'am' : 'pm';
+      const hour = h % 12 || 12;
+      return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+      }
+
+      // Get a list of ISO date strings for Monday through Friday of the current week, adjusted by weekOffset.
+      function getWeekDates() {
+      // Always start from the real current date so navigation never accumulates errors
+      const base = new Date();
+      const currentDay = base.getDay();
+      // Calculate how many days to shift back to get to Monday (or forward if it's Sunday)
+      const daysFromMonday = currentDay === 0 ? -6 : 1 - currentDay;
+
+      // Find Monday of the real current week, then shift by weekOffset weeks
+      const monday = new Date(base);
+      monday.setDate(base.getDate() + daysFromMonday + weekOffset * 7);
+
+      // Generate ISO date strings for Monday through Friday of this week
+      const weekDates = [];
+      for (let i = 0; i < 5; i++) {
+          // Loop from 0 to 4 to get dates for Monday through Friday
+          const d = new Date(monday);
+          d.setDate(monday.getDate() + i);
+          // Use local date parts to avoid UTC timezone shifting the date
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          weekDates.push(`${year}-${month}-${day}`);
+      }
+      // console.log(weekDates); // Uncomment to see the generated week dates in the console
+      return weekDates;
+      }
+
+      function setCalendarDates() {
+    /*
+
+    */
+    const now = new Date(); // real current date, for the title and today-highlight
+
+    // Indexed by getDay(): 0=Sun, 1=Mon, …, 6=Sat
+    // TODO: this need to change to match the macro arg
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    // Mon–Fri labels for the five column headers (getDay() 1–5)
+    const weekdayNames = dayNames.slice(1, 6);
+
+    // Update the "Today, Day Month Date" title at the top of the page
+    const titleElement = document.getElementById('calendar-title');
+
+    // Helper function to format a date as "Day Month Date" with customizable month style
+    const fmt = (date, monthStyle) =>
+      // e.g. "Wednesday March 11" or "Wed Mar 11"
+      `${dayNames[date.getDay()]} ${date.toLocaleString('default', { month: monthStyle })} ${date.getDate()}`;
+
+    // Shorter format for column headers, e.g. "Mar 11"
+    const fmtShort = (date) =>
+      // e.g. "Mar 11"
+      `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`;
+
+    // Helper to get a date offset by a certain number of days
+    // from toda. used for the title when showing last/next week
+    const offsetDate = (days) => {
+      const d = new Date(now);
+      d.setDate(now.getDate() + days);
+      return d;
+    };
+
+    // Show relative week label for ±1 week, or a date range for anything further
+    if (weekOffset === 0) {
+      // if on the current week, show "Today, Month D"
+      titleElement.textContent = `Today, ${fmt(now, 'long')}`;
+    } else if (weekOffset === -1) {
+      // if on the previous week, show "Last Week, Mon D"
+      titleElement.textContent = `Last Week, ${fmt(offsetDate(-7), 'long')}`;
+    } else if (weekOffset === 1) {
+      // if on the next week, show "Next Week, Mon D"
+      titleElement.textContent = `Next Week, ${fmt(offsetDate(7), 'long')}`;
+    } else {
+      // if on any other week, show a date range like "Mar 1 - Mar 5"
+      const weekDates = getWeekDates();
+      const startDate = new Date(weekDates[0]);
+      const endDate = new Date(weekDates[4]);
+      titleElement.textContent = `${fmtShort(startDate)} - ${fmtShort(endDate)}`;
+    }
+    // Update each of the five column header elements with the correct day and date.
+    // Highlight today's column with indigo text.
+    const weekDates = getWeekDates();
+    weekDates.forEach((dateStr, i) => {
+      const columnDate = new Date(dateStr);
+      const columnElement = document.getElementById(`date-col-${i}`);
+      if (columnElement) {
+        columnElement.textContent = `${weekdayNames[i]} ${columnDate.getDate()}`;
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const isToday = dateStr === todayStr;
+        columnElement.classList.toggle('text-indigo-600', isToday);
+        columnElement.classList.toggle('text-gray-900', !isToday);
+      }
+    });
+  }
+
+  //-- Playing around with button
+
+  function updateTodayButton() {
+    // Hide the "Today" button if we're already on the current week, show it otherwise
+    if (weekOffset === 0) {
+      document.getElementById('btn-today').classList.add('hidden');
+    } else {
+      document.getElementById('btn-today').classList.remove('hidden');
+    }
+  }
+
+  document.getElementById('btn-last-week').addEventListener('click', () => {
+    weekOffset--;
+    setCalendarDates();
+    renderDesktopEvents();
+    updateTodayButton();
+  });
+
+  document.getElementById('btn-today').addEventListener('click', () => {
+    weekOffset = 0;
+    setCalendarDates();
+    renderDesktopEvents();
+    updateTodayButton();
+  });
+
+  document.getElementById('btn-next-week').addEventListener('click', () => {
+    weekOffset++;
+    setCalendarDates();
+    renderDesktopEvents();
+    updateTodayButton();
+  });
+
+  // innit
+  setCalendarDates();
+  updateTodayButton();
+</script>
+{%- endmacro %}
