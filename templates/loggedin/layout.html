@@ -71,28 +71,28 @@
           <!-- Authed -->
           <a
             href="{{ url_for('loggedin.dash') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'dash' %}bg-primary-light text-primary{% else %}text-nearwhite{% endif %}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.dash' %}bg-primary-light text-primary{% else %}text-nearwhite{% endif %}"
           >
             <i class="fas fa-solid fa-table-columns w-5 mr-3"></i>
             <span class="font-medium">Dashboard</span>
           </a>
           <a
             href="{{ url_for('loggedin.schedule') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'schedule' %}bg-primary-light text-primary{% else %}text-nearwhite{% endif %}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.schedule' %}bg-primary-light text-primary{% else %}text-nearwhite{% endif %}"
           >
             <i class="fas fa-calendar-days w-5 mr-3"></i>
             <span class="font-medium">Schedule</span>
           </a>
           <a
             href="{{ url_for('loggedin.groups') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'groups' %}bg-primary-light text-primary{% else %}text-nearwhite{% endif %}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.groups' %}bg-primary-light text-primary{% else %}text-nearwhite{% endif %}"
           >
             <i class="fas fa-solid fa-people-group w-5 mr-3"></i>
             <span class="font-medium">Groups</span>
           </a>
           <a
             href="{{ url_for('loggedin.friends') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'friends' %}bg-primary-light text-primary {% else %}text-nearwhite{% endif %}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.friends' %}bg-primary-light text-primary {% else %}text-nearwhite{% endif %}"
           >
             <i class="fas fa-solid fa-user-group w-5 mr-3"></i>
             <span class="font-medium">Friends</span>
@@ -102,7 +102,7 @@
           <div class="pt-4 mt-4 border-t border-gray-200">
             <a
               href="{{ url_for('loggedin.settings') }}"
-              class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'settings' %}bg-primary-light text-primary{% else %}text-nearwhite{% endif %}"
+              class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.settings' %}bg-primary-light text-primary{% else %}text-nearwhite{% endif %}"
             >
               <i class="fas fa-gear w-5 mr-3"></i>
               <span class="font-medium">Settings</span>
