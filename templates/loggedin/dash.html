@@ -1,9 +1,11 @@
 {% extends "loggedin/layout.html" %}
 {% block content %}
 
+<!-- Main dashboard layout: top header row and bottom two-column content -->
 <div class="flex flex-col">
+    <!-- Top row: username/date on the left, live clock on the right -->
     <div class="flex flex-row justify-between">
-        <!-- Top: big text -->
+        <!-- Top-left: day/date and username header -->
         <div class="p-8 space-y-4 mb-4">
             <h1
                 id="title_username"
