@@ -45,7 +45,7 @@
       >
         <div class="flex lg:flex-1">
           <a
-            href="{{ url_for('home') }}"
+            href="{{ url_for('loggedout.home') }}"
             class="-m-1 p-1 text-2xl text-nearwhite"
           >
             <img
@@ -69,13 +69,13 @@
         </div>
         <div class = "flex max-sm:hidden">
           <a
-          href="{{ url_for('register') }}"
+          href="{{ url_for('loggedout.register') }}"
           class="text-1xl font-semibold text-nearwhite max-sm:hidden px-2"
         >
           Register
         </a>
         <a
-          href="{{ url_for('login') }}"
+          href="{{ url_for('loggedout.login') }}"
           class="text-1xl font-semibold text-nearwhite max-sm:hidden px-2"
         >
           Login
@@ -94,7 +94,7 @@
       >
         <div class="mx-auto flex max-w-7xl items-center justify-between p-6">
           <a
-            href="{{ url_for('home') }}"
+            href="{{ url_for('loggedout.home') }}"
             class="-m-1 p-1 text-2xl text-nearwhite font-bold"
           >
             <img
@@ -117,7 +117,7 @@
           <div class="-my-6 divide-y divide-dark py-4">
             <div class="">
               <a
-                href="{{ url_for('login') }}"
+                href="{{ url_for('loggedout.login') }}"
                 class="text-1xl font-semibold text-nearwhite"
               >
                 Login
@@ -129,7 +129,7 @@
               <br />
 
               <a
-                href="{{ url_for('register') }}"
+                href="{{ url_for('loggedout.register') }}"
                 class="text-1xl font-semibold text-nearwhite"
               >
                 Register
@@ -140,7 +140,7 @@
             <div class="">
               <br />
               <a
-                href="{{ url_for('faq') }}"
+                href="{{ url_for('loggedout.faq') }}"
                 class="text-1xl font-semibold text-nearwhite"
               >
                 FAQ
@@ -151,7 +151,7 @@
             <div class="">
               <br />
               <a
-                href="{{ url_for('contactus') }}"
+                href="{{ url_for('loggedout.contactus') }}"
                 class="text-1xl font-semibold text-nearwhite"
               >
                 Contact Us
@@ -184,13 +184,13 @@
       <div class="flex flex-col py-24 justify-center items-center">
         <div class="flex flex-row mx-auto">
           <div class="px-6 max-sm:px-3">
-            <a href="{{ url_for('faq') }}" class="text-nearwhite text-2xl">
+            <a href="{{ url_for('loggedout.faq') }}" class="text-nearwhite text-2xl">
               FAQ
             </a>
           </div>
           <div class="px-6 max-sm:px-3">
             <a
-              href="{{ url_for('contactus') }}"
+              href="{{ url_for('loggedout.contactus') }}"
               class="text-nearwhite text-2xl"
             >
               Contact us
