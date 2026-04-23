@@ -43,8 +43,9 @@ def register():
         new_user.password = form.password.data
         db.session.add(new_user)
         db.session.commit()
-        flash('Registration successful! Please log in.', 'success')
-        return redirect(url_for('loggedout.login'))
+        flash('Registration successful.', 'success')
+        login_user(new_user)
+        return redirect(url_for('loggedin.dash'))
     return render_template("loggedout/register.html", form=form)
 
 # Added /home as a redirect to index, otherwise you can access the homepage from both routes and it's kinda odd
