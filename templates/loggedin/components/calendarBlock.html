@@ -7,6 +7,7 @@ A component is a reusable piece of code that can be used to create a specific UI
 - days: an array of day names (e.g. ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
 - timeRange: a range of time in 24 hour digits (e.g. '8, 18' for 8am to 6pm)
 - includeNav: a boolean that determines whether to include navigation buttons for switching between weeks
+- allowEventCreation: a boolean that determines whether to include a "New Event" button that opens the event creation drawer
 - events: an array of event objects with the following properties:
   - title: the name of the event
   - start: the start time of the event
@@ -15,7 +16,8 @@ A component is a reusable piece of code that can be used to create a specific UI
 
 {% extends "loggedin/layout.html" %} {% block head %}
 <meta name="csrf-token" content="{{ csrf_token() }}" />
-{% endblock %} {% macro calendarBlock(days, timeRange, events=[]) -%}
+{% endblock %} {% macro calendarBlock(days, timeRange, allowEventCreation=false
+, events=[]) -%}
 <div class="w-full max-w-7xl mx-auto px-6 lg:px-8">
   <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
   <div class="sticky top-0 z-20 bg-stone-50">
@@ -33,10 +35,10 @@ A component is a reusable piece of code that can be used to create a specific UI
           Today, Month YYYY
         </h6>
       </div>
+      {% if allowEventCreation %}
       <!-- New Activity Button -->
       <button
         class="hidden md:block p-2 m-2 bg-indigo-600 rounded-xl flex items-center gap-2 font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
-        id="new-event-btn"
         command="show-modal"
         commandfor="drawer"
       >
@@ -45,12 +47,12 @@ A component is a reusable piece of code that can be used to create a specific UI
       </button>
       <button
         class="block md:hidden fixed right-0 bottom-0 m-3 w-12 h-12 z-10 font-semibold rounded-full bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700"
-        id="new-event-btn"
         command="show-modal"
         commandfor="drawer"
       >
         <i class="fa-solid fa-plus text-sm"></i>
       </button>
+      {% endif %}
     </div>
 
     <!-- Week navigation buttons -->
@@ -310,21 +312,18 @@ A component is a reusable piece of code that can be used to create a specific UI
   document.getElementById('btn-last-week').addEventListener('click', () => {
     weekOffset--;
     setCalendarDates();
-    renderDesktopEvents();
     updateTodayButton();
   });
 
   document.getElementById('btn-today').addEventListener('click', () => {
     weekOffset = 0;
     setCalendarDates();
-    renderDesktopEvents();
     updateTodayButton();
   });
 
   document.getElementById('btn-next-week').addEventListener('click', () => {
     weekOffset++;
     setCalendarDates();
-    renderDesktopEvents();
     updateTodayButton();
   });
 
