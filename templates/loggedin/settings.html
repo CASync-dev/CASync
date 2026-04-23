@@ -5,15 +5,21 @@
   <section class="mb-8">
     <div class="flex">
       <h2 class="text-lg font-semibold text-gray-800 mb-1">Import iCal</h2>
-      <button
-        id="sync-button"
-        class="hidden bg-blue-600 text-white ml-auto py-2 px-2 rounded-md text-sm hover:bg-blue-700"
-        type="button"
-        title="Sync Existing Calenders"
-        onclick="syncCal()"
-      >
-        <i class="fa-solid fa-rotate"></i> Sync
-      </button>
+      <div class="ml-auto">
+        <button
+          id="sync-button"
+          class="hidden bg-blue-600 text-white ml-auto py-2 px-2 rounded-md text-sm hover:bg-blue-700"
+          type="button"
+          title="Sync Existing Calenders"
+          onclick="syncCal()"
+        >
+          <i class="fa-solid fa-rotate"></i> Sync
+        </button>
+        <p class="text-sm text-gray-500">
+          Last sync
+          <span id="last-synced">{{ last_synced.strftime("%d/%m/%y ") }}</span>
+        </p>
+      </div>
     </div>
     <form method="post" action="/settings">
       {{ form.hidden_tag() }}
@@ -25,24 +31,6 @@
         {{ form.ical_url( id="ical_url", placeholder="https://...",
         class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm" ) }}
         <div class="flex ml-4">
-          {{ form.user_id(type="hidden") }}
-          <el-dropdown class="inline-block">
-            <button
-              class="inline-flex w-full justify-center rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring-1 inset-ring-gray-300 hover:bg-gray-50"
-            >
-              Users
-              <i class="py-1 pl-2 fas fa-chevron-down text-xs"></i>
-            </button>
-
-            <el-menu
-              anchor="bottom end"
-              popover
-              class="rounded-md bg-white shadow-lg outline-1 outline-black/5 [--anchor-gap:--spacing(2)]"
-            >
-              <div id="dropdown-menu-1" class="py-1"></div>
-            </el-menu>
-            <!-- Options get inserted here -->
-          </el-dropdown>
           {{ form.submit(class="ml-4 bg-green-600 text-white py-2 px-4
           rounded-md text-sm hover:bg-green-700") }}
         </div>
@@ -104,14 +92,13 @@
       return;
     }
     // Check if the user has any calendars
-    fetch(`/api/calendars/${selectedUserId}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token() }}',
-      },
-    })
-      .then((res) => res.json())
+    fetch(`/api/calendars/`)
+      .then((res) => {
+        if (!res.ok) return;
+        return res.json();
+      })
       .then((calendars) => {
+        if (!calendars) return;
         if (calendars.length > 0) {
           $("#sync-button").removeClass("hidden");
           $("#sync-button").html(
@@ -122,6 +109,7 @@
         }
       });
   }
+  checkForExistingCalendars();
 
   function showMsg(msg, isSuccess) {
     const msgEl = document.createElement("p");

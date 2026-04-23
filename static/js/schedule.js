@@ -55,7 +55,7 @@ const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 // We
 let user_id = 4; // TODO: get this from the server or auth context instead of hardcoding
 // Will also have to change it to retrieve other users events when we have that functionality
-fetch(`/api/events/${user_id}`)
+fetch('/api/events/')
   .then((response) => response.json())
   .then((data) => {
     events = data;

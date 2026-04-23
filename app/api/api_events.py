@@ -2,6 +2,7 @@ from datetime import datetime
 from app import db
 from flask import Blueprint, jsonify, request
 from app.models import Calendar, User, Event
+from flask_login import current_user, login_required
 
 
 api_events = Blueprint('api_events', __name__)
@@ -14,13 +15,17 @@ api_events = Blueprint('api_events', __name__)
 # but it works for now, we can change it later if we want to use a different auth system or something
 
 # Upd: Changed def name (Couldn't think of a better name for the blueprint)
-@api_events.route("/api/events/<int:user_id>")
-def api_eventslist(user_id):
+@api_events.route("/api/events/")
+@login_required
+def api_eventslist():
+    # Assuming the user is authenticated and we can get their ID from the session
+    user_id = current_user.id
     events = Event.query.where(Event.user_id == user_id).all()
     return jsonify([e.to_dict() for e in events])
 
 # create event API route - accepts a POST request with the event details in the body and creates a new event for the user
 @api_events.route("/api/events", methods=["POST"])
+@login_required
 def api_create_event():
     """
         Expects a JSON body like this:
@@ -53,6 +58,7 @@ def api_create_event():
 
 # API route to delete an event - accepts a DELETE request with the event id in the url and deletes the event from the database
 @api_events.route("/api/events/<int:event_id>", methods=["DELETE"])
+@login_required
 def api_delete_event(event_id):
     event = Event.query.get(event_id)
     # check event belongs to user - we should get the user id from the session or something instead of passing it in the url, but for now we'll just assume it's correct
@@ -68,6 +74,7 @@ def api_delete_event(event_id):
 
 # API route to edit an event - accepts a PUT request with the event id in the url and the updated event details in the body, and updates the event in the database
 @api_events.route("/api/events/<int:event_id>", methods=["PUT"])
+@login_required
 def api_edit_event(event_id):
     event = Event.query.get(event_id)
     if not event:
