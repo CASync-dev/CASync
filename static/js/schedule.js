@@ -399,7 +399,6 @@ document.getElementById("add-event-form").addEventListener("submit", (e) => {
     end_time: end_time,
     location: location,
     description: description,
-    user_id: user_id,
     color: color,
   };
 

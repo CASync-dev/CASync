@@ -4,7 +4,6 @@ from flask import Blueprint, jsonify, request
 from app.models import Calendar, User, Event
 from flask_login import current_user, login_required
 
-
 api_events = Blueprint('api_events', __name__)
 
 # -- API EVENT ROUTES
@@ -50,7 +49,8 @@ def api_create_event():
         end_time=datetime.strptime(data['end_time'], '%H:%M').time(),
         location=data.get('location'),
         color=data.get('color', 'indigo'),
-        user_id=data['user_id']
+        user_id=current_user.id
+
     )
     db.session.add(event)
     db.session.commit()
@@ -60,11 +60,12 @@ def api_create_event():
 @api_events.route("/api/events/<int:event_id>", methods=["DELETE"])
 @login_required
 def api_delete_event(event_id):
+    # check if event exists and belongs to the user
     event = Event.query.get(event_id)
-    # check event belongs to user - we should get the user id from the session or something instead of passing it in the url, but for now we'll just assume it's correct
-    # check if it exists
     if not event:
         return jsonify({"error": "Event not found"}), 404
+    if event.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized"}), 403
     # check if event is custom (not imported from ical) - we don't want to allow deletion of imported events through this route
     if event.ical_id:
         return jsonify({"error": "Cannot delete imported events"}), 400
@@ -79,6 +80,8 @@ def api_edit_event(event_id):
     event = Event.query.get(event_id)
     if not event:
         return jsonify({"error": "Event not found"}), 404
+    if event.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized"}), 403
     # check if event is custom (not imported from ical) - we don't want to allow editing of imported events through this route
     if event.ical_id:
         return jsonify({"error": "Cannot edit imported events"}), 400
