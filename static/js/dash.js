@@ -1,5 +1,5 @@
 // simple function to update the time and date on the dashboard every second
-// test
+// test 2
 function updateTime() {
     // Get the current date and time each time this runs
     const now = new Date();
