@@ -85,8 +85,9 @@ Use the planning dir for plans
    npm run dev
    ```
    To run them both in one terminal.
+   The dev variant also runs the command `browser-sync` that live reloads your browser on changes to make visual changes instant. 
 
-   The app will be available at `http://localhost:8080`.
+   The app will be available at [http://localhost:8080](http://localhost:8080) {or [http://localhost:3000](http://localhost:3000) with browser-sync}.
 
 
 ## Docs
