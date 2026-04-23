@@ -1,78 +1,74 @@
 {% extends "loggedout/log-out-layout.html" %} {% block content %}
-        <!-- Note that the below will be moved to homepage.html; just here for debugging purposes-->
-         <main>
-            <section class = "flex flex-col py-8">
-                <div class = "flex flex-col mt-16 w-full">
-                    <div class = "flex flex-row items-center content-center justify-between mx-auto">
-                        <div class = "flex flex-col gap-6 justify-center px-32">
-                            <h1 class = "text-5xl">
-                                The All in One
-                                <br>
-                                Timetable that 
-                                <br>
-                                You Need
-                            </h1>
-                            <br>
-                        <p class = "block">
-                            Share your timetable with your friends today.
-                        </p>
-                        <div class = "">
-                            <a class = "inline-flex items-center mx-1 my-1 rounded-2xl bg-primary hover:bg-indigo-800 shadow-black text-nearwhite
-                                p-5 text-1xl" 
-                                href = "{{ url_for('loggedout.register') }}">
-                                Sign Up Now!
-                            </a>
-                        </div>
-                    </div>
-                        <div class = "aspect-square items-center">
-                            <div class = "relative w-full h-full ">
-                                <!-- Not sure if thats the way to import images, check later?-->
-                                <img src = "{{ url_for('static', filename='images/promo.png') }}" class = "h-96 w-96 md:h-56 md:w-56 object-cover max-sm:hidden" alt="Promo picture of a timetable in the app">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <br>
-            <br>
-            <!-- This section gives a brief summary on the app-->
-            <div class = "flex flex-row  py-52 mx-auto">
-                <div class = "items-center ">
-                    <!-- Currently using a temporary image; Image to be changed-->
-                     <img src = "{{ url_for('static', filename='images/temp01.png') }}" class = "h-max w-96 md:h-56 md:w-56 object-cover max-sm:hidden" alt = "Promo picture of two timetables"> 
-                </div>
-                <div class = "flex flex-col gap-6 justify-center">
-                    <h1 class = "text-5xl text-right">
-                        Sync your friends
-                    </h1>
-                    <p class = "text-2xl text-right block">
-                        Lorem ipsum dolor sit amet, 
-                        <br>
-                        consectetur adipiscing elit.
-                        <br>
-                         Cras a elit elementum, placerat
-                         <br>
-                          dolor a, hendrerit dui.
-                         <br>
-                          Aliquam viverra purus vitae 
-                          <br>
-                          pharetra ultricies. Suspendisse 
-                          <br>
-                          magna purus, vulputate vitae gravida
-                          <br>
-                           ut, semper sit amet ipsum.
-                          <br>
-                           Integer orci enim, tincidunt eu enim
-                           <br>
-                            non, pulvinar congue nibh.
-                           <br>
-                            Nullam eu lorem non risus blandit 
-                            <br>
-                            pretium. Aliquam fringilla 
-                            <br>
-                            convallis rhoncus. 
-                    </p>
-                </div>
-            </div>
-        </section>
-    </main>
+<!-- Note that the below will be moved to homepage.html; just here for debugging purposes-->
+<main>
+  <section class="flex flex-col">
+    <!-- This section introduces the app -->
+    <div class="flex flex-col flex-wrap my-16 px-4 md:px-10 lg:px-16 w-full mx-auto max-w-7xl">
+      <div class="flex flex-col md:flex-row items-center justify-between py-6">
+        <div class="flex flex-col gap-6 md:w-1/2">
+          <h1 class="text-5xl">
+            The All-in-One Timetable 
+            <br />
+            That You Need
+          </h1>
+          <br />
+          <p class="wrap-break-word text-base">
+            Tired of not knowing your friends' schedule?
+            Always stressed when trying to compare availability and plan a meet up with your group?
+            Well, CASync is here to solve your problem!
+            Share your timetable with your friends today.
+          </p>
+          <div class="">
+            <a
+              class="btn-primary"
+              href="{{ url_for('loggedout.register') }}"
+            >
+              Sign Up Now!
+            </a>
+          </div>
+        </div>
+        <div class="flex justify-center lg:justify-end md:w-1/2 mt-8 md:mt-0">
+          <div class="relative aspect-square sm:w-80 md:w-96">
+            <!-- Not sure if thats the way to import images, check later?-->
+            <img
+              src="{{ url_for('static', filename='images/promo.png') }}"
+              class="h-full w-full object-cover"
+              alt="Promo picture of a timetable in the app"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <br />
+    <br />
+    <!-- This section gives a brief summary on the app-->
+    <div class="bg-midgray w-full">
+      <div class="flex flex-col flex-wrap my-16 px-4 md:px-10 lg:px-16 w-full mx-auto max-w-7xl">
+        <div class="flex flex-col md:flex-row items-center justify-between py-6">
+      
+          <!-- Currently using a temporary image; Image to be changed-->
+          <div class="flex justify-center lg:justify-start md:w-1/2 mt-8 md:mt-0">
+            <img
+              src="{{ url_for('static', filename='images/temp01.png') }}"
+              class="sm:w-80 md:w-96 object-cover max-md:block"
+              alt="Promo picture of two timetables"
+            />
+          </div>
+          <!-- Text content for summary -->
+          <div class="flex flex-col gap-6 md:w-1/2">
+            <h1 class="text-5xl text-right">Sync With Your Friends</h1>
+            <br />
+            <p class="text-base text-right">
+              With CASync, you can easily share your timetable with your friends and see their schedules in one place.
+              No more back-and-forth messages trying to figure out when everyone is free,
+              simply add your friends and see their availability at a glance.
+              You can also create groups to share your timetable with specific friends,
+              making it even easier to plan meetups and stay connected with your friends.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
 {% endblock %}

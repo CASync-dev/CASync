@@ -8,12 +8,14 @@
   "main": "index.js",
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.1",
+    "browser-sync": "^3.0.4",
     "concurrently": "^9.2.1"
   },
   "scripts": {
     "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify",
     "watch:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
-    "dev": "concurrently \"npm run watch:css\" \"python app.py\""
+    "watch:bs": "browser-sync start --proxy localhost:8080 --files \"templates/**/*.html,static/**/*.css,static/**/*.js\" --port 3000 --no-open --no-notify",
+    "dev": "concurrently \"npm run watch:css\" \"python app.py\" \"npm run watch:bs\""
   },
   "repository": {
     "type": "git",

@@ -1,14 +1,160 @@
-{% extends "loggedin/layout.html" %}
-{% block content %}
-<div class="max-w-2xl mx-auto p-8">
-  <h1
-    id="settings-title"
-    class="text-2xl font-bold text-gray-900 mb-8 select-none"
-  >
-    Friends
-  </h1>
+{% extends "loggedin/layout.html" %} {% block content %}
+<div
+  class="mx-4 2xl:max-w-7xl 2xl:mx-auto px-4 bg-primary py-8 mt-6 rounded-xl"
+>
+  <!-- top bar -->
+  <div class="flex items-center pb-3 border-b border-gray-300">
+    <h1 class="text-3xl font-bold text-white">Friends</h1>
+    <button
+      class="btn-white px-4 ml-auto mr-2 h-10 whitespace-nowrap"
+      onclick="alert('Request functionality is not implemented yet.')"
+    >
+      Friend Requests
+    </button>
+    <button
+      class="btn-white px-4 h-10 whitespace-nowrap"
+      command="show-modal"
+      commandfor="add-friend-modal"
+    >
+      Add Friend
+    </button>
   </div>
-  <section>
-    <!-- Here would be where the list of friends would be shown -->
-  </section>
+  <div class="mt-6">
+    <ul class="">
+      <!-- Friend list items -->
+      {% for friend in friends %}
+      <li
+        class="py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200"
+      >
+        <div class="flex items-center">
+          <img
+            class="h-15 w-15 rounded-full"
+            src="{{ friend.avatar_url }}"
+            alt="{{ friend.username }}'s avatar"
+          />
+          <div class="ml-4">
+            <p class="text-sm font-medium text-white">{{ friend.username }}</p>
+            <p class="text-sm text-gray-300">{{ friend.next_class }}</p>
+          </div>
+        </div>
+        <button
+          class="btn-plain px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400"
+          onclick="alert('Remove Friend functionality is not implemented yet.')"
+        >
+          <i class="fas fa-calendar-alt"></i>
+          Schedule
+        </button>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+<!-- Add Friend Modal -->
+<el-dialog>
+  <dialog
+    id="add-friend-modal"
+    class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+    ></el-dialog-backdrop>
+
+    <div
+      tabindex="0"
+      class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    >
+      <el-dialog-panel
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+      >
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fas fa-user-plus text-green-600"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                Add a Friend
+              </h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">
+                  Enter your friend's username or email to send them a friend
+                  request. {atm not real search}
+                </p>
+                <div class="mt-3 flex w-full items-stretch gap-2">
+                  <input
+                    id="friend-search-input"
+                    type="text"
+                    class="flex-1 rounded-md border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    placeholder="Friend's Username/Email"
+                    autocomplete="off"
+                  />
+                  <button
+                    type="button"
+                    onclick="searchFriends()"
+                    class="btn-plain shrink-0 rounded-md border border-transparent bg-green-600 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+              <div id="friend-search-results" class="mt-4 hidden">
+                <p class="text-sm text-gray-500">Search Results:</p>
+                <ul id="friend-search-list" class="mt-2"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button
+            type="button"
+            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            command="close"
+            commandfor="add-friend-modal"
+          >
+            Close
+          </button>
+        </div>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>
+{% endblock %} {% block scripts %}
+<script>
+  function addFriend() {
+    alert("Add Friend functionality is not implemented yet.");
+  }
+
+  const DEV_USERS = [
+    "alice_wonder",
+    "bob_builder",
+    "charlie_chaplin",
+    "diana_prince",
+    "eve_online",
+  ];
+
+  function searchFriends() {
+    const list = document.getElementById("friend-search-list");
+    list.innerHTML = DEV_USERS.map(
+      (u) => `
+      <li class="flex items-center justify-between py-2 px-4 hover:bg-gray-100 rounded-md">
+        <div class="flex items-center gap-3">
+          <img src="https://placehold.co/200x200" class="h-8 w-8 rounded-full" />
+          <span class="text-sm font-medium text-gray-800">${u}</span>
+        </div>
+        <button onclick="addFriend()" class="text-sm bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">Add</button>
+      </li>`,
+    ).join("");
+    document.getElementById("friend-search-results").classList.remove("hidden");
+  }
+</script>
+<!-- tailwind js -->
+<script
+  src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"
+  type="module"
+></script>
 {% endblock %}

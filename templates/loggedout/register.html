@@ -1,57 +1,115 @@
 {% extends "loggedout/log-out-layout.html" %} {% block content %}
 
-    <body>
-        <div class="antialiased mx-auto bg-white flex items-center justify-center text-center ">
-            <form id = "register" novalidate = "novalidate" class = "bg-primary p-6 m-6 border-8 rounded-3xl border-primary drop-shadow-2xl shadow text-align">
-                <div>
-                    <a href="{{ url_for('loggedout.home') }}" class = "-m-1 text-2xl text-nearwhite mx-auto">
-                    <strong>CAS</strong>ync
-                </a> 
-                <br>         
-                <br>        
-                </div>
-                <legend> <h3 class = "flex items-center justify-center text-center text-xl px-5 text-nearwhite"> Register </h1> </legend>
-                <br>
-                <div>
-                    <label for="email" class = "text-left text-nearwhite"> Email: </label> <br>
-                    <input name = "mail" id="email" type="email" autocomplete="email" aria-required="true" 
-                            aria-invalid="false" autofocus = "autofocus" size="30" name="email" class = "border bg-nearwhite">
-                    <br>
-                    <br>
-                    <label for = "user" class = "text-left text-nearwhite"> Username: </label> <br>
-                    <input name = "user" id="user" type="text" autocomplete="username" aria-required="true" 
-                            aria-invalid="false" autofocus = "autofocus" size="30" name="user" class = "border bg-nearwhite">
-                    <br>
-                    <br>
-                    
-                    <label for="pw1" class = "text-left text-nearwhite"> Password: </label> <br>
-                    <input name = "pw1" id="pw1" type = "password" autocomplete="current-password" 
-                        aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw1" class = "border bg-nearwhite">                
-                    <br>
-                    <br>
-                        <label for="pw2" class = "text-left text-nearwhite"> Reenter Password: </label> <br>
-                    <input name = "pw2" id="pw" type = "password" autocomplete="current-password"  
-                        aria-required="true" aria-invalid="false" autofocus = "autofocus" size="30" name = "pw" class = "border bg-nearwhite">
-                    <br>
-                    <br>
-                    <input type = "checkbox" id = "rme" name = "rme">
-                    <label for="rme" class = "text-nearwhite"> Remember me </label>
-                    <br>
-                    <span id = "field-error"> </span>
-                    <br>
-                    <button
-                        id="log"
-                        type="submit"
-                        class="button cursor-pointer items-center mx-1 rounded-2xl bg-nearwhite hover:bg-midgray shadow-black text-primary
-                        p-5 text-1xl" 
-                    >
-                        Continue
-                    </button>
-                    <br>
-                    <h5 class = "text-xs pt-5 text-nearwhite"> Already registered? Login <a href = "/login" class="underline"> here. </a></h5>
-                </div>
-            </form>
-        </div>
-        <script src="{{ url_for('static', filename='js/register.js') }}"></script>   
-    </body>
+<body>
+  <div
+    class="antialiased mx-auto bg-white flex items-center justify-center text-center"
+  >
+    <form
+      id="register"
+      novalidate="novalidate"
+      class="bg-primary p-6 m-6 border-8 rounded-3xl border-primary drop-shadow-2xl shadow text-align"
+    >
+      <div>
+        <a
+          href="{{ url_for('loggedout.home') }}"
+          class="-m-1 text-2xl text-nearwhite mx-auto"
+        >
+          <strong>CAS</strong>ync
+        </a>
+        <br />
+        <br />
+      </div>
+      <legend>
+        <h3
+          class="flex items-center justify-center text-center text-xl px-5 text-nearwhite"
+        >
+          Register
+        </h3>
+      </legend>
+      <br />
+      <div>
+        <label for="email" class="text-left text-nearwhite"> Email: </label>
+        <br />
+        <input
+          name="mail"
+          id="email"
+          type="email"
+          autocomplete="email"
+          aria-required="true"
+          aria-invalid="false"
+          autofocus="autofocus"
+          size="30"
+          name="email"
+          class="border bg-nearwhite"
+        />
+        <br />
+        <br />
+        <label for="user" class="text-left text-nearwhite"> Username: </label>
+        <br />
+        <input
+          name="user"
+          id="user"
+          type="text"
+          autocomplete="username"
+          aria-required="true"
+          aria-invalid="false"
+          autofocus="autofocus"
+          size="30"
+          name="user"
+          class="border bg-nearwhite"
+        />
+        <br />
+        <br />
+        <label for="pw1" class="text-left text-nearwhite"> Password: </label>
+        <br />
+        <input
+          name="pw1"
+          id="pw1"
+          type="password"
+          autocomplete="current-password"
+          aria-required="true"
+          aria-invalid="false"
+          autofocus="autofocus"
+          size="30"
+          name="pw1"
+          class="border bg-nearwhite"
+        />
+        <br />
+        <br />
+        <label for="pw2" class="text-left text-nearwhite">
+          Reenter Password:
+        </label>
+        <br />
+        <input
+          name="pw2"
+          id="pw"
+          type="password"
+          autocomplete="current-password"
+          aria-required="true"
+          aria-invalid="false"
+          autofocus="autofocus"
+          size="30"
+          name="pw"
+          class="border bg-nearwhite"
+        />
+        <br />
+        <br />
+        <input type="checkbox" id="rme" name="rme" />
+        <label for="rme" class="text-nearwhite"> Remember me </label>
+        <br />
+        <span id="field-error"> </span>
+        <br />
+        <button id="log" type="submit" class="button cursor-pointer btn-white">
+          Continue
+        </button>
+        <br />
+        <h5 class="text-xs pt-5 text-nearwhite">
+          Already registered? Login
+          <a href="{{ url_for('loggedout.login') }}" class="underline"> here. </a>
+        </h5>
+      </div>
+    </form>
+  </div>
+  <script src="{{ url_for('static', filename='js/register.js') }}"></script>
+</body>
 {% endblock %}
