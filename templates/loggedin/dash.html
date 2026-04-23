@@ -1,9 +1,11 @@
 {% extends "loggedin/layout.html" %}
 {% block content %}
 
+<!-- Main dashboard layout: top header row and bottom two-column content -->
 <div class="flex flex-col">
+    <!-- Top row: username/date on the left, live clock on the right -->
     <div class="flex flex-row justify-between">
-        <!-- Top: big text -->
+        <!-- Top-left: day/date and username header -->
         <div class="p-8 space-y-4 mb-4">
             <h1
                 id="title_username"
@@ -15,6 +17,7 @@
                 <span id="day" class="text-blue-600"></span>, <span id="current-date"></span>
             </h2>
         </div>
+        <!-- Top-right: live clock display -->
         <div class="border-5 rounded-2xl border-gray-300 h-full mx-4 mt-10">
             <h2 class="text-7xl p-10">
                     <span id="time" class=" text-blue-600"> 2:30</span> <span id="period" class="text-black">PM</span>
@@ -25,10 +28,10 @@
         
   
 
-  <!-- Bottom: two divs side by side -->
-  <div class="flex flex-row gap-4">
+        <!-- Bottom row: events panel on the left, friends panel on the right -->
+    <div class="flex flex-row gap-4">
     <div class="p-4 flex-1">
-        <!-- Event list -->
+                <!-- Left panel: next event and event list -->
         <div class="flex flex-col gap-4">
             <!-- Primary event card -->
             <div class="flex flex-col bg-slate-200 rounded-2xl p-6 ">
@@ -67,6 +70,7 @@
         </div>
     </div>
     <div class="p-4 flex-1 mt-3.5 mr-4 mb-4 bg-slate-200 rounded-2xl">
+        <!-- Right panel: friends who are available now -->
         <h3 class="text-4xl text-dark space-y-4 mb-4">
             Friends available now:
         </h3>
