@@ -1,7 +1,7 @@
 import json
 from datetime import date, time
 from app import app, db
-from models import User, Event
+from app.models import User, Event
 import sys
 
 def parse_date(s):

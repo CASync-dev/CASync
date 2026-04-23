@@ -104,7 +104,12 @@
       return;
     }
     // Check if the user has any calendars
-    fetch(`/api/calendars/${selectedUserId}`)
+    fetch(`/api/calendars/${selectedUserId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token() }}',
+      },
+    })
       .then((res) => res.json())
       .then((calendars) => {
         if (calendars.length > 0) {
@@ -134,7 +139,11 @@
       return;
     }
     const res = await fetch(`/api/sync-cal/${selectedUserId}`, {
-      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token() }}',
+      },
+      method: 'POST',
     });
     const data = await res.json();
     if (res.ok) {
