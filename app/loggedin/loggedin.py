@@ -1,53 +1,42 @@
 from datetime import datetime
 from flask import Blueprint, redirect, render_template, session, url_for, flash
+from flask_login import login_required
 from app.form import EventForm, IcalImportForm
 
 loggedin = Blueprint('loggedin', __name__, template_folder='../templates/loggedin', static_folder='../static')
 
-# --- Session login logic
-@loggedin.context_processor
-# This function injects the 'logged_in' variable into all tempaltes
-def inject_auth():
-    return {'logged_in': session.get('logged_in', False)}
-def require_login():
-    if not session.get('logged_in'):
-        return redirect(url_for('loggedout.home'))
-    return None
 
 @loggedin.route("/dash")
+@login_required
 def dash():
-    guard = require_login()
-    if guard: return guard
     return render_template("loggedin/dash.html")
 
 @loggedin.route("/schedule")
+@login_required
 def schedule():
-    guard = require_login()
-    if guard: return guard
     now = datetime.now()
     return render_template("loggedin/schedule.html", now=now)
 
 
 @loggedin.route("/groups")
+@login_required
 def groups():
-    guard = require_login()
-    if guard: return guard
     return render_template("loggedin/groups.html")
 
 
 @loggedin.route("/friends")
+@login_required
 def friends():
-    guard = require_login()
-    if guard: return guard
+
     return render_template("loggedin/friends.html")
 
 
 @loggedin.route("/settings", methods=['GET', 'POST'])
+@login_required
 def settings():
     from services.ical import import_ical
     # login protection
-    guard = require_login()
-    if guard: return guard
+
     # ical submit form
     form = IcalImportForm()
     if form.validate_on_submit():

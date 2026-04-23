@@ -2,6 +2,11 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, URLField, DateField, IntegerField, TimeField, SelectField
 from wtforms.validators import InputRequired
 
+class LoginForm(FlaskForm):
+    username = StringField(validators=[InputRequired()])
+    password = StringField(validators=[InputRequired()])
+    submit = SubmitField('Login')
+
 class IcalImportForm(FlaskForm):
     ical_url = URLField('iCal URL', validators=[InputRequired()])
     user_id = IntegerField('User ID', validators=[InputRequired()])
@@ -16,4 +21,3 @@ class EventForm(FlaskForm):
     description = StringField()
     color = StringField()
 
-# TODO: Login Form, Registtration form.

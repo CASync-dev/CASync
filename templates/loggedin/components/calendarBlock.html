@@ -13,8 +13,7 @@ A component is a reusable piece of code that can be used to create a specific UI
   - start: the start time of the event
   - end: the end time of the event
   -->
- {% macro calendarBlock(days, timeRange, allowEventCreation=false
-, eventsUrl) -%}
+ {% macro calendarBlock(days, timeRange, eventsUrl, allowEventCreation=false) -%}
 <div class="w-full max-w-7xl mx-auto px-6 lg:px-8">
   <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
   <div class="sticky top-0 z-20 bg-stone-50">
