@@ -44,7 +44,7 @@
       <nav
         class="mx-auto max-w-7xl px-4 md:px-10 lg:px-16 flex items-center justify-between py-6"
       >
-      <!-- Logo -->
+        <!-- Logo -->
         <div class="flex lg:flex-1">
           <a
             href="{{ url_for('loggedout.home') }}"
@@ -69,19 +69,19 @@
             </span>
           </button>
         </div>
-        <div class = "flex max-sm:hidden">
+        <div class="flex max-sm:hidden">
           <a
-          href="{{ url_for('loggedout.register') }}"
-          class="text-1xl font-semibold text-nearwhite max-sm:hidden px-2"
-        >
-          Register
-        </a>
-        <a
-          href="{{ url_for('loggedout.login') }}"
-          class="text-1xl font-semibold text-nearwhite max-sm:hidden px-2"
-        >
-          Login
-        </a>
+            href="{{ url_for('loggedout.register') }}"
+            class="text-1xl font-semibold text-nearwhite max-sm:hidden px-2"
+          >
+            Register
+          </a>
+          <a
+            href="{{ url_for('loggedout.login') }}"
+            class="text-1xl font-semibold text-nearwhite max-sm:hidden px-2"
+          >
+            Login
+          </a>
         </div>
       </nav>
     </header>
@@ -94,7 +94,9 @@
         tabindex="0"
         class="fixed inset-0 focus:outline-none flex-col bg-primary"
       >
-        <div class="mx-auto flex max-w-7xl items-center justify-between p-6">
+        <div
+          class="mx-auto max-w-7xl px-4 md:px-10 lg:px-16 flex items-center justify-between py-6"
+        >
           <a
             href="{{ url_for('loggedout.home') }}"
             class="-m-1 p-1 text-2xl text-nearwhite font-bold"
@@ -115,7 +117,9 @@
             </span>
           </button>
         </div>
-        <div class="mt-6 flow-root px-2">
+        <div
+          class="mt-6 flow-root mx-auto max-w-7xl px-4 md:px-10 lg:px-16 items-center justify-between py-6"
+        >
           <div class="-my-6 divide-y divide-dark py-4">
             <div class="">
               <a
@@ -186,7 +190,10 @@
       <div class="flex flex-col py-24 justify-center items-center">
         <div class="flex flex-row mx-auto">
           <div class="px-6 max-sm:px-3">
-            <a href="{{ url_for('loggedout.faq') }}" class="text-nearwhite text-2xl">
+            <a
+              href="{{ url_for('loggedout.faq') }}"
+              class="text-nearwhite text-2xl"
+            >
               FAQ
             </a>
           </div>
