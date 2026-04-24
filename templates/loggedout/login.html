@@ -32,7 +32,7 @@
           autofocus="autofocus"
           size="30"
           name="user"
-          class="border bg-nearwhite"
+          class="border bg-nearwhite p-1 my-2"
         />
         <br />
         <br />
@@ -50,7 +50,7 @@
           size="30"
           name="pw"
           required
-          class="border bg-nearwhite"
+          class="border bg-nearwhite p-1 my-2"
         />
         <br />
         <br />
@@ -66,7 +66,9 @@
         <br />
         <h5 class="text-nearwhite text-xs pt-5">
           Not a member yet? Register
-          <a href="{{ url_for('loggedout.register') }}" class="underline"> here. </a>
+          <a href="{{ url_for('loggedout.register') }}" class="underline">
+            here.
+          </a>
         </h5>
       </div>
     </form>
