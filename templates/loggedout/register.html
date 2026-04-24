@@ -41,7 +41,7 @@
           autofocus="autofocus"
           size="30"
           value="{{ form.email.data or '' }}"
-          class="border bg-nearwhite"
+          class="border bg-nearwhite p-1 my-2"
         />
         <br />
         <br />
@@ -57,7 +57,7 @@
           aria-required="true"
           size="30"
           value="{{ form.username.data or '' }}"
-          class="border bg-nearwhite"
+          class="border bg-nearwhite p-1 my-2"
         />
         <br />
         <br />
@@ -72,7 +72,7 @@
           autocomplete="new-password"
           aria-required="true"
           size="30"
-          class="border bg-nearwhite"
+          class="border bg-nearwhite p-1 my-2"
         />
         <br />
         <br />
@@ -87,7 +87,7 @@
           autocomplete="new-password"
           aria-required="true"
           size="30"
-          class="border bg-nearwhite"
+          class="border bg-nearwhite p-1 my-2"
         />
         <br />
         <br />
@@ -108,6 +108,9 @@
         <br />
         <h5 class="text-xs pt-5 text-nearwhite">
           Already registered? Login
+          <a href="{{ url_for('loggedout.login') }}" class="underline">
+            here.
+          </a>
           <a href="{{ url_for('loggedout.login') }}" class="underline">
             here.
           </a>
