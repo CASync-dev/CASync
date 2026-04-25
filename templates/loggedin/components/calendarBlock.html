@@ -365,7 +365,7 @@ A component is a reusable piece of code that can be used to create a specific UI
         card.style.minHeight = '';
         card.style.width = '';
         card.style.left = card.dataset.overlapLeft ?? '';
-        card.style.right = '';
+        card.style.right = card.dataset.overlapRight ?? '';
         card.style.transform = '';
         details.classList.add('hidden');
         card.children[0].classList.remove('text-wrap');
@@ -462,7 +462,7 @@ A component is a reusable piece of code that can be used to create a specific UI
         card.style.minHeight = '';
         card.style.width = '';
         card.style.left = card.dataset.overlapLeft ?? '';
-        card.style.right = '';
+        card.style.right = card.dataset.overlapRight ?? '';
         card.style.transform = '';
         details.classList.add('hidden');
         card.children[0].classList.remove('text-wrap');
@@ -601,6 +601,7 @@ A component is a reusable piece of code that can be used to create a specific UI
     const isMultiUser = Object.keys(events).length > 1;
     const flatEvents = isMultiUser ? multiUserParser(events) : flattenEvents(events);
 
+    // Place each event and log it to placed for overlap calcualtions.
     const placed = flatEvents
       .map((event, i) => placeEvent(event, cellMap, weekDates, cellHeight, i))
       .filter(Boolean); // remove null (events outside visible range)
@@ -609,20 +610,45 @@ A component is a reusable piece of code that can be used to create a specific UI
     applyOverlapOffsets(placed.filter(p => !p.isMulti));
   }
 
-  // For each card, if another card in the same column started earlier and is still active,
-  // push it right so the card behind it remains visible.
+  // Lays out overlapping cards side-by-side.
+  // Cards sharing any overlapping time in the same day are grouped together.
+  // Each card in a group of N gets an equal width slice: left and right are set as percentages.
   function applyOverlapOffsets(placed_cards) {
-    placed_cards.forEach(({ card, dayIndex, startMinutes }) => {
-      const hasOverlapFromAbove = placed_cards.some((other) => {
-        const isSameDay = other.dayIndex === dayIndex;
-        const isDifferentCard = other.card !== card;
-        const otherStartedFirst = other.startMinutes < startMinutes;
-        const otherStillActiveAtStart = other.endMinutes > startMinutes;
-        return isDifferentCard && isSameDay && otherStartedFirst && otherStillActiveAtStart;
+    const visited = new Set();
+
+    placed_cards.forEach((placement) => {
+      if (visited.has(placement)) return;
+
+      // Grow a group by repeatedly pulling in any unvisited card that overlaps any member of the current group
+      const group = [placement];
+      visited.add(placement);
+      let changed = true;
+      while (changed) {
+        changed = false;
+        placed_cards.forEach((other) => {
+          if (visited.has(other)) return;
+          const overlapsGroup = group.some((g) => {
+            const sameDay = g.dayIndex === other.dayIndex;
+            const timesOverlap = g.startMinutes < other.endMinutes && g.endMinutes > other.startMinutes;
+            return sameDay && timesOverlap;
+          });
+          if (overlapsGroup) { group.push(other); visited.add(other); changed = true; }
+        });
+      }
+
+      if (group.length === 1) return; // solo — leave at full width
+
+      // Sort left-to-right by start time and assign each card an equal column slot
+      group.sort((a, b) => a.startMinutes - b.startMinutes);
+      const slotWidth = 100 / group.length;
+      group.forEach(({ card }, i) => {
+        const left = `${i * slotWidth}%`;
+        const right = `${100 - (i + 1) * slotWidth}%`;
+        card.style.left = left;
+        card.style.right = right;
+        card.dataset.overlapLeft = left;   // persist so collapse can restore position
+        card.dataset.overlapRight = right;
       });
-      const offset = hasOverlapFromAbove ? '0.5rem' : '';
-      card.style.left = offset;
-      card.dataset.overlapLeft = offset; // persist so collapse can restore it
     });
   }
 
