@@ -17,7 +17,10 @@
         </button>
         <p class="text-sm text-gray-500">
           Last sync
-          <span id="last-synced">{{ last_synced.strftime("%d/%m/%y ") }}</span>
+          <span id="last-synced"
+            >{{ last_synced if last_synced == 'Never' else
+            last_synced.strftime("%d/%m/%y") }}</span
+          >
         </p>
       </div>
     </div>

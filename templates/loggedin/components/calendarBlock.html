@@ -251,11 +251,12 @@ A component is a reusable piece of code that can be used to create a specific UI
     });
   }
 
-  fetch('/api/events/me?start=2026-04-20&end=2026-04-26')
+  fetch('/api/events')
     .then((response) => response.json())
     .then((data) => {
       events = data;
       renderDesktopEvents(); // render events after loading
+      console.log(events); // Log the event data to the console
     })
     .catch((error) => {
       console.error('Error loading events:', error);
@@ -308,7 +309,17 @@ A component is a reusable piece of code that can be used to create a specific UI
     time.textContent = timeLabel;
     card.appendChild(time);
 
+    // In multi-user mode, show who owns this event so users can tell cards apart by more than color
+    if (event.showUsername && event.username) {
+      const userLabel = document.createElement('p');
+      userLabel.className = `text-xs leading-tight px-1.5 ${colors.text} font-semibold opacity-50`;
+      userLabel.textContent = `@${event.username}`;
+      card.appendChild(userLabel);
+    }
+
     // Location - show only if card is big enough, or if the location is exceptionally large, require an even bigger card
+    // If we are in mulit user mode and showing usernames, we need more room to show the location since the title is taking up more space, so we increase the height thresholds by 25%
+
     if ((heightPx >= 75 && event.location.length <= 50) || heightPx >= 100) {
       const location = document.createElement('p');
       location.className = `text-xs leading-tight px-1.5 text-bold ${colors.text} opacity-75`;
@@ -512,59 +523,34 @@ A component is a reusable piece of code that can be used to create a specific UI
       Object.keys(eventsData).map((userId, i) => [userId, colorNames[i % colorNames.length]])
     );
 
-    // Flatten all events, tagging each with its user's color and username (from the event model)
+    // Flatten all events, tagging each with its user's color.
+    // showUsername: true tells buildEventCard to display the username for attribution.
     const tagged = Object.entries(eventsData).flatMap(([userId, userData]) =>
       Object.values(userData.events).map(event => ({
         ...event,
         type: 'single',
         color: userColorMap[userId],
+        showUsername: true,
       }))
     );
 
-    // Group by date so we only compare events within the same day
-    const byDate = tagged.reduce((acc, e) => {
-      (acc[e.date] ??= []).push(e);
+    // Group by exact date + startTime + endTime.
+    // Only events with identical time slots become multi-events — no fuzzy overlap detection needed.
+    const groups = tagged.reduce((acc, e) => {
+      const key = `${e.date}|${e.startTime}|${e.endTime}`;
+      (acc[key] ??= []).push(e);
       return acc;
     }, {});
 
-    // For each day, sort by start time and walk forward detecting overlap clusters.
-    // A cluster's window extends as long as any new event starts before the current max end time.
-    return Object.entries(byDate).flatMap(([date, dayEvents]) => {
-      const sorted = [...dayEvents].sort((a, b) => parseTime(a.startTime) - parseTime(b.startTime));
-      const clusters = [];
-      let current = [], windowEnd = -Infinity;
-
-      for (const event of sorted) {
-        const start = parseTime(event.startTime);
-        const end = parseTime(event.endTime);
-        if (current.length === 0 || start < windowEnd) {
-          current.push(event);
-          windowEnd = Math.max(windowEnd, end);
-        } else {
-          clusters.push(current);
-          current = [event];
-          windowEnd = end;
-        }
-      }
-      if (current.length) clusters.push(current);
-
-      return clusters.map(cluster => {
-        // Solo events pass through as-is; overlapping clusters become a single multi-event
-        if (cluster.length === 1) return cluster[0];
-
-        const startMins = Math.min(...cluster.map(e => parseTime(e.startTime)));
-        const endMins = Math.max(...cluster.map(e => parseTime(e.endTime)));
-        const toTimeStr = mins =>
-          `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
-
-        return {
-          type: 'multi',
-          date,
-          startTime: toTimeStr(startMins),
-          endTime: toTimeStr(endMins),
-          participants: cluster.map(e => ({ name: e.username, class: e.title, color: e.color })),
-        };
-      });
+    return Object.values(groups).map(cluster => {
+      // Solo events pass through as-is; same-slot clusters become a single multi-event
+      if (cluster.length === 1) return cluster[0];
+      const { date, startTime, endTime } = cluster[0];
+      return {
+        type: 'multi',
+        date, startTime, endTime,
+        participants: cluster.map(e => ({ name: e.username, class: e.title, color: e.color })),
+      };
     });
   }
 

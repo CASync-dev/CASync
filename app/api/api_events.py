@@ -67,10 +67,13 @@ api_events = Blueprint('api_events', __name__)
 @api_events.route("/api/events/")
 @login_required
 def api_eventslist():
-    # Assuming the user is authenticated and we can get their ID from the session
-    user_id = current_user.id
-    events = Event.query.where(Event.user_id == user_id).all()
-    return jsonify([e.to_dict() for e in events])
+    # test route the returns all events from all users in the standard psciefied above
+    events = Event.query.all()
+    users = User.query.all()
+    user_dict = {user.id: {"events": {}} for user in users}
+    for event in events:
+        user_dict[event.user_id]["events"][str(event.id)] = event.to_dict()
+    return jsonify(user_dict)
 
 # Api route that accpets a start and and range of days and returns all events for the user in that date range 
 # acceepts a format like this: GET /api/events/me?start=2026-04-21&end=2026-04-25
