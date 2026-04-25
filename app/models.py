@@ -17,9 +17,6 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256))  # Store hashed passwords
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))  # lambda so it's evaluated at insert time, not class definition
 
-    # Not a real column — a virtual link so you can do user.events to get all events for a user
-    # backref='owner' means you can also go Yeah fix that other way: event.owner gives you the user
-    # lazy='dynamic' returns a query object instead of loading everything at once
     events = db.relationship('Event', backref='owner', lazy='dynamic')
 
     @property
@@ -69,6 +66,7 @@ class Event(db.Model):
         return {
             'id':        self.id,
             'user_id':   self.user_id,
+            'username':  self.owner.username,
             'title':     self.title,
             'description': self.description,
             'date':      self.date.isoformat(),
