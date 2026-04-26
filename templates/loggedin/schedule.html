@@ -1,5 +1,4 @@
-{% extends "loggedin/layout.html" %}
-{% block head %}
+{% extends "loggedin/layout.html" %} {% block head %}
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 {% endblock %}
 
@@ -20,14 +19,14 @@
         <!-- Current date will be dynamically updated by JavaScript -->
         <h6
           id="calendar-title"
-          class="text-xl leading-8 font-semibold text-gray-900"
+          class="text-xl leading-8 text-gray-900"
         >
           Today, January 2024
         </h6>
       </div>
       <!-- New Activity Button -->
       <button
-        class="hidden md:block p-2 m-2 bg-indigo-600 rounded-xl flex items-center gap-2 font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+        class="hidden md:block btn-primary p-3 transition-all duration-300"
         id="new-event-btn"
         command="show-modal"
         commandfor="drawer"
@@ -50,21 +49,21 @@
       <div class="flex justify-between p-2">
         <button
           id="btn-last-week"
-          class="p-2 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+          class="btn-primary p-3 transition-all duration-300"
         >
-          < last week
+          < Last Week
         </button>
         <button
           id="btn-today"
-          class="hidden bg-emerald-500 p-2 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+          class="hidden btn-primary p-3 transition-all duration-300"
         >
-          today
+          Today
         </button>
         <button
           id="btn-next-week"
-          class="p-2 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+          class="btn-primary p-3 transition-all duration-300"
         >
-          next week >
+          Next Week >
         </button>
       </div>
       <!-- Scrollable calendar content -->

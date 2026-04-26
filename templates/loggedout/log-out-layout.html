@@ -6,6 +6,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="icon" type="image/png" sizes="32x32" href="{{url_for('static', filename='images/bluecircle_favicon.png')}}">
     <title>CASync</title>
 
     <!-- Roboto font css file; Sets all text to roboto-->
@@ -41,8 +42,9 @@
   <body class="min-h-screen flex flex-col">
     <header class="bg-primary sticky drop-shadow-2xl shadow">
       <nav
-        class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
+        class="mx-auto max-w-7xl px-4 md:px-10 lg:px-16 flex items-center justify-between py-6"
       >
+      <!-- Logo -->
         <div class="flex lg:flex-1">
           <a
             href="{{ url_for('loggedout.home') }}"
@@ -50,7 +52,7 @@
           >
             <img
               src="{{url_for('static', filename='images/w-logo.png')}}"
-              class="max-h-28 max-w-28 py-0.5"
+              class="h-10 md:h-12 w-auto py-0.5"
             />
           </a>
         </div>

@@ -9,38 +9,38 @@ const GRID_TOTAL_SLOTS = 12; // the grid has 12 rows, so the last row starts at 
 // Tailwind classes needed to style an event card: background, left border, text.
 const COLOR_MAP = {
   indigo: {
-    bg: 'bg-indigo-100',
-    border: 'border-indigo-500',
-    text: 'text-indigo-800',
+    bg: "bg-indigo-100",
+    border: "border-indigo-500",
+    text: "text-indigo-800",
   },
-  blue: { bg: 'bg-blue-100', border: 'border-blue-500', text: 'text-blue-800' },
+  blue: { bg: "bg-blue-100", border: "border-blue-500", text: "text-blue-800" },
   green: {
-    bg: 'bg-green-100',
-    border: 'border-green-500',
-    text: 'text-green-800',
+    bg: "bg-green-100",
+    border: "border-green-500",
+    text: "text-green-800",
   },
-  rose: { bg: 'bg-rose-100', border: 'border-rose-500', text: 'text-rose-800' },
+  rose: { bg: "bg-rose-100", border: "border-rose-500", text: "text-rose-800" },
   amber: {
-    bg: 'bg-amber-100',
-    border: 'border-amber-500',
-    text: 'text-amber-800',
+    bg: "bg-amber-100",
+    border: "border-amber-500",
+    text: "text-amber-800",
   },
   orange: {
-    bg: 'bg-orange-100',
-    border: 'border-orange-500',
-    text: 'text-orange-800',
+    bg: "bg-orange-100",
+    border: "border-orange-500",
+    text: "text-orange-800",
   },
-  red: { bg: 'bg-red-100', border: 'border-red-500', text: 'text-red-800' },
+  red: { bg: "bg-red-100", border: "border-red-500", text: "text-red-800" },
   purple: {
-    bg: 'bg-purple-100',
-    border: 'border-purple-500',
-    text: 'text-purple-800',
+    bg: "bg-purple-100",
+    border: "border-purple-500",
+    text: "text-purple-800",
   },
-  gray: { bg: 'bg-gray-100', border: 'border-gray-500', text: 'text-gray-800' },
+  gray: { bg: "bg-gray-100", border: "border-gray-500", text: "text-gray-800" },
   yellow: {
-    bg: 'bg-yellow-100',
-    border: 'border-yellow-500',
-    text: 'text-yellow-800',
+    bg: "bg-yellow-100",
+    border: "border-yellow-500",
+    text: "text-yellow-800",
   },
 };
 event_color_map = {};
@@ -62,24 +62,24 @@ fetch(`/api/events/${user_id}`)
     renderDesktopEvents(); // render events after loading
   })
   .catch((error) => {
-    console.error('Error loading events:', error);
+    console.error("Error loading events:", error);
   });
 
 // ── Time helpers
 // Converts a "HH:MM" string to total minutes from midnight.
 // Used to calculate event positions and durations on the grid
 function parseTime(timeStr) {
-  const [h, m] = timeStr.split(':').map(Number);
+  const [h, m] = timeStr.split(":").map(Number);
   return h * 60 + m;
 }
 
 // Converts a "HH:MM" 24h string to a readable label like "9:00 am" or "2:30 pm".
 // Used in the event card time display.
 function formatTime(timeStr) {
-  const [h, m] = timeStr.split(':').map(Number);
-  const period = h < 12 ? 'am' : 'pm';
+  const [h, m] = timeStr.split(":").map(Number);
+  const period = h < 12 ? "am" : "pm";
   const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+  return `${hour}:${String(m).padStart(2, "0")} ${period}`;
 }
 
 // Get a list of ISO date strings for Monday through Friday of the current week, adjusted by weekOffset.
@@ -102,8 +102,8 @@ function getWeekDates() {
     d.setDate(monday.getDate() + i);
     // Use local date parts to avoid UTC timezone shifting the date
     const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
     weekDates.push(`${year}-${month}-${day}`);
   }
   // console.log(weekDates); // Uncomment to see the generated week dates in the console
@@ -122,7 +122,7 @@ let events = [];
 // The card is positioned absolutely inside its host cell and sized to span
 // the correct number of rows based on the event duration.
 function buildEventCard(event, heightPx, id) {
-  event_class = event.title.split(',')[0].toLowerCase(); // get the first part of the title as the class (e.g. "CS 101, Lecture" → "cs 101")
+  event_class = event.title.split(",")[0].toLowerCase(); // get the first part of the title as the class (e.g. "CS 101, Lecture" → "cs 101")
   if (!event_color_map[event_class]) {
     // If this class doesn't have a color assigned yet, assign the next available color from COLOR_MAP
     const usedColors = new Set(Object.values(event_color_map));
@@ -130,13 +130,13 @@ function buildEventCard(event, heightPx, id) {
       // find the first color in COLOR_MAP that hasn't been used yet
       (color) => !usedColors.has(color),
     );
-    event_color_map[event_class] = availableColors[0] || 'gray'; // default to gray if we run out of colors, later we can do generating new colors
+    event_color_map[event_class] = availableColors[0] || "gray"; // default to gray if we run out of colors, later we can do generating new colors
   }
   const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`; // e.g. "9:00 am – 10:30 am"
 
   // The card sits inside the grid cell using absolute positioning.
   // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
-  const card = document.createElement('div');
+  const card = document.createElement("div");
   card.id = id;
   // If the event doesn't have a color, use the color mapped to its class. If it has an invalid color, default to gray.
   if (!event.color) {
@@ -144,38 +144,38 @@ function buildEventCard(event, heightPx, id) {
   } else if (event.color && COLOR_MAP[event.color]) {
     colors = COLOR_MAP[event.color];
   } else {
-    colors = COLOR_MAP['gray']; // default to gray if the event has an invalid color
+    colors = COLOR_MAP["gray"]; // default to gray if the event has an invalid color
   }
   card.className = [
-    'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
-    'cursor-pointer transition-shadow hover:shadow-md select-none z-10', // TODO: we should add some on hover info here in futre
+    "absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden",
+    "cursor-pointer transition-shadow hover:shadow-md select-none z-10", // TODO: we should add some on hover info here in futre
     colors.bg,
     colors.border,
-  ].join(' ');
+  ].join(" ");
   card.style.height = `${heightPx - 4}px`;
   // we can store the caluclated hight in a data attribute on the div so we can restore it on collapsed behvaiour later
   card.dataset.collapsedHeight = `${heightPx - 4}px`;
   // Store the collapsed height in a data attribute so we can restore it when collapsing  // Event title — always shown
-  const title = document.createElement('p');
+  const title = document.createElement("p");
   title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
   title.textContent = event.title;
   card.appendChild(title);
 
-  const time = document.createElement('p');
+  const time = document.createElement("p");
   time.className = `text-xs leading-tight px-1.5 ${colors.text} opacity-75`;
   time.textContent = timeLabel;
   card.appendChild(time);
   // Location - show only if card is big enough, or if the location is exceptionay large, requrie an even bigger card
   if ((heightPx >= 75 && event.location.length <= 50) || heightPx >= 100) {
-    const location = document.createElement('p');
+    const location = document.createElement("p");
     location.className = `text-xs leading-tight px-1.5 text-bold ${colors.text} opacity-75`;
     location.textContent = event.location;
     card.appendChild(location);
   }
 
   // Extra details — hidden until the card is expanded
-  const details = document.createElement('div');
-  details.className = 'event-details hidden flex mt-1 px-1.5 pb-1 ';
+  const details = document.createElement("div");
+  details.className = "event-details hidden flex mt-1 px-1.5 pb-1 ";
   details.innerHTML = `
     <p class="text-xs ${colors.text} opacity-60 font-mono">${event.description}</p>
 
@@ -185,9 +185,9 @@ function buildEventCard(event, heightPx, id) {
   // if the event has no ical_id, it means it was created by the user and can be edited/deleted
   if (event.ical_id === null) {
     // we add a little badge to the top right corner to indicate it is a custom event
-    const badge = document.createElement('span');
-    badge.className = 'inline-block w-2 h-2 bg-blue-500 rounded-full ml-2';
-    badge.title = 'User-created event';
+    const badge = document.createElement("span");
+    badge.className = "inline-block w-2 h-2 bg-blue-500 rounded-full ml-2";
+    badge.title = "User-created event";
     card.children[0].appendChild(badge);
 
     // delete + edit btns stacked vertically
@@ -201,52 +201,52 @@ function buildEventCard(event, heightPx, id) {
     </div>`;
   }
 
-  card.addEventListener('click', () => {
-    const isExpanded = card.classList.contains('expanded');
+  card.addEventListener("click", () => {
+    const isExpanded = card.classList.contains("expanded");
 
     if (isExpanded) {
       // Collapse: restore original size and position
-      card.classList.remove('expanded', 'shadow-lg', 'z-20');
-      card.classList.add('overflow-hidden');
+      card.classList.remove("expanded", "shadow-lg", "z-20");
+      card.classList.add("overflow-hidden");
       card.style.height = card.dataset.collapsedHeight;
       // reset any style tags
-      card.style.minHeight = '';
-      card.style.width = '';
-      card.style.left = card.dataset.overlapLeft ?? '';
-      card.style.right = '';
-      card.style.transform = '';
-      details.classList.add('hidden');
-      card.children[0].classList.remove('text-wrap');
+      card.style.minHeight = "";
+      card.style.width = "";
+      card.style.left = card.dataset.overlapLeft ?? "";
+      card.style.right = "";
+      card.style.transform = "";
+      details.classList.add("hidden");
+      card.children[0].classList.remove("text-wrap");
     } else {
       // Expand: auto height (but never shrink below collapsed size), fixed width anchored left or right based on column
-      card.classList.add('expanded', 'shadow-lg', 'z-20');
-      card.classList.remove('overflow-hidden');
+      card.classList.add("expanded", "shadow-lg", "z-20");
+      card.classList.remove("overflow-hidden");
       // Ensure the card doesn't shrink below its original height when expanding
       card.style.minHeight = card.dataset.collapsedHeight;
-      card.style.height = 'auto';
-      card.style.width = '280px';
-      card.children[0].classList.add('text-wrap');
+      card.style.height = "auto";
+      card.style.width = "280px";
+      card.children[0].classList.add("text-wrap");
       // Use the stored day index to determine expand direction:
       //   if it's in the right-side columns, we anchor to the right edge and expand leftward,
       //   if it's in the left-side columns,
       //   we anchor to the left edge and expand rightward.
-      const col = parseInt(card.dataset.col ?? '0');
+      const col = parseInt(card.dataset.col ?? "0");
       if (1 <= col && col <= 3) {
         // middle columns 1,2,3
         // middle column: expand centered form the middle, with some padding on both sides
-        card.style.left = '50%';
-        card.style.transform = 'translateX(-50%)';
-        card.style.right = '';
+        card.style.left = "50%";
+        card.style.transform = "translateX(-50%)";
+        card.style.right = "";
       } else if (col >= 3) {
         // right-side columns: expand leftward'
-        card.style.right = '2px';
-        card.style.left = 'auto';
+        card.style.right = "2px";
+        card.style.left = "auto";
       } else {
         // left-side columns: expand rightward
-        card.style.left = '2px';
-        card.style.right = 'auto';
+        card.style.left = "2px";
+        card.style.right = "auto";
       }
-      details.classList.remove('hidden');
+      details.classList.remove("hidden");
     }
   });
 
@@ -259,7 +259,7 @@ function buildEventCard(event, heightPx, id) {
 // and store it in a lookup map. Then for each event we find its cell and
 // inject an absolutely positioned card that spans the event's full duration.
 function renderDesktopEvents() {
-  const grid = document.getElementById('desktop-grid');
+  const grid = document.getElementById("desktop-grid");
 
   // Clear any previously rendered event cards before re-rendering
   grid.querySelectorAll('[id^="event-"]').forEach((item) => item.remove());
@@ -287,7 +287,7 @@ function renderDesktopEvents() {
 
   // Measure the height of one cell from the DOM so we can size cards correctly.
   // This automatically adapts to whichever CSS breakpoint is active.
-  const referenceCell = cellMap['0-0'];
+  const referenceCell = cellMap["0-0"];
   if (!referenceCell) return;
   const cellHeight = referenceCell.offsetHeight;
 
@@ -321,8 +321,8 @@ function renderDesktopEvents() {
     const cardHeight = durationHours * cellHeight;
 
     // Make the cell a positioning context so the absolute card sits inside it
-    cell.style.position = 'relative';
-    cell.style.overflow = 'visible'; // allow the card to overflow into rows below
+    cell.style.position = "relative";
+    cell.style.overflow = "visible"; // allow the card to overflow into rows below
 
     // Create and insert the event card into the cell
     card = buildEventCard(
@@ -359,35 +359,35 @@ function applyOverlapOffsets(placed_cards) {
         otherStillActiveAtStart
       );
     });
-    const offset = hasOverlapFromAbove ? '0.5rem' : '';
+    const offset = hasOverlapFromAbove ? "0.5rem" : "";
     card.style.left = offset;
     card.dataset.overlapLeft = offset; // persist so collapse can restore it
   });
 }
 
 // -- Add event form handler
-document.getElementById('add-event-form').addEventListener('submit', (e) => {
+document.getElementById("add-event-form").addEventListener("submit", (e) => {
   e.preventDefault();
   // Get form values
-  const title = document.getElementById('event-title').value;
-  const date = document.getElementById('event-date').value;
-  const start_time = document.getElementById('event-time-start').value;
-  const end_time = document.getElementById('event-time-end').value;
-  const location = document.getElementById('event-location').value;
-  const description = document.getElementById('event-description').value;
-  const user_id = document.getElementById('user-id').value;
-  const color = document.getElementById('event-color').value;
-  errorElement = document.getElementById('form-message');
+  const title = document.getElementById("event-title").value;
+  const date = document.getElementById("event-date").value;
+  const start_time = document.getElementById("event-time-start").value;
+  const end_time = document.getElementById("event-time-end").value;
+  const location = document.getElementById("event-location").value;
+  const description = document.getElementById("event-description").value;
+  const user_id = document.getElementById("user-id").value;
+  const color = document.getElementById("event-color").value;
+  errorElement = document.getElementById("form-message");
   // Basic validation
   if (!title || !date || !start_time || !end_time) {
-    errorElement.textContent = 'Please fill in all required fields.';
-    errorElement.classList.remove('hidden');
+    errorElement.textContent = "Please fill in all required fields.";
+    errorElement.classList.remove("hidden");
     return;
   }
   // end time must be after start time
   if (parseTime(end_time) <= parseTime(start_time)) {
-    errorElement.textContent = 'End time must be after start time.';
-    errorElement.classList.remove('hidden');
+    errorElement.textContent = "End time must be after start time.";
+    errorElement.classList.remove("hidden");
     return;
   }
 
@@ -404,61 +404,61 @@ document.getElementById('add-event-form').addEventListener('submit', (e) => {
   };
 
   // Send POST request to API to create the event
-  fetch('/api/events', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+  fetch("/api/events", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-CSRFToken": CSRF },
     body: JSON.stringify(newEvent),
   })
     .then((response) => {
       if (!response.ok) {
-        throw new Error('Failed to create event');
+        throw new Error("Failed to create event");
       }
-      console.log('Event created successfully');
+      console.log("Event created successfully");
       return response.json();
     })
     .then((createdEvent) => {
       // close the modal, reset form and render events
-      document.getElementById('add-event-form').reset();
+      document.getElementById("add-event-form").reset();
       selectColor(
-        document.querySelector('#color-picker-buttons button'),
-        'indigo',
+        document.querySelector("#color-picker-buttons button"),
+        "indigo",
       );
-      const dialog = document.querySelector('#drawer');
+      const dialog = document.querySelector("#drawer");
       dialog.close();
 
       events.push(createdEvent); // add the new event to our local list
       renderDesktopEvents(); // re-render the grid with the new event
     })
     .catch((error) => {
-      console.error('Error creating event:', error);
-      errorElement.textContent = 'Error creating event. Please try again.';
-      errorElement.classList.remove('hidden');
-      console.error('Error creating event:', error);
+      console.error("Error creating event:", error);
+      errorElement.textContent = "Error creating event. Please try again.";
+      errorElement.classList.remove("hidden");
+      console.error("Error creating event:", error);
     });
 });
 
 // When the user clicks a color button in the add event form, we update the hidden input value and add a ring around the selected button.
 function selectColor(btn, color) {
   // expects the button element and the color name as defined in COLOR_MAP (e.g. "indigo", "red", etc.)
-  document.getElementById('event-color').value = color;
+  document.getElementById("event-color").value = color;
   // Remove the ring from all buttons, then add it to the selected button
-  document.querySelectorAll('#color-picker-buttons button').forEach((b) => {
-    b.classList.remove('ring-2', 'ring-offset-2', 'ring-black');
+  document.querySelectorAll("#color-picker-buttons button").forEach((b) => {
+    b.classList.remove("ring-2", "ring-offset-2", "ring-black");
   });
-  btn.classList.add('ring-2', 'ring-offset-2', 'ring-black');
+  btn.classList.add("ring-2", "ring-offset-2", "ring-black");
 }
 
 // Same as selectColor but for the edit event form, we update the hidden input value and add a ring around the selected button.
 function editColor(btn, color) {
   // expects the button element and the color name as defined in COLOR_MAP (e.g. "indigo", "red", etc.)
-  document.getElementById('edit-event-color').value = color;
+  document.getElementById("edit-event-color").value = color;
   // Remove the ring from all buttons, then add it to the selected button
   document
-    .querySelectorAll('#edit-color-picker-buttons button')
+    .querySelectorAll("#edit-color-picker-buttons button")
     .forEach((b) => {
-      b.classList.remove('ring-2', 'ring-offset-2', 'ring-black');
+      b.classList.remove("ring-2", "ring-offset-2", "ring-black");
     });
-  btn.classList.add('ring-2', 'ring-offset-2', 'ring-black');
+  btn.classList.add("ring-2", "ring-offset-2", "ring-black");
 }
 
 // -- Custom Event Action Handlers
@@ -469,10 +469,10 @@ let pendingDeleteId = null;
 // If they confirm, we send a DELETE request to the API and remove the event from our local list and re-render.
 function deleteEvent(eventId) {
   pendingDeleteId = eventId;
-  document.getElementById('delete-confirmation').showModal();
+  document.getElementById("delete-confirmation").showModal();
 }
 
-document.getElementById('confirm-delete-btn').addEventListener('click', () => {
+document.getElementById("confirm-delete-btn").addEventListener("click", () => {
   // If there's no pending delete ID for some reason, just return early
   if (pendingDeleteId === null) return;
   const id = pendingDeleteId;
@@ -480,18 +480,18 @@ document.getElementById('confirm-delete-btn').addEventListener('click', () => {
 
   // Send DELETE request to the API to delete the event
   fetch(`/api/events/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
     headers: {
-      'X-CSRFToken': CSRF,
+      "X-CSRFToken": CSRF,
     },
   })
     .then((response) => {
-      if (!response.ok) throw new Error('Failed to delete');
+      if (!response.ok) throw new Error("Failed to delete");
       // On success, remove the event from our local list and re-render
       events.pop(events.findIndex((e) => e.id === id));
       renderDesktopEvents();
     })
-    .catch((err) => console.error('Error deleting event:', err));
+    .catch((err) => console.error("Error deleting event:", err));
 });
 
 // Edit Buton
@@ -502,15 +502,15 @@ function editEvent(eventId) {
   // Open the edit modal and pre-fill the form with the event's current details
   const event = events.find((e) => e.id === eventId);
   if (!event) return;
-  console.log('Editing event:', event);
-  document.getElementById('edit-event-modal').showModal();
-  document.getElementById('edit-event-title').value = event.title;
-  document.getElementById('edit-event-description').value = event.description;
-  document.getElementById('edit-event-date').value = event.date;
-  document.getElementById('edit-event-time-start').value = event.startTime;
-  document.getElementById('edit-event-time-end').value = event.endTime;
-  document.getElementById('edit-event-location').value = event.location || '';
-  document.getElementById('edit-user-id').value = event.user_id;
+  console.log("Editing event:", event);
+  document.getElementById("edit-event-modal").showModal();
+  document.getElementById("edit-event-title").value = event.title;
+  document.getElementById("edit-event-description").value = event.description;
+  document.getElementById("edit-event-date").value = event.date;
+  document.getElementById("edit-event-time-start").value = event.startTime;
+  document.getElementById("edit-event-time-end").value = event.endTime;
+  document.getElementById("edit-event-location").value = event.location || "";
+  document.getElementById("edit-user-id").value = event.user_id;
   selectColor(
     document.querySelector(
       `#edit-color-picker-buttons #${event.color}-color-btn`,
@@ -518,36 +518,36 @@ function editEvent(eventId) {
     event.color,
   );
   // When the user submits the edit form, we gather the updated details and send a PUT request to the API
-  document.getElementById('save-edit-btn').onclick = (e) => {
-    document.getElementById('edit-event-modal').close();
+  document.getElementById("save-edit-btn").onclick = (e) => {
+    document.getElementById("edit-event-modal").close();
     // We prevent the default form submission behavior
     e.preventDefault();
     // We gather the updated event details from the form inputs as JSON
     const updatedEvent = {
-      title: document.getElementById('edit-event-title').value,
-      description: document.getElementById('edit-event-description').value,
-      date: document.getElementById('edit-event-date').value,
-      start_time: document.getElementById('edit-event-time-start').value,
-      end_time: document.getElementById('edit-event-time-end').value,
-      location: document.getElementById('edit-event-location').value,
-      user_id: document.getElementById('edit-user-id').value,
-      color: document.getElementById('edit-event-color').value,
+      title: document.getElementById("edit-event-title").value,
+      description: document.getElementById("edit-event-description").value,
+      date: document.getElementById("edit-event-date").value,
+      start_time: document.getElementById("edit-event-time-start").value,
+      end_time: document.getElementById("edit-event-time-end").value,
+      location: document.getElementById("edit-event-location").value,
+      user_id: document.getElementById("edit-user-id").value,
+      color: document.getElementById("edit-event-color").value,
     };
     // We send a PUT request to the API to update the event with the new details
     fetch(`/api/events/${eventId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": CSRF },
       body: JSON.stringify(updatedEvent),
     })
       .then((response) => {
-        if (!response.ok) throw new Error('Failed to update event');
+        if (!response.ok) throw new Error("Failed to update event");
         // On success, update the event in our local list and re-render
         const index = events.findIndex((e) => e.id === eventId);
         // We merge the updated details into the existing event object to preserve any unchanged fields (like ical_id)
         events[index] = { ...events[index], ...updatedEvent };
         renderDesktopEvents();
       })
-      .catch((err) => console.error('Error updating event:', err));
+      .catch((err) => console.error("Error updating event:", err));
   };
 }
 
@@ -561,22 +561,22 @@ function setCalendarDates() {
   const now = new Date(); // real current date, for the title and today-highlight
 
   // Indexed by getDay(): 0=Sun, 1=Mon, …, 6=Sat
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   // Mon–Fri labels for the five column headers (getDay() 1–5)
   const weekdayNames = dayNames.slice(1, 6);
 
   // Update the "Today, Day Month Date" title at the top of the page
-  const titleElement = document.getElementById('calendar-title');
+  const titleElement = document.getElementById("calendar-title");
 
   // Helper function to format a date as "Day Month Date" with customizable month style
   const fmt = (date, monthStyle) =>
     // e.g. "Wednesday March 11" or "Wed Mar 11"
-    `${dayNames[date.getDay()]} ${date.toLocaleString('default', { month: monthStyle })} ${date.getDate()}`;
+    `${dayNames[date.getDay()]} ${date.toLocaleString("default", { month: monthStyle })} ${date.getDate()}`;
 
   // Shorter format for column headers, e.g. "Mar 11"
   const fmtShort = (date) =>
     // e.g. "Mar 11"
-    `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`;
+    `${date.toLocaleString("default", { month: "short" })} ${date.getDate()}`;
 
   // Helper to get a date offset by a certain number of days
   // from toda. used for the title when showing last/next week
@@ -589,13 +589,13 @@ function setCalendarDates() {
   // Show relative week label for ±1 week, or a date range for anything further
   if (weekOffset === 0) {
     // if on the current week, show "Today, Month D"
-    titleElement.textContent = `Today, ${fmt(now, 'long')}`;
+    titleElement.textContent = `Today, ${fmt(now, "long")}`;
   } else if (weekOffset === -1) {
     // if on the previous week, show "Last Week, Mon D"
-    titleElement.textContent = `Last Week, ${fmt(offsetDate(-7), 'long')}`;
+    titleElement.textContent = `Last Week, ${fmt(offsetDate(-7), "long")}`;
   } else if (weekOffset === 1) {
     // if on the next week, show "Next Week, Mon D"
-    titleElement.textContent = `Next Week, ${fmt(offsetDate(7), 'long')}`;
+    titleElement.textContent = `Next Week, ${fmt(offsetDate(7), "long")}`;
   } else {
     // if on any other week, show a date range like "Mar 1 - Mar 5"
     const weekDates = getWeekDates();
@@ -611,10 +611,10 @@ function setCalendarDates() {
     const columnElement = document.getElementById(`date-col-${i}`);
     if (columnElement) {
       columnElement.textContent = `${weekdayNames[i]} ${columnDate.getDate()}`;
-      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
       const isToday = dateStr === todayStr;
-      columnElement.classList.toggle('text-indigo-600', isToday);
-      columnElement.classList.toggle('text-gray-900', !isToday);
+      columnElement.classList.toggle("text-indigo-600", isToday);
+      columnElement.classList.toggle("text-gray-900", !isToday);
     }
   });
 }
@@ -624,27 +624,27 @@ function setCalendarDates() {
 function updateTodayButton() {
   // Hide the "Today" button if we're already on the current week, show it otherwise
   if (weekOffset === 0) {
-    document.getElementById('btn-today').classList.add('hidden');
+    document.getElementById("btn-today").classList.add("hidden");
   } else {
-    document.getElementById('btn-today').classList.remove('hidden');
+    document.getElementById("btn-today").classList.remove("hidden");
   }
 }
 
-document.getElementById('btn-last-week').addEventListener('click', () => {
+document.getElementById("btn-last-week").addEventListener("click", () => {
   weekOffset--;
   setCalendarDates();
   renderDesktopEvents();
   updateTodayButton();
 });
 
-document.getElementById('btn-today').addEventListener('click', () => {
+document.getElementById("btn-today").addEventListener("click", () => {
   weekOffset = 0;
   setCalendarDates();
   renderDesktopEvents();
   updateTodayButton();
 });
 
-document.getElementById('btn-next-week').addEventListener('click', () => {
+document.getElementById("btn-next-week").addEventListener("click", () => {
   weekOffset++;
   setCalendarDates();
   renderDesktopEvents();
