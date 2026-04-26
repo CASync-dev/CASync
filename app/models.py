@@ -74,3 +74,20 @@ class Calendar(db.Model):
 
     def __repr__(self):
         return f'<Calendar {self.ical_url}>'
+    
+# Holds groups | We'll use another table to hold user_ids.
+class Groups(db.Model):
+    __tablename__ = 'groups'
+
+    id         = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    group_name = db.Column(db.String(500), nullable=False)
+    # Need to hold list of user_ids...
+
+    def __repr(self):
+        return f'<Group {self.group_name}>'
+
+# Table to hold list of user ids for 
+class GroupList(db.Model):
+    user_id   = db.Column(db.Integer, db.ForeignKey('users.id'), nullable = False)
+    group_id  = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable = False)
+    
