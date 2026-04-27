@@ -13,7 +13,7 @@
       Create Group
     </button>
   </div>
-  <section class = "mt-6">
+  <div class = "mt-6">
     <ul> <!-- FFilter through groups table to find group with current user in done in app pkg?-->
         {% for group in groups %}
       <li
@@ -22,11 +22,12 @@
         <div class="flex items-center">
             <div class="ml-4">
               <p class="text-sm font-medium text-white">{{ group.group_name }}</p>
+              <i class="fas fa-calendar-alt"></i>
+              Schedule
         </div>
       </li>
         {% endfor %}
     </ul>
-    <!-- Here would be where the list of groups would be shown -->
-  </section>
+  </div>
 </div>
 {% endblock %}
