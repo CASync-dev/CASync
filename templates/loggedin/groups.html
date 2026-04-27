@@ -1,5 +1,6 @@
 {% extends "loggedin/layout.html" %} 
 {% block content %}
+<!-- TODO: Add dialog to add friends to group -->
 <div
   class="mx-4 2xl:max-w-7xl 2xl:mx-auto px-4 bg-primary py-8 mt-6 rounded-xl"
 >
@@ -66,7 +67,7 @@
               <button
                 type="button"
                 class="btn-plain cursor-pointer shrink-0 rounded-md border border-transparent bg-primary px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                onclick = "alert('Not Finished!')"
+                onclick = "return loadselectfriends()"
               >
               <i class="fa-solid fa-angle-right" style="color: rgb(255, 255, 255);"></i>
               </button>
@@ -86,12 +87,23 @@
     </div>
   </div>
 </dialog>
+<dialog
+  id = "select-friends"
+  class="fixed mx-auto size-auto max-h-none max-w-none overflow-y-auto sm:my-8 sm:w-full sm:max-w-2xl bg-transparent backdrop:bg-gray-900/50 backdrop:backdrop-blur-sm"
+>
+
+
+</dialog>
 <script>
   function loadcreategroup() {
     const x = document.getElementById("create-group");
     x.showModal();
   }
   function closeloadcreategroup() {
+    const x = document.getElementById("create-group");
+    x.close();
+  }
+  function loadselectfriends(){
     const x = document.getElementById("create-group");
     x.close();
   }
