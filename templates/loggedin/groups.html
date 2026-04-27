@@ -1,13 +1,32 @@
-{% extends "loggedin/layout.html" %} {% block content %}
-<div class="max-w-2xl mx-auto p-8">
-  <h1
-    id="settings-title"
-    class="text-2xl font-bold text-gray-900 mb-8 select-none"
-  >
-    Groups
-  </h1>
+{% extends "loggedin/layout.html" %} 
+{% block content %}
+<div
+  class="mx-4 2xl:max-w-7xl 2xl:mx-auto px-4 bg-primary py-8 mt-6 rounded-xl"
+>
+  <!-- top bar -->
+  <div class="flex items-center pb-3 border-b border-gray-300">
+    <h1 class="text-3xl font-bold text-white">Groups</h1>
+    <button
+      class="btn-white px-4 ml-auto mr-2 h-10 whitespace-nowrap"
+      onclick="alert('Group creation not implemented yet')"
+    >
+      Create Group
+    </button>
+  </div>
+  <section class = "mt-6">
+    <ul> <!-- FFilter through groups table to find group with current user in done in app pkg?-->
+        {% for group in groups %}
+      <li
+        class="py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200"
+      >
+        <div class="flex items-center">
+            <div class="ml-4">
+              <p class="text-sm font-medium text-white">{{ group.group_name }}</p>
+        </div>
+      </li>
+        {% endfor %}
+    </ul>
+    <!-- Here would be where the list of groups would be shown -->
+  </section>
 </div>
-<section>
-  <!-- Here would be where the list of groups would be shown -->
-</section>
 {% endblock %}
