@@ -88,6 +88,9 @@ class Groups(db.Model):
 
 # Table to hold list of user ids for 
 class GroupList(db.Model):
+    __tablename__ = 'grouplist'
+
+    index     = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id   = db.Column(db.Integer, db.ForeignKey('users.id'), nullable = False)
     group_id  = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable = False)
     
