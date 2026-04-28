@@ -81,6 +81,8 @@ def api_eventslist():
 @api_events.route("/api/events/me")
 def api_events_range():
     """
+    Accepts a start and end date as query parameters as:
+    GET /api/events/me?start=2026-04-21&end=2026-04-25  
     Returns all events for the current user in the specified date range, used for loading events onto the calendar in a single request'
     response has the format:
     {
@@ -177,7 +179,7 @@ def api_delete_event(event_id):
     return jsonify({"message": "Event deleted"}), 200
 
 # API route to edit an event - accepts a PUT request with the event id in the url and the updated event details in the body, and updates the event in the database
-@api_events.route("/api/events/<int:event_id>", methods=["PUT"])
+@api_events.route("/api/events/<int:event_id>", methods=["PUT", "GET"])
 @login_required
 def api_edit_event(event_id):
     event = Event.query.get(event_id)

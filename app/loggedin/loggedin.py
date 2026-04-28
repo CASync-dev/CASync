@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Blueprint, render_template, flash
 from flask_login import current_user, login_required
 from app.form import EventForm, IcalImportForm
@@ -17,7 +17,7 @@ def dash():
 @login_required
 def schedule():
     now = datetime.now()
-    return render_template("loggedin/schedule.html", now=now)
+    return render_template("loggedin/schedule.html", now=now, timedelta=timedelta)
 
 
 @loggedin.route("/groups")
