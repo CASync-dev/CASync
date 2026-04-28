@@ -5,7 +5,7 @@ A component is a reusable piece of code that can be used to create a specific UI
 -->
 <!-- Accepts:
 - days: an array of day names (e.g. ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
-- timeRange: a range of time in 24 hour digits (e.g. '8, 18' for 8am to 6pm)
+- timeRange: a range of time in 24 hour digits (e.g. 8, 18 for 8am to 6pm)
 - includeNav: a boolean that determines whether to include navigation buttons for switching between weeks
 - allowEventCreation: a boolean that determines whether to include a "New Event" button that opens the event creation drawer
 - eventUrl: an array of event objects with the following properties:
@@ -30,7 +30,9 @@ The general flow of it is:
   - Fetch events from the server and render them onto the calendar in the correct positions
   - Handle week navigation by updating the header and re-rendering events for the new week
 -->
-{% macro calendarBlock(days, timeRange, eventsUrl, allowEventCreation=false) -%}
+
+{% macro calendarBlock(days, eventsUrl, timeRange=(8, 18),
+allowEventCreation=false) -%}
 <div class="w-full max-w-7xl mx-auto px-6 lg:px-8">
   <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
   <div class="sticky top-0 z-20 bg-stone-50">
@@ -115,7 +117,7 @@ The general flow of it is:
       <!-- Grid structure: 6 columns (time + 5 weekdays), multiple rows for time slots -->
       <!-- Time range: 07:00 am to 06:00 pm -->
       <div id="desktop-grid" class="grid grid-cols-6 min-w-150">
-        {% for hour in timeRange %}
+        {% for hour in range(timeRange[0], timeRange[1]) %}
         <div
           class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
         >
@@ -148,7 +150,7 @@ The general flow of it is:
 
     // Grid Constants: these are parsed from the macro args
     const GRID_START_HOUR = {{ timeRange[0] }}; // the grid start (7am = 7)
-    const GRID_TOTAL_SLOTS = {{ timeRange|length }}; // total number of hour slots in the grid (7am-6pm = 11)
+    const GRID_TOTAL_SLOTS = {{ timeRange[1] - timeRange[0] }}; // total number of hour slots in the grid (7am-6pm = 11)
 
     // ── Color themes
     // Each event has a color. This maps that name to the three
@@ -271,13 +273,14 @@ The general flow of it is:
         }
       });
     }
-
-    fetch('/api/events')
+    // TODO: we will add a listener to requst more data if we are outside of the range
+    // safe makes jinja render the string without escaping characters, which is important for the api url since it has query parameters
+    apiUrl = "{{ eventsUrl | safe }}";
+    fetch(apiUrl)
       .then((response) => response.json())
       .then((data) => {
         events = data;
         renderDesktopEvents(); // render events after loading
-        console.log(events); // Log the event data to the console
       })
       .catch((error) => {
         console.error('Error loading events:', error);
@@ -752,5 +755,35 @@ The general flow of it is:
 
     setCalendarDates();
     updateTodayButton();
+
+    // Event listners to listen to the event mutaion features on schedule.html
+    document.addEventListener('calendar:event-created', (event) => {
+      const newEvent = event.detail;
+      const userId = String(newEvent.user_id);
+      if (!events[userId]) events[userId] = { events: {} };
+      events[userId].events[String(newEvent.id)] = newEvent;
+      renderDesktopEvents();
+    });
+
+    document.addEventListener('calendar:event-updated', (event) => {
+      const updatedEvent = event.detail;
+      const userId = String(updatedEvent.user_id);
+      const key = Object.keys(events[userId]?.events ?? {}).find(
+        k => events[userId].events[k].id === updatedEvent.id
+      );
+      if (key) events[userId].events[key] = updatedEvent;
+      renderDesktopEvents();
+    });
+
+    document.addEventListener('calendar:event-deleted', (event) => {
+      const deletedId = event.detail.id;
+      for (const userId of Object.keys(events)) {
+        const key = Object.keys(events[userId].events).find(
+          k => events[userId].events[k].id === deletedId
+        );
+        if (key) { delete events[userId].events[key]; break; }
+      }
+      renderDesktopEvents();
+    });
 </script>
 {%- endmacro %}

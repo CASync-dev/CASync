@@ -179,7 +179,7 @@ def api_delete_event(event_id):
     return jsonify({"message": "Event deleted"}), 200
 
 # API route to edit an event - accepts a PUT request with the event id in the url and the updated event details in the body, and updates the event in the database
-@api_events.route("/api/events/<int:event_id>", methods=["PUT"])
+@api_events.route("/api/events/<int:event_id>", methods=["PUT", "GET"])
 @login_required
 def api_edit_event(event_id):
     event = Event.query.get(event_id)
