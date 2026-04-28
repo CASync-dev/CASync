@@ -606,7 +606,7 @@ A component is a reusable piece of code that can be used to create a specific UI
       .map((event, i) => placeEvent(event, cellMap, weekDates, cellHeight, i))
       .filter(Boolean); // remove null (events outside visible range)
 
-    // Multi-events have already absorbed their overlapping siblings, so skip them for offset logic
+    // Multi-events are already grouped and dont need overlap.
     applyOverlapOffsets(placed.filter(p => !p.isMulti));
   }
 
@@ -614,42 +614,61 @@ A component is a reusable piece of code that can be used to create a specific UI
   // Cards sharing any overlapping time in the same day are grouped together.
   // Each card in a group of N gets an equal width slice: left and right are set as percentages.
   function applyOverlapOffsets(placed_cards) {
-    const visited = new Set();
+    function overlaps(a, b) {
+      // We check if a starts before b ends and ends after b starts.
+      return a.dayIndex === b.dayIndex
+        && a.startMinutes < b.endMinutes
+        && a.endMinutes > b.startMinutes;
+    }
 
-    placed_cards.forEach((placement) => {
-      if (visited.has(placement)) return;
-
-      // Grow a group by repeatedly pulling in any unvisited card that overlaps any member of the current group
-      const group = [placement];
-      visited.add(placement);
+    function buildGroup(firstCard, visited) {
+      // Build a group of all cards that overlap with the firstCard, directly or indirectly.
+      // firstCard is the first card we provide the function and roots the group of overlapping cards
+      // visited is a set of cards we've already included in a group, so we don't process them again. It is passed by reference and updated in place.
+      const group = [firstCard];
+      visited.add(firstCard);
       let changed = true;
       while (changed) {
         changed = false;
-        placed_cards.forEach((other) => {
-          if (visited.has(other)) return;
-          const overlapsGroup = group.some((g) => {
-            const sameDay = g.dayIndex === other.dayIndex;
-            const timesOverlap = g.startMinutes < other.endMinutes && g.endMinutes > other.startMinutes;
-            return sameDay && timesOverlap;
-          });
-          if (overlapsGroup) { group.push(other); visited.add(other); changed = true; }
-        });
+        for (const other of placed_cards) {
+          if (visited.has(other)) continue;
+          if (group.some(g => overlaps(g, other))) {
+            group.push(other);
+            visited.add(other);
+            changed = true;
+          }
+        }
       }
+      return group;
+    }
 
-      if (group.length === 1) return; // solo — leave at full width
-
-      // Sort left-to-right by start time and assign each card an equal column slot
-      group.sort((a, b) => a.startMinutes - b.startMinutes);
+    function assignColumns(group) {
+      group.sort(function(a, b) { return a.startMinutes - b.startMinutes; });
       const slotWidth = 100 / group.length;
-      group.forEach(({ card }, i) => {
-        const left = `${i * slotWidth}%`;
+      for (let i = 0; i < group.length; i++) {
+        // For each card in the group (a set of overlapping cards), we assign it custom css.
+        const card = group[i].card;
+        // The width is determined by the number of cards in the group (e.g. 2 cards → each gets 50% width, 3 cards → each gets ~33.3% width, etc).
+        const left  = `${i * slotWidth}%`;
         const right = `${100 - (i + 1) * slotWidth}%`;
-        card.style.left = left;
+        // we set the style
+        card.style.left  = left;
         card.style.right = right;
-        card.dataset.overlapLeft = left;   // persist so collapse can restore position
+        // we store the value in a data attrubte to return to normal size after expand
+        card.dataset.overlapLeft  = left;
         card.dataset.overlapRight = right;
-      });
-    });
+      }
+    }
+
+    // initialise a set that keeps track of which cards have ended up in a group
+    const visited = new Set();
+    // we go through every card, if theres overlapp it will be added to th set and a group fro its overlap
+    // then its width is based on how many cards are in its group
+    for (const placement of placed_cards) {
+      if (visited.has(placement)) continue;
+      const group = buildGroup(placement, visited);
+      if (group.length > 1) assignColumns(group);
+    }
   }
 
   function updateTodayButton() {
