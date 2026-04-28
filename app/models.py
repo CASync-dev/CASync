@@ -12,13 +12,6 @@ def load_user(user_id):
 
 class Base(DeclarativeBase):
     pass
-# Association table for Many-Many relationship between User and Groups
-user_group_association = Table(
-    "user_group_association",
-    Base.metadata,
-    db.Column("user_id", ForeignKey("users.id"), primary_key=True),
-    db.Column("group_id", ForeignKey("groups.id"), primary_key=True)
-)
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -31,7 +24,6 @@ class User(UserMixin, db.Model):
 
     events = db.relationship('Event', backref='owner', lazy='dynamic')
     # Many to many relationship with groups
-    groups = db.relationship("Groups", secondary = user_group_association, back_populates = "user_ids")
 
 
     @property
@@ -108,15 +100,24 @@ class Calendar(db.Model):
         return f'<Calendar {self.ical_url}>'
     
 # Holds groups | We'll use another table to hold user_ids.
-class Groups(db.Model):
-    __tablename__ = 'groups'
+class Group(db.Model):
+    __tablename__ = 'group'
 
     id         = db.Column(db.Integer, primary_key=True, autoincrement=True)
     group_name = db.Column(db.String(500), nullable=False)
     # Need to hold list of user_ids...
     # Many to many relationship with users
-    user_ids   = db.relationship("User", secondary = user_group_association, back_populates = "groups")
 
     def __repr__(self):
         return f'<Group {self.group_name}>'
 
+# Association table for Many-Many relationship between User and Groups
+user_group_association = db.Table(
+    "user_group_association",
+    Base.metadata,
+    db.Column('user_id', ForeignKey(User.id), primary_key=True),
+    db.Column('group_id', ForeignKey(Group.id), primary_key=True)
+)
+
+User.groups = db.relationship("Group", secondary = user_group_association, back_populates = "user_ids")
+Group.user_ids   = db.relationship("User", secondary = user_group_association, back_populates = "groups")
