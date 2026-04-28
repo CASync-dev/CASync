@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from app import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import Table, ForeignKey
+from sqlalchemy import Column, Table, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, relationship
 from . import login_manager
 
@@ -31,7 +31,7 @@ class User(UserMixin, db.Model):
 
     events = db.relationship('Event', backref='owner', lazy='dynamic')
     # Many to many relationship with groups
-    groups = db.relationship(secondary = user_group_association, back_populates = "user_ids")
+    groups = db.relationship("Groups", secondary = user_group_association, back_populates = "user_ids")
 
 
     @property
@@ -115,7 +115,7 @@ class Groups(db.Model):
     group_name = db.Column(db.String(500), nullable=False)
     # Need to hold list of user_ids...
     # Many to many relationship with users
-    user_ids   = db.relationship(secondary = user_group_association, back_populates = "groups")
+    user_ids   = db.relationship("User", secondary = user_group_association, back_populates = "groups")
 
     def __repr__(self):
         return f'<Group {self.group_name}>'
