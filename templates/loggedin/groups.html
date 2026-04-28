@@ -203,13 +203,19 @@
   }
 
   function added(button) {
-    alert("Hopefully I show lmao");
-    if (button.innerText = '+') {
+    if (button.innerHTML == '+') {
       button.innerHTML = '-';
-    }
-    else {
-      button.innerText = '+';
-    }
+      button.classList.add('bg-red-600');
+      button.classList.add('hover:bg-red-800');
+      button.classList.remove('bg-primary');
+      button.classList.remove('hover:bg-blue-800');
+      return
+      }
+    button.innerHTML = '+';
+    button.classList.add('bg-primary');
+    button.classList.add('hover:bg-blue-800');
+    button.classList.remove('bg-red-600');
+    button.classList.remove('hover:bg-red-800');
   }
 </script>
 {% endblock %}
