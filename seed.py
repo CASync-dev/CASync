@@ -20,11 +20,12 @@ with app.app_context():
         exit(0)
 
     # Create the test users
+    DEFAULT_PASSWORD = 'password123'
     users = []
-    liam = User(username='liam', email='24083063@student.uwa.edu.au')
-    sze = User(username='sze', email='24214052@student.uwa.edu.au')
-    kelly = User(username='kelly', email='24540356@student.uwa.edu.au')
-    tehei = User(username='tehei', email='24467332@student.uwa.edu.au')
+    liam = User(username='liam', email='24083063@student.uwa.edu.au', password=DEFAULT_PASSWORD)
+    sze = User(username='sze', email='24214052@student.uwa.edu.au', password=DEFAULT_PASSWORD)
+    kelly = User(username='kelly', email='24540356@student.uwa.edu.au', password=DEFAULT_PASSWORD)
+    tehei = User(username='tehei', email='24467332@student.uwa.edu.au', password=DEFAULT_PASSWORD)
     users.extend([liam, sze, kelly, tehei])
     for user in users:
         db.session.add(user)
