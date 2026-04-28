@@ -2,11 +2,23 @@ from datetime import datetime, timezone
 from app import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import Table, ForeignKey
+from sqlalchemy.orm import DeclarativeBase, relationship
 from . import login_manager
 
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
+
+class Base(DeclarativeBase):
+    pass
+# Association table for Many-Many relationship between User and Groups
+user_group_association = Table(
+    "user_group_association",
+    Base.metadata,
+    db.Column("user_id", ForeignKey("users.id"), primary_key=True),
+    db.Column("group_id", ForeignKey("groups.id"), primary_key=True)
+)
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -18,6 +30,9 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))  # lambda so it's evaluated at insert time, not class definition
 
     events = db.relationship('Event', backref='owner', lazy='dynamic')
+    # Many to many relationship with groups
+    groups = db.relationship(secondary = user_group_association, back_populates = "user_ids")
+
 
     @property
     def password(self):
@@ -99,15 +114,9 @@ class Groups(db.Model):
     id         = db.Column(db.Integer, primary_key=True, autoincrement=True)
     group_name = db.Column(db.String(500), nullable=False)
     # Need to hold list of user_ids...
+    # Many to many relationship with users
+    user_ids   = db.relationship(secondary = user_group_association, back_populates = "groups")
 
-    def __repr(self):
+    def __repr__(self):
         return f'<Group {self.group_name}>'
 
-# Table to hold list of user ids for 
-class GroupList(db.Model):
-    __tablename__ = 'grouplist'
-
-    index     = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id   = db.Column(db.Integer, db.ForeignKey('users.id'), nullable = False)
-    group_id  = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable = False)
-    
