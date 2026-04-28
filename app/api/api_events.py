@@ -81,6 +81,8 @@ def api_eventslist():
 @api_events.route("/api/events/me")
 def api_events_range():
     """
+    Accepts a start and end date as query parameters as:
+    GET /api/events/me?start=2026-04-21&end=2026-04-25  
     Returns all events for the current user in the specified date range, used for loading events onto the calendar in a single request'
     response has the format:
     {
