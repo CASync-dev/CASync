@@ -6,9 +6,11 @@
   >
     <form
       id="login"
-      novalidate="novalidate"
+      method="POST"
+      action="{{ url_for('loggedout.login') }}"
       class="bg-primary p-6 m-6 border-8 rounded-3xl border-primary drop-shadow-2xl shadow"
     >
+      {{ form.hidden_tag() }}
       <div>
         <a
           href="{{ url_for('loggedout.home') }}"
@@ -20,35 +22,30 @@
         <br />
       </div>
       <div>
-        <label for="user" class="text-left text-nearwhite">Username:</label>
+        <label for="username" class="text-left text-nearwhite">Username:</label>
         <br />
         <input
-          id="user"
-          name="user"
+          id="username"
+          name="username"
           type="text"
           autocomplete="username"
           aria-required="true"
-          aria-invalid="false"
           autofocus="autofocus"
           size="30"
-          name="user"
           class="border bg-nearwhite"
         />
         <br />
         <br />
         <br />
-        <label for="pw" class="text-left text-nearwhite">Password:</label>
+        <label for="password" class="text-left text-nearwhite">Password:</label>
         <br />
         <input
-          id="pw"
-          name="pw"
+          id="password"
+          name="password"
           type="password"
           autocomplete="current-password"
           aria-required="true"
-          aria-invalid="false"
-          autofocus="autofocus"
           size="30"
-          name="pw"
           required
           class="border bg-nearwhite"
         />
@@ -57,12 +54,17 @@
         <input type="checkbox" id="rme" name="rme" />
         <label for="rme" class="text-nearwhite"> Remember me </label>
         <br />
-        <span id="field-error"> </span>
+        {% with messages = get_flashed_messages(with_categories=true) %} {% for
+        category, message in messages %}
+        <p class="text-green-400 text-sm mt-1">{{ message }}</p>
+        {% endfor %} {% endwith %} {% if form.errors %} {% for field, errors in
+        form.errors.items() %} {% for error in errors %}
+        <p class="text-red-400 text-sm mt-1">{{ error }}</p>
+        {% endfor %} {% endfor %} {% endif %}
         <br />
         <button id="log" type="submit" class="button cursor-pointer btn-white">
           Continue
         </button>
-
         <br />
         <h5 class="text-nearwhite text-xs pt-5">
           Not a member yet? Register

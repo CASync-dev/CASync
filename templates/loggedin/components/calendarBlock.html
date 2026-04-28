@@ -1,0 +1,789 @@
+<!-- If you have heard of or used js frameowkrs like vue, they have a concept called a component. 
+A component is a reusable piece of code that can be used to create a specific UI element or functionality.
+ In this case, I am creating a calendar block component that can be used to display a calendar with a specific
+  number of days and time range. It will also accept an events block and render dyanicly based on the number of events
+-->
+<!-- Accepts:
+- days: an array of day names (e.g. ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
+- timeRange: a range of time in 24 hour digits (e.g. 8, 18 for 8am to 6pm)
+- includeNav: a boolean that determines whether to include navigation buttons for switching between weeks
+- allowEventCreation: a boolean that determines whether to include a "New Event" button that opens the event creation drawer
+- eventUrl: an array of event objects with the following properties:
+  - title: the name of the event
+  - start: the start time of the event
+  - end: the end time of the event
+
+  Parsing Events:
+  See the format defined in the api_events.py file for how the events are structured when fetched from the server.
+  The api will always repond with json in the format {user_id: {events: {event_id: event_data}}}, so the component 
+  will need to extract the events for the current user and render them on the calendar.
+  This way we know weather or not to render the calendar in singel user mode (just show the current user's events) 
+  or multi-user mode (show events for all friends, color coded by user).
+  -->
+
+<!--
+This is growing to become a bit of a monster but i think its better to have one big monster over lots of specific little ones. 
+The general flow of it is:
+1. Render the static calendar structure with jinja for loops (the grid, the headers, the nav buttons)  
+2. Use javascript to fill in dynamic content and interactivity:
+  - Set the correct dates in the header based on the current week
+  - Fetch events from the server and render them onto the calendar in the correct positions
+  - Handle week navigation by updating the header and re-rendering events for the new week
+-->
+
+{% macro calendarBlock(days, eventsUrl, timeRange=(8, 18),
+allowEventCreation=false) -%}
+<div class="w-full max-w-7xl mx-auto px-6 lg:px-8">
+  <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
+  <div class="sticky top-0 z-20 bg-stone-50">
+    <!-- Calendar Header: Contains title and new activity button -->
+    <div
+      class="flex flex-col md:flex-row max-md:gap-3 items-center justify-between py-4"
+    >
+      <!-- Calendar Icon and Current Date Display -->
+      <div class="flex items-center gap-4">
+        <i class="fa-solid fa-calendar-days text-gray-400 text-2xl"></i>
+        <h6
+          id="calendar-title"
+          class="text-xl leading-8 font-semibold text-gray-900"
+        >
+          Today, Month YYYY
+        </h6>
+      </div>
+      {% if allowEventCreation %}
+      <!-- New Activity Button -->
+      <button
+        class="hidden md:block p-2 m-2 bg-indigo-600 rounded-xl flex items-center gap-2 font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+        command="show-modal"
+        commandfor="drawer"
+      >
+        <i class="fa-solid fa-plus text-sm"></i>
+        New Activity
+      </button>
+      <button
+        class="block md:hidden fixed right-0 bottom-0 m-3 w-12 h-12 z-10 font-semibold rounded-full bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700"
+        command="show-modal"
+        commandfor="drawer"
+      >
+        <i class="fa-solid fa-plus text-sm"></i>
+      </button>
+      {% endif %}
+    </div>
+
+    <!-- Week navigation buttons -->
+    <div class="flex justify-between p-2">
+      <button
+        id="btn-last-week"
+        class="p-2 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+      >
+        < last week
+      </button>
+      <button
+        id="btn-today"
+        class="hidden bg-emerald-500 p-2 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+      >
+        today
+      </button>
+      <button
+        id="btn-next-week"
+        class="p-2 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+      >
+        next week >
+      </button>
+    </div>
+
+    <!-- Week Header Row: outside overflow-x-auto so it sticks; JS syncs horizontal scroll -->
+    <div id="day-headers-scroll" class="overflow-x-hidden">
+      <div class="grid grid-cols-6 border-t border-gray-200 w-full min-w-150">
+        <div
+          class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
+        ></div>
+        {% for day in days %}
+        <div
+          id="date-col-{{ loop.index0 }}"
+          class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
+        >
+          {{ day }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Grid Container -->
+  <div class="relative">
+    <div id="grid-scroll" class="overflow-x-auto">
+      <!--  Calendar Grid -->
+      <!-- Grid structure: 6 columns (time + 5 weekdays), multiple rows for time slots -->
+      <!-- Time range: 07:00 am to 06:00 pm -->
+      <div id="desktop-grid" class="grid grid-cols-6 min-w-150">
+        {% for hour in range(timeRange[0], timeRange[1]) %}
+        <div
+          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
+        >
+          <span class="text-xs font-semibold text-gray-400">
+            {{ (hour ~ ':00 am') if hour < 12 else ('12:00 pm' if hour == 12
+            else ((hour - 12) ~ ':00 pm')) }}
+          </span>
+        </div>
+        {% for day in range(5) %}
+        <div
+          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t {{ 'border-r' if day < 4 }} border-gray-200 transition-all hover:bg-stone-100"
+        ></div>
+        {% endfor %} {% endfor %}
+      </div>
+    </div>
+    <!-- end scrollable calendar content -->
+  </div>
+</div>
+<script>
+    /*
+    This is getting long so i will describe the functional flow here:
+  1. Define constants and helper functions for time parsing/formatting and date calculations.
+  2. On page load, fetch events from the server and render them onto the calendar grid.
+  3. The render function calculates the correct grid cell for each event based on its date and time,
+    creates a styled event card, and appends it to the cell with absolute positioning.
+  4. Event cards are interactive: clicking toggles an expanded view with more details.
+  I have tried to split things up into functions to keep it organized, but there is still
+    some room for improvement in terms of structure..
+    */
+
+    // Grid Constants: these are parsed from the macro args
+    const GRID_START_HOUR = {{ timeRange[0] }}; // the grid start (7am = 7)
+    const GRID_TOTAL_SLOTS = {{ timeRange[1] - timeRange[0] }}; // total number of hour slots in the grid (7am-6pm = 11)
+
+    // ── Color themes
+    // Each event has a color. This maps that name to the three
+    // Tailwind classes needed to style an event card: background, left border, text.
+    let COLOR_MAP = {
+      indigo: { bg: 'bg-indigo-100', border: 'border-indigo-500', text: 'text-indigo-800' },
+      blue: { bg: 'bg-blue-100', border: 'border-blue-500', text: 'text-blue-800' },
+      green: { bg: 'bg-green-100', border: 'border-green-500', text: 'text-green-800' },
+      rose: { bg: 'bg-rose-100', border: 'border-rose-500', text: 'text-rose-800' },
+      amber: { bg: 'bg-amber-100', border: 'border-amber-500', text: 'text-amber-800' },
+      orange: { bg: 'bg-orange-100', border: 'border-orange-500', text: 'text-orange-800' },
+      red: { bg: 'bg-red-100', border: 'border-red-500', text: 'text-red-800' },
+      purple: { bg: 'bg-purple-100', border: 'border-purple-500', text: 'text-purple-800' },
+      gray: { bg: 'bg-gray-100', border: 'border-gray-500', text: 'text-gray-800' },
+      yellow: { bg: 'bg-yellow-100', border: 'border-yellow-500', text: 'text-yellow-800' },
+    };
+    event_color_map = {};
+
+    // CSRF token for API requests, we read it from the meta tag that the server renders into the page
+    const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+
+    // A var to track how many weeks are offset from the real current week.
+    let weekOffset = 0;
+
+    // ── Time helpers
+    // Converts a "HH:MM" string to total minutes from midnight.
+    function parseTime(timeStr) {
+      const [h, m] = timeStr.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    // Converts a "HH:MM" 24h string to a readable label like "9:00 am" or "2:30 pm".
+    function formatTime(timeStr) {
+      const [h, m] = timeStr.split(':').map(Number);
+      const period = h < 12 ? 'am' : 'pm';
+      const hour = h % 12 || 12;
+      return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+    }
+
+    // Get a list of ISO date strings for Monday through Friday of the current week, adjusted by weekOffset.
+    function getWeekDates() {
+      // Always start from the real current date so navigation never accumulates errors
+      const base = new Date();
+      const currentDay = base.getDay();
+      // Calculate how many days to shift back to get to Monday (or forward if it's Sunday)
+      const daysFromMonday = currentDay === 0 ? -6 : 1 - currentDay;
+
+      // Find Monday of the real current week, then shift by weekOffset weeks
+      const monday = new Date(base);
+      monday.setDate(base.getDate() + daysFromMonday + weekOffset * 7);
+
+      // Generate ISO date strings for Monday through Friday of this week
+      const weekDates = [];
+      for (let i = 0; i < 5; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        // Use local date parts to avoid UTC timezone shifting the date
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        weekDates.push(`${year}-${month}-${day}`);
+      }
+      // console.log(weekDates); // Uncomment to see the generated week dates in the console
+      return weekDates;
+    }
+
+    function setCalendarDates() {
+      const now = new Date(); // real current date, for the title and today-highlight
+
+      // Indexed by getDay(): 0=Sun, 1=Mon, …, 6=Sat
+      // TODO: this need to change to match the macro arg
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      // Mon–Fri labels for the five column headers (getDay() 1–5)
+      const weekdayNames = dayNames.slice(1, 6);
+
+      const titleElement = document.getElementById('calendar-title');
+
+      // Helper function to format a date as "Day Month Date" with customizable month style
+      const fmt = (date, monthStyle) =>
+        `${dayNames[date.getDay()]} ${date.toLocaleString('default', { month: monthStyle })} ${date.getDate()}`;
+
+      // Shorter format for column headers, e.g. "Mar 11"
+      const fmtShort = (date) =>
+        `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`;
+
+      // Helper to get a date offset by a certain number of days from today,
+      // used for the title when showing last/next week
+      const offsetDate = (days) => {
+        const d = new Date(now);
+        d.setDate(now.getDate() + days);
+        return d;
+      };
+
+      // Show relative week label for ±1 week, or a date range for anything further
+      if (weekOffset === 0) {
+        titleElement.textContent = `Today, ${fmt(now, 'long')}`;
+      } else if (weekOffset === -1) {
+        titleElement.textContent = `Last Week, ${fmt(offsetDate(-7), 'long')}`;
+      } else if (weekOffset === 1) {
+        titleElement.textContent = `Next Week, ${fmt(offsetDate(7), 'long')}`;
+      } else {
+        const weekDates = getWeekDates();
+        const startDate = new Date(weekDates[0]);
+        const endDate = new Date(weekDates[4]);
+        titleElement.textContent = `${fmtShort(startDate)} - ${fmtShort(endDate)}`;
+      }
+
+      // Update each of the five column header elements with the correct day and date.
+      // Highlight today's column with indigo text.
+      const weekDates = getWeekDates();
+      weekDates.forEach((dateStr, i) => {
+        const columnDate = new Date(dateStr);
+        const columnElement = document.getElementById(`date-col-${i}`);
+        if (columnElement) {
+          columnElement.textContent = `${weekdayNames[i]} ${columnDate.getDate()}`;
+          const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+          const isToday = dateStr === todayStr;
+          columnElement.classList.toggle('text-indigo-600', isToday);
+          columnElement.classList.toggle('text-gray-900', !isToday);
+        }
+      });
+    }
+    // TODO: we will add a listener to requst more data if we are outside of the range
+    // safe makes jinja render the string without escaping characters, which is important for the api url since it has query parameters
+    apiUrl = "{{ eventsUrl | safe }}";
+    fetch(apiUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        events = data;
+        renderDesktopEvents(); // render events after loading
+      })
+      .catch((error) => {
+        console.error('Error loading events:', error);
+      });
+
+    // ── Event card builder
+    // Creates and returns a styled event card DOM element for a single event.
+    // The card is positioned absolutely inside its host cell and sized to span
+    // the correct number of rows based on the event duration.
+    function buildEventCard(event, heightPx, id) {
+      event_class = event.title.split(',')[0].toLowerCase(); // get the first part of the title as the class (e.g. "CS 101, Lecture" → "cs 101")
+      if (!event_color_map[event_class]) {
+        // If this class doesn't have a color assigned yet, assign the next available color from COLOR_MAP
+        const usedColors = new Set(Object.values(event_color_map));
+        const availableColors = Object.keys(COLOR_MAP).filter(
+          (color) => !usedColors.has(color),
+        );
+        event_color_map[event_class] = availableColors[0] || 'gray'; // default to gray if we run out of colors
+      }
+      const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`;
+
+      // The card sits inside the grid cell using absolute positioning.
+      // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
+      const card = document.createElement('div');
+      card.id = id;
+      if (!event.color) {
+        colors = COLOR_MAP[event_color_map[event_class]];
+      } else if (event.color && COLOR_MAP[event.color]) {
+        colors = COLOR_MAP[event.color];
+      } else {
+        colors = COLOR_MAP['gray'];
+      }
+      card.className = [
+        'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
+        'cursor-pointer transition-shadow hover:shadow-md select-none z-10',
+        colors.bg,
+        colors.border,
+      ].join(' ');
+      card.style.height = `${heightPx - 4}px`;
+      card.dataset.collapsedHeight = `${heightPx - 4}px`;
+
+      // Event title — always shown
+      const title = document.createElement('p');
+      title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
+      title.textContent = event.title;
+      card.appendChild(title);
+
+      const time = document.createElement('p');
+      time.className = `text-xs leading-tight px-1.5 ${colors.text} opacity-75`;
+      time.textContent = timeLabel;
+      card.appendChild(time);
+
+      // In multi-user mode, show who owns this event so users can tell cards apart by more than color
+      if (event.showUsername && event.username) {
+        const userLabel = document.createElement('p');
+        userLabel.className = `text-xs leading-tight px-1.5 ${colors.text} font-semibold opacity-50`;
+        userLabel.textContent = `@${event.username}`;
+        card.appendChild(userLabel);
+      }
+
+      // Location - show only if card is big enough, or if the location is exceptionally large, require an even bigger card
+      // If we are in mulit user mode and showing usernames, we need more room to show the location since the title is taking up more space, so we increase the height thresholds by 25%
+
+      if ((heightPx >= 75 && event.location.length <= 50) || heightPx >= 100) {
+        const location = document.createElement('p');
+        location.className = `text-xs leading-tight px-1.5 text-bold ${colors.text} opacity-75`;
+        location.textContent = event.location;
+        card.appendChild(location);
+      }
+
+      // Extra details — hidden until the card is expanded
+      const details = document.createElement('div');
+      details.className = 'event-details hidden flex mt-1 px-1.5 pb-1 ';
+      details.innerHTML = `
+        <p class="text-xs ${colors.text} opacity-60 font-mono">${event.description}</p>
+      `;
+      card.appendChild(details);
+
+      // if the event has no ical_id, it means it was created by the user and can be edited/deleted
+      if (event.ical_id === null) {
+        // we add a little badge to the top right corner to indicate it is a custom event
+        const badge = document.createElement('span');
+        badge.className = 'inline-block w-2 h-2 bg-blue-500 rounded-full ml-2';
+        badge.title = 'User-created event';
+        card.children[0].appendChild(badge);
+
+        // delete + edit btns stacked vertically
+        details.innerHTML += `<div class="flex flex-col gap-1 ml-auto">
+          <button class="bg-red-500 text-white rounded p-1 hover:bg-red-600" onclick="deleteEvent('${event.id}')">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+          <button class="bg-blue-500 text-white rounded p-1 hover:bg-blue-600" onclick="editEvent('${event.id}')">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+        </div>`;
+      }
+
+      card.addEventListener('click', () => {
+        const isExpanded = card.classList.contains('expanded');
+
+        if (isExpanded) {
+          // Collapse: restore original size and position
+          card.classList.remove('expanded', 'shadow-lg', 'z-20');
+          card.classList.add('overflow-hidden');
+          card.style.height = card.dataset.collapsedHeight;
+          card.style.minHeight = '';
+          card.style.width = '';
+          card.style.left = card.dataset.overlapLeft ?? '';
+          card.style.right = card.dataset.overlapRight ?? '';
+          card.style.transform = '';
+          details.classList.add('hidden');
+          card.children[0].classList.remove('text-wrap');
+        } else {
+          // Expand: auto height (but never shrink below collapsed size), fixed width anchored left or right based on column
+          card.classList.add('expanded', 'shadow-lg', 'z-20');
+          card.classList.remove('overflow-hidden');
+          card.style.minHeight = card.dataset.collapsedHeight;
+          card.style.height = 'auto';
+          card.style.width = '280px';
+          card.children[0].classList.add('text-wrap');
+          // Use the stored day index to determine expand direction:
+          //   columns 1-3 expand centered, column 4+ expand leftward, column 0 expands rightward
+          const col = parseInt(card.dataset.col ?? '0');
+          if (1 <= col && col <= 3) {
+            card.style.left = '50%';
+            card.style.transform = 'translateX(-50%)';
+            card.style.right = '';
+          } else if (col >= 3) {
+            card.style.right = '2px';
+            card.style.left = 'auto';
+          } else {
+            card.style.left = '2px';
+            card.style.right = 'auto';
+          }
+          details.classList.remove('hidden');
+        }
+      });
+
+      return card;
+    }
+
+    function buildMultiEventCard(event, heightPx, id) {
+      // This function builds a card that represents multiple overlapping events, expanding it shows who has what classes in this time slot.
+      // Clickin on a user and there class will directo to that users profile in the frinds tab evantually
+      // It accepts an event object with the following properties:
+      // - title: the name of the event (might just use the time label)
+      // - start: the start time of the event
+      // - end: the end time of the event
+      // - participants: an array of participant objects with the following properties:
+      //   - name: the name of the participant (username or real name depending on what we decide)
+      //   - class: the class they have during this time slot
+      // those properties are detected and built by the multiUserParser function when it detects multiple events with the same time slot
+
+      const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`;
+      // Multi-event cards are always gray TODO: cold be a lot niced
+      // The card sits inside the grid cell using absolute positioning.
+      // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
+      const colors = COLOR_MAP['gray'];
+      const card = document.createElement('div');
+      card.id = id;
+      card.className = [
+        'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
+        'cursor-pointer transition-shadow hover:shadow-md select-none z-10',
+        colors.bg,
+        colors.border,
+      ].join(' ');
+      card.style.height = `${heightPx - 4}px`;
+      card.dataset.collapsedHeight = `${heightPx - 4}px`;
+
+      // Time label as title
+      const title = document.createElement('p');
+      title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
+      title.textContent = timeLabel;
+      card.appendChild(title);
+
+      // Collapsed summary: just the participant names on one line
+      const summary = document.createElement('p');
+      summary.className = `text-xs leading-tight px-1.5 ${colors.text} opacity-75 truncate`;
+      summary.textContent = event.participants.map(p => p.name).join(', ');
+      card.appendChild(summary);
+
+      // Extra details - hidden till expanded
+      // Each participant gets a colored dot (their user color) + name and class.
+      const details = document.createElement('div');
+      details.className = 'event-details hidden flex flex-col gap-0.5 mt-1 px-1.5 pb-1';
+      details.innerHTML = event.participants.map(p => {
+        // Convert the border color class (e.g. "border-indigo-500") to a solid bg dot ("bg-indigo-500")
+        const dot = (COLOR_MAP[p.color]?.border ?? 'border-gray-500').replace('border-', 'bg-');
+        return `<div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full flex-shrink-0 ${dot}"></span>
+          <span class="text-xs ${colors.text} opacity-80">${p.name} — ${p.class}</span>
+        </div>`;
+      }).join('');
+      card.appendChild(details);
+
+      card.addEventListener('click', () => {
+        const isExpanded = card.classList.contains('expanded');
+
+        if (isExpanded) {
+          // Collapse: restore original size and position
+          card.classList.remove('expanded', 'shadow-lg', 'z-20');
+          card.classList.add('overflow-hidden');
+          card.style.height = card.dataset.collapsedHeight;
+          card.style.minHeight = '';
+          card.style.width = '';
+          card.style.left = card.dataset.overlapLeft ?? '';
+          card.style.right = card.dataset.overlapRight ?? '';
+          card.style.transform = '';
+          details.classList.add('hidden');
+          card.children[0].classList.remove('text-wrap');
+        } else {
+          // Expand: auto height (but never shrink below collapsed size), fixed width anchored left or right based on column
+          card.classList.add('expanded', 'shadow-lg', 'z-20');
+          card.classList.remove('overflow-hidden');
+          card.style.minHeight = card.dataset.collapsedHeight;
+          card.style.height = 'auto';
+          card.style.width = '280px';
+          card.children[0].classList.add('text-wrap');
+          // Use the stored day index to determine expand direction:
+          //   columns 1-3 expand centered, column 4+ expand leftward, column 0 expands rightward
+          const col = parseInt(card.dataset.col ?? '0');
+          if (1 <= col && col <= 3) {
+            card.style.left = '50%';
+            card.style.transform = 'translateX(-50%)';
+            card.style.right = '';
+          } else if (col >= 3) {
+            card.style.right = '2px';
+            card.style.left = 'auto';
+          } else {
+            card.style.left = '2px';
+            card.style.right = 'auto';
+          }
+          details.classList.remove('hidden');
+        }
+      });
+
+      return card;
+    }
+
+    // ── Grid helpers
+
+    // Returns a "dayIndex-hourIndex" → cell element map for the 5-day grid.
+    // col 0 is the time label column and is skipped; cols 1–5 become dayIndex 0–4.
+    // the map looks like:
+    // {
+    //   "0-0": cellElement, // Monday 7am
+    //   "0-1": cellElement, // Monday 8am
+    //   ...
+    //   "4-10": cellElement, // Friday 6pm
+    // }
+    // TODO: would be a good idea to better hanle the dynamic grid generation. This logix still wokrs but was based on the hard coded grid
+    function buildCellMap(grid) {
+      const cellMap = {};
+      // for each child (cell) in the grid, calcualte its position and add it to the map.
+      Array.from(grid.children).forEach((cell, i) => {
+        // col 0 is the time label column, so we skip it and adjust the index for the map accordingly
+        const col = i % 6;
+        // row is determined by how many complete sets of 6 we've seen (i.e. how many times we've wrapped back to col 0) (not great)
+        if (col !== 0) cellMap[`${col - 1}-${Math.floor(i / 6)}`] = cell;
+      });
+      return cellMap;
+    }
+
+    // Flattens the API response json to an array of event objects {userId: {events: {id: event}}} → [event, ...]
+    function flattenEvents(eventsData) {
+      return Object.values(eventsData).flatMap(u => Object.values(u.events));
+    }
+
+    // Parses a multi-user API response into a flat list of typed event objects.
+    // Each user is assigned a color from COLOR_MAP. Events that overlap on the same day
+    // are merged into a single 'multi' event with a participants array; solo events get type 'single'.
+    function multiUserParser(eventsData) {
+      // Assign one color per user through COLOR_MAP
+      const colorNames = Object.keys(COLOR_MAP);
+      const userColorMap = Object.fromEntries(
+        // we get all the user id in order and map them to a color based on the index so events belonging to the same user match color
+        Object.keys(eventsData).map((userId, i) => [userId, colorNames[i % colorNames.length]])
+      );
+
+      // Flatten all events, tagging each with its user's color.
+      // showUsername: true tells buildEventCard to display the username for attribution.
+      // without it (i.e in single user mode) the card does not show the username
+      // to do this we use tags: simple key value pairs added to the event object
+      // it parses the json reponse to an array of key value pairs where the key is the user id and the value is the user data (including events)
+      const tagged = Object.entries(eventsData).flatMap(([userId, userData]) =>
+        // then for each event of each user we create a new event object thatt includes the og data aswell as the tags for color and showUsername
+        Object.values(userData.events).map(event => ({
+          ...event, // new event object with all the og data, uses Spread syntax because we are in a arrow function
+          type: 'single',
+          color: userColorMap[userId],
+          showUsername: true,
+        }))
+      );
+
+      // Group by exact date + startTime + endTime.
+      // Only events with identical time slots become multi-events
+      // events outside the same time slot are handled by overlapp detection after placing the cards
+      // itterate trhough each event e, add each itterated event to the sortedDict array
+      // produces a dict where the key is the date + startTime + endTime and the value is an array of events that share that time slot
+      const groups = tagged.reduce((sortedDict, e) => {
+        const key = `${e.date}|${e.startTime}|${e.endTime}`; // e.g key = "2024-03-11|09:00|10:00"
+        (sortedDict[key] ??= []).push(e); // add the key to the dict if it doesn't exist and push the event to the array at that key
+        return sortedDict;
+      }, {});
+
+      // Map each group to either a solo event (if only one) or a multi-event with participants.
+      // this builds the final array of events that will be rendered on the calendar
+      // if the group is a multi user card, it gives it the multi type and provides the data it needs fro the multuCardBuiler
+      return Object.values(groups).map(cluster => {
+        // Solo events pass through as-is; same-slot clusters become a single multi-event
+        if (cluster.length === 1) return cluster[0];
+        const { date, startTime, endTime } = cluster[0];
+        return {
+          type: 'multi',
+          date, startTime, endTime,
+          participants: cluster.map(e => ({ name: e.username, class: e.title, color: e.color })),
+        };
+      });
+    }
+
+    // Places one event card into the grid. Returns placement data for overlap detection, or null if the event is outside the visible range.
+    function placeEvent(event, cellMap, weekDates, cellHeight, index) {
+      // Determine the event's day index (0–4) based on its date, or skip if it's outside the current week (day index is derived from the event date and the current week's dates)
+      const dayIndex = weekDates.indexOf(event.date);
+      if (dayIndex === -1) return null;
+
+      // Determine the event's start and end times in minutes from midnight, and calculate its position and height in the grid
+      const startMinutes = parseTime(event.startTime);
+      const endMinutes = parseTime(event.endTime);
+      const hourIndex = Math.floor(startMinutes / 60) - GRID_START_HOUR;
+      // If the event starts before the grid start time or after the grid end time, we skip it.
+      // TODO: could be improved
+      if (hourIndex < 0 || hourIndex >= GRID_TOTAL_SLOTS) return null;
+
+      // Find the corresponding grid cell and append the event card to it, positioned absolutely within the cell
+      const cell = cellMap[`${dayIndex}-${hourIndex}`];
+      if (!cell) return null;
+
+      // Ensure the cell is positioned relatively so the absolute positioning of the card is anchored to it
+      Object.assign(cell.style, { position: 'relative', overflow: 'visible' });
+
+      // Calculate the card height based on the event duration, with a minimum height to ensure short events are still visible.
+      // Route to the correct builder based on event type: multi-events get their own card builder.
+      const cardHeight = ((endMinutes - startMinutes) / 60) * cellHeight;
+      const builder = event.type === 'multi' ? buildMultiEventCard : buildEventCard;
+      const card = builder(event, cardHeight, `event-${index}`);
+      // We store the day index and start/end minutes as data attributes on the card for later use in overlap calculations and expand direction.
+      card.dataset.col = dayIndex;
+      cell.appendChild(card);
+
+      // Return placement data for overlap detection: day index and start/end times in minutes.
+      return { card, dayIndex, startMinutes, endMinutes, isMulti: event.type === 'multi' };
+    }
+
+
+    // ── Render events onto the desktop grid
+    function renderDesktopEvents() {
+      // Clear existing event cards before re-rendering
+      const grid = document.getElementById('desktop-grid');
+      grid.querySelectorAll('[id^="event-"]').forEach(el => el.remove());
+
+      // Build a cell map for quick lookup, get the current week's dates, and place each event onto the grid
+      const cellMap = buildCellMap(grid);
+      if (!cellMap['0-0']) return;
+      // we get the height based on the first sell TODO: this could be dynamic evnetually
+      const cellHeight = cellMap['0-0'].offsetHeight;
+      const weekDates = getWeekDates();
+
+      // Route to multi-user parser if more than one user is present, otherwise use the simple flatten
+      const isMultiUser = Object.keys(events).length > 1;
+      const flatEvents = isMultiUser ? multiUserParser(events) : flattenEvents(events);
+
+      // Place each event and log it to placed for overlap calcualtions.
+      const placed = flatEvents
+        .map((event, i) => placeEvent(event, cellMap, weekDates, cellHeight, i))
+        .filter(Boolean); // remove null (events outside visible range)
+
+      // Multi-events are already grouped and dont need overlap.
+      applyOverlapOffsets(placed.filter(p => !p.isMulti));
+    }
+
+    // Lays out overlapping cards side-by-side.
+    // Cards sharing any overlapping time in the same day are grouped together.
+    // Each card in a group of N gets an equal width slice: left and right are set as percentages.
+    function applyOverlapOffsets(placed_cards) {
+      function overlaps(a, b) {
+        // We check if a starts before b ends and ends after b starts.
+        return a.dayIndex === b.dayIndex
+          && a.startMinutes < b.endMinutes
+          && a.endMinutes > b.startMinutes;
+      }
+
+      function buildGroup(firstCard, visited) {
+        // Build a group of all cards that overlap with the firstCard, directly or indirectly.
+        // firstCard is the first card we provide the function and roots the group of overlapping cards
+        // visited is a set of cards we've already included in a group, so we don't process them again. It is passed by reference and updated in place.
+        const group = [firstCard];
+        visited.add(firstCard);
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (const other of placed_cards) {
+            if (visited.has(other)) continue;
+            if (group.some(g => overlaps(g, other))) {
+              group.push(other);
+              visited.add(other);
+              changed = true;
+            }
+          }
+        }
+        return group;
+      }
+
+      function assignColumns(group) {
+        group.sort(function(a, b) { return a.startMinutes - b.startMinutes; });
+        const slotWidth = 100 / group.length;
+        for (let i = 0; i < group.length; i++) {
+          // For each card in the group (a set of overlapping cards), we assign it custom css.
+          const card = group[i].card;
+          // The width is determined by the number of cards in the group (e.g. 2 cards → each gets 50% width, 3 cards → each gets ~33.3% width, etc).
+          const left  = `${i * slotWidth}%`;
+          const right = `${100 - (i + 1) * slotWidth}%`;
+          // we set the style
+          card.style.left  = left;
+          card.style.right = right;
+          // we store the value in a data attrubte to return to normal size after expand
+          card.dataset.overlapLeft  = left;
+          card.dataset.overlapRight = right;
+        }
+      }
+
+      // initialise a set that keeps track of which cards have ended up in a group
+      const visited = new Set();
+      // we go through every card, if theres overlapp it will be added to th set and a group fro its overlap
+      // then its width is based on how many cards are in its group
+      for (const placement of placed_cards) {
+        if (visited.has(placement)) continue;
+        const group = buildGroup(placement, visited);
+        if (group.length > 1) assignColumns(group);
+      }
+    }
+
+    function updateTodayButton() {
+      // Hide the "Today" button if we're already on the current week, show it otherwise
+      if (weekOffset === 0) {
+        document.getElementById('btn-today').classList.add('hidden');
+      } else {
+        document.getElementById('btn-today').classList.remove('hidden');
+      }
+    }
+
+    document.getElementById('btn-last-week').addEventListener('click', () => {
+      weekOffset--;
+      setCalendarDates();
+      renderDesktopEvents();
+      updateTodayButton();
+    });
+
+    document.getElementById('btn-today').addEventListener('click', () => {
+      weekOffset = 0;
+      setCalendarDates();
+      renderDesktopEvents();
+      updateTodayButton();
+    });
+
+    document.getElementById('btn-next-week').addEventListener('click', () => {
+      weekOffset++;
+      setCalendarDates();
+      renderDesktopEvents();
+      updateTodayButton();
+    });
+
+    setCalendarDates();
+    updateTodayButton();
+
+    // Event listners to listen to the event mutaion features on schedule.html
+    document.addEventListener('calendar:event-created', (event) => {
+      const newEvent = event.detail;
+      const userId = String(newEvent.user_id);
+      if (!events[userId]) events[userId] = { events: {} };
+      events[userId].events[String(newEvent.id)] = newEvent;
+      renderDesktopEvents();
+    });
+
+    document.addEventListener('calendar:event-updated', (event) => {
+      const updatedEvent = event.detail;
+      const userId = String(updatedEvent.user_id);
+      const key = Object.keys(events[userId]?.events ?? {}).find(
+        k => events[userId].events[k].id === updatedEvent.id
+      );
+      if (key) events[userId].events[key] = updatedEvent;
+      renderDesktopEvents();
+    });
+
+    document.addEventListener('calendar:event-deleted', (event) => {
+      const deletedId = event.detail.id;
+      for (const userId of Object.keys(events)) {
+        const key = Object.keys(events[userId].events).find(
+          k => events[userId].events[k].id === deletedId
+        );
+        if (key) { delete events[userId].events[key]; break; }
+      }
+      renderDesktopEvents();
+    });
+</script>
+{%- endmacro %}
