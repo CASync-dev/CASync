@@ -28,6 +28,7 @@ def getusers():
         if mail == None:
             print("No email found!")
             return jsonify({'results': 0})
+        mail = [mail]
         print("Email found!")
         return jsonify({'results': mail})
     else:
@@ -43,5 +44,7 @@ def getusers():
         query = text("SELECT users.username FROM users WHERE users.username = :u_")
         param = {"u_":user}
         users = list(db.session.scalars(query, param).all())
+        if users == []:
+            return jsonify({'results':0})
         print(users)
         return jsonify({'results': users})
