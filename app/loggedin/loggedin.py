@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, flash
+from flask import Blueprint, app, render_template, flash
 from flask_login import current_user, login_required
 from app.form import EventForm, IcalImportForm
-from app.models import Calendar
+from app.models import Calendar, User
 
 
 loggedin = Blueprint('loggedin', __name__, template_folder='../templates/loggedin', static_folder='../static')
@@ -29,8 +29,9 @@ def groups():
 @loggedin.route("/friends")
 @login_required
 def friends():
-
-    return render_template("loggedin/friends.html")
+    # this will evnetually retrun all the users friends, for now i return all users
+    friends = User.query.all()
+    return render_template("loggedin/friends.html", friends=friends)
 
 
 @loggedin.route("/settings", methods=['GET', 'POST'])
