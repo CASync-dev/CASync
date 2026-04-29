@@ -3,6 +3,9 @@ from app.models import User
 
 api_users = Blueprint('api_users', __name__)
 
+# Delete User Route (So users can delete their accounts if they want to)
+  # needs to properly delete the user and cascade delete any related data (events, settings, etc.) to avoid orphaned data in the database
+
 # -- OTHER API ROUTES
 # This file is for any API routes related to users, such as fetching user info, updating settings, etc.
 # @api_users.route("/api/user")

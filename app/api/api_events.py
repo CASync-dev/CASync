@@ -124,6 +124,59 @@ def api_events_range():
     indexed_events = {str(i + 1): e.to_dict() for i, e in enumerate(events)}
     return jsonify({user_id: {"events": indexed_events}})
 
+# API route to retrieve a specific Users events - accepts a user id as a url parameter and returns all events for that user
+# Mostly same as above but checks if the current logged in user is friends with the user id provided and only returns events if they are friends, otherwise returns an error message
+@api_events.route("/api/events/<int:user_id>")
+@login_required
+def api_user_events(user_id):
+    """
+    Accepts a start and end date as query parameters as:
+    GET /api/events/<int:user-id>?start=2026-04-21&end=2026-04-25  
+    Returns all events for the current user in the specified date range, used for loading events onto the calendar in a single request'
+    response has the format:
+    {
+        "1": {
+            "events": {
+                "1": {
+                    "title": "Event Title",
+                    "description": "Event Description",
+                    "date": "2024-07-01",
+                    "startTime": "14:00",
+                    "endTime": "15:00",
+                    "user_id": 1,
+                    "username": "exampleuser",
+                    "location": "Event Location",
+                    "color": "indigo",
+                    "ical_id": null,
+                    "ical_uid": null,
+                    "id": 1
+                },
+                ...
+
+    """
+
+    start_str = request.args.get('start')
+    end_str = request.args.get('end')
+    if not start_str or not end_str:
+        return jsonify({"error": "Missing start or end date"}), 400
+    try:
+        start_date = datetime.strptime(start_str, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_str, '%Y-%m-%d').date()
+    except ValueError:
+        return jsonify({"error": "Invalid date format, should be YYYY-MM-DD"}), 400
+    # check if the user is friends with the user id provided, if not return an error message
+    # TODO: there is no friends system yet but we will do that chekck here
+
+    events = Event.query.where(
+        Event.user_id == user_id,
+        Event.date >= start_date,
+        Event.date <= end_date
+    ).all()
+    user_id = str(current_user.id)
+    indexed_events = {str(i + 1): e.to_dict() for i, e in enumerate(events)}
+    return jsonify({user_id: {"events": indexed_events}})
+
+
 
 # -- Manipulation routes (create, edit, delete) --
 
