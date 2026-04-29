@@ -167,8 +167,17 @@
     } catch (error) {
       console.error('Error:', error)
     }
-       const list = document.getElementById("friend-search-list");
-
+    const list = document.getElementById("friend-search-list");
+    if (users = 0){
+      // ie. no results
+      list.innerHtml = 
+      `<li class="flex items-center mx-auto">
+        No results found :(
+      </li>`
+      document.getElementById("friend-search-results").classList.remove("hidden");
+      return
+    }
+      
     // Like the dev vers, maps the response' user list to a list element
     list.innerHTML = users.map(
       (u) => `
