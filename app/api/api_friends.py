@@ -6,7 +6,7 @@ from app.models import User
 
 api_friends = Blueprint("api_friends", __name__)
 
-@api_friends.route("api/getusers", methods=["GET"])
+@api_friends.route("/api/getusers", methods=["POST", "GET"])
 @login_required
 def getusers():
     # Username search: 3 letters should give a range of usernames with those three letters
