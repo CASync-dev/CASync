@@ -32,7 +32,7 @@ class LoginForm(FlaskForm):
 
 class RegisterForm(FlaskForm):
     email = EmailField(validators=[InputRequired(message="All fields are required.")])
-    username = StringField(validators=[InputRequired(message="All fields are required."), Regexp('^[A-Za-z0-9_]+$', message="Username must contain only letters, numbers, and underscores.")]),
+    username = StringField(validators=[InputRequired(message="All fields are required."), Regexp('^[A-Za-z0-9_]+$', message="Username must contain only letters, numbers, and underscores.")])
     password = StringField(validators=[InputRequired(message="All fields are required."),strong_password])
     repeat_password = StringField(validators=[InputRequired(message="All fields are required."), EqualTo('password', message='Passwords must match')])
     submit = SubmitField('Register')
