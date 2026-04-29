@@ -172,7 +172,6 @@
       .then((response) => response.json())
       .then(x => {
         results = x;
-        console.log(results);
       })
     // Debugging:
     users = results["results"];
@@ -183,11 +182,12 @@
     const list = document.getElementById("friend-search-list");
     if (users == 0){
       // ie. no results
-      list.innerHtml = 
-      `<li class="flex items-center mx-auto">
-        No results found :(
-      </li>`
+      list.innerHTML = '';
+      const nores = document.createElement("li");
+      nores.classList.add("flex", "items-center", "mx-auto");
+      nores.innerText = "No results found :( ";
       document.getElementById("friend-search-results").classList.remove("hidden");
+      list.appendChild(nores);
       return;
     }
       
