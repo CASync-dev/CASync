@@ -33,12 +33,6 @@ def register():
         return redirect(url_for('loggedin.dash'))
     form=RegisterForm()
     if form.validate_on_submit():
-        if User.query.filter_by(username=form.username.data).first():
-            flash('Username already exists', 'error')
-            return render_template("loggedout/register.html", form=form)
-        if User.query.filter_by(email=form.email.data).first():
-            flash('Email already exists', 'error')
-            return render_template("loggedout/register.html", form=form)
         new_user = User(username=form.username.data, email=form.email.data)
         new_user.password = form.password.data
         db.session.add(new_user)

@@ -32,6 +32,7 @@
           aria-required="true"
           autofocus="autofocus"
           size="30"
+          value="{{ form.username.data or '' }}"
           class="border bg-nearwhite"
         />
         <br />
@@ -68,11 +69,12 @@
         <br />
         <h5 class="text-nearwhite text-xs pt-5">
           Not a member yet? Register
-          <a href="{{ url_for('loggedout.register') }}" class="underline"> here. </a>
+          <a href="{{ url_for('loggedout.register') }}" class="underline">
+            here.
+          </a>
         </h5>
       </div>
     </form>
   </div>
-  <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 </body>
 {% endblock %}
