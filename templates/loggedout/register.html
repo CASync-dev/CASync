@@ -44,7 +44,9 @@
         />
         <br />
         <br />
-        <label for="username" class="text-left text-nearwhite"> Username: </label>
+        <label for="username" class="text-left text-nearwhite">
+          Username:
+        </label>
         <br />
         <input
           id="username"
@@ -57,7 +59,9 @@
         />
         <br />
         <br />
-        <label for="password" class="text-left text-nearwhite"> Password: </label>
+        <label for="password" class="text-left text-nearwhite">
+          Password:
+        </label>
         <br />
         <input
           id="password"
@@ -90,10 +94,10 @@
         <br />
         {% with messages = get_flashed_messages(with_categories=true) %} {% for
         category, message in messages %}
-        <p class="text-red-400 text-sm mt-1">{{ message }}</p>
+        <p class="text-red-400 text-sm mt-1 max-w-sm">{{ message }}</p>
         {% endfor %} {% endwith %} {% if form.errors %} {% for field, errors in
         form.errors.items() %} {% for error in errors %}
-        <p class="text-red-400 text-sm mt-1">{{ error }}</p>
+        <p class="text-red-400 text-sm mt-1 max-w-sm">{{ error }}</p>
         {% endfor %} {% endfor %} {% endif %}
         <br />
         <button id="log" type="submit" class="button cursor-pointer btn-white">
@@ -102,7 +106,9 @@
         <br />
         <h5 class="text-xs pt-5 text-nearwhite">
           Already registered? Login
-          <a href="{{ url_for('loggedout.login') }}" class="underline"> here. </a>
+          <a href="{{ url_for('loggedout.login') }}" class="underline">
+            here.
+          </a>
         </h5>
       </div>
     </form>
