@@ -22,6 +22,8 @@ def getusers():
         # Something wrong with the datebase...
         # .scalar in case email entered does not have an associated acc
         mail = db.session.scalar(query)
+        if mail == None:
+            return jsonify({'results': 0})
         return jsonify({'results': mail})
     else:
         # ie. Username
