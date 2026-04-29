@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_login import login_required
 from sqlalchemy import select
-
+from app import db
 from app.models import User
 
 api_friends = Blueprint("api_friends", __name__)
@@ -17,8 +17,12 @@ def getusers():
     # If it's an email
     if '@' in data['search']:
         searchmail = data['search']
-        query = select(User.username).where(User.email == searchmail).first()
-
+        query = select(User.username).where(User.email == searchmail)
+        # There should only be one account per email, if an error raises then there's
+        # Something wrong with the datebase...
+        # .scalar in case email entered does not have an associated acc
+        mail = db.session.scalar(query)
+        return jsonify({'results': mail})
     else:
         # ie. Username
         user = data['search']
@@ -26,4 +30,5 @@ def getusers():
             # Prevent users from searching using less than 3 letters
             return jsonify({'results': 0})
         query = select(User.username).where(User.username.startswith(user))
-    return jsonify({'results': query})
+        users = list(db.session.scalars(query).all())
+        return jsonify({'results': users})
