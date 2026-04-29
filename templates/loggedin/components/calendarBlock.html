@@ -153,6 +153,9 @@ The general flow of it is:
     some room for improvement in terms of structure..
     */
 
+    // Overrideable base URL — set this before calling fetchAndRenderEvents() to change the data source
+    let calendarBaseUrl = "{{ eventsUrl | safe }}";
+
     // Grid Constants: these are parsed from the macro args
     const GRID_START_HOUR = {{ timeRange[0] }}; // the grid start (7am = 7)
     const GRID_TOTAL_SLOTS = {{ timeRange[1] - timeRange[0] }}; // total number of hour slots in the grid (7am-6pm = 11)
@@ -282,8 +285,7 @@ The general flow of it is:
     let lastFetchedStart = null;
     let lastFetchedEnd = null;
     function fetchAndRenderEvents() {
-      // safe makes jinja render the string without escaping characters, which is important for the api url since it has query parameters
-      let apiUrl = "{{ eventsUrl | safe }}"
+      let apiUrl = calendarBaseUrl;
       if ( {{ enableAdaptiveDateCalls | lower }} ) {
         const weekDates = getWeekDates();
         const weekStart = new Date(weekDates[0]);
@@ -314,7 +316,7 @@ The general flow of it is:
         return;
       } else {
         // if adaptive data calls is not enabled it means the url provided expects no date query param and will return all events
-        let apiUrl = "{{ eventsUrl | safe }}"
+        let apiUrl = calendarBaseUrl;
                 fetch(apiUrl)
           .then((response) => response.json())
           .then((data) => {

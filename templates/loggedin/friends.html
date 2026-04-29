@@ -43,8 +43,7 @@
         </div>
         <button
           class="btn-plain px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400"
-          command="show-modal"
-          commandfor="friend-schedule-modal"
+          onclick="openFriendSchedule({{ friend.id }}, '{{ friend.username }}')"
         >
           <i class="fas fa-calendar-alt"></i>
           Schedule
@@ -168,8 +167,9 @@
           </div>
           <div class="flex-1 overflow-y-auto">
             {% from 'loggedin/components/calendarBlock.html' import
-            calendarBlock %} {{calendarBlock(days=['Mon', 'Tue', 'Wed', 'Thu',
-            'Fri'], eventsUrl='/api/events/me', clipVerticalOverflow=true) }}
+            calendarBlock %} {{calendarBlock(days=['Mon', 'Tue', 'Wed',
+            'Thu','Fri'], eventsUrl='/api/events/', clipVerticalOverflow=true)
+            }}
           </div>
         </div>
       </el-dialog-panel>
@@ -208,6 +208,21 @@
   new MutationObserver(() => {
     if (scheduleModal.open) requestAnimationFrame(() => renderDesktopEvents());
   }).observe(scheduleModal, { attributes: true, attributeFilter: ['open'] });
+
+  openFriendSchedule = (friendId, friendName) => {
+    // reset the calendars data source and cache range
+    calendarBaseUrl = `/api/events/${friendId}`;
+    lastFetchedStart = null;
+    lastFetchedEnd = null;
+    // re-render the calendar with the new data source
+    fetchAndRenderEvents();
+    // set the modal title to the friends name
+    document.getElementById('friend-schedule-title').textContent =
+      `${friendName}'s Schedule`;
+    // open the modal
+    const modal = document.getElementById('friend-schedule-modal');
+    modal.showModal();
+  };
 </script>
 <!-- tailwind js -->
 <script
