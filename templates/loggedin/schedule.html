@@ -8,10 +8,8 @@
 <!-- Main Calendar Section Container -->
 <section class="relative bg-stone-50">
   {% from 'loggedin/components/calendarBlock.html' import calendarBlock %} 
-  {% set month_start = now.replace(day=1).strftime('%Y-%m-%d') %}
-  {% set month_end = (now.replace(day=1) + timedelta(days=32)).replace(day=1) - timedelta(days=1) %}
-  {# parsed the events url to get data for the current month, will be dyanmic later #}
-  {{calendarBlock(days=['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], eventsUrl='/api/events/me?start=' ~ month_start ~ '&end=' ~ month_end.strftime('%Y-%m-%d'), allowEventCreation=true) }}
+
+  {{calendarBlock(days=['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], eventsUrl='/api/events/me', allowEventCreation=true) }}
 
   <!-- Add Event Drawer-->
   <el-dialog>

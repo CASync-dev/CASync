@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, flash
+from flask import Blueprint, app, render_template, flash
 from flask_login import current_user, login_required
 from app.form import EventForm, IcalImportForm
-from app.models import Calendar
+from app.models import Calendar, User
 
 
 loggedin = Blueprint('loggedin', __name__, template_folder='../templates/loggedin', static_folder='../static')
@@ -29,8 +29,14 @@ def groups():
 @loggedin.route("/friends")
 @login_required
 def friends():
+    # this will evnetually retrun all the users friends, for now i return all users
+    friends = User.query.all()
+    # give random avatar urls to each friend using their id as a seed for testing
+    for friend in friends:
+        friend.avatar_url = f"https://i.pravatar.cc/150?u={friend.id}"
 
-    return render_template("loggedin/friends.html")
+    friends = friends + friends
+    return render_template("loggedin/friends.html", friends=friends)
 
 
 @loggedin.route("/settings", methods=['GET', 'POST'])
