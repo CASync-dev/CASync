@@ -29,7 +29,7 @@
         <div class="flex items-center">
           <img
             class="h-15 w-15 rounded-full"
-            src="{{ friend.avatar_url }}"
+            src="{{friend.avatar_url }}"
             alt="{{ friend.username }}'s avatar"
           />
           <div class="ml-4">
@@ -39,7 +39,8 @@
         </div>
         <button
           class="btn-plain px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400"
-          onclick="alert('Remove Friend functionality is not implemented yet.')"
+          command="show-modal"
+          commandfor="friend-schedule-modal"
         >
           <i class="fas fa-calendar-alt"></i>
           Schedule
@@ -123,22 +124,65 @@
     </div>
   </dialog>
 </el-dialog>
+<!-- Friend Schedule Modal -->
+<el-dialog>
+  <dialog
+    id="friend-schedule-modal"
+    class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+    ></el-dialog-backdrop>
+
+    <div
+      tabindex="0"
+      class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    >
+      <el-dialog-panel
+        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-7xl max-h-[90vh] flex flex-col data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+      >
+        <div class="flex flex-col flex-1 overflow-hidden bg-white pt-5 sm:pt-6">
+          <div
+            class="shrink-0 flex items-center justify-between mb-4 px-4 sm:px-6"
+          >
+            <h3
+              class="text-lg font-medium leading-6 text-gray-900"
+              id="friend-schedule-title"
+            >
+              Friend's Schedule
+            </h3>
+            <button
+              type="button"
+              class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:text-sm"
+              command="close"
+              commandfor="friend-schedule-modal"
+            >
+              Close
+            </button>
+          </div>
+          <div class="flex-1 overflow-y-auto">
+            {% from 'loggedin/components/calendarBlock.html' import
+            calendarBlock %} {{calendarBlock(days=['Mon', 'Tue', 'Wed', 'Thu',
+            'Fri'], eventsUrl='/api/events/me') }}
+          </div>
+        </div>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>
+
 {% endblock %} {% block scripts %}
 <script>
-  function addFriend() {
-    alert("Add Friend functionality is not implemented yet.");
-  }
-
   const DEV_USERS = [
-    "alice_wonder",
-    "bob_builder",
-    "charlie_chaplin",
-    "diana_prince",
-    "eve_online",
+    'alice_wonder',
+    'bob_builder',
+    'charlie_chaplin',
+    'diana_prince',
+    'eve_online',
   ];
 
   function searchFriends() {
-    const list = document.getElementById("friend-search-list");
+    const list = document.getElementById('friend-search-list');
     list.innerHTML = DEV_USERS.map(
       (u) => `
       <li class="flex items-center justify-between py-2 px-4 hover:bg-gray-100 rounded-md">
@@ -148,9 +192,16 @@
         </div>
         <button onclick="addFriend()" class="text-sm bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">Add</button>
       </li>`,
-    ).join("");
-    document.getElementById("friend-search-results").classList.remove("hidden");
+    ).join('');
+    document.getElementById('friend-search-results').classList.remove('hidden');
   }
+
+  // offsetHeight returns 0 while the dialog is hidden, so card heights are wrong on first open.
+  // Re-render once the dialog becomes visible so cells have their real layout dimensions.
+  const scheduleModal = document.getElementById('friend-schedule-modal');
+  new MutationObserver(() => {
+    if (scheduleModal.open) requestAnimationFrame(() => renderDesktopEvents());
+  }).observe(scheduleModal, { attributes: true, attributeFilter: ['open'] });
 </script>
 <!-- tailwind js -->
 <script
