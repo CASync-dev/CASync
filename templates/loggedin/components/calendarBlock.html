@@ -12,6 +12,9 @@ A component is a reusable piece of code that can be used to create a specific UI
   - title: the name of the event
   - start: the start time of the event
   - end: the end time of the event
+- enableAdaptiveDateCalls: Many api routes will require a date range to be parsed as a query paramater in the format ?start=YYYY-MM-DD&end=YYYY-MM-DD
+  If this is enabled, the component will automatically calculate the correct start and end dates based on the current week being viewed and include those in the api call to fetch events. 
+  This way we can ensure that we are only fetching the events we need for the current view, and not overfetching data for events that are outside of the current week.
 
   Parsing Events:
   See the format defined in the api_events.py file for how the events are structured when fetched from the server.
@@ -31,8 +34,8 @@ The general flow of it is:
   - Handle week navigation by updating the header and re-rendering events for the new week
 -->
 
-{% macro calendarBlock(days, eventsUrl, timeRange=(8, 18),
-allowEventCreation=false) -%}
+{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true,
+timeRange=(8, 18), allowEventCreation=false) -%}
 <div class="w-full max-w-7xl mx-auto px-6 lg:px-8">
   <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
   <div class="sticky top-0 z-20 bg-stone-50">
@@ -273,18 +276,52 @@ allowEventCreation=false) -%}
         }
       });
     }
-    // TODO: we will add a listener to requst more data if we are outside of the range
-    // safe makes jinja render the string without escaping characters, which is important for the api url since it has query parameters
-    apiUrl = "{{ eventsUrl | safe }}";
-    fetch(apiUrl)
-      .then((response) => response.json())
-      .then((data) => {
-        events = data;
-        renderDesktopEvents(); // render events after loading
-      })
-      .catch((error) => {
-        console.error('Error loading events:', error);
-      });
+    
+    let lastFetchedStart = null;
+    let lastFetchedEnd = null;
+    function fetchAndRenderEvents() {
+      // safe makes jinja render the string without escaping characters, which is important for the api url since it has query parameters
+      let apiUrl = "{{ eventsUrl | safe }}"
+      if ( {{ enableAdaptiveDateCalls | lower }} ) {
+        const weekDates = getWeekDates();
+        const weekStart = new Date(weekDates[0]);
+        const weekEnd = new Date(weekDates[4]);
+        // if the current week is already covered by the last fetch, just re-render
+        if (lastFetchedStart && lastFetchedEnd && weekStart >= lastFetchedStart && weekEnd <= lastFetchedEnd) {
+          renderDesktopEvents();
+          return;
+        }
+        // fetch 2 weeks before and after the current week
+        const startDate = new Date(weekStart);
+        startDate.setDate(startDate.getDate() - 14);
+        const endDate = new Date(weekEnd);
+        endDate.setDate(endDate.getDate() + 14);
+        const fmt = d => d.toLocaleDateString('en-CA');
+        apiUrl += `?start=${fmt(startDate)}&end=${fmt(endDate)}`;
+        fetch(apiUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            lastFetchedStart = startDate;
+            lastFetchedEnd = endDate;
+            events = data;
+            renderDesktopEvents();
+          })
+          .catch((error) => {
+            console.error('Error loading events:', error);
+          });
+        return;
+      }
+
+      fetch(apiUrl)
+        .then((response) => response.json())
+        .then((data) => {
+          events = data;
+          renderDesktopEvents();
+        })
+        .catch((error) => {
+          console.error('Error loading events:', error);
+        });
+    }
 
     // ── Event card builder
     // Creates and returns a styled event card DOM element for a single event.
@@ -735,21 +772,21 @@ allowEventCreation=false) -%}
     document.getElementById('btn-last-week').addEventListener('click', () => {
       weekOffset--;
       setCalendarDates();
-      renderDesktopEvents();
+      fetchAndRenderEvents();
       updateTodayButton();
     });
 
     document.getElementById('btn-today').addEventListener('click', () => {
       weekOffset = 0;
       setCalendarDates();
-      renderDesktopEvents();
+      fetchAndRenderEvents();
       updateTodayButton();
     });
 
     document.getElementById('btn-next-week').addEventListener('click', () => {
       weekOffset++;
       setCalendarDates();
-      renderDesktopEvents();
+      fetchAndRenderEvents();
       updateTodayButton();
     });
 
@@ -785,5 +822,6 @@ allowEventCreation=false) -%}
       }
       renderDesktopEvents();
     });
+    fetchAndRenderEvents();
 </script>
 {%- endmacro %}
