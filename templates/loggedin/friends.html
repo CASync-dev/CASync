@@ -95,7 +95,7 @@
                   />
                   <button
                     type="button"
-                    onclick="devsearchFriends()"
+                    onclick="searchFriends()"
                     class="btn-plain shrink-0 rounded-md border border-transparent bg-green-600 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                   >
                     Search
@@ -156,26 +156,39 @@
   // Handle displaying possible users to add
   async function searchFriends() {
     let users;
+    let results;
+    // Reads CSRFtoken from token and sends with data.
+    const token = document.querySelector('meta[name="csrf-token"]').content;
     const search = document.getElementById("friend-search-input").value;
+    if (search == "") {
+      return;
+    }
     try {
-      response = await fetch("/api/getusers", {
+      const response = await fetch("/api/getusers", {
         method: 'POST',
+        headers: { "X-CSRFToken": token, "Content-Type": "application/json" },
         body: JSON.stringify({'search': search})
-    })
-    const results = await response.JSON
-    users = results["results"]
+      })
+      .then((response) => response.json())
+      .then(x => {
+        results = x;
+        console.log(results);
+      })
+    // Debugging:
+    users = results["results"];
     } catch (error) {
-      console.error('Error:', error)
+      console.error('Error:', error);
+      return;
     }
     const list = document.getElementById("friend-search-list");
-    if (users = 0){
+    if (users == 0){
       // ie. no results
       list.innerHtml = 
       `<li class="flex items-center mx-auto">
         No results found :(
       </li>`
       document.getElementById("friend-search-results").classList.remove("hidden");
-      return
+      return;
     }
       
     // Like the dev vers, maps the response' user list to a list element
