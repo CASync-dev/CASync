@@ -34,6 +34,8 @@ def friends():
     # give random avatar urls to each friend using their id as a seed for testing
     for friend in friends:
         friend.avatar_url = f"https://i.pravatar.cc/150?u={friend.id}"
+
+    friends = friends + friends
     return render_template("loggedin/friends.html", friends=friends)
 
 
