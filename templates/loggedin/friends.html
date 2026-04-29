@@ -95,7 +95,7 @@
                   />
                   <button
                     type="button"
-                    onclick="searchFriends()"
+                    onclick="devsearchFriends()"
                     class="btn-plain shrink-0 rounded-md border border-transparent bg-green-600 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                   >
                     Search
@@ -129,6 +129,7 @@
     alert("Add Friend functionality is not implemented yet.");
   }
 
+  // Temporary measure
   const DEV_USERS = [
     "alice_wonder",
     "bob_builder",
@@ -137,7 +138,7 @@
     "eve_online",
   ];
 
-  function searchFriends() {
+  function devsearchFriends() {
     const list = document.getElementById("friend-search-list");
     list.innerHTML = DEV_USERS.map(
       (u) => `
@@ -150,6 +151,37 @@
       </li>`,
     ).join("");
     document.getElementById("friend-search-results").classList.remove("hidden");
+  }
+
+  // Handle displaying possible users to add
+  async function searchFriends() {
+    let users;
+    const search = document.getElementById("friend-search-input").value;
+    try {
+      response = await fetch("/api/getusers", {
+        method: 'POST',
+        body: JSON.stringify({'search': search})
+    })
+    const results = await response.JSON
+    users = results["results"]
+    } catch (error) {
+      console.error('Error:', error)
+    }
+       const list = document.getElementById("friend-search-list");
+
+    // Like the dev vers, maps the response' user list to a list element
+    list.innerHTML = users.map(
+      (u) => `
+      <li class="flex items-center justify-between py-2 px-4 hover:bg-gray-100 rounded-md">
+        <div class="flex items-center gap-3">
+          <img src="https://placehold.co/200x200" class="h-8 w-8 rounded-full" />
+          <span class="text-sm font-medium text-gray-800">${u}</span>
+        </div>
+        <button onclick="addFriend()" class="text-sm bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">Add</button>
+      </li>`,
+    ).join("");
+    document.getElementById("friend-search-results").classList.remove("hidden");
+    return
   }
 </script>
 <!-- tailwind js -->
