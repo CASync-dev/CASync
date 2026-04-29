@@ -14,6 +14,9 @@ A component is a reusable piece of code that can be used to create a specific UI
   We currently call data for two weeks before and after the current week to give some buffer for users navigating between weeks, but this can be adjusted as needed. 
   This way we can ensure that we are only fetching the events we need for the current view, and not overfetching data for events that are outside of the current week.
   Often api routes that dont require date ranges will ignore nay date ranges provided and just retrun the data, but it would be good practice to only provide date ranges when needed
+- clipVerticalOverflow: if disabled it allows cards that extend past the bottom of the calendar grid to be fully visible, if enabled it clips any overflow so cards will be cut off at 
+  the bottom edge of the calendar grid
+
 
 Standard Data Format Expectation
 - Parsing Events:
@@ -34,11 +37,10 @@ The general flow of it is:
   - Handle week navigation by updating the header and re-rendering events for the new week
 -->
 
-{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true,
-timeRange=(8, 18), allowEventCreation=false) -%}
+{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true, timeRange=(8, 18), allowEventCreation=false, clipVerticalOverflow=false) -%}
 <div class="w-full max-w-7xl mx-auto px-6 lg:px-8">
   <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
-  <div class="sticky top-0 z-20 bg-stone-50">
+  <div class="sticky top-0 z-20 bg-white">
     <!-- Calendar Header: Contains title and new activity button -->
     <div
       class="flex flex-col md:flex-row max-md:gap-3 items-center justify-between py-4"
@@ -115,7 +117,7 @@ timeRange=(8, 18), allowEventCreation=false) -%}
 
   <!-- Calendar Grid Container -->
   <div class="relative">
-    <div id="grid-scroll" class="overflow-x-auto">
+    <div id="grid-scroll" class="overflow-x-auto {{ 'overflow-y-hidden' if clipVerticalOverflow }}">
       <!--  Calendar Grid -->
       <!-- Grid structure: 6 columns (time + 5 weekdays), multiple rows for time slots -->
       <!-- Time range: 07:00 am to 06:00 pm -->
