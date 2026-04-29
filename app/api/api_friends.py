@@ -22,5 +22,8 @@ def getusers():
     else:
         # ie. Username
         user = data['search']
-        query = select(User.username).where(user in User.username)
+        if len(user) < 3:
+            # Prevent users from searching using less than 3 letters
+            return jsonify({'results': 0})
+        query = select(User.username).where(User.username.startswith(user))
     return jsonify({'results': query})
