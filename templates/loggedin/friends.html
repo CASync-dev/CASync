@@ -8,6 +8,7 @@
     <!-- search bar -->
     <div class="relative ml-4">
       <input
+        id="friend-search-input"
         type="text"
         placeholder="Search friends..."
         class="bg-white text-gray-700 placeholder:text-gray-500 border border-gray-500 focus:ring-blue-500 focus:border-blue-500 rounded-2xl py-2 pl-4 pr-10"
@@ -32,7 +33,7 @@
     </div>
   </div>
   <div class="mt-6">
-    <ul class="">
+    <ul class="" id="friends-list">
       <!-- Friend list items -->
       {% for friend in friends %}
       <li
@@ -46,7 +47,7 @@
           />
           <div class="ml-4">
             <p class="text-sm font-medium text-white">{{ friend.username }}</p>
-            <p class="text-sm text-gray-300">{{ friend.next_class }}</p>
+            <p class="text-sm text-gray-300">{{ friend.email }}</p>
           </div>
         </div>
         <button
@@ -194,6 +195,22 @@
     'diana_prince',
     'eve_online',
   ];
+
+  // Friends Search bar
+  document
+    .getElementById('friend-search-input')
+    .addEventListener('input', (e) => {
+      // fo lowercase for stadnard search
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll('#friends-list li').forEach((li) => {
+        const username = li.querySelector('p').textContent.toLowerCase();
+        if (username.includes(query)) {
+          li.classList.remove('hidden');
+        } else {
+          li.classList.add('hidden');
+        }
+      });
+    });
 
   function searchFriends() {
     const list = document.getElementById('friend-search-list');
