@@ -1,6 +1,6 @@
 {% extends "loggedin/layout.html" %} 
 {% block content %}
-<!-- TODO: Add dialog to add friends to group -->
+<!-- TODO: Add functionability to group creation -->
 <div
   class="mx-4 2xl:max-w-7xl 2xl:mx-auto px-4 bg-primary py-8 mt-6 rounded-xl"
 >
@@ -230,7 +230,7 @@
       button.classList.remove('bg-primary');
       button.classList.remove('hover:bg-blue-800');
       const idtopush = String(button.id);
-      grouplist.push("idtopush");
+      grouplist.push(idtopush);
       return
       }
     button.innerHTML = '+';
@@ -239,7 +239,7 @@
     button.classList.remove('bg-red-600');
     button.classList.remove('hover:bg-red-800');
     const idtopop = String(button.id);
-    grouplist.pop("idtopop");
+    grouplist.pop(idtopop);
   }
 </script>
 {% endblock %}
