@@ -7,16 +7,16 @@ A component is a reusable piece of code that can be used to create a specific UI
 - days: an array of day names (e.g. ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
 - timeRange: a range of time in 24 hour digits (e.g. 8, 18 for 8am to 6pm)
 - includeNav: a boolean that determines whether to include navigation buttons for switching between weeks
-- allowEventCreation: a boolean that determines whether to include a "New Event" button that opens the event creation drawer
-- eventUrl: an array of event objects with the following properties:
-  - title: the name of the event
-  - start: the start time of the event
-  - end: the end time of the event
+- allowEventCreation: a boolean that determines whether to include a "New Event" button that opens the event creation drawer (note the drawer is not included in this component)
+- eventUrl: the api endpoint to fetch events from, the component will handle fetching and rendering events onto the calendar grid
 - enableAdaptiveDateCalls: Many api routes will require a date range to be parsed as a query paramater in the format ?start=YYYY-MM-DD&end=YYYY-MM-DD
-  If this is enabled, the component will automatically calculate the correct start and end dates based on the current week being viewed and include those in the api call to fetch events. 
+  If this is enabled, the component will automatically calculate the correct start and end dates based on the current week being viewed and include those in the api call to fetch events.
+  We currently call data for two weeks before and after the current week to give some buffer for users navigating between weeks, but this can be adjusted as needed. 
   This way we can ensure that we are only fetching the events we need for the current view, and not overfetching data for events that are outside of the current week.
+  Often api routes that dont require date ranges will ignore nay date ranges provided and just retrun the data, but it would be good practice to only provide date ranges when needed
 
-  Parsing Events:
+Standard Data Format Expectation
+- Parsing Events:
   See the format defined in the api_events.py file for how the events are structured when fetched from the server.
   The api will always repond with json in the format {user_id: {events: {event_id: event_data}}}, so the component 
   will need to extract the events for the current user and render them on the calendar.
@@ -310,6 +310,20 @@ timeRange=(8, 18), allowEventCreation=false) -%}
             console.error('Error loading events:', error);
           });
         return;
+      } else {
+        // if adaptive data calls is not enabled it means the url provided expects no date query param and will return all events
+        let apiUrl = "{{ eventsUrl | safe }}"
+                fetch(apiUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            lastFetchedStart = startDate;
+            lastFetchedEnd = endDate;
+            events = data;
+            renderDesktopEvents();
+          })
+          .catch((error) => {
+            console.error('Error loading events:', error);
+          });
       }
 
       fetch(apiUrl)
