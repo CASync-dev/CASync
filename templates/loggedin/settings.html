@@ -228,13 +228,6 @@
     a.dataset.userId = user.id; // Store user id in data attribute for later use
     $("#dropdown-menu-1").append(a);
   }
-    // Get Users
-  async function getUsers() {
-    const res = await fetch("/api/users");
-    const users = await res.json();
-    users.forEach(addUserOptions);
-  }
-  getUsers();
 
   let selectedUserId = null;
   // On Selection Of User From Dropdown, set selectedUserId
@@ -255,14 +248,12 @@
     show the sync button with the number of existing calenders, 
     if not hide the sync button since there is nothing to sync with
     */
-    if (!selectedUserId) {
-      $("#sync-button").addClass("hidden");
-      return;
-    }
     // Check if the user has any calendars
-    fetch(`/api/calendars/`)
+    fetch("/api/calendars/")
       .then((res) => {
-        if (!res.ok) return;
+        if (!res.ok) {
+          return;
+        }
         return res.json();
       })
       .then((calendars) => {
@@ -290,11 +281,8 @@
   }
 
   async function syncCal() {
-    if (!selectedUserId) {
-      showMsg("Please select a user to sync the calendar for.", false);
-      return;
-    }
-    const res = await fetch(`/api/sync-cal/${selectedUserId}`, {
+
+    const res = await fetch(`/api/sync-cal/`, {
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": "{{ csrf_token() }}",
