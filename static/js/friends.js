@@ -60,7 +60,6 @@ async function searchFriends() {
       });
     // Debugging:
     users = results['results'];
-    console.log(users);
   } catch (error) {
     console.error('Error:', error);
     return;
@@ -78,6 +77,7 @@ async function searchFriends() {
   }
 
   // Like the dev vers, maps the response' user list to a list element
+  // Ensure we add the user id to the button as a data attribute so we can send it with the friend request
   list.innerHTML = users
     .map(
       (u) => `
@@ -86,7 +86,7 @@ async function searchFriends() {
         <img src="https://placehold.co/200x200" class="h-8 w-8 rounded-full" />
         <span class="text-sm font-medium text-gray-800">${u.username}</span>
     </div>
-    <button onclick="addFriend()" class="text-sm bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">Add</button>
+    <button id="add-friend-btn-${u.id}" onclick="addFriend()" data-user-id="${u.id}" class="text-sm bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">Add</button>
     </li>`,
     )
     .join('');
@@ -97,16 +97,24 @@ async function searchFriends() {
 function addFriend() {
   // Reads CSRFtoken from token and sends with data.
   const token = document.querySelector('meta[name="csrf-token"]').content;
-  const username = event.target.parentElement.querySelector('span').textContent;
+  const userId = event.target.getAttribute('data-user-id');
   fetch('/api/requestfriend', {
     method: 'POST',
     headers: { 'X-CSRFToken': token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: username }),
+    body: JSON.stringify({ user_id: userId }),
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log('Success:', data);
-      // Optionally, you can update the UI to reflect the sent friend request
+      // On success, disable the button and change text to "Request Sent"
+      document.getElementById(`add-friend-btn-${userId}`).disabled = true;
+      document.getElementById(`add-friend-btn-${userId}`).textContent =
+        'Request Sent';
+      document
+        .getElementById(`add-friend-btn-${userId}`)
+        .classList.remove('bg-green-600', 'hover:bg-green-700');
+      document
+        .getElementById(`add-friend-btn-${userId}`)
+        .classList.add('bg-gray-400', 'cursor-not-allowed');
     })
     .catch((error) => {
       console.error('Error:', error);

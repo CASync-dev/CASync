@@ -40,17 +40,30 @@ def getusers():
 # If the username does not exist, it returns an error message.
 def requestfriend():
     data = request.get_json()
-    # Check if the username is provided in the request data
-    if 'username' not in data:
-        return jsonify({"Error: Invalid username"}), 400
-    username = data['username']
+    # Check if the user_id is provided in the request data
+    if 'user_id' not in data:
+        return jsonify({"Error: Invalid user_id"}), 400
+    user_id = data['user_id']
     # This checks if the user exists, this shoulnt be a probelm as the frontend only allows searhcing for existing users but just in case.
-    user_id = db.session.scalar(select(User.id).where(User.username == username))
-    if user_id == None:
+    user = User.query.get(user_id)
+    if not user:
         return jsonify({"Error: User not found"}), 404
+    # Check if a friend request already exists between the current user and the target user
+    existing_request = Friendship.query.filter(
+        ((Friendship.user_id == current_user.id) & (Friendship.friend_id == user_id)) |
+        ((Friendship.user_id == user_id) & (Friendship.friend_id == current_user.id))
+    ).first()
+    if existing_request:
+        if existing_request.status == 'pending':
+            return jsonify({"Error: Friend request already pending"}), 400
+        elif existing_request.status == 'accepted':
+            return jsonify({"Error: You are already friends"}), 400
+        elif existing_request.status == 'rejected':
+            # If the previous request was rejected, we can allow sending a new request
+            pass
     # Create a new friend request entry in the database
-    new_request = Friendship(requester_id=current_user.id, receiver_id=user_id, status='pending', created_at=db.func.now(), updated_at=db.func.now())
+    new_request = Friendship(user_id=current_user.id, friend_id=user_id, status='pending', created_at=db.func.now())
     db.session.add(new_request)
     db.session.commit()
     
-    return jsonify({"message": f"Friend request sent to {username}!"}), 200
+    return jsonify({"message": f"Friend request sent to {user.username}!"}), 200
