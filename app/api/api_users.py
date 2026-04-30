@@ -21,3 +21,11 @@ api_users = Blueprint('api_users', __name__)
 # def api_userlist():
 #     users = User.query.all()
 #     return jsonify([u.to_dict() for u in users])
+
+@api_users.route("/api/changeusername", methods=["POST"])
+def change_username():
+    print("Placeholder :)")
+
+@api_users.route("/api/changeemail", methods=["POST"])
+def change_email():
+    print("Placeholder :) #2")
