@@ -91,3 +91,17 @@ class Calendar(db.Model):
 
     def __repr__(self):
         return f'<Calendar {self.ical_url}>'
+    
+
+class Friendship(db.Model):
+    __tablename__ = 'friendships'
+
+    id          = db.Column(db.Integer, primary_key=True)
+    user_id     = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # the user who sent the friend request
+    friend_id   = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # the user who received the friend request
+    status      = db.Column(db.String(20), nullable=False)  # "pending", "accepted", "rejected"
+    created_at  = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))  # when the friend request was created
+    accepted_at = db.Column(db.DateTime(timezone=True))  # when the friend request was accepted (null if still pending or rejected)
+
+    def __repr__(self):
+        return f'<Friendship {self.user_id} -> {self.friend_id} ({self.status})>'

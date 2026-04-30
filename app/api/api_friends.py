@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request
-from flask_login import login_required
+from flask_login import current_user, login_required
 from sqlalchemy import select, text
 from app import db
-from app.models import User
+from app.models import User, Friendship
 
 api_friends = Blueprint("api_friends", __name__)
 
@@ -39,3 +39,27 @@ def getusers():
         if users == []:
             return jsonify({'results':0})
         return jsonify({'results': users})
+    
+@api_friends.route("/api/requestfriend", methods=["POST"])
+@login_required
+# This route is for sending a friend request to another user. It checks if the username provided in the request exists 
+# in the database, if so, it creates a new friend request entry in the database and returns a success message. 
+# If the username does not exist, it returns an error message.
+def requestfriend():
+    data = request.get_json()
+    # Check if the username is provided in the request data
+    if 'username' not in data:
+        return jsonify({"Error: Invalid username"}), 400
+    username = data['username']
+    # This checks if the user exists, this shoulnt be a probelm as the frontend only allows searhcing for existing users but just in case.
+    query = text("SELECT users.id FROM users WHERE users.username = :u_")
+    param = {"u_":username}
+    user_id = db.session.scalar(query, param)
+    if user_id == None:
+        return jsonify({"Error: User not found"}), 404
+    # Create a new friend request entry in the database
+    new_request = Friendship(requester_id=current_user.id, receiver_id=user_id, status='pending', created_at=db.func.now(), updated_at=db.func.now())
+    db.session.add(new_request)
+    db.session.commit()
+    
+    return jsonify({"message": f"Friend request sent to {username}!"}), 200
