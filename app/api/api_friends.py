@@ -80,5 +80,25 @@ def requestfriend():
     new_request = Friendship(user_id=current_user.id, friend_id=user_id, status='pending', created_at=db.func.now())
     db.session.add(new_request)
     db.session.commit()
-    
     return jsonify({"message": f"Friend request sent to {user.username}!"}), 200
+
+@api_friends.route("/api/acceptfriend", methods=["POST"])
+@login_required
+def acceptfriend():
+    data = request.get_json()
+    if 'user_id' not in data:
+        return jsonify({"Error: Invalid user_id"}), 400
+    user_id = data['user_id']
+    # Check if the friend request exists and is pending
+    # can only accept friend requests that are sent to the current user, not ones they sent themselves
+    friend_request = Friendship.query.filter(
+        ((Friendship.friend_id == current_user.id) & (Friendship.status == 'pending'))
+    ).first()
+    if not friend_request:
+        return jsonify({"Error: No pending friend request found"}), 404
+    # Update the friend request status to accepted
+    friend_request.status = 'accepted'
+    friend_request.accepted_at = db.func.now()
+    friend = User.query.get(user_id)
+    db.session.commit()
+    return jsonify({"message": f"Friend request accepted from {friend.username}!"}), 200
