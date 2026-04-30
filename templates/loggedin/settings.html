@@ -89,7 +89,7 @@
             <div
               class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-light sm:mx-0 sm:h-10 sm:w-10"
             >
-              <i class="fa-solid fa-address-book" style="color: #4741f7;"></i>
+              <i class="fa-solid fa-address-book" style="color: #4741f7"></i>
             </div>
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
               <h3
@@ -99,33 +99,55 @@
                 Profile Settings
               </h3>
               <div class="mt-2">
-                <p class="text-gray-500">
-                  Username: {{current_user.username}}
-                </p>
-                <button onclick = "return showusernamefield()" class = "bg-gray-300 rounded-2xl p-1.5 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-full">
+                <p class="text-gray-500">Username: {{current_user.username}}</p>
+                <button
+                  onclick="return showusernamefield();"
+                  class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-full"
+                >
                   Change username
                 </button>
-                <div id = "change-username" class = "flex-row py-3 invisible">
-                  <input id = "newusername" type = "text" class = "bg-white rounded-md">
-                  <button onclick = "return changeUsername()"class = "rounded-md hover:bg-green-700 bg-green-600 px-3 text-white">
+                <div id="change-username" class="flex-row py-3 invisible">
+                  <input
+                    id="newusername"
+                    type="text"
+                    class="bg-white rounded-md"
+                  />
+                  <button
+                    onclick="return changeUsername();"
+                    class="rounded-md hover:bg-green-700 bg-green-600 px-3 text-white"
+                  >
                     Confirm
                   </button>
-                  <button onclick = "return removeusernamefield()"class = "rounded-md hover:bg-red-700 bg-red-600 px-3 text-white">
+                  <button
+                    onclick="return removeusernamefield();"
+                    class="rounded-md hover:bg-red-700 bg-red-600 px-3 text-white"
+                  >
                     Cancel
                   </button>
                 </div>
-                <p class="text-gray-500">
-                  Email: {{current_user.email}}
-                </p>
-                <button onclick = "return showemailfield()" class = "bg-gray-300 rounded-2xl p-1.5 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-full">
+                <p class="text-gray-500">Email: {{current_user.email}}</p>
+                <button
+                  onclick="return showemailfield();"
+                  class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-full"
+                >
                   Change email
                 </button>
-                <div id = "change-email" class = "flex-row py-3 hidden">
-                  <input id = "newemail" type = "text" class = "bg-white rounded-md">
-                  <button onclick = "return changeEmail()" class = "rounded-md hover:bg-green-700 bg-green-600 px-3 text-white">
+                <div id="change-email" class="flex-row py-3 hidden">
+                  <input
+                    id="newemail"
+                    type="text"
+                    class="bg-white rounded-md"
+                  />
+                  <button
+                    onclick="return changeEmail();"
+                    class="rounded-md hover:bg-green-700 bg-green-600 px-3 text-white"
+                  >
                     Confirm
                   </button>
-                  <button onclick = "return removeemailfield()"class = "rounded-md hover:bg-red-700 bg-red-600 px-3 text-white">
+                  <button
+                    onclick="return removeemailfield();"
+                    class="rounded-md hover:bg-red-700 bg-red-600 px-3 text-white"
+                  >
                     Cancel
                   </button>
                 </div>
@@ -152,7 +174,7 @@
   </dialog>
 </el-dialog>
 <!-- Account modal -->
- <el-dialog>
+<el-dialog>
   <dialog
     id="account-modal"
     class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
@@ -173,7 +195,7 @@
             <div
               class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-light sm:mx-0 sm:h-10 sm:w-10"
             >
-              <i class="fa-solid fa-gear" style="color: #4741f7;"></i>
+              <i class="fa-solid fa-gear" style="color: #4741f7"></i>
             </div>
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
               <h3
@@ -183,15 +205,19 @@
                 Account Settings
               </h3>
               <div class="mt-2">
-                <p class="text-gray-500">
-                </p>
-                <button class = "bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full">
+                <p class="text-gray-500"></p>
+                <button
+                  onclick="alert('Functionability coming in the future!')"
+                  class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
+                >
                   Change your password
                 </button>
-                <p class="text-gray-500">
-                </p>
-                <br>
-                <button class = "bg-red-600 text-white rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full">
+                <p class="text-gray-500"></p>
+                <br />
+                <button
+                  onclick="alert('Functionability coming in the future!')"
+                  class="bg-red-600 text-white rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
+                >
                   Delete your account
                 </button>
               </div>
@@ -216,7 +242,6 @@
     </div>
   </dialog>
 </el-dialog>
-
 
 {% endblock %} {% block scripts %}
 <script>
@@ -284,7 +309,6 @@
   }
 
   async function syncCal() {
-
     const res = await fetch(`/api/sync-cal/`, {
       headers: {
         "Content-Type": "application/json",
@@ -308,11 +332,12 @@
     document.getElementById("change-username").classList.remove("invisible");
   }
   function removeusernamefield() {
-    document.getElementById("newusername").value = '';
+    document.getElementById("newusername").value = "";
     document.getElementById("change-username").classList.add("invisible");
   }
   function changeUsername() {
-
+    // Will require a bit more code, so will leave it as it is for another branch
+    alert("Functionability coming in the future!");
   }
 
   // Changing email functions
@@ -320,12 +345,16 @@
     document.getElementById("change-email").classList.remove("hidden");
   }
   function removeemailfield() {
-    document.getElementById("newemail").value = '';
+    document.getElementById("newemail").value = "";
     document.getElementById("change-email").classList.add("hidden");
   }
   function changeEmail() {
-
+    // Will require a bit more code, so will leave it as it is for another branch
+    alert("Functionability coming in the future!");
   }
+
+  // Changing Password and Account deletion will probably require more security (ie. Are you sures, require password)
+  // As well as some database/flask shenanigans.
 </script>
 <!-- Tailwind Elements -->
 <script
