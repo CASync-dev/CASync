@@ -17,11 +17,19 @@ def getusers():
     # If it's an email
     if '@' in data['search']:
         searchmail = data['search']
-        mail = User.query.filter_by(email=searchmail).all()
-        if mail == []:
+        mail = User.query.filter(User.email == searchmail).first()
+        # .first() in case email entered does not have an associated acc
+        # Dont include the user themselves in search results
+        if mail is None or mail.id == current_user.id:
             return jsonify({'results': 0})
-        # the user model has a to dict method that converts the user object to a dictionary.
-        return jsonify({'results': [u.public_dict() for u in mail]})
+        # Check if a friendship already exists with the searched user, if so, don't return them in search results
+        existing_friendship = Friendship.query.filter(
+            ((Friendship.user_id == current_user.id) & (Friendship.friend_id == mail.id)) |
+            ((Friendship.user_id == mail.id) & (Friendship.friend_id == current_user.id))
+        ).first()
+        if existing_friendship:
+            return jsonify({'results': 0})
+        return jsonify({'results': [mail.public_dict()]})
     else:
         # ie. Username
         user = data['search']
@@ -29,6 +37,13 @@ def getusers():
             # Prevent users from searching using less than 3 letters
             return jsonify({'results': 0})
         users = User.query.filter(User.username.contains(user)).all()
+        # Dont include the user themselves in search results
+        users = [u for u in users if u.id != current_user.id]
+        # Filter out users that already have a friendship with the current user
+        users = [u for u in users if not Friendship.query.filter(
+            ((Friendship.user_id == current_user.id) & (Friendship.friend_id == u.id)) |
+            ((Friendship.user_id == u.id) & (Friendship.friend_id == current_user.id))
+        ).first()]
         if users == []:
             return jsonify({'results': 0})
         return jsonify({'results': [u.public_dict() for u in users]})
