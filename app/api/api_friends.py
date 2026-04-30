@@ -17,28 +17,21 @@ def getusers():
     # If it's an email
     if '@' in data['search']:
         searchmail = data['search']
-        query = text("SELECT users.username FROM users WHERE users.email = :e")
-        param = {"e":searchmail}
-        # There should only be one account per email, if an error raises then there's
-        # Something wrong with the datebase...
-        # .scalar in case email entered does not have an associated acc
-        mail = db.session.scalar(query, param)
-        if mail == None:
+        mail = User.query.filter_by(email=searchmail).all()
+        if mail == []:
             return jsonify({'results': 0})
-        mail = [mail]
-        return jsonify({'results': mail})
+        # the user model has a to dict method that converts the user object to a dictionary.
+        return jsonify({'results': [u.to_dict() for u in mail]})
     else:
         # ie. Username
         user = data['search']
         if len(user) < 3:
             # Prevent users from searching using less than 3 letters
             return jsonify({'results': 0})
-        query = text("SELECT users.username FROM users WHERE users.username = :u_")
-        param = {"u_":user}
-        users = list(db.session.scalars(query, param).all())
+        users = User.query.filter(User.username.contains(user)).all()
         if users == []:
-            return jsonify({'results':0})
-        return jsonify({'results': users})
+            return jsonify({'results': 0})
+        return jsonify({'results': [u.to_dict() for u in users]})
     
 @api_friends.route("/api/requestfriend", methods=["POST"])
 @login_required
@@ -52,9 +45,7 @@ def requestfriend():
         return jsonify({"Error: Invalid username"}), 400
     username = data['username']
     # This checks if the user exists, this shoulnt be a probelm as the frontend only allows searhcing for existing users but just in case.
-    query = text("SELECT users.id FROM users WHERE users.username = :u_")
-    param = {"u_":username}
-    user_id = db.session.scalar(query, param)
+    user_id = db.session.scalar(select(User.id).where(User.username == username))
     if user_id == None:
         return jsonify({"Error: User not found"}), 404
     # Create a new friend request entry in the database
