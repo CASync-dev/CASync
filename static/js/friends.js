@@ -1,7 +1,3 @@
-function addFriend() {
-  alert('Add Friend functionality is not implemented yet.');
-}
-
 // Temporary measure
 const DEV_USERS = [
   'alice_wonder',
@@ -64,6 +60,7 @@ async function searchFriends() {
       });
     // Debugging:
     users = results['results'];
+    console.log(users);
   } catch (error) {
     console.error('Error:', error);
     return;
@@ -87,7 +84,7 @@ async function searchFriends() {
     <li class="flex items-center justify-between py-2 px-4 hover:bg-gray-100 rounded-md">
     <div class="flex items-center gap-3">
         <img src="https://placehold.co/200x200" class="h-8 w-8 rounded-full" />
-        <span class="text-sm font-medium text-gray-800">${u}</span>
+        <span class="text-sm font-medium text-gray-800">${u.username}</span>
     </div>
     <button onclick="addFriend()" class="text-sm bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">Add</button>
     </li>`,
@@ -95,6 +92,25 @@ async function searchFriends() {
     .join('');
   document.getElementById('friend-search-results').classList.remove('hidden');
   return;
+}
+// Sends a friend request to the requestfriend endpoint, with the username of the user to be added as a friend in the body.
+function addFriend() {
+  // Reads CSRFtoken from token and sends with data.
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+  const username = event.target.parentElement.querySelector('span').textContent;
+  fetch('/api/requestfriend', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: username }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      // Optionally, you can update the UI to reflect the sent friend request
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
 }
 
 // Handle displaying a friends schedule in the modal

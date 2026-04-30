@@ -21,7 +21,7 @@ def getusers():
         if mail == []:
             return jsonify({'results': 0})
         # the user model has a to dict method that converts the user object to a dictionary.
-        return jsonify({'results': [u.to_dict() for u in mail]})
+        return jsonify({'results': [u.public_dict() for u in mail]})
     else:
         # ie. Username
         user = data['search']
@@ -31,7 +31,7 @@ def getusers():
         users = User.query.filter(User.username.contains(user)).all()
         if users == []:
             return jsonify({'results': 0})
-        return jsonify({'results': [u.to_dict() for u in users]})
+        return jsonify({'results': [u.public_dict() for u in users]})
     
 @api_friends.route("/api/requestfriend", methods=["POST"])
 @login_required

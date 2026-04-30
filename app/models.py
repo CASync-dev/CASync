@@ -43,6 +43,11 @@ class User(UserMixin, db.Model):
             'email': self.email,
             'created_at': self.created_at.isoformat(),
         }
+    def public_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+        }
 
 
 class Event(db.Model):
