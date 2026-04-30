@@ -102,28 +102,31 @@
                 <p class="text-gray-500">
                   Username: {{current_user.username}}
                 </p>
-                <button class = "bg-gray-300 rounded-2xl p-1.5 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-full">
+                <button onclick = "return showusernamefield()" class = "bg-gray-300 rounded-2xl p-1.5 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-full">
                   Change username
                 </button>
-                <div id = "change-username" class = "flex-row py-3 hidden">
-                  <input type = "text" class = "bg-white rounded-md">
-                  <button class = "rounded-md hover:bg-green-700 bg-green-600 px-3 text-white">
+                <div id = "change-username" class = "flex-row py-3 invisible">
+                  <input id = "newusername" type = "text" class = "bg-white rounded-md">
+                  <button onclick = "return changeUsername()"class = "rounded-md hover:bg-green-700 bg-green-600 px-3 text-white">
                     Confirm
                   </button>
-                  <button class = "rounded-md hover:bg-red-700 bg-red-600 px-3 text-white">
+                  <button onclick = "return removeusernamefield()"class = "rounded-md hover:bg-red-700 bg-red-600 px-3 text-white">
                     Cancel
                   </button>
                 </div>
                 <p class="text-gray-500">
                   Email: {{current_user.email}}
                 </p>
-                <button class = "bg-gray-300 rounded-2xl p-1.5 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-full">
+                <button onclick = "return showemailfield()" class = "bg-gray-300 rounded-2xl p-1.5 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-full">
                   Change email
                 </button>
                 <div id = "change-email" class = "flex-row py-3 hidden">
-                  <input type = "text" class = "bg-white rounded-md">
-                  <button class = "rounded-md hover:bg-green-700 bg-green-600 px-3 text-white">
+                  <input id = "newemail" type = "text" class = "bg-white rounded-md">
+                  <button onclick = "return changeEmail()" class = "rounded-md hover:bg-green-700 bg-green-600 px-3 text-white">
                     Confirm
+                  </button>
+                  <button onclick = "return removeemailfield()"class = "rounded-md hover:bg-red-700 bg-red-600 px-3 text-white">
+                    Cancel
                   </button>
                 </div>
               </div>
@@ -298,6 +301,30 @@
     } else {
       showMsg("Error: " + (data.error || "Unknown error"), false);
     }
+  }
+
+  // Changing username Functions
+  function showusernamefield() {
+    document.getElementById("change-username").classList.remove("invisible");
+  }
+  function removeusernamefield() {
+    document.getElementById("newusername").value = '';
+    document.getElementById("change-username").classList.add("invisible");
+  }
+  function changeUsername() {
+
+  }
+
+  // Changing email functions
+  function showemailfield() {
+    document.getElementById("change-email").classList.remove("hidden");
+  }
+  function removeemailfield() {
+    document.getElementById("newemail").value = '';
+    document.getElementById("change-email").classList.add("hidden");
+  }
+  function changeEmail() {
+
   }
 </script>
 <!-- Tailwind Elements -->
