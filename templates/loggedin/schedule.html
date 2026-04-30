@@ -2,383 +2,14 @@
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 {% endblock %}
 
-<!-- This is template cal from https://pagedone.io/tailwind-blocks/application/calendar -->
+<!-- This is template cal from https://pagedone.io/tailwind-blocks/application/calendar that has been modified a lot-->
 {% block content %}
 
 <!-- Main Calendar Section Container -->
 <section class="relative bg-stone-50">
-  <div class="w-full max-w-7xl mx-auto px-6 lg:px-8">
-    <!-- Calendar Header: Contains title, view selector, and new activity button -->
-    <div
-      class="flex flex-col md:flex-row max-md:gap-3 items-center justify-between"
-    >
-      <!-- Calendar Icon and Current Date Display -->
-      <div class="flex items-center gap-4">
-        <!-- Calendar Icon  -->
-        <i class="fa-solid fa-calendar-days text-gray-400 text-2xl"></i>
-        <!-- Current date will be dynamically updated by JavaScript -->
-        <h6
-          id="calendar-title"
-          class="text-xl leading-8 text-gray-900"
-        >
-          Today, January 2024
-        </h6>
-      </div>
-      <!-- New Activity Button -->
-      <button
-        class="hidden md:block btn-primary p-3 transition-all duration-300"
-        id="new-event-btn"
-        command="show-modal"
-        commandfor="drawer"
-      >
-        <i class="fa-solid fa-plus text-sm"></i>
-        New Activity
-      </button>
-      <button
-        class="block md:hidden fixed right-0 bottom-0 m-3 w-12 h-12 z-50 font-semibold rounded-full bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700"
-        id="new-event-btn"
-        command="show-modal"
-        commandfor="drawer"
-      >
-        <i class="fa-solid fa-plus text-sm"></i>
-      </button>
-    </div>
+  {% from 'loggedin/components/calendarBlock.html' import calendarBlock %} 
 
-    <!-- Calendar Grid Container -->
-    <div class="relative">
-      <div class="flex justify-between p-2">
-        <button
-          id="btn-last-week"
-          class="btn-primary p-3 transition-all duration-300"
-        >
-          < Last Week
-        </button>
-        <button
-          id="btn-today"
-          class="hidden btn-primary p-3 transition-all duration-300"
-        >
-          Today
-        </button>
-        <button
-          id="btn-next-week"
-          class="btn-primary p-3 transition-all duration-300"
-        >
-          Next Week >
-        </button>
-      </div>
-      <!-- Scrollable calendar content -->
-      <div class="overflow-x-auto">
-        <!-- Week Header Row: Monday-Friday work week -->
-        <div class="grid grid-cols-6 border-t border-gray-200 w-full min-w-150">
-          <!-- Empty corner cell for time column -->
-          <div
-            class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
-          ></div>
-          <!-- Day columns - dates and day names will be dynamically set by JavaScript -->
-          <div
-            id="date-col-0"
-            class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
-          >
-            Mon
-          </div>
-          <div
-            id="date-col-1"
-            class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
-          >
-            Tue
-          </div>
-          <div
-            id="date-col-2"
-            class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
-          >
-            Wed
-          </div>
-          <div
-            id="date-col-3"
-            class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
-          >
-            Thu
-          </div>
-          <div
-            id="date-col-4"
-            class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
-          >
-            Fri
-          </div>
-        </div>
-
-        <!--  Calendar Grid -->
-        <!-- Grid structure: 6 columns (time + 5 weekdays), multiple rows for time slots -->
-        <!-- Time range: 07:00 am to 06:00 pm -->
-        <div id="desktop-grid" class="grid grid-cols-6 min-w-150">
-          <!-- 07:00 AM time slot -->
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-          >
-            <span class="text-xs font-semibold text-gray-400">07:00 am</span>
-          </div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-
-          <!-- 08:00 AM time slot -->
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-          >
-            <span class="text-xs font-semibold text-gray-400">08:00 am</span>
-          </div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-
-          <!-- 09:00 AM time slot -->
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-          >
-            <span class="text-xs font-semibold text-gray-400">09:00 am</span>
-          </div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-
-          <!-- 10:00 AM time slot -->
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-          >
-            <span class="text-xs font-semibold text-gray-400">10:00 am</span>
-          </div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-
-          <!-- 11:00 AM time slot -->
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-          >
-            <span class="text-xs font-semibold text-gray-400">11:00 am</span>
-          </div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-
-          <!-- 12:00 PM time slot -->
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-          >
-            <span class="text-xs font-semibold text-gray-400">12:00 pm</span>
-          </div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-
-          <!-- 01:00 PM time slot -->
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-          >
-            <span class="text-xs font-semibold text-gray-400">01:00 pm</span>
-          </div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-
-          <!-- 02:00 PM time slot -->
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-          >
-            <span class="text-xs font-semibold text-gray-400">02:00 pm</span>
-          </div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-
-          <!-- 03:00 PM time slot -->
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-          >
-            <span class="text-xs font-semibold text-gray-400">03:00 pm</span>
-          </div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-
-          <!-- 04:00 PM time slot -->
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-          >
-            <span class="text-xs font-semibold text-gray-400">04:00 pm</span>
-          </div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-
-          <!-- 05:00 PM time slot -->
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-          >
-            <span class="text-xs font-semibold text-gray-400">05:00 pm</span>
-          </div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-
-          <!-- 06:00 PM time slot -->
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
-          >
-            <span class="text-xs font-semibold text-gray-400">06:00 pm</span>
-          </div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-          <div
-            class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-gray-200 transition-all hover:bg-stone-100"
-          ></div>
-        </div>
-      </div>
-      <!-- end scrollable calendar content -->
-    </div>
-  </div>
+  {{calendarBlock(days=['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], eventsUrl='/api/events/me', allowEventCreation=true) }}
 
   <!-- Add Event Drawer-->
   <el-dialog>
@@ -447,6 +78,7 @@
                       id="event-date"
                       name="event-date"
                       class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      value="{{now.strftime('%Y-%m-%d')}}"
                     />
                   </div>
                   <div class="mb-3">
@@ -459,6 +91,7 @@
                         id="event-time-start"
                         name="event-time-start"
                         class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        value="{{now.strftime("%H:%M")}}"
                       />
                       <p class="mx-2">-</p>
                       <input
@@ -466,6 +99,7 @@
                         id="event-time-end"
                         name="event-time-end"
                         class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        value="{{now.replace(hour=now.hour+1).strftime('%H:%M')}}"
                       />
                     </div>
                   </div>
@@ -493,19 +127,6 @@
                       rows="3"
                       class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     ></textarea>
-                  </div>
-                  <!-- TODO: Temporary user selection. will be based on session later -->
-                  <div class="mb-3">
-                    <label for="event-users" class="text-sm font-medium">
-                      User ID
-                    </label>
-                    <input
-                      type="text"
-                      id="user-id"
-                      name="user-id"
-                      placeholder="1..."
-                      class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
                   </div>
                   <!-- color picker - these colors are defined in schedule.js/COLOR_MAP -->
                   <div>
@@ -769,19 +390,6 @@
                         class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       ></textarea>
                     </div>
-                    <!-- TODO: Temporary user selection. will be based on session later -->
-                    <div class="mb-3">
-                      <label for="user-id" class="block text-sm font-medium">
-                        User ID
-                      </label>
-                      <input
-                        type="text"
-                        id="edit-user-id"
-                        name="user-id"
-                        placeholder="1..."
-                        class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      />
-                    </div>
                     <!-- color picker - these colors are defined in schedule.js/COLOR_MAP -->
                     <div class="mb-3">
                       <label
@@ -875,6 +483,16 @@
 </section>
 {% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/schedule.js') }}"></script>
+<!-- sync day-header horizontal scroll with the grid scroll -->
+<script>
+  // sync horizontal scroll of day headers with calendar grid
+  const gridScroll = document.getElementById('grid-scroll');
+  const dayHeadersScroll = document.getElementById('day-headers-scroll');
+  // when the calendar grid is scrolled horizontally, update the scroll position of the day headers
+  gridScroll.addEventListener('scroll', () => {
+    dayHeadersScroll.scrollLeft = gridScroll.scrollLeft;
+  });
+</script>
 <!-- tailwind js -->
 <script
   src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"

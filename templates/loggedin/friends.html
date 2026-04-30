@@ -5,22 +5,35 @@
   <!-- top bar -->
   <div class="flex items-center pb-3 border-b border-gray-300">
     <h1 class="text-3xl font-bold text-white">Friends</h1>
-    <button
-      class="btn-white px-4 ml-auto mr-2 h-10 whitespace-nowrap"
-      onclick="alert('Request functionality is not implemented yet.')"
+    <!-- search bar -->
+    <div class="relative ml-4">
+      <input
+        id="friend-search-input"
+        type="text"
+        placeholder="Search friends..."
+        class="bg-white text-gray-700 placeholder:text-gray-500 border border-gray-500 focus:ring-blue-500 focus:border-blue-500 rounded-2xl py-2 pl-4 pr-10"
+      />
+    </div>
+    <div
+      class="flex ml-auto gap-2 sm:flex-row flex-col items-end sm:items-center mt-2 sm:mt-0"
     >
-      Friend Requests
-    </button>
-    <button
-      class="btn-white px-4 h-10 whitespace-nowrap"
-      command="show-modal"
-      commandfor="add-friend-modal"
-    >
-      Add Friend
-    </button>
+      <button
+        class="btn-white px-4 mr-2 h-10 whitespace-nowrap"
+        onclick="alert('Request functionality is not implemented yet.')"
+      >
+        Friend Requests
+      </button>
+      <button
+        class="btn-white px-4 h-10 whitespace-nowrap"
+        command="show-modal"
+        commandfor="add-friend-modal"
+      >
+        Add Friend
+      </button>
+    </div>
   </div>
   <div class="mt-6">
-    <ul class="">
+    <ul class="" id="friends-list">
       <!-- Friend list items -->
       {% for friend in friends %}
       <li
@@ -29,17 +42,17 @@
         <div class="flex items-center">
           <img
             class="h-15 w-15 rounded-full"
-            src="{{ friend.avatar_url }}"
+            src="{{friend.avatar_url }}"
             alt="{{ friend.username }}'s avatar"
           />
           <div class="ml-4">
             <p class="text-sm font-medium text-white">{{ friend.username }}</p>
-            <p class="text-sm text-gray-300">{{ friend.next_class }}</p>
+            <p class="text-sm text-gray-300">{{ friend.email }}</p>
           </div>
         </div>
         <button
           class="btn-plain px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400"
-          onclick="alert('Remove Friend functionality is not implemented yet.')"
+          onclick="openFriendSchedule('{{ friend.id }}', '{{ friend.username }}')"
         >
           <i class="fas fa-calendar-alt"></i>
           Schedule
@@ -87,7 +100,7 @@
                 </p>
                 <div class="mt-3 flex w-full items-stretch gap-2">
                   <input
-                    id="friend-search-input"
+                    id="user-search-input"
                     type="text"
                     class="flex-1 rounded-md border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                     placeholder="Friend's Username/Email"
@@ -123,35 +136,58 @@
     </div>
   </dialog>
 </el-dialog>
-{% endblock %} {% block scripts %}
-<script>
-  function addFriend() {
-    alert("Add Friend functionality is not implemented yet.");
-  }
+<!-- Friend Schedule Modal -->
+<el-dialog>
+  <dialog
+    id="friend-schedule-modal"
+    class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+    ></el-dialog-backdrop>
 
-  const DEV_USERS = [
-    "alice_wonder",
-    "bob_builder",
-    "charlie_chaplin",
-    "diana_prince",
-    "eve_online",
-  ];
-
-  function searchFriends() {
-    const list = document.getElementById("friend-search-list");
-    list.innerHTML = DEV_USERS.map(
-      (u) => `
-      <li class="flex items-center justify-between py-2 px-4 hover:bg-gray-100 rounded-md">
-        <div class="flex items-center gap-3">
-          <img src="https://placehold.co/200x200" class="h-8 w-8 rounded-full" />
-          <span class="text-sm font-medium text-gray-800">${u}</span>
+    <div
+      tabindex="0"
+      class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    >
+      <el-dialog-panel
+        class="relative transform overflow-hidden rounded-lg bg-stone-50 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-7xl max-h-[90vh] flex flex-col data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+      >
+        <div
+          class="flex flex-col flex-1 overflow-hidden bg-stone-50 pt-5 sm:pt-6"
+        >
+          <div
+            class="shrink-0 flex items-center justify-between mb-4 px-4 sm:px-6"
+          >
+            <h3
+              class="text-lg font-medium leading-6 text-gray-900"
+              id="friend-schedule-title"
+            >
+              Friend's Schedule
+            </h3>
+            <button
+              type="button"
+              class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:text-sm"
+              command="close"
+              commandfor="friend-schedule-modal"
+            >
+              Close
+            </button>
+          </div>
+          <div class="flex-1 overflow-y-auto">
+            {% from 'loggedin/components/calendarBlock.html' import
+            calendarBlock %} {{calendarBlock(days=['Mon', 'Tue', 'Wed',
+            'Thu','Fri'], eventsUrl='/api/events/', clipVerticalOverflow=true)
+            }}
+          </div>
         </div>
-        <button onclick="addFriend()" class="text-sm bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">Add</button>
-      </li>`,
-    ).join("");
-    document.getElementById("friend-search-results").classList.remove("hidden");
-  }
-</script>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>
+
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/friends.js') }}"></script>
 <!-- tailwind js -->
 <script
   src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"
