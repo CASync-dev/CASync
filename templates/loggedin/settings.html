@@ -98,7 +98,7 @@
               >
                 Profile Settings
               </h3>
-              <div class="mt-2">
+              <div class="mt-2 sm:mx-auto">
                 <p class="text-gray-500">Username: {{current_user.username}}</p>
                 <button
                   onclick="return showusernamefield();"
@@ -152,10 +152,6 @@
                   </button>
                 </div>
               </div>
-              <div id="friend-search-results" class="mt-4 hidden">
-                <p class="text-sm text-gray-500">Search Results:</p>
-                <ul id="friend-search-list" class="mt-2"></ul>
-              </div>
             </div>
           </div>
         </div>
@@ -204,14 +200,44 @@
               >
                 Account Settings
               </h3>
-              <div class="mt-2">
+              <div class="mt-2 sm:mx-auto">
                 <p class="text-gray-500"></p>
                 <button
-                  onclick="alert('Functionability coming in the future!')"
+                  onclick="return openPass();"
                   class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
                 >
                   Change your password
                 </button>
+                  <div id="change-pass" class="flex-col py-3 mb-2 invisible">
+                    <div class = "flex flex-row">
+                      <input
+                        id="old-password"
+                        placeholder="Current password..."
+                        type="password"
+                        class="bg-white rounded-md mx-2"
+                      />
+                      <input
+                        id="new-password"
+                        placeholder="New password..."
+                        type="password"
+                        class="bg-white rounded-md mx-2"
+                      />
+                    </div>
+                    <div class = "flex flex-row mt-2">
+                      <button
+                      onclick="return changePass();"
+                      class="rounded-md hover:bg-green-700 bg-green-600 px-3 text-white mx-2"
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      onclick="return removePass();"
+                      class="rounded-md hover:bg-red-700 bg-red-600 px-3 text-white mx-2"
+                    >
+                      Cancel
+                    </button>
+                    </div>
+                </div>
                 <p class="text-gray-500"></p>
                 <br />
                 <button
@@ -350,6 +376,20 @@
   }
   function changeEmail() {
     // Will require a bit more code, so will leave it as it is for another branch
+    alert("Functionability coming in the future!");
+  }
+
+  //Changing Pass
+  function openPass() {
+    document.getElementById("change-pass").classList.remove("invisible");
+  }
+  function removePass() {
+    document.getElementById("old-password").value = "";
+    document.getElementById("new-password").value = "";
+    document.getElementById("change-pass").classList.add("invisible");
+  }
+  function changePass() {
+    // This really should be done with jinja/flaskforms...
     alert("Functionability coming in the future!");
   }
 
