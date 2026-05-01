@@ -9,7 +9,9 @@
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.1",
     "browser-sync": "^3.0.4",
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "prettier": "^3.8.3",
+    "prettier-plugin-jinja-template": "^2.1.0"
   },
   "scripts": {
     "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify",
