@@ -99,7 +99,11 @@
                         id="event-time-end"
                         name="event-time-end"
                         class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        value="{{now.replace(hour=now.hour+1).strftime('%H:%M')}}"
+                        {% if now.hour == 23 %} 
+                          value= "{{now.replace(hour=0).strftime('%H:%M')}}" 
+                        {% else %} 
+                          value = "{{now.replace(hour=now.hour+1).strftime('%H:%M')}}" 
+                        {% endif %}
                       />
                     </div>
                   </div>
