@@ -12,18 +12,22 @@
   .btn-primary {
     @apply inline-flex items-center mx-1 my-1 rounded-2xl gap-2
               bg-primary hover:bg-indigo-800 shadow-black text-nearwhite
-                p-5 text-base font-semibold
+                p-5 text-base font-semibold;
   }
 
   .btn-white {
     @apply inline-flex items-center mx-1 my-1 rounded-2xl gap-2
               bg-nearwhite hover:bg-midgray shadow-black text-primary 
-                p-5 text-base font-semibold
+                p-5 text-base font-semibold;
   }
 
   .btn-plain {
     @apply inline-flex items-center mx-1 my-1 rounded-2xl gap-2
-              p-5 text-base font-semibold
+              p-5 text-base font-semibold;
+  }
+
+  .input-box {
+    @apply border bg-nearwhite field-sizing-fixed px-2 py-1;
   }
 }
 
