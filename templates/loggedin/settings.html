@@ -63,7 +63,8 @@
           class="h-12 w-12 rounded-full"
         />
         <button
-          onclick="alert('Functionability not implemented, stay tuned!')"
+          command="show-modal"
+          commandfor="changepfp-modal"
           class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-1/2"
         >
           Change Profile Picture
@@ -74,7 +75,8 @@
       <div class="flex flex-row justify-between">
         <p class="text-gray-500">Username: {{current_user.username}}</p>
         <button
-          onclick="return showusernamefield();"
+          command="show-modal"
+          commandfor="changeuser-modal"
           class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-1/2"
         >
           Change Username
@@ -84,26 +86,11 @@
       <div class="flex flex-row justify-between">
         <p class="text-gray-500">Email: {{current_user.email}}</p>
         <button
-          onclick="return showemailfield();"
+          command="show-modal"
+          commandfor="changemail-modal"
           class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-1/2"
         >
           Change Email
-        </button>
-      </div>
-
-      <div id="change-email" class="flex-row py-3 hidden">
-        <input id="newemail" type="text" class="bg-white rounded-md" />
-        <button
-          onclick="return changeEmail();"
-          class="rounded-md hover:bg-green-700 bg-green-600 px-3 text-white"
-        >
-          Confirm
-        </button>
-        <button
-          onclick="return removeemailfield();"
-          class="rounded-md hover:bg-red-700 bg-red-600 px-3 text-white"
-        >
-          Cancel
         </button>
       </div>
     </div>
@@ -112,94 +99,42 @@
       class="cursor-pointer flex items-center bg-primary rounded-2xl p-6 gap-4 text-white shadow-2xl hover:shadow transition duration-200 w-full"
       onclick="return showAccountSettings();"
     >
-    <i class="fa-solid fa-gear" style="color: white"></i>
+      <i class="fa-solid fa-gear" style="color: white"></i>
       Account
     </button>
     <div id="account-settings" class="mt-2 sm:mx-auto py-3 hidden">
       <p class="text-gray-500"></p>
       <button
-        onclick="alert('Functionability not implemented yet, stay tuned!')"
+        command="show-modal"
+        commandfor="ical-modal"
         class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
       >
         Edit iCal Links
       </button>
       <button
-        onclick="return openPass();"
+        command="show-modal"
+        commandfor="changepass-modal"
         class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
       >
         Change password
       </button>
-      <div id="change-pass" class="flex-col py-3 mb-2 invisible">
-        <div class="flex flex-row">
-          <input
-            id="old-password"
-            placeholder="Current password..."
-            type="password"
-            class="bg-white rounded-md mx-2"
-          />
-          <input
-            id="new-password"
-            placeholder="New password..."
-            type="password"
-            class="bg-white rounded-md mx-2"
-          />
-        </div>
-        <div class="flex flex-row mt-2">
-          <button
-            onclick="return changePass();"
-            class="rounded-md hover:bg-green-700 bg-green-600 px-3 text-white mx-2"
-          >
-            Confirm
-          </button>
-          <button
-            onclick="return removePass();"
-            class="rounded-md hover:bg-red-700 bg-red-600 px-3 text-white mx-2"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
       <p class="text-gray-500"></p>
       <button
-        onclick="alert('Functionability coming in the future!')"
+        command = "show-modal"
+        commandfor = "deleteacc-modal"
         class="bg-red-600 text-white rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
       >
         Delete account
       </button>
     </div>
   </div>
-  <!-- Profile Modal -->
+
+  <!-- All modals -->
+
+  <!-- Changing Profile Picture -->
   <el-dialog>
     <dialog
-      id="profile-modal"
-      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
-    >
-      <el-dialog-backdrop
-        class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
-      ></el-dialog-backdrop>
-      <el-dialog-panel>
-        <div id="change-username" class="flex-row py-3 invisible">
-          <input id="newusername" type="text" class="bg-white rounded-md" />
-          <button
-            onclick="return changeUsername();"
-            class="rounded-md hover:bg-green-700 bg-green-600 px-3 text-white"
-          >
-            Confirm
-          </button>
-          <button
-            onclick="return removeusernamefield();"
-            class="rounded-md hover:bg-red-700 bg-red-600 px-3 text-white"
-          >
-            Cancel
-          </button>
-        </div>
-      </el-dialog-panel>
-    </dialog>
-  </el-dialog>
-  <!-- Account modal -->
-  <el-dialog>
-    <dialog
-      id="account-modal"
+      id="changepfp-modal"
       class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
     >
       <el-dialog-backdrop
@@ -211,42 +146,328 @@
         class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
       >
         <el-dialog-panel
-          class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+          class="relative transform overflow-hidden rounded-lg bg-stone-50 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-7xl max-h-[90vh] flex flex-col data-closed:sm:translate-y-0 data-closed:sm:scale-95"
         >
-          <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
-            <div class="sm:flex sm:items-start">
-              <div
-                class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-light sm:mx-0 sm:h-10 sm:w-10"
-              >
-                
-              </div>
-              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                <h3
-                  class="text-lg font-medium leading-6 text-gray-900"
-                  id="modal-title"
-                >
-                  Account Settings
-                </h3>
-
-                <div id="friend-search-results" class="mt-4 hidden">
-                  <p class="text-sm text-gray-500">Search Results:</p>
-                  <ul id="friend-search-list" class="mt-2"></ul>
-                </div>
-              </div>
-            </div>
-          </div>
           <div
-            class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
-          >
-            <button
-              type="button"
-              class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-              command="close"
-              commandfor="account-modal"
+            class="flex flex-col flex-1 overflow-hidden bg-stone-50 pt-5 sm:pt-6"
+          ></div>
+          <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
             >
-              Close
-            </button>
+              <i class="fa-solid fa-address-book" style="color: #4741f7"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                Change Profile Picture
+              </h3>
+              <div class="mt-2">
+                <p>
+                  Currently not implemented, come back later!
+                </p>
+              </div>
+              </div>
           </div>
+        </div>
+          <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button
+            type="button"
+            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            command="close"
+            commandfor="changepfp-modal"
+          >
+            Close
+          </button>
+        </div>
+        </el-dialog-panel>
+      </div>
+    </dialog>
+  </el-dialog>
+
+  <!-- Changing Username -->
+    <el-dialog>
+    <dialog
+      id="changeuser-modal"
+      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+    >
+      <el-dialog-backdrop
+        class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+      ></el-dialog-backdrop>
+
+      <div
+        tabindex="0"
+        class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+      >
+        <el-dialog-panel
+          class="relative transform overflow-hidden rounded-lg bg-stone-50 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-7xl max-h-[90vh] flex flex-col data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        >
+          <div
+            class="flex flex-col flex-1 overflow-hidden bg-stone-50 pt-5 sm:pt-6"
+          ></div>
+          <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fa-solid fa-address-book" style="color: #4741f7"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                Change Username
+              </h3>
+              <div class="mt-2">
+                <p>
+                  Currently not implemented, come back later!
+                </p>
+              </div>
+              </div>
+          </div>
+        </div>
+          <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button
+            type="button"
+            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            command="close"
+            commandfor="changeuser-modal"
+          >
+            Close
+          </button>
+        </div>
+        </el-dialog-panel>
+      </div>
+    </dialog>
+  </el-dialog>
+
+  <!-- Changing Email -->
+    <el-dialog>
+    <dialog
+      id="changemail-modal"
+      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+    >
+      <el-dialog-backdrop
+        class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+      ></el-dialog-backdrop>
+
+      <div
+        tabindex="0"
+        class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+      >
+        <el-dialog-panel
+          class="relative transform overflow-hidden rounded-lg bg-stone-50 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-7xl max-h-[90vh] flex flex-col data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        >
+          <div
+            class="flex flex-col flex-1 overflow-hidden bg-stone-50 pt-5 sm:pt-6"
+          ></div>
+          <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fa-solid fa-address-book" style="color: #4741f7"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                Change Email
+              </h3>
+              <div class="mt-2">
+                <p>
+                  Currently not implemented, come back later!
+                </p>
+              </div>
+              </div>
+          </div>
+        </div>
+          <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button
+            type="button"
+            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            command="close"
+            commandfor="changemail-modal"
+          >
+            Close
+          </button>
+        </div>
+        </el-dialog-panel>
+      </div>
+    </dialog>
+  </el-dialog>
+
+    <!-- Edit/Remove iCal links (Will show a table here of current ical links) -->
+    <el-dialog>
+    <dialog
+      id="ical-modal"
+      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+    >
+      <el-dialog-backdrop
+        class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+      ></el-dialog-backdrop>
+
+      <div
+        tabindex="0"
+        class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+      >
+        <el-dialog-panel
+          class="relative transform overflow-hidden rounded-lg bg-stone-50 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-7xl max-h-[90vh] flex flex-col data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        >
+          <div
+            class="flex flex-col flex-1 overflow-hidden bg-stone-50 pt-5 sm:pt-6"
+          ></div>
+          <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fa-solid fa-gear" style="color: #4741f7"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                iCal Links
+              </h3>
+              <div class="mt-2">
+                <p>
+                  Currently not implemented, come back later!
+                </p>
+              </div>
+              </div>
+          </div>
+        </div>
+          <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button
+            type="button"
+            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            command="close"
+            commandfor="ical-modal"
+          >
+            Close
+          </button>
+        </div>
+        </el-dialog-panel>
+      </div>
+    </dialog>
+  </el-dialog>
+
+    <!-- Changing Password -->
+    <el-dialog>
+    <dialog
+      id="changepass-modal"
+      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+    >
+      <el-dialog-backdrop
+        class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+      ></el-dialog-backdrop>
+
+      <div
+        tabindex="0"
+        class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+      >
+        <el-dialog-panel
+          class="relative transform overflow-hidden rounded-lg bg-stone-50 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-7xl max-h-[90vh] flex flex-col data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        >
+          <div
+            class="flex flex-col flex-1 overflow-hidden bg-stone-50 pt-5 sm:pt-6"
+          ></div>
+          <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fa-solid fa-gear" style="color: #4741f7"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                Change Password
+              </h3>
+              <div class="mt-2">
+                <p>
+                  Currently not implemented, come back later!
+                </p>
+              </div>
+              </div>
+          </div>
+        </div>
+          <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button
+            type="button"
+            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            command="close"
+            commandfor="changepass-modal"
+          >
+            Close
+          </button>
+        </div>
+        </el-dialog-panel>
+      </div>
+    </dialog>
+  </el-dialog>
+
+    <!-- Account deletion -->
+    <el-dialog>
+    <dialog
+      id="deleteacc-modal"
+      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+    >
+      <el-dialog-backdrop
+        class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+      ></el-dialog-backdrop>
+
+      <div
+        tabindex="0"
+        class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+      >
+        <el-dialog-panel
+          class="relative transform overflow-hidden rounded-lg bg-stone-50 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-7xl max-h-[90vh] flex flex-col data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        >
+          <div
+            class="flex flex-col flex-1 overflow-hidden bg-stone-50 pt-5 sm:pt-6"
+          ></div>
+          <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fa-solid fa-gear" style="color: #4741f7"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                Account Deletion
+              </h3>
+              <div class="mt-2">
+                <p>
+                  Currently not implemented, come back later!
+                </p>
+              </div>
+              </div>
+          </div>
+        </div>
+          <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button
+            type="button"
+            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            command="close"
+            commandfor="deleteacc-modal"
+          >
+            Close
+          </button>
+        </div>
         </el-dialog-panel>
       </div>
     </dialog>
