@@ -99,6 +99,17 @@
                 Profile Settings
               </h3>
               <div class="mt-2 sm:mx-auto">
+                <!-- Here would be where the user's pfp would be displayed-->
+                <button
+                  onclick="
+                    alert('Functionability not implemented, stay tuned!')
+                  "
+                  class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-full"
+                >
+                  Change your Profile Picture
+                </button>
+                <br />
+                <br />
                 <p class="text-gray-500">Username: {{current_user.username}}</p>
                 <button
                   onclick="return showusernamefield();"
@@ -203,6 +214,14 @@
               <div class="mt-2 sm:mx-auto">
                 <p class="text-gray-500"></p>
                 <button
+                  onclick="
+                    alert('Functionability not implemented yet, stay tuned!')
+                  "
+                  class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
+                >
+                  Edit your iCal Links
+                </button>
+                <button
                   onclick="return openPass();"
                   class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
                 >
@@ -239,14 +258,6 @@
                   </div>
                 </div>
                 <p class="text-gray-500"></p>
-                <button
-                  onclick="
-                    alert('Functionability not implemented yet, stay tuned!')
-                  "
-                  class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
-                >
-                  Edit your iCal Links
-                </button>
                 <button
                   onclick="alert('Functionability coming in the future!')"
                   class="bg-red-600 text-white rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
