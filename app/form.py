@@ -72,5 +72,5 @@ class EventForm(FlaskForm):
 
 # I've only done this for changing passwords since other changing fields shouldn't need validation (ie. current pass) ?
 class changePassword(FlaskForm):
-    current_password = StringField(validators=[InputRequired])
+    current_password = StringField(validators=[InputRequired()])
     new_password = StringField(validators=[InputRequired(message="All fields are required."),strong_password])
