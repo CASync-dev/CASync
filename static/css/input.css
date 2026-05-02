@@ -11,13 +11,13 @@
 @layer components {
   .btn-primary {
     @apply inline-flex items-center mx-1 my-1 rounded-2xl gap-2
-              bg-primary hover:bg-indigo-800 shadow-black text-nearwhite
-                py-4 px-7 text-base font-semibold;
+              bg-primary hover:bg-primary-dark shadow-primary-dark shadow-md text-nearwhite
+                py-3 px-7 text-base font-semibold;
   }
 
   .btn-white {
     @apply inline-flex items-center mx-1 my-1 rounded-2xl gap-2
-              bg-nearwhite hover:bg-midgray shadow-black text-primary 
+              bg-nearwhite hover:bg-midgray shadow-primary-dark shadow-md text-primary 
                 py-4 px-7 text-base font-semibold;
   }
 
