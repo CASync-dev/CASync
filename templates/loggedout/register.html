@@ -8,7 +8,7 @@
         id="register"
         method="POST"
         action="{{ url_for('loggedout.register') }}"
-        class="bg-primary p-6 m-6 border-8 rounded-3xl border-primary drop-shadow-2xl shadow text-align"
+        class="card-form"
       >
         {{ form.hidden_tag() }}
         <legend class="-m-1 text-2xl text-nearwhite mx-auto font-medium">
@@ -99,15 +99,15 @@
           <button
             id="log"
             type="submit"
-            class="button cursor-pointer btn-white"
+            class="button cursor-pointer btn-white px-12"
           >
-            Continue
+            Register
           </button>
           <br />
           <h5 class="text-xs pt-5 text-nearwhite">
             Already registered? Login
             <a href="{{ url_for('loggedout.login') }}" class="underline">
-              here.
+              here
             </a>
           </h5>
         </div>
