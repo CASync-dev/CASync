@@ -32,7 +32,19 @@
   }
 
   .card-form {
-    @apply bg-primary/90 p-6 m-6 border-8 rounded-3xl border-primary-dark/90 drop-shadow-xl drop-shadow-black shadow;
+    @apply bg-primary/90 p-6 m-6 border-8 rounded-3xl border-primary-dark/70 drop-shadow-xl drop-shadow-black shadow;
+  }
+
+  .section-layout {
+    @apply flex flex-col;
+  }
+
+  .container-layout {
+    @apply flex flex-col flex-wrap my-16 px-4 md:px-10 lg:px-16 w-full mx-auto max-w-7xl;
+  }
+
+  .container-spacing {
+    @apply flex flex-col md:flex-row items-center justify-between py-6;
   }
 }
 
