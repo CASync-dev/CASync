@@ -1,18 +1,19 @@
 {% extends "loggedout/log-out-layout.html" %}
 {% block content %}
   <body>
-    <br />
     <div
-      class="antialiased mx-auto bg-white flex max-w-2.5 items-center justify-center text-center"
+      class="antialiased mx-auto bg-white flex max-w-2.5 items-center justify-center"
     >
       <form
         id="login"
         method="POST"
         action="{{ url_for('loggedout.login') }}"
-        class="bg-primary p-6 m-6 border-8 rounded-3xl border-primary drop-shadow-2xl shadow"
+        class="card-form"
       >
         {{ form.hidden_tag() }}
-        <legend class="-m-1 text-2xl text-nearwhite mx-auto font-medium">
+        <legend
+          class="-m-1 text-2xl text-nearwhite mx-auto font-medium text-center"
+        >
           LOGIN
         </legend>
         <br />
@@ -21,18 +22,19 @@
             >Username:</label
           >
           <br />
-          <input
-            id="username"
-            name="username"
-            type="text"
-            autocomplete="username"
-            aria-required="true"
-            autofocus="autofocus"
-            size="30"
-            value="{{ form.username.data or '' }}"
-            class="input-box"
-          />
-          <br />
+          <div>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              autocomplete="username"
+              aria-required="true"
+              autofocus="autofocus"
+              size="30"
+              value="{{ form.username.data or '' }}"
+              class="input-box"
+            />
+          </div>
           <br />
           <br />
           <label for="password" class="text-left text-nearwhite"
@@ -69,15 +71,16 @@
             {% endfor %}
           {% endfor %}{% endif %}
           <br />
-          <button
-            id="log"
-            type="submit"
-            class="button cursor-pointer btn-white"
-          >
-            Continue
-          </button>
-          <br />
-          <h5 class="text-nearwhite text-xs pt-5">
+          <div class="flex justify-center">
+            <button
+              id="log"
+              type="submit"
+              class="button cursor-pointer btn-white px-12"
+            >
+              Login
+            </button>
+          </div>
+          <h5 class="text-nearwhite text-xs pt-5 text-center">
             Not a member yet? Register
             <a href="{{ url_for('loggedout.register') }}" class="underline">
               here.
