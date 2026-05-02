@@ -2,7 +2,7 @@
 {% block content %}
   <body>
     <div
-      class="antialiased mx-auto bg-white flex max-w-2.5 items-center justify-center text-center"
+      class="antialiased mx-auto bg-white flex max-w-2.5 items-center justify-center"
     >
       <form
         id="register"
@@ -11,7 +11,9 @@
         class="card-form"
       >
         {{ form.hidden_tag() }}
-        <legend class="-m-1 text-2xl text-nearwhite mx-auto font-medium">
+        <legend
+          class="-m-1 text-2xl text-nearwhite mx-auto font-medium text-center"
+        >
           REGISTER
         </legend>
         <br />
@@ -96,15 +98,16 @@
             {% endfor %}
           {% endfor %}{% endif %}
           <br />
-          <button
-            id="log"
-            type="submit"
-            class="button cursor-pointer btn-white px-12"
-          >
-            Register
-          </button>
-          <br />
-          <h5 class="text-xs pt-5 text-nearwhite">
+          <div class="flex justify-center">
+            <button
+              id="log"
+              type="submit"
+              class="button cursor-pointer btn-white px-12"
+            >
+              Register
+            </button>
+          </div>
+          <h5 class="text-xs pt-5 text-nearwhite text-center">
             Already registered? Login
             <a href="{{ url_for('loggedout.login') }}" class="underline">
               here
