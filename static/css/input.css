@@ -46,6 +46,14 @@
   .container-spacing {
     @apply flex flex-col md:flex-row items-center justify-between py-6;
   }
+
+  .h1 {
+    @apply text-5xl font-bold;
+  }
+
+  .h2 {
+    @apply text-2xl block font-semibold mb-4;
+  }
 }
 
 @theme {
