@@ -48,7 +48,7 @@
   }
 
   .h1 {
-    @apply text-5xl font-bold;
+    @apply text-5xl font-bold mb-4;
   }
 
   .h2 {
