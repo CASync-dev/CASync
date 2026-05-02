@@ -27,16 +27,20 @@
   }
 
   .input-box {
-    @apply border bg-nearwhite field-sizing-fixed px-2 py-1 
+    @apply border bg-nearwhite field-sizing-fixed px-2 py-1 rounded-md
               ease-linear transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary-light/50 shadow-lg shadow-primary-dark;
   }
 
   .card-form {
-    @apply bg-primary/90 p-6 m-6 border-8 rounded-3xl border-primary-dark/70 drop-shadow-xl drop-shadow-black shadow;
+    @apply bg-primary/90 p-6 px-12 m-6 border-8 rounded-3xl border-primary-dark/70 drop-shadow-xl drop-shadow-black shadow;
   }
 
   .section-layout {
     @apply flex flex-col;
+  }
+
+  .container-loggedin {
+    @apply w-full max-w-7xl mx-auto px-6 lg:px-8;
   }
 
   .container-layout {
