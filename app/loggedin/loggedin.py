@@ -29,16 +29,17 @@ def groups():
 @loggedin.route("/friends")
 @login_required
 def friends():
-    # this will evnetually retrun all the users friends, for now i return all users
-    friends = Friendship.query.filter((Friendship.user_id == current_user.id) | (Friendship.friend_id == current_user.id), Friendship.status == 'accepted').all()
-    
-    # give random avatar urls to each friend using their id as a seed for testing
+    # this will evnetually retrun all the users friends. 
+    friends = current_user.get_friends()
     for friend in friends:
         friend.avatar_url = f"https://i.pravatar.cc/150?u={friend.id}"
-
-    # Double the list for testing
-    friends = friends + friends 
-    return render_template("loggedin/friends.html", friends=friends)
+    # only show pending entries where the current user is the recipient
+    friend_requests = Friendship.query.filter((Friendship.recipient_id == current_user.id) & (Friendship.status == 'pending')).all()
+    # Join username to the friend request for display purposes, we can do this because we know the sender_id of the sender of the friend request is in the sender_id field of the Friendship model.
+    for request in friend_requests:
+        request.username = User.query.get(request.sender_id).username
+        request.avatar_url = f"https://i.pravatar.cc/150?u={request.id}"
+    return render_template("loggedin/friends.html", friends=friends, friend_requests=friend_requests)
 
 
 @loggedin.route("/settings", methods=['GET', 'POST'])
