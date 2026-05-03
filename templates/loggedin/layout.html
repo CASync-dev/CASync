@@ -40,23 +40,26 @@
       <!-- Left Sidebar Navigation: template code -->
       <aside
         id="sidebar"
-        class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 md:static transition-transform duration-300 ease-in-out flex flex-col"
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-primary shadow-primary-dark shadow-xl transform -translate-x-full md:translate-x-0 md:static transition-transform duration-300 ease-in-out flex flex-col"
       >
         <!-- Logo/Brand-->
         <div
           class="flex items-center justify-between px-6 py-4 border-b border-gray-200"
         >
-          <a href="{{ url_for('loggedin.dash') }}" class="flex items-center space-x-2">
+          <a
+            href="{{ url_for('loggedin.dash') }}"
+            class="flex items-center space-x-2"
+          >
             <img
-              src="{{url_for('static', filename='images/logo.png')}}"
-              class="h-16 md:h-20 width-auto py-0.5"
-              alt = "logo"
+              src="{{url_for('static', filename='images/w-logo.png')}}"
+              class="h-10 md:h-14 width-auto py-0.5 my-2"
+              alt="logo"
             />
           </a>
           <!-- Close button for mobile -->
           <button
             id="sidebar-close"
-            class="md:hidden text-gray-500 hover:text-gray-700"
+            class="md:hidden text-nearwhite hover:text-dark"
           >
             <i class="fas fa-xmark text-xl"></i>
           </button>
@@ -68,28 +71,28 @@
           <!-- Authed -->
           <a
             href="{{ url_for('loggedin.dash') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'dash' %}bg-primary-light text-primary{% else %}text-gray-700{% endif %}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.dash' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
           >
             <i class="fas fa-solid fa-table-columns w-5 mr-3"></i>
             <span class="font-medium">Dashboard</span>
           </a>
           <a
             href="{{ url_for('loggedin.schedule') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'schedule' %}bg-primary-light text-primary{% else %}text-gray-700{% endif %}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.schedule' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
           >
             <i class="fas fa-calendar-days w-5 mr-3"></i>
-            <span class="font-medium">Schedule</span>
+            <span class="font-medium">Your Schedule</span>
           </a>
           <a
             href="{{ url_for('loggedin.groups') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'groups' %}bg-primary-light text-primary{% else %}text-gray-700{% endif %}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.groups' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
           >
             <i class="fas fa-solid fa-people-group w-5 mr-3"></i>
             <span class="font-medium">Groups</span>
           </a>
           <a
             href="{{ url_for('loggedin.friends') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'friends' %}bg-primary-light text-primary{% else %}text-gray-700{% endif %}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.friends' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
           >
             <i class="fas fa-solid fa-user-group w-5 mr-3"></i>
             <span class="font-medium">Friends</span>
@@ -99,7 +102,7 @@
           <div class="pt-4 mt-4 border-t border-gray-200">
             <a
               href="{{ url_for('loggedin.settings') }}"
-              class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'settings' %}bg-primary-light text-primary{% else %}text-gray-700{% endif %}"
+              class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.settings' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
             >
               <i class="fas fa-gear w-5 mr-3"></i>
               <span class="font-medium">Settings</span>
@@ -113,7 +116,7 @@
             href="/logout"
             return false;
             "
-            class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-red-50 hover:text-red-600 transition group"
+            class="flex items-center px-4 py-3 text-nearwhite rounded-lg hover:bg-primary-light hover:shadow-primary-dark hover:shadow-md hover:text-red-600 transition group"
           >
             <i class="fas fa-right-from-bracket w-5 mr-3"></i>
             <span class="font-medium">Logout</span>

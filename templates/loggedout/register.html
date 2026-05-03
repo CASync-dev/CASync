@@ -1,119 +1,125 @@
-{% extends "loggedout/log-out-layout.html" %} {% block content %}
-
-<body>
-  <div
-    class="antialiased mx-auto bg-white flex max-w-2.5 items-center justify-center text-center"
-  >
-    <form
-      id="register"
-      method="POST"
-      action="{{ url_for('loggedout.register') }}"
-      class="bg-primary p-6 m-6 border-8 rounded-3xl border-primary drop-shadow-2xl shadow text-align"
+{% extends "loggedout/log-out-layout.html" %}
+{% block content %}
+  <body>
+    <div
+      class="antialiased mx-auto bg-white flex max-w-2.5 items-center justify-center"
     >
-      {{ form.hidden_tag() }}
-      <div>
-        <a
-          href="{{ url_for('loggedout.home') }}"
-          class="-m-1 text-2xl text-nearwhite mx-auto"
+      <form
+        id="register"
+        method="POST"
+        action="{{ url_for('loggedout.register') }}"
+        class="card-form"
+      >
+        {{ form.hidden_tag() }}
+        <legend
+          class="-m-1 text-2xl text-nearwhite mx-auto font-medium text-center"
         >
-          <strong>CAS</strong>ync
-        </a>
+          REGISTER
+        </legend>
         <br />
-        <br />
-      </div>
-      <legend>
-        <h3
-          class="flex items-center justify-center text-center text-xl px-5 text-nearwhite"
-        >
-          Register
-        </h3>
-      </legend>
-      <br />
-      <div>
-        <label for="email" class="text-left text-nearwhite"> Email: </label>
-        <br />
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autocomplete="email"
-          aria-required="true"
-          autofocus="autofocus"
-          size="30"
-          value="{{ form.email.data or '' }}"
-          class="border bg-nearwhite"
-        />
-        <br />
-        <br />
-        <label for="username" class="text-left text-nearwhite">
-          Username:
-        </label>
-        <br />
-        <input
-          id="username"
-          name="username"
-          type="text"
-          autocomplete="username"
-          aria-required="true"
-          size="30"
-          value="{{ form.username.data or '' }}"
-          class="border bg-nearwhite"
-        />
-        <br />
-        <br />
-        <label for="password" class="text-left text-nearwhite">
-          Password:
-        </label>
-        <br />
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autocomplete="new-password"
-          aria-required="true"
-          size="30"
-          class="border bg-nearwhite"
-        />
-        <br />
-        <br />
-        <label for="repeat_password" class="text-left text-nearwhite">
-          Reenter Password:
-        </label>
-        <br />
-        <input
-          id="repeat_password"
-          name="repeat_password"
-          type="password"
-          autocomplete="new-password"
-          aria-required="true"
-          size="30"
-          class="border bg-nearwhite"
-        />
-        <br />
-        <br />
-        <input type="checkbox" id="rme" name="rme" />
-        <label for="rme" class="text-nearwhite"> Remember me </label>
-        <br />
-        {% with messages = get_flashed_messages(with_categories=true) %} {% for
-        category, message in messages %}
-        <p class="text-red-400 text-sm mt-1 max-w-sm">{{ message }}</p>
-        {% endfor %} {% endwith %} {% if form.errors %} {% for field, errors in
-        form.errors.items() %} {% for error in errors %}
-        <p class="text-red-400 text-sm mt-1 max-w-sm">{{ error }}</p>
-        {% endfor %} {% endfor %} {% endif %}
-        <br />
-        <button id="log" type="submit" class="button cursor-pointer btn-white">
-          Continue
-        </button>
-        <br />
-        <h5 class="text-xs pt-5 text-nearwhite">
-          Already registered? Login
-          <a href="{{ url_for('loggedout.login') }}" class="underline">
-            here.
-          </a>
-        </h5>
-      </div>
-    </form>
-  </div>
-</body>
+        <div>
+          <label for="email" class="text-left text-nearwhite font-medium">
+            Email:
+          </label>
+          <br />
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            aria-required="true"
+            autofocus="autofocus"
+            size="30"
+            value="{{ form.email.data or '' }}"
+            class="input-box"
+            placeholder="e.g. university@student.edu.au"
+          />
+          <br />
+          <br />
+          <label for="username" class="text-left text-nearwhite font-medium">
+            Username:
+          </label>
+          <br />
+          <input
+            id="username"
+            name="username"
+            type="text"
+            autocomplete="username"
+            aria-required="true"
+            size="30"
+            value="{{ form.username.data or '' }}"
+            class="input-box"
+          />
+          <br />
+          <br />
+          <label for="password" class="text-left text-nearwhite font-medium">
+            Password:
+          </label>
+          <br />
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            aria-required="true"
+            size="30"
+            class="input-box"
+          />
+          <br />
+          <br />
+          <label
+            for="repeat_password"
+            class="text-left text-nearwhite font-medium"
+          >
+            Confirm Password:
+          </label>
+          <br />
+          <input
+            id="repeat_password"
+            name="repeat_password"
+            type="password"
+            autocomplete="new-password"
+            aria-required="true"
+            size="30"
+            class="input-box"
+          />
+          <br />
+          <br />
+          <input type="checkbox" id="rme" name="rme" />
+          <label for="rme" class="text-nearwhite"> Remember me </label>
+          <br />
+          {% with messages = get_flashed_messages(with_categories=true) %}{%
+            for
+            category, message in messages
+          %}
+            <p class="text-red-400 text-sm mt-1 max-w-sm">{{ message }}</p>
+          {% endfor %}{% endwith %}
+          {% if form.errors %}{%
+            for field, errors in
+            form.errors.items()
+          %}
+            {% for error in errors %}
+              <p class="text-red-400 text-sm mt-1 max-w-sm">{{ error }}</p>
+            {% endfor %}
+          {% endfor %}{% endif %}
+          <br />
+          <div class="flex justify-center">
+            <button
+              id="log"
+              type="submit"
+              class="button cursor-pointer btn-white px-12"
+            >
+              Register
+            </button>
+          </div>
+          <h5 class="text-xs pt-5 text-nearwhite text-center">
+            Already registered? Login
+            <a href="{{ url_for('loggedout.login') }}" class="underline">
+              here
+            </a>
+          </h5>
+        </div>
+      </form>
+    </div>
+  </body>
 {% endblock %}

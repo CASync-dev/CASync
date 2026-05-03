@@ -38,7 +38,7 @@ The general flow of it is:
 -->
 
 {% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true, timeRange=(8, 18), allowEventCreation=false, clipVerticalOverflow=false) -%}
-<div class="w-full max-w-7xl mx-auto px-6 lg:px-8">
+<div class="container-loggedin">
   <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
   <div class="sticky top-0 z-20 bg-stone-50 ">
     <!-- Calendar Header: Contains title and new activity button -->
@@ -58,7 +58,7 @@ The general flow of it is:
       {% if allowEventCreation %}
       <!-- New Activity Button -->
       <button
-        class="hidden md:block p-2 m-2 bg-indigo-600 rounded-xl flex items-center gap-2 font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+        class="btn-primary hidden md:block flex gap-2 transition-all duration-300"
         command="show-modal"
         commandfor="drawer"
       >
@@ -76,24 +76,24 @@ The general flow of it is:
     </div>
 
     <!-- Week navigation buttons -->
-    <div class="flex justify-between p-2">
+    <div class="flex justify-between py-2">
       <button
         id="btn-last-week"
-        class="p-2 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+        class="btn-primary flex gap-2 transition-all duration-300"
       >
-        < last week
+        < Last week
       </button>
       <button
         id="btn-today"
-        class="hidden bg-emerald-500 p-2 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+        class="btn-plain hidden bg-emerald-500 flex items-center gap-2 text-white transition-all duration-300 hover:bg-primary-dark shadow-dark shadow-md"
       >
-        today
+        Today
       </button>
       <button
         id="btn-next-week"
-        class="p-2 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700"
+        class="btn-primary flex gap-2 transition-all duration-300"
       >
-        next week >
+        Next week >
       </button>
     </div>
 
