@@ -106,3 +106,43 @@ def acceptfriend():
     friend = User.query.get(friend_request.sender_id)
     db.session.commit()
     return jsonify({"message": f"Friend request accepted from {friend.username}!"}), 200
+
+@api_friends.route("/api/rejectfriend", methods=["POST"])
+@login_required
+def rejectfriend():
+    data = request.get_json()
+    if 'request_id' not in data:
+        return jsonify({"Error: Invalid request_id"}), 400
+    request_id = data['request_id']
+    # Check if the friend request exists and is pending
+    # can only reject friend requests that are sent to the current user, not ones they sent themselves
+    friend_request = Friendship.query.filter(
+        ((Friendship.id == request_id) & (Friendship.status == 'pending'))
+    ).first()
+    if not friend_request:
+        return jsonify({"Error: No pending friend request found"}), 404
+    # Check if the current user is the recipient of the friend request
+    if friend_request.recipient_id != current_user.id:
+        return jsonify({"Error: You can only reject friend requests sent to you"}), 403
+    # Update the friend request status to rejected
+    friend_request.status = 'rejected'
+    db.session.commit()
+    return jsonify({"message": "Friend request rejected."}), 200
+
+@api_friends.route("/api/removefriend", methods=["POST"])
+@login_required
+def removefriend():
+    data = request.get_json()
+    if 'friend_id' not in data:
+        return jsonify({"Error: Invalid friend_id"}), 400
+    friend_id = data['friend_id']
+    # Check if a friendship exists between the current user and the target user
+    friendship = Friendship.query.filter(
+        ((Friendship.user_id == current_user.id) & (Friendship.friend_id == friend_id)) |
+        ((Friendship.user_id == friend_id) & (Friendship.friend_id == current_user.id))
+    ).first()
+    if not friendship or friendship.status != 'accepted':
+        return jsonify({"Error: You are not friends with this user"}), 404
+    db.session.delete(friendship)
+    db.session.commit()
+    return jsonify({"message": "Friend removed."}), 200

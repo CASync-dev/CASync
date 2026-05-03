@@ -160,3 +160,20 @@ function acceptFriendRequest(requestId) {
       console.error('Error:', error);
     });
 }
+
+function rejectFriendRequest(requestId) {
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+  fetch('/api/rejectfriend', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ request_id: requestId }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // On success, remove the friend request from the list
+      document.getElementById(`friend-request-${requestId}`).remove();
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+}
