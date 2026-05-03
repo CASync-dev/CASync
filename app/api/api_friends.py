@@ -29,6 +29,7 @@ def getusers():
         ).first()
         if existing_friendship:
             return jsonify({'results': 0})
+        # We call the public_dict method to only return the id and username of the user from the USer object.
         return jsonify({'results': [mail.public_dict()]})
     else:
         # ie. Username
@@ -65,8 +66,8 @@ def requestfriend():
         return jsonify({"Error: User not found"}), 404
     # Check if a friend request already exists between the current user and the target user
     existing_request = Friendship.query.filter(
-        ((Friendship.user_id == current_user.id) & (Friendship.friend_id == user_id)) |
-        ((Friendship.user_id == user_id) & (Friendship.friend_id == current_user.id))
+        ((Friendship.sender_id == current_user.id) & (Friendship.recipient_id == user_id)) |
+        ((Friendship.sender_id == user_id) & (Friendship.recipient_id == current_user.id))
     ).first()
     if existing_request:
         if existing_request.status == 'pending':
@@ -77,7 +78,7 @@ def requestfriend():
             # If the previous request was rejected, we can allow sending a new request
             pass
     # Create a new friend request entry in the database
-    new_request = Friendship(user_id=current_user.id, friend_id=user_id, status='pending', created_at=db.func.now())
+    new_request = Friendship(sender_id=current_user.id, recipient_id=user_id, status='pending', created_at=db.func.now())
     db.session.add(new_request)
     db.session.commit()
     return jsonify({"message": f"Friend request sent to {user.username}!"}), 200
@@ -86,19 +87,22 @@ def requestfriend():
 @login_required
 def acceptfriend():
     data = request.get_json()
-    if 'user_id' not in data:
-        return jsonify({"Error: Invalid user_id"}), 400
-    user_id = data['user_id']
+    if 'request_id' not in data:
+        return jsonify({"Error: Invalid request_id"}), 400
+    request_id = data['request_id']
     # Check if the friend request exists and is pending
     # can only accept friend requests that are sent to the current user, not ones they sent themselves
     friend_request = Friendship.query.filter(
-        ((Friendship.friend_id == current_user.id) & (Friendship.status == 'pending'))
+        ((Friendship.id == request_id) & (Friendship.status == 'pending'))
     ).first()
     if not friend_request:
         return jsonify({"Error: No pending friend request found"}), 404
+    # Check if the current user is the recipient of the friend request
+    if friend_request.recipient_id != current_user.id:
+        return jsonify({"Error: You can only accept friend requests sent to you"}), 403
     # Update the friend request status to accepted
     friend_request.status = 'accepted'
     friend_request.accepted_at = db.func.now()
-    friend = User.query.get(user_id)
+    friend = User.query.get(friend_request.sender_id)
     db.session.commit()
     return jsonify({"message": f"Friend request accepted from {friend.username}!"}), 200
