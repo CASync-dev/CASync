@@ -46,6 +46,14 @@
         {{ message }}
       </p>
       {% endfor %} {% endwith %}
+          {% if cpform.errors %}{%
+            for field, errors in
+            cpform.errors.items()
+          %}
+            {% for error in errors %}
+              <p class="text-red-400 text-sm mt-1 max-w-sm">{{ error }}</p>
+            {% endfor %}
+      {% endfor %}{% endif %}
     </form>
   </section>
 
@@ -470,6 +478,7 @@
                 {{ cpform.repeat_new(size=25, class = "text-black flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
                   <p class = "text-red-400 mb-3">
                     <span class = "font-bold"> Please note this password somewhere safe. </span>
+                  
                 <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                   {{ cpform.submit(class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm") }}
                   <button
