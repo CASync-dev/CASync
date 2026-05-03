@@ -72,7 +72,14 @@ class EventForm(FlaskForm):
 
 # Settings' Changing details forms
 
-class changePassword(FlaskForm):
-    current_password = StringField(validators=[InputRequired()])
-    new_password = StringField(validators=[InputRequired(message="All fields are required."),strong_password])
+class changePasswordForm(FlaskForm):
+    current_password = StringField('Current Password', validators=[InputRequired()])
+    new_password = StringField('New Password', validators=[InputRequired(message="All fields are required."),strong_password])
+    repeat_new = StringField('Re-enter New', validators=[InputRequired(message="All fields are required."),strong_password])
     submit = SubmitField('Continue')
+
+class accountDelForm(FlaskForm):
+    email = EmailField(validators=[InputRequired(message="All fields are required.")])
+    username = StringField(validators=[InputRequired()])
+    password = StringField(validators=[InputRequired()])
+    submit = SubmitField('Delete your Account')
