@@ -143,3 +143,20 @@ openFriendSchedule = (friendId, friendName) => {
   const modal = document.getElementById('friend-schedule-modal');
   modal.showModal();
 };
+
+function acceptFriendRequest(requestId) {
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+  fetch('/api/acceptfriend', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ request_id: requestId }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // On success, remove the friend request from the list
+      document.getElementById(`friend-request-${requestId}`).remove();
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+}
