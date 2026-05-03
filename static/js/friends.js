@@ -156,6 +156,10 @@ function acceptFriendRequest(requestId) {
       // On success, remove the friend request from the list
       document.getElementById(`friend-request-${requestId}`).remove();
     })
+    .then(() => {
+      // reload the page:
+      location.reload();
+    })
     .catch((error) => {
       console.error('Error:', error);
     });

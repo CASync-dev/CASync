@@ -24,7 +24,7 @@ def getusers():
             return jsonify({'results': 0})
         # Check if a friendship already exists with the searched user, if so, don't return them in search results
         existing_friendship = Friendship.query.filter(
-            ((Friendship.recipient_id == current_user.id) & (Friendship.sender_id == mail.id)) |
+            ((Friendship.sender_id == current_user.id) & (Friendship.recipient_id == mail.id)) |
             ((Friendship.sender_id == mail.id) & (Friendship.recipient_id == current_user.id))
         ).first()
         if existing_friendship:
@@ -42,7 +42,7 @@ def getusers():
         users = [u for u in users if u.id != current_user.id]
         # Filter out users that already have a friendship with the current user
         users = [u for u in users if not Friendship.query.filter(
-            ((Friendship.recipient_id == current_user.id) & (Friendship.sender_id == u.id)) |
+            ((Friendship.sender_id == current_user.id) & (Friendship.recipient_id == u.id)) |
             ((Friendship.sender_id == u.id) & (Friendship.recipient_id == current_user.id))
         ).first()]
         if users == []:
@@ -59,7 +59,7 @@ def requestfriend():
     # Check if the user_id is provided in the request data
     if 'user_id' not in data:
         return jsonify({"Error: Invalid user_id"}), 400
-    user_id = data['user_id']
+    user_id = int(data['user_id'])
     # This checks if the user exists, this shoulnt be a probelm as the frontend only allows searhcing for existing users but just in case.
     user = User.query.get(user_id)
     if not user:
@@ -75,8 +75,12 @@ def requestfriend():
         elif existing_request.status == 'accepted':
             return jsonify({"error": "You are already friends"}), 400
         elif existing_request.status == 'rejected':
-            # If the previous request was rejected, we can allow sending a new request
-            pass
+            existing_request.status = 'pending'
+            existing_request.sender_id = current_user.id
+            existing_request.recipient_id = user_id
+            existing_request.created_at = db.func.now()
+            db.session.commit()
+            return jsonify({"message": f"Friend request sent to {user.username}!"}), 200
     # Create a new friend request entry in the database
     new_request = Friendship(sender_id=current_user.id, recipient_id=user_id, status='pending', created_at=db.func.now())
     db.session.add(new_request)
@@ -135,10 +139,10 @@ def removefriend():
     data = request.get_json()
     if 'friend_id' not in data:
         return jsonify({"Error: Invalid friend_id"}), 400
-    friend_id = data['friend_id']
+    friend_id = int(data['friend_id'])
     # Check if a friendship exists between the current user and the target user
     friendship = Friendship.query.filter(
-        ((Friendship.recipient_id == current_user.id) & (Friendship.sender_id == friend_id)) |
+        ((Friendship.sender_id == current_user.id) & (Friendship.recipient_id == friend_id)) |
         ((Friendship.sender_id == friend_id) & (Friendship.recipient_id == current_user.id))
     ).first()
     if not friendship or friendship.status != 'accepted':
