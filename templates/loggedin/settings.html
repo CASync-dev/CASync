@@ -458,35 +458,32 @@
               >
                 Change Password
               </h3>
-              <div class="mt-2">
-                <div class = "flex flex-row sm:flex-col">
-                  <p class=" text-gray-500 mb-3">
-                    New Email: 
-                  </p>
-                  <input id = "newuser" 
-                    type ="text" 
-                    autocomplete="off" 
-                    class="flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+              <form method="post" action="/settings" class = "text-gray-400 mt-3 px-5">
+                {{ cpform.hidden_tag() }} <br>
+                {{ cpform.current_password.label }}
+                {{ cpform.current_password(size=25, class = "text-black flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50") }}
+                <br>
+                {{ cpform.new_password.label }}
+                {{ cpform.new_password(size=25, class = "text-black flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50") }}
+                <br>
+                {{ cpform.repeat_new.label }}
+                {{ cpform.repeat_new(size=25, class = "text-black flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
+                  <p class = "text-red-400 mb-3">
+                    <span class = "font-bold"> Please note this password somewhere safe. </span>
+                <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                  {{ cpform.submit(class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm") }}
+                  <button
+                    type="button"
+                    class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+                    command="close"
+                    commandfor="changepass-modal"
+                  >
+                    Close
+                  </button>
                 </div>
-            </div>
-          </div>
-        </div>
-        <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 justify-between">
-          <button
-            type="button"
-            class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-            onclick = ""
-          >
-            Submit
-          </button>
-          <button
-            type="button"
-            class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-            command="close"
-            commandfor="changepass-modal"
-          >
-            Close
-          </button>
+                
+              </form>
+          
         </div>
       </el-dialog-panel>
     </div>
@@ -529,21 +526,33 @@
               </h3>
               <div class="mt-2">
                 <p>
-                  Currently not implemented, come back later!
+                  Please enter your details to continue.
                 </p>
+                <form method="post" action="/settings" class = "text-gray-400 mt-3 px-5"> 
+                  {{ acdform.hidden_tag() }}
+                  {{ acdform.email.label }}
+                  {{ acdform.email(size=25, class = "text-black flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
+                  <br>
+                  {{ acdform.username.label }}
+                  {{ acdform.username(size=25, class = "text-black flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
+                  <br>
+                  {{ acdform.password.label }}
+                  {{ acdform.password(size=25, class = "text-black flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
+                  <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                  {{ acdform.submit(class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm") }}
+                  <button
+                    type="button"
+                    class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+                    command="close"
+                    commandfor="deleteacc-modal"
+                  >
+                    Close
+                  </button>
+                </div>
+                </form>
               </div>
               </div>
           </div>
-        </div>
-          <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-          <button
-            type="button"
-            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-            command="close"
-            commandfor="deleteacc-modal"
-          >
-            Close
-          </button>
         </div>
         </el-dialog-panel>
       </div>
