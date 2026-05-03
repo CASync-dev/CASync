@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
 from flask import Blueprint, app, render_template, flash
 from flask_login import current_user, login_required
-from app.form import EventForm, IcalImportForm
+from app.form import EventForm, IcalImportForm, accountDelForm, changePasswordForm
 from app.models import Calendar, User
+from services.ical import import_ical
 
 
 loggedin = Blueprint('loggedin', __name__, template_folder='../templates/loggedin', static_folder='../static')
@@ -42,8 +43,9 @@ def friends():
 @loggedin.route("/settings", methods=['GET', 'POST'])
 @login_required
 def settings():
-    from services.ical import import_ical
     form = IcalImportForm()
+    changePassform = changePasswordForm()
+    acdform = accountDelForm()
     if form.validate_on_submit():
         url = form.ical_url.data
         result, error = import_ical(url, current_user.id)
@@ -60,5 +62,5 @@ def settings():
     # For iCal Links editing and deleting
     links = Calendar.query.filter_by(user_id=current_user.id).all()
 
-    return render_template("loggedin/settings.html", form=form, last_synced=last_synced, links=links)
+    return render_template("loggedin/settings.html", form=form, last_synced=last_synced, links=links, cpform=changePassform, acdform= acdform)
 
