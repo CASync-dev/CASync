@@ -177,3 +177,34 @@ function rejectFriendRequest(requestId) {
       console.error('Error:', error);
     });
 }
+
+function removeFriend(friendId) {
+  // open the confirmation dialog
+  const dialog = document.getElementById('remove-confirmation');
+  dialog.showModal();
+  // store the friendId in a data attribute on the confirm button so we can access it in the confirmRemoveFriend function
+  document
+    .getElementById('confirm-delete-btn')
+    .setAttribute('data-friend-id', friendId);
+}
+
+function confirmRemoveFriend() {
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+  const friendId = document
+    .getElementById('confirm-delete-btn')
+    .getAttribute('data-friend-id');
+  fetch('/api/removefriend', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ friend_id: friendId }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // On success, remove the friend from the list and close the dialog
+      document.getElementById(`friend-${friendId}`).remove();
+      document.getElementById('remove-confirmation').close();
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+}

@@ -39,7 +39,7 @@ def friends():
     for request in friend_requests:
         request.username = User.query.get(request.sender_id).username
         request.avatar_url = f"https://i.pravatar.cc/150?u={request.id}"
-    return render_template("loggedin/friends.html", friends=friends, friend_requests=friend_requests)
+    return render_template("loggedin/friends.html", friend_requests=friend_requests, friends=friends)
 
 
 @loggedin.route("/settings", methods=['GET', 'POST'])

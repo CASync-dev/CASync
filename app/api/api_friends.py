@@ -24,8 +24,8 @@ def getusers():
             return jsonify({'results': 0})
         # Check if a friendship already exists with the searched user, if so, don't return them in search results
         existing_friendship = Friendship.query.filter(
-            ((Friendship.user_id == current_user.id) & (Friendship.friend_id == mail.id)) |
-            ((Friendship.user_id == mail.id) & (Friendship.friend_id == current_user.id))
+            ((Friendship.recipient_id == current_user.id) & (Friendship.sender_id == mail.id)) |
+            ((Friendship.sender_id == mail.id) & (Friendship.recipient_id == current_user.id))
         ).first()
         if existing_friendship:
             return jsonify({'results': 0})
@@ -42,8 +42,8 @@ def getusers():
         users = [u for u in users if u.id != current_user.id]
         # Filter out users that already have a friendship with the current user
         users = [u for u in users if not Friendship.query.filter(
-            ((Friendship.user_id == current_user.id) & (Friendship.friend_id == u.id)) |
-            ((Friendship.user_id == u.id) & (Friendship.friend_id == current_user.id))
+            ((Friendship.recipient_id == current_user.id) & (Friendship.sender_id == u.id)) |
+            ((Friendship.sender_id == u.id) & (Friendship.recipient_id == current_user.id))
         ).first()]
         if users == []:
             return jsonify({'results': 0})
@@ -71,9 +71,9 @@ def requestfriend():
     ).first()
     if existing_request:
         if existing_request.status == 'pending':
-            return jsonify({"Error: Friend request already pending"}), 400
+            return jsonify({"error": "Friend request already pending"}), 400
         elif existing_request.status == 'accepted':
-            return jsonify({"Error: You are already friends"}), 400
+            return jsonify({"error": "You are already friends"}), 400
         elif existing_request.status == 'rejected':
             # If the previous request was rejected, we can allow sending a new request
             pass
@@ -138,8 +138,8 @@ def removefriend():
     friend_id = data['friend_id']
     # Check if a friendship exists between the current user and the target user
     friendship = Friendship.query.filter(
-        ((Friendship.user_id == current_user.id) & (Friendship.friend_id == friend_id)) |
-        ((Friendship.user_id == friend_id) & (Friendship.friend_id == current_user.id))
+        ((Friendship.recipient_id == current_user.id) & (Friendship.sender_id == friend_id)) |
+        ((Friendship.sender_id == friend_id) & (Friendship.recipient_id == current_user.id))
     ).first()
     if not friendship or friendship.status != 'accepted':
         return jsonify({"Error: You are not friends with this user"}), 404
