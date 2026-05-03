@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, render_template
 from app.models import User
 
 api_users = Blueprint('api_users', __name__)
@@ -29,3 +29,11 @@ def change_username():
 @api_users.route("/api/changeemail", methods=["POST"])
 def change_email():
     print("Placeholder :) #2")
+
+@api_users.route("/accountdeletion", methods=["POST"])
+def accdelpage():
+    return render_template("/settings/removeacc.html")
+
+@api_users.route("/api/delacc", methods=["POST"])
+def delacc():
+    print()
