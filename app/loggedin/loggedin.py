@@ -57,5 +57,8 @@ def settings():
     syncs = Calendar.query.filter_by(user_id=current_user.id).order_by(Calendar.synced_at.desc()).first()
     last_synced = syncs.synced_at if syncs else "Never"
 
-    return render_template("loggedin/settings.html", form=form, last_synced=last_synced)
+    # For iCal Links editing and deleting
+    links = Calendar.query.filter_by(user_id=current_user.id).all()
+
+    return render_template("loggedin/settings.html", form=form, last_synced=last_synced, links=links)
 
