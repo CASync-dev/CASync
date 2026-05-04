@@ -66,3 +66,22 @@ def api_sync_cal():
     if errors and not (total_created or total_updated):
         return jsonify({"error": errors[0]["error"]}), 400
     return jsonify({"created": total_created, "updated": total_updated}), 200
+
+@api_cal.route("/api/remove-cal/", methods=["POST"])
+@login_required
+def api_remove_cal():
+    '''
+    POST /api/remove-cal/
+
+    Removes iCal link from user.
+    '''
+    data = request.get_json()
+    if 'id' not in data or len(data['id']) < 1:
+        return jsonify({"error": "Invalid iCal Link"})
+    icalid = data['id']
+    user_id = current_user.id
+    # Check in case somehow the id does not belong to a calendar the user has.
+    cal = Calendar.query.where(Calendar.user_id == user_id and Calendar.id == icalid)
+    if not cal:
+        return jsonify({"error": "Something's gone wrong!"})
+    # Incomplete
