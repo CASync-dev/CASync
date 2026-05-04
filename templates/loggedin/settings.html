@@ -67,7 +67,7 @@
     <div id="profile-settings" class="mt-2 sm:mx-auto py-3 hidden">
       <div class="flex flex-row justify-between">
         <img
-          src="https://placehold.co/200x200"
+          src="{{current_user.gravatar(150)}}"
           class="h-12 w-12 rounded-full"
         />
         <button
@@ -140,26 +140,23 @@
   <!-- All modals -->
 
   <!-- Changing Profile Picture -->
-  <el-dialog>
-    <dialog
-      id="changepfp-modal"
-      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
-    >
-      <el-dialog-backdrop
-        class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
-      ></el-dialog-backdrop>
+<el-dialog>
+  <dialog
+    id="changepfp-modal"
+    class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+    ></el-dialog-backdrop>
 
-      <div
-        tabindex="0"
-        class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    <div
+      tabindex="0"
+      class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    >
+      <el-dialog-panel
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
       >
-        <el-dialog-panel
-          class="relative transform overflow-hidden rounded-lg bg-stone-50 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-7xl max-h-[90vh] flex flex-col data-closed:sm:translate-y-0 data-closed:sm:scale-95"
-        >
-          <div
-            class="flex flex-col flex-1 overflow-hidden bg-stone-50 pt-5 sm:pt-6"
-          ></div>
-          <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
           <div class="sm:flex sm:items-start">
             <div
               class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
@@ -174,27 +171,30 @@
                 Change Profile Picture
               </h3>
               <div class="mt-2">
-                <p>
-                  Currently not implemented, come back later!
-                </p>
+                <form method="POST" action="" enctype="multipart/form-data">
+                  <input type="file" name = "file">
+                  <input type = "submit" value = "Submit" class = "mt-3 p-1.5 rounded-sm bg-primary hover:bg-blue-700 text-white cursor-pointer">
+                  <button type = "button" onclick = "" class = "mt-3 p-1.5 rounded-sm bg-red-500 hover:bg-red-600 text-white cursor-pointer"> Remove </button>
+                </form>
+                <p class = "text-gray-500 mt-4"> Rather use Gravatar? Set your profile via. <a href = "https://gravatar.com/" class = "text-primary underline"> Gravatar.</a></p>
               </div>
-              </div>
+            </div>
           </div>
         </div>
-          <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+        <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
           <button
             type="button"
-            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
             command="close"
             commandfor="changepfp-modal"
           >
             Close
           </button>
         </div>
-        </el-dialog-panel>
-      </div>
-    </dialog>
-  </el-dialog>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>
 
   <!-- Changing Username -->
     <el-dialog>
