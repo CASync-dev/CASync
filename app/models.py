@@ -17,8 +17,8 @@ class User(UserMixin, db.Model):
     email      = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))  # Store hashed passwords
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))  # lambda so it's evaluated at insert time, not class definition
+    # avatar = db.Column(db.String(120), unique=True, default="")
     
-
     events = db.relationship('Event', backref='owner', lazy='dynamic')
 
     @property
@@ -49,6 +49,12 @@ class User(UserMixin, db.Model):
     def gravatar(self, size):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
+    
+    def avatar(self, size):
+        if self.avatar:
+            print()
+        else:
+            return self.gravatar(size)
 
 
 class Event(db.Model):
