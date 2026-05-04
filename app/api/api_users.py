@@ -24,6 +24,7 @@ api_users = Blueprint('api_users', __name__)
 
 @api_users.route("/api/changeusername", methods=["POST"])
 def change_username():
+    # Awaiting groups/friends page
     print("Placeholder :)")
 
 @api_users.route("/api/changeemail", methods=["POST"])
@@ -33,7 +34,3 @@ def change_email():
 @api_users.route("/accountdeletion", methods=["POST"])
 def accdelpage():
     return render_template("/settings/removeacc.html")
-
-@api_users.route("/api/delacc", methods=["POST"])
-def delacc():
-    print()
