@@ -107,9 +107,41 @@ function showAccountSettings() {
 }
 
 // Changing username Functions
-function changeUsername() {
-    // Will require a bit more code, so will leave it as it is for another branch
-    alert("Functionability coming in the future!");
+async function changeUsername() {
+    // error will display errors encountered during changing username...
+    const errormsg = document.getElementById("usererror");
+    const newusername = document.getElementById("newuser").value;
+    let results;
+
+    const token = document.querySelector('meta[name="csrf-token"]').content;
+    if (newusername == "") {
+        return
+    }
+    try {
+      const response = await fetch("/api/changeusername", {
+        method: "POST", 
+        headers: { "X-CSRFToken": token, "Content-Type": "application/json" },
+        body: JSON.stringify({ newuser: newusername})
+    })
+        .then((response) => response.json())
+        .then((x) => {
+        results = x;
+        if ("error" in results) {
+            throw new Error(results["error"]);
+        }
+        });
+    } catch (error) {
+    // In case leftover 
+        errormsg.classList.remove("text-green-600");
+        errormsg.classList.add("text-red-600");
+        errormsg.innerHTML = "Error:" + error;
+        console.error("Error:", error);
+        return
+    }
+    errormsg.classList.remove("text-red-600");
+    errormsg.classList.add("text-green-600");
+    errormsg.innerHTML = "Successfully changed your username!"
+    return
 }
 
 // Changing email function
@@ -121,7 +153,7 @@ async function changeEmail() {
 
     const token = document.querySelector('meta[name="csrf-token"]').content;
     if (newmail == "") {
-    return
+        return
     }
     try {
     const response = await fetch("/api/changeemail", {
@@ -137,10 +169,10 @@ async function changeEmail() {
         }
         });
     } catch (error) {
-    errormsg.innerHTML = "Error:" + error;
     // In case leftover 
     errormsg.classList.remove("text-green-600");
     errormsg.classList.add("text-red-600");
+    errormsg.innerHTML = "Error:" + error;
     console.error("Error:", error);
     return
     }
@@ -151,3 +183,32 @@ async function changeEmail() {
 }
 
 // Changing Password and Account deletion done via. flask forms.
+
+async function removeLink(urlid) {
+    const icaldiv = document.getElementsByClassName("urlid");
+    const errormsg = document.getElementById('icalediterror');
+    let results;
+    
+    const token = document.querySelector('meta[name="csrf-token"]').content;
+    try {
+        const response = fetch("/api/remove-cal/", {
+            method: "POST",
+            headers: { "X-CSRFToken": token, "Content-Type": "application/json" },
+            body: JSON.stringify({id:urlid})
+        })
+        .then((response) => response.json())
+        .then((x) => {
+        results = x;
+        if ("error" in results) {
+            throw new Error(results["error"]);
+        }
+        });
+    } catch (error) {
+        errormsg.classList.remove("text-green-600");
+        errormsg.classList.add("text-red-600");
+        errormsg.innerHTML = "Error:" + error;
+        console.error("Error:", error);
+        return
+    }
+
+}

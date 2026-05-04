@@ -253,6 +253,7 @@
                     Only continue if you understand what you're doing.
                   </p>
                   <br>
+                  <p><span id = "usererror"></span></p>
                 </div>
             </div>
           </div>
@@ -261,7 +262,7 @@
           <button
             type="button"
             class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-            onclick = ""
+            onclick = "return changeUsername();"
           >
             Submit
           </button>
@@ -402,13 +403,13 @@
                 <div class="mt-3 flex flex-wrap gap-4 justify-between text-gray-400"> 
                   {% if links %}
                   {% for cal in links %}
-                  <div class = "flex-1">
+                  <div class = "{{cal.id}} flex-1">
                     {{ cal.ical_url }}
                   </div>
                    <div>
                     <button 
                       onclick = "return removeLink('{{cal.id}}');"
-                      class = "rounded-sm bg-red-500 p-2 text-white cursor-pointer hover:bg-red-700 focus:ring-2 focus:ring-red-800"
+                      class = "{{cal.id}} rounded-sm bg-red-500 p-2 text-white cursor-pointer hover:bg-red-700 focus:ring-2 focus:ring-red-800"
                       > 
                       Remove 
                     </button>
@@ -424,6 +425,7 @@
               </div>
             </div>
             <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+              <p id = "icalediterror"> </p>
           <button
             type="button"
             class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
