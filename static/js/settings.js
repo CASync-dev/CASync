@@ -210,5 +210,10 @@ async function removeLink(urlid) {
         console.error("Error:", error);
         return
     }
-
+    errormsg.classList.remove("text-red-600");
+    errormsg.classList.add("text-green-600");
+    for (var i = 0; i < icaldiv.length; i++) {
+        icaldiv[i].remove();
+    }
+    errormsg.innerHTML = "Succesfully removed iCal Link!"
 }
