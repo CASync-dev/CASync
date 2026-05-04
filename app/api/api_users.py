@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, render_template, request
-from flask_login import current_user
+from flask_login import current_user, login_required
 from app.models import User
 from app import db
 
@@ -8,6 +8,7 @@ api_users = Blueprint('api_users', __name__)
 # Delete User Route (So users can delete their accounts if they want to)
   # needs to properly delete the user and cascade delete any related data (events, settings, etc.) to avoid orphaned data in the database
 @api_users.route("/api/changeusername", methods=["POST"])
+@login_required
 def change_username():
     data = request.get_json()
     if 'newuser' not in data or len(data['newuser']) < 1:
@@ -26,6 +27,7 @@ def change_username():
     return jsonify({"success": "Username successfully changed."})
 
 @api_users.route("/api/changeemail", methods=["POST"])
+@login_required
 def change_email():
     data = request.get_json()
     if 'newemailaddress' not in data or len(data['newemailaddress']) < 1:
@@ -47,7 +49,7 @@ def change_email():
     return jsonify({"success": "Email successfully changed."})
 
 
-@api_users.route("/accountdeletion", methods=["POST"])
+@api_users.route("/accountdeletion")
 def accdelpage():
     return render_template("/settings/removeacc.html")
 
