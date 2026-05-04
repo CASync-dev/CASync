@@ -63,7 +63,6 @@ def settings():
         current = changePassform.current_password.data
         if current_user.verify_password(current):
             current_user.password = changePassform.new_password.data
-            db.session.flush()
             db.session.commit()
             flash(f"Successfully changed user's password.", "success")
         else:
