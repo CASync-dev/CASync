@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 from flask import Blueprint, app, redirect, render_template, flash, url_for
-from flask_login import current_user, login_required
-from sqlalchemy import update
+from flask_login import current_user, login_required, logout_user
+from sqlalchemy import delete, update
 from app.form import EventForm, IcalImportForm, accountDelForm, changePasswordForm
 from app.models import Calendar, User
 from services.ical import import_ical
+from services.delacc import removeUser
 from app import db
 
 
@@ -77,7 +78,8 @@ def settings():
             flash(f'Error in account deletion: Incorrect password.', "error")
         else:
             # Will implement the rest of this method at a later date, when groups/friends are fully implemented.
-
+            removeUser(current_user.id)
+            logout_user()
             redirect(url_for('api_users.accountdeletion'), code=301)
     syncs = Calendar.query.filter_by(user_id=current_user.id).order_by(Calendar.synced_at.desc()).first()
     last_synced = syncs.synced_at if syncs else "Never"
