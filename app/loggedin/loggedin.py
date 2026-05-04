@@ -77,7 +77,9 @@ def settings():
         elif not current_user.verify_password(acdform.password.data):
             flash(f'Error in account deletion: Incorrect password.', "error")
         else:
-            redirect(url_for('api_users.accountdeletion'))
+            # Will implement the rest of this method at a later date, when groups/friends are fully implemented.
+
+            redirect(url_for('api_users.accountdeletion'), code=301)
     syncs = Calendar.query.filter_by(user_id=current_user.id).order_by(Calendar.synced_at.desc()).first()
     last_synced = syncs.synced_at if syncs else "Never"
 
