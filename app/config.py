@@ -13,6 +13,10 @@ class Config:
     # Configure the database URI and initialize the database
     SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
 
+    # PFP vars
+    MAX_CONTENT_LENGTH = 320 * 320
+    UPLOAD_EXTENSIONS = ['.jpg', '.png']
+    UPLOAD_PATH = 'static/avatars'
 
     # It's generally bad practice to hardcode a key even on the chance that environment variable is inaccessable.
     # If a SECRET_KEY can't be retrieved from env, the app should raise an error instead.
