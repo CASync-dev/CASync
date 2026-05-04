@@ -315,7 +315,7 @@
                   <p class=" text-gray-500 mb-3">
                     New Email: 
                   </p>
-                  <input id = "newuser" 
+                  <input id = "newemail" 
                     type ="text" 
                     autocomplete="off" 
                     class="flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
@@ -339,6 +339,7 @@
                     Only continue if you understand what you're doing.
                   </p>
                   <br>
+                  <p><span id = "mailerror"></span></p>
                 </div>
             </div>
           </div>
@@ -347,7 +348,7 @@
           <button
             type="button"
             class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-            onclick = ""
+            onclick = "return changeEmail();"
           >
             Submit
           </button>
@@ -680,40 +681,50 @@
     }
 
     // Changing username Functions
-    function showusernamefield() {
-      document.getElementById("change-username").classList.remove("invisible");
-    }
-    function removeusernamefield() {
-      document.getElementById("newusername").value = "";
-      document.getElementById("change-username").classList.add("invisible");
-    }
     function changeUsername() {
       // Will require a bit more code, so will leave it as it is for another branch
       alert("Functionability coming in the future!");
     }
 
-    // Changing email functions
-    function showemailfield() {
-      document.getElementById("change-email").classList.remove("hidden");
-    }
-    function removeemailfield() {
-      document.getElementById("newemail").value = "";
-      document.getElementById("change-email").classList.add("hidden");
-    }
-    function changeEmail() {
-      // Will require a bit more code, so will leave it as it is for another branch
-      alert("Functionability coming in the future!");
+    // Changing email function
+    async function changeEmail() {
+      // error will display errors encountered during changing email (ie. not an email...)
+      const errormsg = document.getElementById("mailerror"); 
+      const newmail = document.getElementById("newemail").value;
+      let results;
+
+      const token = document.querySelector('meta[name="csrf-token"]').content;
+      if (newmail == "") {
+        return
+      }
+      try {
+        const response = await fetch("/api/changeemail", {
+          method: "POST", 
+          headers: { "X-CSRFToken": token, "Content-Type": "application/json" },
+          body: JSON.stringify({ newemailaddress: newmail})
+        })
+          .then((response) => response.json())
+          .then((x) => {
+            results = x;
+            if ("error" in results) {
+              throw new Error(results["error"]);
+            }
+          });
+      } catch (error) {
+        errormsg.innerHTML = "Error:" + error;
+        // In case leftover 
+        errormsg.classList.remove("text-green-600");
+        errormsg.classList.add("text-red-600");
+        console.error("Error:", error);
+        return
+      }
+      errormsg.classList.remove("text-red-600");
+      errormsg.classList.add("text-green-600");
+      errormsg.innerHTML = "Successfully changed your email!"
+      return
     }
 
     //Changing Pass
-    function openPass() {
-      document.getElementById("change-pass").classList.remove("invisible");
-    }
-    function removePass() {
-      document.getElementById("old-password").value = "";
-      document.getElementById("new-password").value = "";
-      document.getElementById("change-pass").classList.add("invisible");
-    }
     function changePass() {
       // This really should be done with jinja/flaskforms...
       alert("Functionability coming in the future!");
