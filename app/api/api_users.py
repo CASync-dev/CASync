@@ -9,8 +9,21 @@ api_users = Blueprint('api_users', __name__)
   # needs to properly delete the user and cascade delete any related data (events, settings, etc.) to avoid orphaned data in the database
 @api_users.route("/api/changeusername", methods=["POST"])
 def change_username():
-    # Awaiting groups/friends page
-    print("Placeholder :)")
+    data = request.get_json()
+    if 'newuser' not in data or len(data['newuser']) < 1:
+        return jsonify({"error": "Invalid Username"})
+    newusername = data['newuser']
+    # SqlAlchemy should make sure that an username isn't being used twice in the database
+    # But for extra precaution I've added a check here as well.
+    # Also lets us give us an custom error message.
+    check = User.query.filter(User.username == newusername).first()
+    if check:
+        return jsonify({"error": "Username already taken."})
+    
+    # If all checks are passed, the username is free and can be used by the current user.
+    current_user.username = newusername
+    db.session.commit()
+    return jsonify({"success": "Username successfully changed."})
 
 @api_users.route("/api/changeemail", methods=["POST"])
 def change_email():
@@ -25,9 +38,6 @@ def change_email():
     # But for extra precaution I've added a check here as well.
     # Also lets us give an custom error message 
     check = User.query.filter(User.email == newmail).first()
-    if current_user.id == check.id:
-        return jsonify({"error": "Already your email!"})
-    # If check is not None
     if check:
         return jsonify({"error": "Email already associated with another account."})
     
