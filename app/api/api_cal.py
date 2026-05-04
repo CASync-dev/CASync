@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
-
-from app.models import Calendar
+from sqlalchemy import delete
+from app import db
+from app.models import Calendar, Event
 from services.ical import import_ical
 
 api_cal = Blueprint('api_cal', __name__)
@@ -84,4 +85,17 @@ def api_remove_cal():
     cal = Calendar.query.where(Calendar.user_id == user_id and Calendar.id == icalid)
     if not cal:
         return jsonify({"error": "Something's gone wrong!"})
-    # Incomplete
+    
+    # Actual deletion of ical
+    # First deletes events then the iCal link
+    # 1. Remove events associated with the ical link
+    delEvents = delete(Event).where(Event.ical_id == icalid)
+    db.session.execute(delEvents)
+
+    # 2. Remove Calendar with the link
+    delCal = delete(Calendar).where(Calendar.user_id == user_id and Calendar.id == icalid)
+    db.session.execute(delCal)
+
+    # 3. Commit and return with success.
+    db.session.commit()
+    return jsonify({"success": "iCal successfully removed."})
