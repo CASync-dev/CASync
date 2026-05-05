@@ -80,7 +80,8 @@ def settings():
             # Will implement the rest of this method at a later date, when groups/friends are fully implemented.
             removeUser(current_user.id)
             logout_user()
-            redirect(url_for('api_users.accountdeletion'), code=301)
+            return redirect(url_for('api_users.accdelpage'), code=301)
+
     syncs = Calendar.query.filter_by(user_id=current_user.id).order_by(Calendar.synced_at.desc()).first()
     last_synced = syncs.synced_at if syncs else "Never"
 
