@@ -14,7 +14,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
 
     # PFP vars
-    MAX_CONTENT_LENGTH = 1024 * 1024 # Allow files up to 1MB
+    MAX_CONTENT_LENGTH = 5120 * 5120 # Allow files up to 1MB
     UPLOAD_EXTENSIONS = ['.jpg', '.png']
     UPLOAD_PATH = 'static/avatars'
 
