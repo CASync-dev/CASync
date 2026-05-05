@@ -62,7 +62,7 @@ def change_pfp():
         uploaded_pfp.save(pfploc)
         current_user.avatarurl = True
         db.session.commit()
-        return 
+        return jsonify({"success": "PFP set!"})
     return jsonify({"error": "No file detected"})
 
 # Rest of this is handled prior in /settings.

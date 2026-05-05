@@ -173,7 +173,7 @@ async function changeEmail() {
     // In case leftover 
     errormsg.classList.remove("text-green-600");
     errormsg.classList.add("text-red-600");
-    errormsg.innerHTML = "Error:" + error;
+    errormsg.innerHTML = error;
     console.error("Error:", error);
     return
     }
@@ -192,7 +192,7 @@ async function removeLink(urlid) {
     
     const token = document.querySelector('meta[name="csrf-token"]').content;
     try {
-        const response = fetch("/api/remove-cal/", {
+        const response = await fetch("/api/remove-cal/", {
             method: "POST",
             headers: { "X-CSRFToken": token, "Content-Type": "application/json" },
             body: JSON.stringify({id:urlid})
@@ -207,7 +207,7 @@ async function removeLink(urlid) {
     } catch (error) {
         errormsg.classList.remove("text-green-600");
         errormsg.classList.add("text-red-600");
-        errormsg.innerHTML = "Error:" + error;
+        errormsg.innerHTML = error;
         console.error("Error:", error);
         return;
     }
@@ -219,15 +219,57 @@ async function removeLink(urlid) {
     errormsg.innerHTML = "Succesfully removed iCal Link!";
 }
 
-async function changePFP() {
-    const newPFP = document.getElementById("newpfp");
+document.getElementById("pfpform").addEventListener('submit', async function(e) {
+    e.preventDefault(); // We'll handle sending ourselves!
+
+    const newPFP = document.getElementById("newpfp").files; // Only used to check length
     const errormsg = document.getElementById('pfperror');
+    if (newPFP.length < 1) {
+        errormsg.classList.remove("text-green-600");
+        errormsg.classList.add("text-red-600");
+        errormsg.innerHTML = "No file uploaded."
+        return
+    }
     let results;
+
+
+    const formToSend = new FormData(this);
 
     const token = document.querySelector('meta[name="csrf-token"]').content;
     try {
-        
+        const response = await fetch("/api/changepfp", {
+            method: "POST",
+            headers: { "X-CSRFToken": token },
+            body: formToSend
+        })
+        .then((response) => response.json())
+        .then((x) => {
+        results = x;
+        if ("error" in results) {
+            throw new Error(results["error"]);
+        }
+        });
     } catch (error) {
+        if (error instanceof TypeError) {
+            errormsg.classList.remove("text-green-600");
+            errormsg.classList.add("text-red-600");
+            errormsg.innerHTML = "Oops! File not supported! Supported types are: .png, .jpg"
+            return;
+        }
+        errormsg.classList.remove("text-green-600");
+        errormsg.classList.add("text-red-600");
+        errormsg.innerHTML = error;
+        console.error("Error:", error);
+        return;
+    } 
+    errormsg.classList.remove("text-red-600");
+    errormsg.classList.add("text-green-600");
+    errormsg.innerHTML = "Successfully changed your profile!"
+    document.getElementById("newpfp").value = "" // Clear file selection after setting
+    return
+    
+})
 
-    }
+async function delPFP() {
+    const errormsg = document.getElementById('pfperror');
 }
