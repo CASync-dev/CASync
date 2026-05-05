@@ -1,7 +1,5 @@
 from datetime import datetime, timezone
-import os
-
-from flask import current_app
+from flask import current_app, url_for
 from app import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -54,7 +52,7 @@ class User(UserMixin, db.Model):
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
     
     def getavatar(self):
-        return os.path.join('avatars/', self.id)
+        return url_for('static', filename= 'avatars/' + str(self.id))
     
     def avatar(self, size):
         if self.avatarurl:
