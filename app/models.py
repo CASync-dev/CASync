@@ -1,4 +1,7 @@
 from datetime import datetime, timezone
+import os
+
+from flask import current_app
 from app import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -17,7 +20,7 @@ class User(UserMixin, db.Model):
     email      = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))  # Store hashed passwords
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))  # lambda so it's evaluated at insert time, not class definition
-    # avatar = db.Column(db.String(120), unique=True, default="")
+    avatarurl = db.Column(db.Boolean, default=False) # Default uses Gravatar
     
     events = db.relationship('Event', backref='owner', lazy='dynamic')
 
@@ -50,11 +53,14 @@ class User(UserMixin, db.Model):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
     
+    def getavatar(self):
+        return os.path.join('avatars/', self.id)
+    
     def avatar(self, size):
-        if self.avatar:
-            print()
+        if self.avatarurl:
+            return self.getavatar()
         else:
-            return self.gravatar(size)
+            return self.gravatar(150)
 
 
 class Event(db.Model):
