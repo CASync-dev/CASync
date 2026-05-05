@@ -272,4 +272,29 @@ document.getElementById("pfpform").addEventListener('submit', async function(e) 
 
 async function delPFP() {
     const errormsg = document.getElementById('pfperror');
+    const token = document.querySelector('meta[name="csrf-token"]').content;
+    try {
+        const response = await fetch("/api/removepfp", {
+            method: "POST",
+            headers: { "X-CSRFToken": token, "Content-Type": "application/json" },
+            body: JSON.stringify({removepfp: "true"})
+        })
+        .then((response) => response.json())
+        .then((x) => {
+        results = x;
+        if ("error" in results) {
+            throw new Error(results["error"]);
+        }
+        });
+    } catch (error) {
+        errormsg.classList.remove("text-green-600");
+        errormsg.classList.add("text-red-600");
+        errormsg.innerHTML = error;
+        console.error("Error:", error);
+        return;
+    }
+    errormsg.classList.remove("text-red-600");
+    errormsg.classList.add("text-green-600");
+    errormsg.innerHTML = "Successfully removed your profile!"
+    return
 }

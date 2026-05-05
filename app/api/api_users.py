@@ -58,12 +58,28 @@ def change_pfp():
         file_ext = os.path.splitext(uploaded_pfp.filename)[1]
         if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
             return jsonify({"error": "File not supported"})
-        pfploc = os.path.join(current_app.config['UPLOAD_PATH'], current_user.get_id())
+        pfploc = os.path.join(current_app.config['UPLOAD_PATH'], str(current_user.id))
         uploaded_pfp.save(pfploc)
         current_user.avatarurl = True
         db.session.commit()
         return jsonify({"success": "PFP set!"})
     return jsonify({"error": "No file detected"})
+
+@api_users.route("/api/removepfp", methods=["POST"])
+@login_required
+def remove_pfp():
+    data = request.get_json()
+    # In case somehow it's being accessed not through its intended way?
+    if 'removepfp' not in data or len(data['removepfp']) < 1:
+        return jsonify({"error": "Internal server error"})
+    if data['removepfp'] == 'true':
+        if not current_user.avatarurl:
+            return jsonify({"error": "No profile picture associated with this account."})
+        os.remove(os.path.join(current_app.config['UPLOAD_PATH'], str(current_user.id)))
+        current_user.avatarurl = False
+        db.session.commit()
+        return jsonify({"success": "PFP removed!"})
+    return jsonify({'error': 'Unable to delete profile picture'})
 
 # Rest of this is handled prior in /settings.
 @api_users.route("/accountdeletion")
