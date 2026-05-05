@@ -60,7 +60,7 @@ def settings():
             updated = result.get('updated', 0)
             flash(f"Imported {imported} events, updated {updated}.", "success")
     # Change Password Form Validation
-    if changePassform.validate_on_submit():
+    elif changePassform.validate_on_submit():
         current = changePassform.current_password.data
         if current_user.verify_password(current):
             current_user.password = changePassform.new_password.data
@@ -69,7 +69,7 @@ def settings():
         else:
             flash(f"Error changing password: Incorrect password.", "error")
     # Account Deletion form Validation
-    if acdform.validate_on_submit():
+    elif acdform.validate_on_submit():
         if current_user.email != acdform.email.data:
             flash(f'Error in account deletion: Incorrect email.', "error")
         elif current_user.username != acdform.username.data:
