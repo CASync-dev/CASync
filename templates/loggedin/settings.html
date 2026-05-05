@@ -144,9 +144,9 @@
       class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
     >
       <el-dialog-panel
-        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
       >
-        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-start">
             <div
               class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
@@ -207,9 +207,9 @@
       class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
     >
       <el-dialog-panel
-        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
       >
-        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-start">
             <div
               class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
@@ -244,8 +244,6 @@
                         - Your old username will not be linked to this account anymore
                       </li>
                     </ul>
-                    <br>
-                    <br>
                     Only continue if you understand what you're doing.
                   </p>
                   <br>
@@ -291,9 +289,9 @@
       class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
     >
       <el-dialog-panel
-        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
       >
-        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-start">
             <div
               class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
@@ -331,8 +329,6 @@
                         - Anyone trying to add you will not be able to without your new email or current username
                       </li>
                     </ul>
-                    <br>
-                    <br>
                     Only continue if you understand what you're doing.
                   </p>
                   <br>
@@ -380,7 +376,7 @@
       <el-dialog-panel
         class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
       >
-        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-start">
             <div
               class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
@@ -399,10 +395,9 @@
                 <div class="mt-3 flex flex-wrap gap-4 justify-between text-gray-400"> 
                   {% if links %}
                   {% for cal in links %}
-                  <div class = "{{cal.id}} flex-1">
+                  <div class="{{cal.id}} w-full flex">
                     {{ cal.ical_url }}
-                  </div>
-                   <div>
+
                     <button 
                       onclick = "return removeLink('{{cal.id}}');"
                       class = "{{cal.id}} rounded-sm bg-red-500 p-2 text-white cursor-pointer hover:bg-red-700 focus:ring-2 focus:ring-red-800"
@@ -454,9 +449,9 @@
       class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
     >
       <el-dialog-panel
-        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
       >
-        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-start">
             <div
               class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
@@ -518,9 +513,9 @@
       class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
     >
       <el-dialog-panel
-        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
       >
-        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-start">
             <div
               class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
