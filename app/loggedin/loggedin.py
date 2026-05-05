@@ -36,7 +36,7 @@ def friends():
     # this will evnetually retrun all the users friends. 
     friends = current_user.get_friends()
     for friend in friends:
-        friend.avatar_url = f"https://i.pravatar.cc/150?u={friend.id}"
+        friend.avatar_url = friend.avatar(150)
     # only show pending entries where the current user is the recipient
     friend_requests = Friendship.query.filter((Friendship.recipient_id == current_user.id) & (Friendship.status == 'pending')).all()
     # Join username to the friend request for display purposes, we can do this because we know the sender_id of the sender of the friend request is in the sender_id field of the Friendship model.
