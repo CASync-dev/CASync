@@ -66,10 +66,11 @@ function showMsg(msg, isSuccess) {
 }
 
 async function syncCal() {
+    const token = document.querySelector('meta[name="csrf-token"]').content;
     const res = await fetch(`/api/sync-cal/`, {
     headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": "{{ csrf_token() }}",
+        "X-CSRFToken": token,
     },
     method: "POST",
     });
