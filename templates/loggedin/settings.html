@@ -1,10 +1,48 @@
 {% extends "loggedin/layout.html" %} {% block content %}
-<div class="p-8 overflow:scroll">
+<div class="p-8 overflow-scroll">
   <h1 class="text-3xl font-bold text-gray-900 mb-8">Settings</h1>
 
-  <section class="mb-8">
+  
+
+  <div class="mb-8">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-1"><i class="fa-solid fa-address-book text-black"></i>Profile</h2>
+       
+    <div id="profile-settings" class="mt-2 sm:mx-auto py-3">
+      <div class="flex flex-row gap-6 items-center">
+        <button class="relative group cursor-pointer shrink-0 rounded-full" command="show-modal" commandfor="changepfp-modal">
+          <img src="{{current_user.avatar(150)}}" class="h-24 w-24 rounded-full" />
+          <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200">
+            <span class="text-white text-xs font-medium">Change</span>
+          </div>
+        </button>
+        <div class="flex flex-col gap-3 flex-1">
+          <div class="flex flex-row justify-between items-center">
+            <p class="text-gray-500">Username: {{current_user.username}}</p>
+            <button
+              command="show-modal"
+              commandfor="changeuser-modal"
+              class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer shadow-2xl hover:shadow transition duration-200 w-1/2"
+            >
+              Change Username
+            </button>
+          </div>
+          <div class="flex flex-row justify-between items-center">
+            <p class="text-gray-500">Email: {{current_user.email}}</p>
+            <button
+              command="show-modal"
+              commandfor="changemail-modal"
+              class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer shadow-2xl hover:shadow transition duration-200 w-1/2"
+            >
+              Change Email
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div class="mb-8">
     <div class="flex">
-      <h2 class="text-2xl font-semibold text-gray-800 mb-1">Import iCal</h2>
+      <h2 class="text-2xl font-semibold text-gray-800 mb-1"> <i class="fa-solid fa-calendar text-black"></i>Import iCal</h2>
       <div class="ml-auto">
         <button
           id="sync-button"
@@ -24,6 +62,7 @@
         </p>
       </div>
     </div>
+
     <form method="post" action="/settings">
       {{ form.hidden_tag() }}
       <p class="text-sm text-gray-500 mb-3">
@@ -55,70 +94,21 @@
             {% endfor %}
       {% endfor %}{% endif %}
     </form>
-  </section>
-
-  <div>
-    <button
-      class="cursor-pointer flex items-center bg-primary rounded-2xl p-6 gap-4 text-white shadow-2xl hover:shadow transition duration-200 w-full"
-      onclick="return showProfileSettings();"
-    >
-      <i class="fa-solid fa-address-book" style="color: white"></i> Profile
-    </button>
-    <div id="profile-settings" class="mt-2 sm:mx-auto py-3 hidden">
-      <div class="flex flex-row justify-between">
-        <img
-          src="{{current_user.avatar(150)}}"
-          class="h-12 w-12 rounded-full"
-        />
-        <button
-          command="show-modal"
-          commandfor="changepfp-modal"
-          class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-1/2"
-        >
-          Change Profile Picture
-        </button>
-      </div>
-      <br />
-
-      <div class="flex flex-row justify-between">
-        <p class="text-gray-500">Username: {{current_user.username}}</p>
-        <button
-          command="show-modal"
-          commandfor="changeuser-modal"
-          class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-1/2"
-        >
-          Change Username
-        </button>
-      </div>
-      <br />
-      <div class="flex flex-row max-sm:flex-col justify-between">
-        <p class="text-gray-500">Email: {{current_user.email}}</p>
-        <button
-          command="show-modal"
-          commandfor="changemail-modal"
-          class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer mb-1.5 shadow-2xl hover:shadow transition duration-200 w-1/2"
-        >
-          Change Email
-        </button>
-      </div>
-    </div>
-    <br />
-    <button
-      class="cursor-pointer flex items-center bg-primary rounded-2xl p-6 gap-4 text-white shadow-2xl hover:shadow transition duration-200 w-full"
-      onclick="return showAccountSettings();"
-    >
-      <i class="fa-solid fa-gear" style="color: white"></i>
-      Account
-    </button>
-    <div id="account-settings" class="mt-2 sm:mx-auto py-3 hidden">
-      <p class="text-gray-500"></p>
-      <button
+          <button
         command="show-modal"
         commandfor="ical-modal"
         class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
       >
         Edit iCal Links
       </button>
+    </div>
+
+    <h2 class="text-2xl font-semibold text-gray-800 mb-1">
+      <i class="fa-solid fa-gear text black"></i>
+      Account
+    </h2>
+    <div id="account-settings" class="mt-2 sm:mx-auto py-3">
+      <p class="text-gray-500"></p>
       <button
         command="show-modal"
         commandfor="changepass-modal"
@@ -492,7 +482,7 @@
                 {{ cpform.repeat_new(size=25, class = "text-black flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
                   <p class = "text-red-400 mb-3">
                     <span class = "font-bold"> Please note this password somewhere safe. </span>
-                  
+                  </p>
                 <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                   {{ cpform.submit(class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm") }}
                   <button
