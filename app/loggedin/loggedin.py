@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, app, render_template, flash
 from flask_login import current_user, login_required
 from app.form import EventForm, IcalImportForm
-from app.models import Calendar, User
+from app.models import Calendar, User, Friendship
 
 
 loggedin = Blueprint('loggedin', __name__, template_folder='../templates/loggedin', static_folder='../static')
@@ -29,14 +29,17 @@ def groups():
 @loggedin.route("/friends")
 @login_required
 def friends():
-    # this will evnetually retrun all the users friends, for now i return all users
-    friends = User.query.all()
-    # give random avatar urls to each friend using their id as a seed for testing
+    # this will evnetually retrun all the users friends. 
+    friends = current_user.get_friends()
     for friend in friends:
         friend.avatar_url = f"https://i.pravatar.cc/150?u={friend.id}"
-
-    friends = friends + friends
-    return render_template("loggedin/friends.html", friends=friends)
+    # only show pending entries where the current user is the recipient
+    friend_requests = Friendship.query.filter((Friendship.recipient_id == current_user.id) & (Friendship.status == 'pending')).all()
+    # Join username to the friend request for display purposes, we can do this because we know the sender_id of the sender of the friend request is in the sender_id field of the Friendship model.
+    for request in friend_requests:
+        request.username = User.query.get(request.sender_id).username
+        request.avatar_url = f"https://i.pravatar.cc/150?u={request.id}"
+    return render_template("loggedin/friends.html", friend_requests=friend_requests, friends=friends)
 
 
 @loggedin.route("/settings", methods=['GET', 'POST'])

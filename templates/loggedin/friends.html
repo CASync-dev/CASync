@@ -19,9 +19,10 @@
     >
       <button
         class="btn-white px-4 mr-2 h-10 whitespace-nowrap"
-        onclick="alert('Request functionality is not implemented yet.')"
+        command="show-modal"
+        commandfor="friend-requests-modal"
       >
-        Friend Requests
+        Friend Requests ({{ friend_requests|length }})
       </button>
       <button
         class="btn-white px-4 h-10 whitespace-nowrap"
@@ -37,6 +38,7 @@
       <!-- Friend list items -->
       {% for friend in friends %}
       <li
+        id="friend-{{friend.id}}"
         class="py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200"
       >
         <div class="flex items-center">
@@ -51,6 +53,12 @@
           </div>
         </div>
         <button
+          class="btn-plain px-3 ml-auto py-2 bg-red-300 text-white rounded-lg hover:bg-red-400"
+          onclick="removeFriend('{{ friend.id }}')"
+        >
+          <i class="fas fa-user-times"></i>
+        </button>
+        <button
           class="btn-plain px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400"
           onclick="openFriendSchedule('{{ friend.id }}', '{{ friend.username }}')"
         >
@@ -62,6 +70,75 @@
     </ul>
   </div>
 </div>
+{# Confirm Friend Removal Modal #}
+<el-dialog>
+    <dialog
+      id="remove-confirmation"
+      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+    >
+      <el-dialog-backdrop
+        class="fixed  bg-gray-900/50  inset-0 transition-opacity data-closed:opacity-0"
+      ></el-dialog-backdrop>
+
+      <div
+        tabindex="0"
+        class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+      >
+        <el-dialog-panel
+          class="relative transform overflow-hidden rounded-lg bg-blue-800 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        >
+          <div class=" px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div
+                class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-white sm:mx-0 sm:size-10"
+              >
+                <i
+                  class="fa-solid fa-triangle-exclamation  text-red-500 text-lg"
+                ></i>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3
+                  id="dialog-title"
+                  class="text-base font-semibold text-white"
+                >
+                  Remove Friend
+                </h3>
+                <div class="mt-2">
+                  <p class="text-sm text-gray-300">
+                    Are you sure you want to remove this friend? This action
+                    cannot be undone.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="bg-blue-700/25 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+          >
+            <button
+              id="confirm-delete-btn"
+              type="button"
+              command="close"
+              commandfor="remove-confirmation"
+              class="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 sm:ml-3 sm:w-auto"
+              onclick="confirmRemoveFriend()"
+            >
+              Remove Friend
+            </button>
+            <button
+              id="cancel-delete-btn"
+              type="button"
+              command="close"
+              commandfor="remove-confirmation"
+              class="mt-3 inline-flex w-full justify-center rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white inset-ring inset-ring-white/5 hover:bg-white/20 sm:mt-0 sm:w-auto"
+            >
+              Cancel
+            </button>
+          </div>
+        </el-dialog-panel>
+      </div>
+    </dialog>
+  </el-dialog>
 <!-- Add Friend Modal -->
 <el-dialog>
   <dialog
@@ -96,7 +173,7 @@
               <div class="mt-2">
                 <p class="text-sm text-gray-500">
                   Enter your friend's username or email to send them a friend
-                  request. {atm not real search}
+                  request.
                 </p>
                 <div class="mt-3 flex w-full items-stretch gap-2">
                   <input
@@ -128,6 +205,93 @@
             class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
             command="close"
             commandfor="add-friend-modal"
+          >
+            Close
+          </button>
+        </div>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>
+<!-- Friend Requests Modal -->
+<el-dialog>
+  <dialog
+    id="friend-requests-modal"
+    class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+    ></el-dialog-backdrop>
+
+    <div
+      tabindex="0"
+      class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    >
+      <el-dialog-panel
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+      >
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fas fa-user-plus text-blue-800"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1 min-w-0">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                Friend Requests
+              </h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500"></p>
+                <div class="mt-3 flex flex-col w-full gap-2">
+                  {% if friend_requests|length == 0 %}
+                    <p class="text-sm text-gray-500">No pending friend requests.</p>
+                  {% endif %}
+                  {% for request in friend_requests %}
+                    <div id="friend-request-{{ request.id }}" class="flex items-center justify-between rounded-md border border-gray-300 bg-white p-4 shadow-sm">
+                      <div class="flex items-center">
+                        <img
+                          src="{{ request.avatar_url }}"
+                          alt="User Avatar"
+                          class="h-10 w-10 rounded-full"
+                        />
+                        <div class="ml-3">
+                          <p class="text-sm font-medium text-gray-900">{{ request.username }}</p>
+                          <p class="text-xs text-gray-500">Sent you a friend request</p>
+                        </div>
+                      </div>
+                      <div class="flex space-x-2">
+                        <button
+                          type="button"
+                          class="rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                          onclick="acceptFriendRequest('{{ request.id }}')"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          type="button"
+                          class="rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                          onclick="rejectFriendRequest('{{ request.id }}')"
+                        >
+                          Decline
+                        </button>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button
+            type="button"
+            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            command="close"
+            commandfor="friend-requests-modal"
           >
             Close
           </button>

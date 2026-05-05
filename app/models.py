@@ -43,6 +43,20 @@ class User(UserMixin, db.Model):
             'email': self.email,
             'created_at': self.created_at.isoformat(),
         }
+    def public_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+        }
+    def get_friends(self):
+        # This method retrieves all friends of the user by querying the Friendship model for entries where the user is either the sender
+        #  or recipient of an accepted friendship. It then combines these results to return a list of User objects representing the user's friends.
+        sent = db.session.query(User).join(Friendship, Friendship.recipient_id == User.id)\
+            .filter(Friendship.sender_id == self.id, Friendship.status == 'accepted')
+        received = db.session.query(User).join(Friendship, Friendship.sender_id == User.id)\
+            .filter(Friendship.recipient_id == self.id, Friendship.status == 'accepted')
+        # returns a nice list of the users friedns regardless of who sent the request, much simpelr for front end
+        return sent.union(received).all()
 
 
 class Event(db.Model):
@@ -91,3 +105,17 @@ class Calendar(db.Model):
 
     def __repr__(self):
         return f'<Calendar {self.ical_url}>'
+    
+
+class Friendship(db.Model):
+    __tablename__ = 'friendships'
+
+    id          = db.Column(db.Integer, primary_key=True)
+    sender_id     = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # the user who sent the friend request
+    recipient_id   = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # the user who received the friend request
+    status      = db.Column(db.String(20), nullable=False)  # "pending", "accepted", "rejected"
+    created_at  = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))  # when the friend request was created
+    accepted_at = db.Column(db.DateTime(timezone=True))  # when the friend request was accepted (null if still pending or rejected)
+
+    def __repr__(self):
+        return f'<Friendship {self.sender_id} -> {self.recipient_id} ({self.status})>'
