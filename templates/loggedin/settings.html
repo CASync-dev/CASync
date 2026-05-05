@@ -465,16 +465,20 @@
               >
                 Change Password
               </h3>
-              <form method="post" action="/settings" class = "text-gray-400 mt-3 px-5">
-                {{ cpform.hidden_tag() }} <br>
-                {{ cpform.current_password.label }}
-                {{ cpform.current_password(size=25, class = "text-black flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50") }}
-                <br>
-                {{ cpform.new_password.label }}
-                {{ cpform.new_password(size=25, class = "text-black flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50") }}
-                <br>
-                {{ cpform.repeat_new.label }}
-                {{ cpform.repeat_new(size=25, class = "text-black flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
+              <form method="post" action="/settings" class="text-gray-400 mt-3 px-5 space-y-3">
+                {{ cpform.hidden_tag() }}
+                <div>
+                  {{ cpform.current_password.label(class="block text-sm font-medium mb-1") }}
+                  {{ cpform.current_password(class="w-full text-black rounded-md border border-gray-300 px-3 py-2 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50") }}
+                </div>
+                <div>
+                  {{ cpform.new_password.label(class="block text-sm font-medium mb-1") }}
+                  {{ cpform.new_password(class="w-full text-black rounded-md border border-gray-300 px-3 py-2 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50") }}
+                </div>
+                <div>
+                  {{ cpform.repeat_new.label(class="block text-sm font-medium mb-1") }}
+                  {{ cpform.repeat_new(class="w-full text-black rounded-md border border-gray-300 px-3 py-2 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50") }}
+                </div>
                   <p class = "text-red-400 mb-3">
                     <span class = "font-bold"> Please note this password somewhere safe. </span>
                   </p>
