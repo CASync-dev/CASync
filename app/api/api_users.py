@@ -60,6 +60,8 @@ def change_pfp():
             return jsonify({"error": "File not supported"})
         pfploc = os.path.join(current_app.config['UPLOAD_PATH'], current_user.get_id())
         uploaded_pfp.save(pfploc)
+        current_user.avatarurl = True
+        db.session.commit()
         return 
     return jsonify({"error": "No file detected"})
 
