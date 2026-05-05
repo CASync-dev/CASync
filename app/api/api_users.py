@@ -1,4 +1,6 @@
-from flask import Blueprint, jsonify, render_template, request
+import os
+
+from flask import Blueprint, current_app, jsonify, render_template, request
 from flask_login import current_user, login_required
 from app.models import User
 from app import db
@@ -48,7 +50,20 @@ def change_email():
     db.session.commit()
     return jsonify({"success": "Email successfully changed."})
 
+@api_users.route("/api/changepfp", methods=["POST"])
+@login_required
+def change_pfp():
+    uploaded_pfp = request.files['file']
+    if uploaded_pfp.filename != "":
+        file_ext = os.path.splitext(uploaded_pfp.filename)[1]
+        if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
+            return jsonify({"error": "File not supported"})
+        pfploc = os.path.join(current_app.config['UPLOAD_PATH'], current_user.get_id())
+        uploaded_pfp.save(pfploc)
+        return 
+    return jsonify({"error": "No file detected"})
 
+# Rest of this is handled prior in /settings.
 @api_users.route("/accountdeletion")
 def accdelpage():
     return render_template("/settings/removeacc.html")
