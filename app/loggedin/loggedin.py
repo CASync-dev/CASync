@@ -42,7 +42,7 @@ def friends():
     # Join username to the friend request for display purposes, we can do this because we know the sender_id of the sender of the friend request is in the sender_id field of the Friendship model.
     for request in friend_requests:
         request.username = User.query.get(request.sender_id).username
-        request.avatar_url = f"https://i.pravatar.cc/150?u={request.id}"
+        request.avatar_url = request.avatar(150)
     return render_template("loggedin/friends.html", friend_requests=friend_requests, friends=friends)
 
 
