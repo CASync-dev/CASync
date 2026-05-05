@@ -209,12 +209,25 @@ async function removeLink(urlid) {
         errormsg.classList.add("text-red-600");
         errormsg.innerHTML = "Error:" + error;
         console.error("Error:", error);
-        return
+        return;
     }
     errormsg.classList.remove("text-red-600");
     errormsg.classList.add("text-green-600");
     for (var i = 0; i < icaldiv.length; i++) {
         icaldiv[i].remove();
     }
-    errormsg.innerHTML = "Succesfully removed iCal Link!"
+    errormsg.innerHTML = "Succesfully removed iCal Link!";
+}
+
+async function changePFP() {
+    const newPFP = document.getElementById("newpfp");
+    const errormsg = document.getElementById('pfperror');
+    let results;
+
+    const token = document.querySelector('meta[name="csrf-token"]').content;
+    try {
+        
+    } catch (error) {
+
+    }
 }
