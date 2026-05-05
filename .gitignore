@@ -10,3 +10,4 @@ __pycache__/
 instance/
 .claude/
 static/css/output.css
+static/avatars/**
