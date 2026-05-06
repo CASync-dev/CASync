@@ -186,7 +186,7 @@ async function changeEmail() {
 // Changing Password and Account deletion done via. flask forms.
 
 async function removeLink(urlid) {
-    const icaldiv = document.getElementsByClassName("urlid");
+    const icaldiv = document.getElementsByClassName(urlid);
     const errormsg = document.getElementById('icalediterror');
     let results;
     
