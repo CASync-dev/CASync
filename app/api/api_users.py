@@ -26,7 +26,7 @@ def change_username():
     # If all checks are passed, the username is free and can be used by the current user.
     current_user.username = newusername
     db.session.commit()
-    return jsonify({"success": "Username successfully changed."})
+    return jsonify({"success": current_user.username})
 
 @api_users.route("/api/changeemail", methods=["POST"])
 @login_required

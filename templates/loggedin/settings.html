@@ -17,7 +17,7 @@
         </button>
         <div class="flex flex-col gap-3 flex-1">
           <div class="flex flex-row justify-between items-center">
-            <p class="text-gray-500">Username: {{current_user.username}}</p>
+            <p class="text-gray-500">Username: <span id = "username"> {{current_user.username}} </span></p>
             <button
               command="show-modal"
               commandfor="changeuser-modal"

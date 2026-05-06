@@ -142,6 +142,7 @@ async function changeUsername() {
     errormsg.classList.remove("text-red-600");
     errormsg.classList.add("text-green-600");
     errormsg.innerHTML = "Successfully changed your username!"
+    document.getElementById("username").innerHTML = results["success"]
     return
 }
 
