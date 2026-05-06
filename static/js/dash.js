@@ -1,5 +1,4 @@
 // simple function to update the time and date on the dashboard every second
-// test 4
 function updateTime() {
   // Get the current date and time each time this runs
   const now = new Date();
@@ -32,73 +31,187 @@ setInterval(updateTime, 1000);
 
 // dynamic stuff for the calendar events -------------------------------------
 
+// craft the url for fetching events: format is /api/events/me?start=2026-05-06&end=2026-05-07
+function getCalendarBaseUrl() {
+  let apiUrl = "/api/events/me";
+  const now = new Date();
+  
+  const fmt = d => d.toLocaleDateString('en-CA');
+  apiUrl += `?start=${fmt(now)}&end=${fmt(now)}`;
+  
+  return apiUrl;
+}
 
-//     GET /api/events/me?start=2026-05-06&end=2026-05-07 
-fetch("/api/events/me?start=2026-05-06&end=2026-05-06")
-  .then((response) => response.json())
-  .then((data) => {
-    console.log('Fetched events:', data); // Log the fetched data for debugging
-  })
-  .catch((error) => {
-    console.error('Error loading events:', error);
+
+
+//  GET /api/events/me?start=2026-05-06&end=2026-05-07 
+let events = null;
+async function loadEvents() {
+  try {
+    const res = await fetch(getCalendarBaseUrl());
+    if (!res.ok) throw new Error(res.statusText);
+    events = await res.json(); // store it here
+    console.log('events', events);
+    // renderCalendar(events);
+    return events;
+  } catch (err) {
+    console.error('fetch error', err);
+  }
+}
+
+
+// helper: parse "HH:MM" to minutes since midnight
+function parseTimeToMinutes(hhmm = '00:00') {
+  const [h, m] = hhmm.split(':').map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
+
+
+
+/*
+    {
+        "1": {
+            "events": {
+                "1": {
+                    "title": "Event Title",
+                    "description": "Event Description",
+                    "date": "2024-07-01",
+                    "startTime": "14:00",
+                    "endTime": "15:00",
+                    "user_id": 1,
+                    "username": "exampleuser",
+                    "location": "Event Location",
+                    "color": "indigo",
+                    "ical_id": null,
+                    "ical_uid": null,
+                    "id": 1
+                },
+                ...
+*/
+
+// process raw API JSON into useful structures
+function processEvents(eventsData) {
+  if (!eventsData) return { flat: [], byDate: {} };
+
+  // 1) flatten all users' events into an array
+  const flat = Object.values(eventsData).flatMap(user => Object.values(user.events)).map(e => {
+    const dateISO = e.date; // e.g. "2026-05-06"
+    const start = e.startTime ?? e.start_time ?? e.start ?? '00:00';
+    const end = e.endTime ?? e.end_time ?? e.end ?? '00:00';
+    return {
+      ...e,
+      dateISO,
+      dateObj: new Date(dateISO + 'T00:00'),
+      startMinutes: parseTimeToMinutes(start),
+      endMinutes: parseTimeToMinutes(end),
+    };
   });
 
+  // 2) group by date and sort each day's events by start time
+  const byDate = flat.reduce((acc, ev) => {
+    (acc[ev.dateISO] ??= []).push(ev);
+    return acc;
+  }, {});
+  Object.values(byDate).forEach(arr => arr.sort((a, b) => a.startMinutes - b.startMinutes));
 
-    // let lastFetchedStart = null;
-    // let lastFetchedEnd = null;
-    // function fetchAndRenderEvents() {
-    //   let apiUrl = calendarBaseUrl;
-    //   if ( {{ enableAdaptiveDateCalls | lower }} ) {
-    //     const weekDates = getWeekDates();
-    //     const weekStart = new Date(weekDates[0]);
-    //     const weekEnd = new Date(weekDates[4]);
-    //     // if the current week is already covered by the last fetch, just re-render
-    //     if (lastFetchedStart && lastFetchedEnd && weekStart >= lastFetchedStart && weekEnd <= lastFetchedEnd) {
-    //       renderDesktopEvents();
-    //       return;
-    //     }
-    //     // fetch 2 weeks before and after the current week
-    //     const startDate = new Date(weekStart);
-    //     startDate.setDate(startDate.getDate() - 14);
-    //     const endDate = new Date(weekEnd);
-    //     endDate.setDate(endDate.getDate() + 14);
-    //     const fmt = d => d.toLocaleDateString('en-CA');
-    //     apiUrl += `?start=${fmt(startDate)}&end=${fmt(endDate)}`;
-    //     fetch(apiUrl)
-    //       .then((response) => response.json())
-    //       .then((data) => {
-    //         lastFetchedStart = startDate;
-    //         lastFetchedEnd = endDate;
-    //         events = data;
-    //         renderDesktopEvents();
-    //       })
-    //       .catch((error) => {
-    //         console.error('Error loading events:', error);
-    //       });
-    //     return;
-    //   } else {
-    //     // if adaptive data calls is not enabled it means the url provided expects no date query param and will return all events
-    //     let apiUrl = calendarBaseUrl;
-    //             fetch(apiUrl)
-    //       .then((response) => response.json())
-    //       .then((data) => {
-    //         lastFetchedStart = startDate;
-    //         lastFetchedEnd = endDate;
-    //         events = data;
-    //         renderDesktopEvents();
-    //       })
-    //       .catch((error) => {
-    //         console.error('Error loading events:', error);
-    //       });
-    //   }
+  return { flat, byDate };
+}
 
-    //   fetch(apiUrl)
-    //     .then((response) => response.json())
-    //     .then((data) => {
-    //       events = data;
-    //       renderDesktopEvents();
-    //     })
-    //     .catch((error) => {
-    //       console.error('Error loading events:', error);
-    //     });
-    // }
+
+function formatHHMM(hhmm = '00:00') {
+  const [h, m] = (hhmm || '00:00').split(':').map(Number);
+  const period = (h || 0) < 12 ? 'AM' : 'PM';
+  const hour = (h || 0) % 12 || 12;
+  return `${hour}:${String(m || 0).padStart(2,'0')} ${period}`;
+}
+
+function bigCard(processed) {
+  const bigCardEl = document.getElementById('big-card');
+  if (!bigCardEl) return;
+
+  let nextEvent = null;
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  const todayISO = now.toISOString().slice(0,10);
+  
+
+  // Find the next event
+  for (const ev of processed.flat) {
+    if (ev.startMinutes > nowMinutes) {
+      nextEvent = ev;
+      break;
+    }
+  }
+
+  if (!nextEvent) {
+    bigCardEl.innerHTML = '<p class="text-gray-600">No upcoming events.</p>';
+    return;
+  }
+
+  bigCardEl.innerHTML = `
+      <h3 class="text-4xl font-medium text-dark space-y-4 mb-4">
+              Next Event:
+            </h3>
+      <h4 class="text-3xl text-dark space-y-4 mb-4">
+          in <span class="text-blue-600">30 minutes</span> at ${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)}
+      </h4>
+      <span class="text-3xl flex-1">${nextEvent.title}</span>
+      <span class="text-lg text-gray-500 shrink-0">${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)} – ${formatHHMM(nextEvent.endTime ?? nextEvent.end_time)}</span>
+      <span class="text-lg text-gray-500 shrink-0">
+          ${nextEvent.location ? `@ ${nextEvent.location}` : ''}
+      </span>
+      <div class="flex"><!-- avatars --></div>
+  `;
+}
+
+function renderDashboardEvents(processed) {
+  // put the username in the header (just take it from any event, since they should all be the same user)
+  // could be an easier way to do it with ajax but it would give me <user tehei>
+  const usernameEl = document.getElementById('username');
+  if (usernameEl) {
+    const anyEvent = processed.flat[0];
+    usernameEl.innerText = anyEvent ? anyEvent.username : 'User';
+  }
+  // call function to render data for the big card
+  bigCard(processed);
+  const container = document.getElementById('dashboard-sub-events');
+  if (!container) return;
+  container.innerHTML = '';
+  const todayISO = new Date().toISOString().slice(0,10);
+  const todays = processed.byDate[todayISO] || [];
+  if (!todays.length) {
+    container.innerHTML = '<p class="text-sm text-gray-600">No events today.</p>';
+    return;
+  }
+  todays.forEach(ev => {
+    const el = document.createElement('div');
+    el.className = 'p-3 bg-white rounded-md shadow-sm';
+    el.innerHTML = `
+      <div class="flex justify-between items-start">
+        <div>
+          <div class="text-sm font-semibold"></div>
+          <div class="text-xs text-gray-500">${ev.location || ''}</div>
+        </div>
+        <div class="text-xs text-gray-700">${formatHHMM(ev.startTime ?? ev.start_time)} — ${formatHHMM(ev.endTime ?? ev.end_time)}</div>
+      </div>
+      <p class="mt-2 text-xs text-gray-600">${ev.description || ''}</p>
+
+      <div class="flex items-center bg-slate-200 rounded-2xl p-6 gap-4">
+              <span class="text-xl font-medium flex-1"
+                >${ev.title}</span
+              >
+              <span class="text-lg text-gray-500 w-50 text-right shrink-0"
+                >${formatHHMM(ev.startTime ?? ev.start_time)} – ${formatHHMM(ev.endTime ?? ev.end_time)}</span
+              >
+              <div class="flex"><!-- avatars --></div>
+            </div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+let processedEvs = null;
+loadEvents().then(events => {
+  processedEvs = processEvents(events);
+  renderDashboardEvents(processedEvs);
+});
