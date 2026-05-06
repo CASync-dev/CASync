@@ -78,7 +78,7 @@ def remove_pfp():
         os.remove(os.path.join(current_app.config['UPLOAD_PATH'], str(current_user.id)))
         current_user.avatarurl = False
         db.session.commit()
-        return jsonify({"success": "PFP removed!"})
+        return jsonify({"success": current_user.avatar(150)})
     return jsonify({'error': 'Unable to delete profile picture'})
 
 # Rest of this is handled prior in /settings.

@@ -296,5 +296,6 @@ async function delPFP() {
     errormsg.classList.remove("text-red-600");
     errormsg.classList.add("text-green-600");
     errormsg.innerHTML = "Successfully removed your profile!"
+    document.getElementById("pfp").setAttribute("src", results["success"])
     return
 }

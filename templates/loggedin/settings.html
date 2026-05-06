@@ -10,7 +10,7 @@
     <div id="profile-settings" class="mt-2 sm:mx-auto py-3">
       <div class="flex flex-row gap-6 items-center">
         <button class="relative group cursor-pointer shrink-0 rounded-full" command="show-modal" commandfor="changepfp-modal">
-          <img src="{{current_user.avatar(150)}}" class="h-24 w-24 rounded-full" />
+          <img id = "pfp" src="{{current_user.avatar(150)}}" class="h-24 w-24 rounded-full" />
           <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200">
             <span class="text-white text-xs font-medium">Change</span>
           </div>
