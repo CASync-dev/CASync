@@ -64,6 +64,7 @@ class User(UserMixin, db.Model):
         return {
             'id': self.id,
             'username': self.username,
+            'pfp': self.avatar(200)
         }
     def get_friends(self):
         # This method retrieves all friends of the user by querying the Friendship model for entries where the user is either the sender
