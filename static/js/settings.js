@@ -266,6 +266,7 @@ document.getElementById("pfpform").addEventListener('submit', async function(e) 
     errormsg.classList.add("text-green-600");
     errormsg.innerHTML = "Successfully changed your profile!"
     document.getElementById("newpfp").value = "" // Clear file selection after setting
+    document.getElementById("pfp").setAttribute("src", results["success"])
     return
     
 })

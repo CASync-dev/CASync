@@ -62,7 +62,7 @@ def change_pfp():
         uploaded_pfp.save(pfploc)
         current_user.avatarurl = True
         db.session.commit()
-        return jsonify({"success": "PFP set!"})
+        return jsonify({"success": current_user.avatar(150)})
     return jsonify({"error": "No file detected"})
 
 @api_users.route("/api/removepfp", methods=["POST"])
