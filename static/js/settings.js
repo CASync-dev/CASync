@@ -85,6 +85,8 @@ async function syncCal() {
     }
 }
 
+// The following is no longer used after settings redesign, but left here in case anything breaks.
+// -------------------------------------------------------------------------------
 let pfpFlag = 0;
 function showProfileSettings() {
     if (pfpFlag == 0) {
@@ -106,6 +108,8 @@ function showAccountSettings() {
     accFlag = 0;
     }
 }
+
+// -------------------------------------------------------------------------------
 
 // Changing username Functions
 async function changeUsername() {
