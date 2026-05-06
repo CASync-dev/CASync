@@ -48,7 +48,7 @@ def change_email():
     # If all checks are passed, the email is free and can be used by the current user.
     current_user.email = newmail
     db.session.commit()
-    return jsonify({"success": "Email successfully changed."})
+    return jsonify({"success": current_user.email})
 
 @api_users.route("/api/changepfp", methods=["POST"])
 @login_required

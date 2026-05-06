@@ -27,7 +27,7 @@
             </button>
           </div>
           <div class="flex flex-row justify-between items-center">
-            <p class="text-gray-500">Email: {{current_user.email}}</p>
+            <p class="text-gray-500">Email: <span id = "email"> {{current_user.email}} </span></p>
             <button
               command="show-modal"
               commandfor="changemail-modal"

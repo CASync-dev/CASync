@@ -180,6 +180,7 @@ async function changeEmail() {
     errormsg.classList.remove("text-red-600");
     errormsg.classList.add("text-green-600");
     errormsg.innerHTML = "Successfully changed your email!"
+    document.getElementById("email").innerHTML = results["success"]
     return
 }
 
