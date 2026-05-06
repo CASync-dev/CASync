@@ -1,8 +1,10 @@
 from datetime import datetime, timezone
+from flask import current_app, url_for
 from app import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import login_manager
+from hashlib import md5
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -16,7 +18,8 @@ class User(UserMixin, db.Model):
     email      = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))  # Store hashed passwords
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))  # lambda so it's evaluated at insert time, not class definition
-
+    avatarurl = db.Column(db.Boolean, default=False) # Default uses Gravatar
+    
     events = db.relationship('Event', backref='owner', lazy='dynamic')
 
     @property
@@ -43,6 +46,20 @@ class User(UserMixin, db.Model):
             'email': self.email,
             'created_at': self.created_at.isoformat(),
         }
+    
+    def gravatar(self, size):
+        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
+    
+    def getavatar(self):
+        return url_for('static', filename= 'avatars/' + str(self.id))
+    
+    def avatar(self, size):
+        if self.avatarurl:
+            return self.getavatar()
+        else:
+            return self.gravatar(150)
+    
     def public_dict(self):
         return {
             'id': self.id,

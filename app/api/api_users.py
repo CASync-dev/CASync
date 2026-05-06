@@ -1,12 +1,92 @@
-from flask import Blueprint, jsonify
+import os
+
+from flask import Blueprint, current_app, jsonify, render_template, request
+from flask_login import current_user, login_required
 from app.models import User
+from app import db
 
 api_users = Blueprint('api_users', __name__)
 
 # Delete User Route (So users can delete their accounts if they want to)
   # needs to properly delete the user and cascade delete any related data (events, settings, etc.) to avoid orphaned data in the database
+@api_users.route("/api/changeusername", methods=["POST"])
+@login_required
+def change_username():
+    data = request.get_json()
+    if 'newuser' not in data or len(data['newuser']) < 1:
+        return jsonify({"error": "Invalid Username"})
+    newusername = data['newuser']
+    # SqlAlchemy should make sure that an username isn't being used twice in the database
+    # But for extra precaution I've added a check here as well.
+    # Also lets us give us an custom error message.
+    check = User.query.filter(User.username == newusername).first()
+    if check:
+        return jsonify({"error": "Username already taken."})
+    
+    # If all checks are passed, the username is free and can be used by the current user.
+    current_user.username = newusername
+    db.session.commit()
+    return jsonify({"success": current_user.username})
 
-# -- OTHER API ROUTES
+@api_users.route("/api/changeemail", methods=["POST"])
+@login_required
+def change_email():
+    data = request.get_json()
+    if 'newemailaddress' not in data or len(data['newemailaddress']) < 1:
+        return jsonify({"error": "Invalid Address"})
+    # Checking if its an email
+    if '@' not in data['newemailaddress']:
+        return jsonify({"error": "Not an Email"})
+    newmail = data['newemailaddress']
+    # SQLAlchemy should make sure that an email isn't being used twice in the database,
+    # But for extra precaution I've added a check here as well.
+    # Also lets us give an custom error message 
+    check = User.query.filter(User.email == newmail).first()
+    if check:
+        return jsonify({"error": "Email already associated with another account."})
+    
+    # If all checks are passed, the email is free and can be used by the current user.
+    current_user.email = newmail
+    db.session.commit()
+    return jsonify({"success": current_user.email})
+
+@api_users.route("/api/changepfp", methods=["POST"])
+@login_required
+def change_pfp():
+    uploaded_pfp = request.files['file']
+    if uploaded_pfp.filename != "":
+        file_ext = os.path.splitext(uploaded_pfp.filename)[1]
+        if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
+            return jsonify({"error": "File not supported"})
+        pfploc = os.path.join(current_app.config['UPLOAD_PATH'], str(current_user.id))
+        uploaded_pfp.save(pfploc)
+        current_user.avatarurl = True
+        db.session.commit()
+        return jsonify({"success": current_user.avatar(150)})
+    return jsonify({"error": "No file detected"})
+
+@api_users.route("/api/removepfp", methods=["POST"])
+@login_required
+def remove_pfp():
+    data = request.get_json()
+    # In case somehow it's being accessed not through its intended way?
+    if 'removepfp' not in data or len(data['removepfp']) < 1:
+        return jsonify({"error": "Internal server error"})
+    if data['removepfp'] == 'true':
+        if not current_user.avatarurl:
+            return jsonify({"error": "No profile picture associated with this account."})
+        os.remove(os.path.join(current_app.config['UPLOAD_PATH'], str(current_user.id)))
+        current_user.avatarurl = False
+        db.session.commit()
+        return jsonify({"success": current_user.avatar(150)})
+    return jsonify({'error': 'Unable to delete profile picture'})
+
+# Rest of this is handled prior in /settings.
+@api_users.route("/accountdeletion")
+def accdelpage():
+    return render_template("/settings/removeacc.html")
+
+# -- OTHER API ROUTES (Deprecated)
 # This file is for any API routes related to users, such as fetching user info, updating settings, etc.
 # @api_users.route("/api/user")
 # def api_user():
