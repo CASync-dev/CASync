@@ -125,23 +125,9 @@ function formatHHMM(hhmm = '00:00') {
   return `${hour}:${String(m || 0).padStart(2,'0')} ${period}`;
 }
 
-function bigCard(processed) {
+function bigCard(nextEvent) {
   const bigCardEl = document.getElementById('big-card');
   if (!bigCardEl) return;
-
-  let nextEvent = null;
-  const now = new Date();
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-  const todayISO = now.toISOString().slice(0,10);
-  
-
-  // Find the next event
-  for (const ev of processed.flat) {
-    if (ev.startMinutes > nowMinutes) {
-      nextEvent = ev;
-      break;
-    }
-  }
 
   if (!nextEvent) {
     bigCardEl.innerHTML = '<p class="text-gray-600">No upcoming events.</p>';
@@ -172,18 +158,36 @@ function renderDashboardEvents(processed) {
     const anyEvent = processed.flat[0];
     usernameEl.innerText = anyEvent ? anyEvent.username : 'User';
   }
-  // call function to render data for the big card
-  bigCard(processed);
+
+  // render the list of today's sub events in the bottom left panel
   const container = document.getElementById('dashboard-sub-events');
   if (!container) return;
   container.innerHTML = '';
   const todayISO = new Date().toISOString().slice(0,10);
   const todays = processed.byDate[todayISO] || [];
-  if (!todays.length) {
+
+  let events  = []
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  
+
+  // Find the next event
+  for (const ev of processed.flat) {
+    if (ev.startMinutes > nowMinutes) {
+      console.log('next event', ev.startMinutes, nowMinutes);
+      events.push(ev);
+    }
+  }
+
+  // call function to render data for the big card
+  if (events.length > 0) bigCard(events[0]);
+
+  if (todays.length -1 <= 0) {
     container.innerHTML = '<p class="text-sm text-gray-600">No events today.</p>';
     return;
   }
-  todays.forEach(ev => {
+  events.slice(1).forEach(ev => {
     const el = document.createElement('div');
     el.className = 'flex items-center bg-slate-200 rounded-2xl p-6 gap-4';
     el.innerHTML = `
