@@ -185,18 +185,8 @@ function renderDashboardEvents(processed) {
   }
   todays.forEach(ev => {
     const el = document.createElement('div');
-    el.className = 'p-3 bg-white rounded-md shadow-sm';
+    el.className = 'flex items-center bg-slate-200 rounded-2xl p-6 gap-4';
     el.innerHTML = `
-      <div class="flex justify-between items-start">
-        <div>
-          <div class="text-sm font-semibold"></div>
-          <div class="text-xs text-gray-500">${ev.location || ''}</div>
-        </div>
-        <div class="text-xs text-gray-700">${formatHHMM(ev.startTime ?? ev.start_time)} — ${formatHHMM(ev.endTime ?? ev.end_time)}</div>
-      </div>
-      <p class="mt-2 text-xs text-gray-600">${ev.description || ''}</p>
-
-      <div class="flex items-center bg-slate-200 rounded-2xl p-6 gap-4">
               <span class="text-xl font-medium flex-1"
                 >${ev.title}</span
               >
@@ -204,7 +194,6 @@ function renderDashboardEvents(processed) {
                 >${formatHHMM(ev.startTime ?? ev.start_time)} – ${formatHHMM(ev.endTime ?? ev.end_time)}</span
               >
               <div class="flex"><!-- avatars --></div>
-            </div>
     `;
     container.appendChild(el);
   });
