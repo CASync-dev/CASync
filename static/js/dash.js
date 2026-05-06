@@ -24,10 +24,7 @@ function updateTime() {
   document.getElementById("period").innerText = timeParts[1] ?? "";
 }
 
-// Run once immediately so the page shows the current time on load
-updateTime();
-// Keep the time updated every second
-setInterval(updateTime, 1000);
+
 
 // dynamic stuff for the calendar events -------------------------------------
 
@@ -105,7 +102,7 @@ function processEvents(eventsData) {
       startMinutes: parseTimeToMinutes(start),
       endMinutes: parseTimeToMinutes(end),
     };
-  });
+  }).sort((a, b) => a.startMinutes - b.startMinutes);
 
   // 2) group by date and sort each day's events by start time
   const byDate = flat.reduce((acc, ev) => {
@@ -125,6 +122,16 @@ function formatHHMM(hhmm = '00:00') {
   return `${hour}:${String(m || 0).padStart(2,'0')} ${period}`;
 }
 
+function formatTime(totalMinutes) {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  
+  if (hours === 0 && minutes > 0) return `${minutes} minutes`;
+  if (minutes === 0 && hours > 0) return `${hours} hour`;
+  if (minutes === 0 && hours === 0) return `RIGHT NOW`;
+  return `${hours}:${String(minutes).padStart(2, '0')} minutes`;
+}
+
 function bigCard(nextEvent) {
   const bigCardEl = document.getElementById('big-card');
   if (!bigCardEl) return;
@@ -133,13 +140,18 @@ function bigCard(nextEvent) {
     bigCardEl.innerHTML = '<p class="text-gray-600">No upcoming events.</p>';
     return;
   }
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  let minutesUntil = nextEvent.startMinutes - nowMinutes;
+  if (minutesUntil < 0) minutesUntil = 0; // in case the event is currently happening
+
 
   bigCardEl.innerHTML = `
       <h3 class="text-4xl font-medium text-dark space-y-4 mb-4">
               Next Event:
             </h3>
       <h4 class="text-3xl text-dark space-y-4 mb-4">
-          in <span class="text-blue-600">30 minutes</span> at ${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)}
+          in <span class="text-blue-600">${formatTime(minutesUntil)}</span> at ${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)}
       </h4>
       <span class="text-3xl flex-1">${nextEvent.title}</span>
       <span class="text-lg text-gray-500 shrink-0">${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)} – ${formatHHMM(nextEvent.endTime ?? nextEvent.end_time)}</span>
@@ -174,8 +186,8 @@ function renderDashboardEvents(processed) {
 
   // Find the next event
   for (const ev of processed.flat) {
-    if (ev.startMinutes > nowMinutes) {
-      console.log('next event', ev.startMinutes, nowMinutes);
+     // if there is  5 min left of this class then display the next one 
+    if (ev.endMinutes > nowMinutes+5) {
       events.push(ev);
     }
   }
@@ -204,6 +216,25 @@ function renderDashboardEvents(processed) {
 }
 
 let processedEvs = null;
+
+
+// Every second — clock only
+setInterval(updateTime, 1000);
+
+// Every minute — re-render cards (handles event transitions)
+setInterval(() => {
+  if (processedEvs) renderDashboardEvents(processedEvs);
+}, 60 * 1000);
+
+// Every 5 minutes — re-fetch from API (handles new/changed events)
+setInterval(async () => {
+  const fresh = await loadEvents();
+  processedEvs = processEvents(fresh);
+  renderDashboardEvents(processedEvs);
+}, 5 * 60 * 1000);
+
+// run once immediately on load
+updateTime();
 loadEvents().then(events => {
   processedEvs = processEvents(events);
   renderDashboardEvents(processedEvs);
