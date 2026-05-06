@@ -83,7 +83,7 @@ async function searchFriends() {
       (u) => `
     <li class="flex items-center justify-between py-2 px-4 hover:bg-gray-100 rounded-md">
     <div class="flex items-center gap-3">
-        <img src="https://placehold.co/200x200" class="h-8 w-8 rounded-full" />
+        <img src="${u.pfp}" class="h-8 w-8 rounded-full" />
         <span class="text-sm font-medium text-gray-800">${u.username}</span>
     </div>
     <button id="add-friend-btn-${u.id}" onclick="addFriend()" data-user-id="${u.id}" class="text-sm bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">Add</button>
