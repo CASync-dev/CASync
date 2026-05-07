@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, URLField, DateField, TimeField, EmailField
+from wtforms import StringField, SubmitField, URLField, DateField, TimeField, EmailField, PasswordField
 from wtforms.validators import EqualTo, InputRequired, Regexp, Length, ValidationError
 import re
 from app.models import User
@@ -70,3 +70,16 @@ class EventForm(FlaskForm):
     description = StringField()
     color = StringField()
 
+# Settings' Changing details forms
+
+class changePasswordForm(FlaskForm):
+    current_password = PasswordField('Current Password', validators=[InputRequired()])
+    new_password = PasswordField('New Password', validators=[InputRequired(),strong_password])
+    repeat_new = PasswordField('Re-enter New', validators=[InputRequired(),EqualTo('new_password', message='Passwords must match')])
+    submit = SubmitField('Continue')
+
+class accountDelForm(FlaskForm):
+    email = EmailField(validators=[InputRequired()])
+    username = StringField(validators=[InputRequired()])
+    password = PasswordField(validators=[InputRequired()])
+    submit = SubmitField('Delete your Account')

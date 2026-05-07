@@ -1,10 +1,12 @@
 from datetime import datetime, timezone
+from flask import current_app, url_for
 from app import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Column, Table, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, relationship
 from . import login_manager
+from hashlib import md5
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -21,7 +23,8 @@ class User(UserMixin, db.Model):
     email      = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))  # Store hashed passwords
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))  # lambda so it's evaluated at insert time, not class definition
-
+    avatarurl = db.Column(db.Boolean, default=False) # Default uses Gravatar
+    
     events = db.relationship('Event', backref='owner', lazy='dynamic')
     # Many to many relationship with groups
 
@@ -50,6 +53,35 @@ class User(UserMixin, db.Model):
             'email': self.email,
             'created_at': self.created_at.isoformat(),
         }
+    
+    def gravatar(self, size):
+        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
+    
+    def getavatar(self):
+        return url_for('static', filename= 'avatars/' + str(self.id))
+    
+    def avatar(self, size):
+        if self.avatarurl:
+            return self.getavatar()
+        else:
+            return self.gravatar(150)
+    
+    def public_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'pfp': self.avatar(200)
+        }
+    def get_friends(self):
+        # This method retrieves all friends of the user by querying the Friendship model for entries where the user is either the sender
+        #  or recipient of an accepted friendship. It then combines these results to return a list of User objects representing the user's friends.
+        sent = db.session.query(User).join(Friendship, Friendship.recipient_id == User.id)\
+            .filter(Friendship.sender_id == self.id, Friendship.status == 'accepted')
+        received = db.session.query(User).join(Friendship, Friendship.sender_id == User.id)\
+            .filter(Friendship.recipient_id == self.id, Friendship.status == 'accepted')
+        # returns a nice list of the users friedns regardless of who sent the request, much simpelr for front end
+        return sent.union(received).all()
 
 
 class Event(db.Model):
@@ -98,6 +130,20 @@ class Calendar(db.Model):
 
     def __repr__(self):
         return f'<Calendar {self.ical_url}>'
+    
+
+class Friendship(db.Model):
+    __tablename__ = 'friendships'
+
+    id          = db.Column(db.Integer, primary_key=True)
+    sender_id     = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # the user who sent the friend request
+    recipient_id   = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # the user who received the friend request
+    status      = db.Column(db.String(20), nullable=False)  # "pending", "accepted", "rejected"
+    created_at  = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))  # when the friend request was created
+    accepted_at = db.Column(db.DateTime(timezone=True))  # when the friend request was accepted (null if still pending or rejected)
+
+    def __repr__(self):
+        return f'<Friendship {self.sender_id} -> {self.recipient_id} ({self.status})>'
     
 # Holds groups | We'll use another table to hold user_ids.
 class Group(db.Model):

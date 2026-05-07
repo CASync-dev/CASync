@@ -1,14 +1,52 @@
 {% extends "loggedin/layout.html" %} {% block content %}
-<div class="max-w-2xl mx-auto p-8">
-  <h1 class="text-2xl font-bold text-gray-900 mb-8">Settings</h1>
+<div class="p-8 overflow-scroll">
+  <h1 class="text-3xl font-bold text-gray-900 mb-8">Settings</h1>
 
-  <section class="mb-8">
+  
+
+  <div class="mb-8">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-1"><i class="fa-solid fa-address-book text-black"></i> Profile</h2>
+       
+    <div id="profile-settings" class="mt-2 sm:mx-auto py-3">
+      <div class="flex flex-row gap-6 items-center">
+        <button class="relative group cursor-pointer shrink-0 rounded-full" command="show-modal" commandfor="changepfp-modal">
+          <img id = "pfp" src="{{current_user.avatar(150)}}" class="h-24 w-24 rounded-full" />
+          <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200">
+            <span class="text-white text-xs font-medium">Change</span>
+          </div>
+        </button>
+        <div class="flex flex-col gap-3 flex-1">
+          <div class="flex flex-row justify-between items-center">
+            <p class="text-gray-500">Username: <span id = "username"> {{current_user.username}} </span></p>
+            <button
+              command="show-modal"
+              commandfor="changeuser-modal"
+              class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer shadow-2xl hover:shadow transition duration-200 w-1/2"
+            >
+              Change Username
+            </button>
+          </div>
+          <div class="flex flex-row justify-between items-center">
+            <p class="text-gray-500">Email: <span id = "email"> {{current_user.email}} </span></p>
+            <button
+              command="show-modal"
+              commandfor="changemail-modal"
+              class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer shadow-2xl hover:shadow transition duration-200 w-1/2"
+            >
+              Change Email
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div class="mb-8">
     <div class="flex">
-      <h2 class="text-lg font-semibold text-gray-800 mb-1">Import iCal</h2>
+      <h2 class="text-2xl font-semibold text-gray-800 mb-1"> <i class="fa-solid fa-calendar text-black"></i> Import iCal</h2>
       <div class="ml-auto">
         <button
           id="sync-button"
-          class="hidden bg-blue-600 text-white ml-auto py-2 px-2 rounded-md text-sm hover:bg-blue-700"
+          class="cursor-pointer hidden bg-blue-600 text-white ml-auto py-2 px-2 rounded-md text-sm hover:bg-blue-700"
           type="button"
           title="Sync Existing Calenders"
           onclick="syncCal()"
@@ -24,6 +62,7 @@
         </p>
       </div>
     </div>
+
     <form method="post" action="/settings">
       {{ form.hidden_tag() }}
       <p class="text-sm text-gray-500 mb-3">
@@ -35,7 +74,7 @@
         class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm" ) }}
         <div class="flex ml-4">
           {{ form.submit(class="ml-4 bg-green-600 text-white py-2 px-4
-          rounded-md text-sm hover:bg-green-700") }}
+          rounded-md text-sm hover:bg-green-700 cursor-pointer") }}
         </div>
       </div>
       {% with messages = get_flashed_messages(with_categories=true) %} {% for
@@ -46,110 +85,498 @@
         {{ message }}
       </p>
       {% endfor %} {% endwith %}
+          {% if cpform.errors %}{%
+            for field, errors in
+            cpform.errors.items()
+          %}
+            {% for error in errors %}
+              <p class="text-red-400 text-sm mt-1 max-w-sm">{{ error }}</p>
+            {% endfor %}
+      {% endfor %}{% endif %}
     </form>
-  </section>
+          <button
+        command="show-modal"
+        commandfor="ical-modal"
+        class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
+      >
+        Edit iCal Links
+      </button>
+    </div>
+
+    <h2 class="text-2xl font-semibold text-gray-800 mb-1">
+      <i class="fa-solid fa-gear text black"></i>
+      Account
+    </h2>
+    <div id="account-settings" class="mt-2 sm:mx-auto py-3">
+      <p class="text-gray-500"></p>
+      <button
+        command="show-modal"
+        commandfor="changepass-modal"
+        class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
+      >
+        Change password
+      </button>
+      <p class="text-gray-500"></p>
+      <button
+        command = "show-modal"
+        commandfor = "deleteacc-modal"
+        class="bg-red-600 text-white rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
+      >
+        Delete account
+      </button>
+    </div>
+  </div>
+
+  <!-- All modals -->
+
+  <!-- Changing Profile Picture -->
+<el-dialog>
+  <dialog
+    id="changepfp-modal"
+    class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+    ></el-dialog-backdrop>
+
+    <div
+      tabindex="0"
+      class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    >
+      <el-dialog-panel
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+      >
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fa-solid fa-address-book" style="color: #4741f7"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                Change Profile Picture
+              </h3>
+              <div class="mt-2">
+                <form id = "pfpform">
+                  <label for = "newpfp"> Upload your Profile Picture:</label>
+                  <input id = "newpfp" type="file" name = "file" class = "text-gray-500 underline hover:cursor-pointer hover:text-gray-700">
+                  <br>
+                  <div class = "justify-between items-center">
+                    <button type = "submit" id = "pfpupload" class = "mt-3 p-1.5 rounded-sm bg-primary hover:bg-blue-700 text-white cursor-pointer"> Submit </button>
+                    <button type = "button" onclick = "return delPFP();" class = "mt-3 p-1.5 rounded-sm bg-red-500 hover:bg-red-600 text-white cursor-pointer"> Remove </button>
+                  </div>
+                </form>
+                <p id = "pfperror"></p>
+                <p class = "text-gray-800"> Accepts files up to 5MB, in png and jpg format. </p>
+                <p class = "text-gray-500 mt-4"> Rather use Gravatar? Set your profile via. <a href = "https://gravatar.com/" class = "text-primary underline"> Gravatar.</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button
+            type="button"
+            class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            command="close"
+            commandfor="changepfp-modal"
+          >
+            Close
+          </button>
+        </div>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>
+
+  <!-- Changing Username -->
+    <el-dialog>
+  <dialog
+    id="changeuser-modal"
+    class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+    ></el-dialog-backdrop>
+
+    <div
+      tabindex="0"
+      class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    >
+      <el-dialog-panel
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+      >
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fa-solid fa-address-book" style="color: #4741f7"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                Change Username
+              </h3>
+              <div class="mt-2">
+                <div class = "flex flex-row sm:flex-col">
+                  <p class=" text-gray-500 mb-3">
+                    New Username: 
+                  </p>
+                  <input id = "newuser" 
+                    type ="text" 
+                    autocomplete="off" 
+                    class="flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+                <div class = "mt-2">
+                  <p class = "text-red-400 mb-3">
+                    <span class = "font-bold"> Warning! Changing your username will do the following: </span>
+                    <ul class = "text-red-400 mb-3 text-sm">
+                      <li>
+                        - Change username for all your friends and groups
+                      </li>
+                      <li>
+                        - Your old username will not be linked to this account anymore
+                      </li>
+                    </ul>
+                    Only continue if you understand what you're doing.
+                  </p>
+                  <br>
+                  <p><span id = "usererror"></span></p>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 justify-between">
+          <button
+            type="button"
+            class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            onclick = "return changeUsername();"
+          >
+            Submit
+          </button>
+          <button
+            type="button"
+            class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            command="close"
+            commandfor="changeuser-modal"
+          >
+            Close
+          </button>
+        </div>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>
+
+  <!-- Changing Email -->
+    <el-dialog>
+  <dialog
+    id="changemail-modal"
+    class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+    ></el-dialog-backdrop>
+
+    <div
+      tabindex="0"
+      class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    >
+      <el-dialog-panel
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+      >
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fa-solid fa-address-book" style="color: #4741f7"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                Change Email
+              </h3>
+              <div class="mt-2">
+                <div class = "flex flex-row sm:flex-col">
+                  <p class=" text-gray-500 mb-3">
+                    New Email: 
+                  </p>
+                  <input id = "newemail" 
+                    type ="text" 
+                    autocomplete="off" 
+                    class="flex-1 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+                <div class = "mt-2">
+                  <p class = "text-red-400 mb-3">
+                    <span class = "font-bold"> Warning! Changing your email will do the following: </span>
+                    <ul class = "text-red-400 mb-3 text-sm">
+                      <li>
+                        - Your old email will not be associated with this account anymore
+                      </li>
+                      <li>
+                        - You won't receive anymore emails from us in your old email address
+                      </li>
+                      <li>
+                        - Anyone trying to add you will not be able to without your new email or current username
+                      </li>
+                    </ul>
+                    Only continue if you understand what you're doing.
+                  </p>
+                  <br>
+                  <p><span id = "mailerror"></span></p>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 justify-between">
+          <button
+            type="button"
+            class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            onclick = "return changeEmail();"
+          >
+            Submit
+          </button>
+          <button
+            type="button"
+            class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            command="close"
+            commandfor="changemail-modal"
+          >
+            Close
+          </button>
+        </div>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>
+
+    <!-- Edit/Remove iCal links (Will show a table here of current ical links) -->
+<el-dialog>
+  <dialog
+    id="ical-modal"
+    class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+    ></el-dialog-backdrop>
+
+    <div
+      tabindex="0"
+      class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    >
+      <el-dialog-panel
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+      >
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fa-solid fa-gear" style="color: #4741f7"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+              Edit iCal Links
+              </h3>
+              <div class="mt-2">
+                Your iCal Links:
+                <div class="mt-3 flex flex-wrap gap-4 justify-between text-gray-400"> 
+                  {% if links %}
+                  {% for cal in links %}
+                  <div class="{{cal.id}} w-full flex">
+                    {{ cal.ical_url }}
+
+                    <button 
+                      onclick = "return removeLink('{{cal.id}}');"
+                      class = "{{cal.id}} rounded-sm bg-red-500 p-2 text-white cursor-pointer hover:bg-red-700 focus:ring-2 focus:ring-red-800"
+                      > 
+                      Remove 
+                    </button>
+                   </div>
+                   {% endfor %}
+                   {% else %}
+                   <div>
+                    No links are associated with your account.
+                   </div>
+                   {% endif %}
+                </div>
+                <p id = "icalediterror"> </p>
+                </div>
+              </div>
+            </div>
+            <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button
+            type="button"
+            class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            command="close"
+            commandfor="ical-modal"
+          >
+            Close
+          </button>
+              <p class = "text-red-600 text-sm font-extrabold"> Warning! Removing an iCal will remove any events associated with it! </p>
+        </div>
+          </div>
+        </div>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>
+
+    <!-- Changing Password -->
+    <el-dialog>
+  <dialog
+    id="changepass-modal"
+    class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+    ></el-dialog-backdrop>
+
+    <div
+      tabindex="0"
+      class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    >
+      <el-dialog-panel
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+      >
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fa-solid fa-gear" style="color: #4741f7"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                Change Password
+              </h3>
+              <form method="post" action="/settings" class="text-gray-400 mt-3 px-5 space-y-3">
+                {{ cpform.hidden_tag() }}
+                <div>
+                  {{ cpform.current_password.label(class="block text-sm font-medium mb-1") }}
+                  {{ cpform.current_password(class="w-full text-black rounded-md border border-gray-300 px-3 py-2 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50") }}
+                </div>
+                <div>
+                  {{ cpform.new_password.label(class="block text-sm font-medium mb-1") }}
+                  {{ cpform.new_password(class="w-full text-black rounded-md border border-gray-300 px-3 py-2 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50") }}
+                </div>
+                <div>
+                  {{ cpform.repeat_new.label(class="block text-sm font-medium mb-1") }}
+                  {{ cpform.repeat_new(class="w-full text-black rounded-md border border-gray-300 px-3 py-2 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50") }}
+                </div>
+                  <p class = "text-red-400 mb-3">
+                    <span class = "font-bold"> Please note this password somewhere safe. </span>
+                  </p>
+                <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                  {{ cpform.submit(class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm") }}
+                  <button
+                    type="button"
+                    class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+                    command="close"
+                    commandfor="changepass-modal"
+                  >
+                    Close
+                  </button>
+                </div>
+                
+              </form>
+          
+        </div>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>
+
+    <!-- Account deletion -->
+    <el-dialog>
+  <dialog
+    id="deleteacc-modal"
+    class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+    ></el-dialog-backdrop>
+
+    <div
+      tabindex="0"
+      class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    >
+      <el-dialog-panel
+        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+      >
+        <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+            >
+              <i class="fa-solid fa-gear" style="color: #4741f7"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="modal-title"
+              >
+                Account Deletion
+              </h3>
+              <div class="mt-2">
+                <p>
+                  Please enter your details to continue.
+                </p>
+                <form method="post" action="/settings" class = "text-gray-400 mt-3 px-5"> 
+                  {{ acdform.hidden_tag() }}
+                  {{ acdform.email.label }}
+                  {{ acdform.email(size=25, class = "text-black flex-1 my-3 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
+                  <br>
+                  {{ acdform.username.label }}
+                  {{ acdform.username(size=25, class = "text-black flex-1 my-3 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
+                  <br>
+                  {{ acdform.password.label }}
+                  {{ acdform.password(size=25, class = "text-black flex-1 my-3 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
+                  <p class = "font-bold text-red-600 "> 
+                    Warning! Are you sure you want to delete your account? All of your data will be deleted. 
+                      To cancel account deletion, leave this page at any time.
+                  </p>
+                  <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 md:justify-between">
+                  {{ acdform.submit(class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm") }}
+                  <button
+                    type="button"
+                    class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+                    command="close"
+                    commandfor="deleteacc-modal"
+                  >
+                    Close
+                  </button>
+                </div>
+                </form>
+              </div>
+          
+        </div>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>
+
+  {% endblock %} {% block scripts %}
+  <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+  <!-- Tailwind Elements -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"
+    type="module"
+  ></script>
+  {% endblock %}
 </div>
-
-{% endblock %} {% block scripts %}
-<script>
-  // TODO: This will get replaced with a user session deteciton system later
-  // Jquery  for adding user options to the dropdown (replace with actual user data)
-  function addUserOptions(user) {
-    const a = document.createElement("a");
-    a.href = "#";
-    a.className =
-      "block px-4 py-2 text-sm text-gray-700 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden";
-    a.textContent = user.username;
-    a.dataset.userId = user.id; // Store user id in data attribute for later use
-    $("#dropdown-menu-1").append(a);
-  }
-  // Get Users
-  async function getUsers() {
-    const res = await fetch("/api/users");
-    const users = await res.json();
-    users.forEach(addUserOptions);
-  }
-  getUsers();
-
-  let selectedUserId = null;
-  // On Selection Of User From Dropdown, set selectedUserId
-  $(document).on("click", "#dropdown-menu-1 a", function () {
-    // Set selected user ID based on clicked option
-    selectedUserId = $(this).data("userId");
-    // Update dropdown button text to show selected user
-    $("#menu-button-1").html(
-      $(this).text() + ' <i class="py-1 pl-2 fas fa-chevron-down text-xs"></i>',
-    );
-    $('[name="user_id"]').val(selectedUserId);
-    checkForExistingCalendars(); // Check if the selected user has existing calendars to determine whether to show sync button
-  });
-
-  function checkForExistingCalendars() {
-    /*
-    Check if a selected user has any calender in the system. If they do
-    show the sync button with the number of existing calenders, 
-    if not hide the sync button since there is nothing to sync with
-    */
-    if (!selectedUserId) {
-      $("#sync-button").addClass("hidden");
-      return;
-    }
-    // Check if the user has any calendars
-    fetch(`/api/calendars/`)
-      .then((res) => {
-        if (!res.ok) return;
-        return res.json();
-      })
-      .then((calendars) => {
-        if (!calendars) return;
-        if (calendars.length > 0) {
-          $("#sync-button").removeClass("hidden");
-          $("#sync-button").html(
-            `<i class="fa-solid fa-rotate"></i> Sync (${calendars.length}) cals`,
-          );
-        } else {
-          $("#sync-button").addClass("hidden");
-        }
-      });
-  }
-  checkForExistingCalendars();
-
-  function showMsg(msg, isSuccess) {
-    const msgEl = document.createElement("p");
-    msgEl.className = `${isSuccess ? "text-green-600" : "text-red-600"} text-sm mt-2`;
-    msgEl.textContent = msg;
-    document.querySelector("form").appendChild(msgEl);
-    setTimeout(() => {
-      msgEl.remove();
-    }, 5000);
-  }
-
-  async function syncCal() {
-    if (!selectedUserId) {
-      showMsg("Please select a user to sync the calendar for.", false);
-      return;
-    }
-    const res = await fetch(`/api/sync-cal/${selectedUserId}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token() }}',
-      },
-      method: 'POST',
-    });
-    const data = await res.json();
-    if (res.ok) {
-      showMsg(
-        `Successfully synced calendar. ${data.created} events created, ${data.updated} events updated.`,
-        true,
-      );
-    } else {
-      showMsg("Error: " + (data.error || "Unknown error"), false);
-    }
-  }
-</script>
-<!-- Tailwind Elements -->
-<script
-  src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"
-  type="module"
-></script>
-{% endblock %}
