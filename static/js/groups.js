@@ -70,8 +70,8 @@
       button.classList.add('hover:bg-red-800');
       button.classList.remove('bg-primary');
       button.classList.remove('hover:bg-blue-800');
-      const idtopush = String(button.id);
-      grouplist.push(idtopush);
+      const idToPush = String(button.id);
+      grouplist.push(idToPush);
       return
       }
     button.innerHTML = '+';
@@ -79,6 +79,6 @@
     button.classList.add('hover:bg-blue-800');
     button.classList.remove('bg-red-600');
     button.classList.remove('hover:bg-red-800');
-    const idtopop = String(button.id);
-    grouplist.pop(idtopop);
+    const idToPop = String(button.id);
+    grouplist.pop(idToPop);
   }
