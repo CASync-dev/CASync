@@ -48,7 +48,6 @@ async function loadEvents() {
     const res = await fetch(getCalendarBaseUrl());
     if (!res.ok) throw new Error(res.statusText);
     events = await res.json(); // store it here
-    console.log('events', events);
     // renderCalendar(events);
     return events;
   } catch (err) {
@@ -138,9 +137,9 @@ function formatTime(totalMinutes) {
 function bigCard(nextEvent) {
   const bigCardEl = document.getElementById('big-card');
   if (!bigCardEl) return;
-  console.log('nextEvent', nextEvent);
+
   if (!nextEvent) {
-    console.log("no upcoming events");
+
     bigCardEl.innerHTML = '<p class="text-gray-600">No upcoming events.</p>';
     return;
   }
@@ -150,7 +149,6 @@ function bigCard(nextEvent) {
   let minutesUntil = nextEvent.startMinutes - nowMinutes;
   if (minutesUntil < 0) minutesUntil = 0; // in case the event is currently happening
 
-  console.log("renderingbig card")
   bigCardEl.innerHTML = `
       <h3 class="text-4xl font-medium text-dark space-y-4 mb-4">
               Next Event:
@@ -187,19 +185,10 @@ function renderDashboardEvents(processed) {
   for (const ev of processed.flat) {
     // if we are 10 mins past the start of the event dont up it in the list
     if (ev.startMinutes > nowMinutes - 10) {
-      console.log(
-        "upcoming event",
-        ev.title,
-        "in",
-        ev.startMinutes,
-        "vs",
-        nowMinutes,
-        "minutes",
-      );
       events.push(ev);
     }
   }
-  console.log("rendering");
+  events.slice(0, 5); // limit to 5 events for performance and to avoid overwhelming the user
   // call function to render data for the big card, or clear it if nothing is left
   if (events.length > 0) {
     bigCard(events[0]);
