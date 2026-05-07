@@ -114,7 +114,7 @@ function processEvents(eventsData) {
   return { flat, byDate };
 }
 
-
+// Convert 24-hour time (HH:MM) to 12-hour format with AM/PM
 function formatHHMM(hhmm = '00:00') {
   const [h, m] = (hhmm || '00:00').split(':').map(Number);
   const period = (h || 0) < 12 ? 'AM' : 'PM';
@@ -122,6 +122,8 @@ function formatHHMM(hhmm = '00:00') {
   return `${hour}:${String(m || 0).padStart(2,'0')} ${period}`;
 }
 
+// Convert minutes to human-readable time remaining (e.g., "45 minutes" or "1:30 minutes") 
+// for the big card event in minutes until the next event starts
 function formatTime(totalMinutes) {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
@@ -132,20 +134,23 @@ function formatTime(totalMinutes) {
   return `${hours}:${String(minutes).padStart(2, '0')} minutes`;
 }
 
+// function for renderign the big card on the dashboard with the next upcoming event
 function bigCard(nextEvent) {
   const bigCardEl = document.getElementById('big-card');
   if (!bigCardEl) return;
-
+  console.log('nextEvent', nextEvent);
   if (!nextEvent) {
+    console.log("no upcoming events");
     bigCardEl.innerHTML = '<p class="text-gray-600">No upcoming events.</p>';
     return;
   }
+  
   const now = new Date();
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
   let minutesUntil = nextEvent.startMinutes - nowMinutes;
   if (minutesUntil < 0) minutesUntil = 0; // in case the event is currently happening
 
-
+  console.log("renderingbig card")
   bigCardEl.innerHTML = `
       <h3 class="text-4xl font-medium text-dark space-y-4 mb-4">
               Next Event:
@@ -162,6 +167,7 @@ function bigCard(nextEvent) {
   `;
 }
 
+//renders events in the dashboard - specifically the next event and the list of today's sub events in the bottom left panel
 function renderDashboardEvents(processed) {
   // put the username in the header (just take it from any event, since they should all be the same user)
   // could be an easier way to do it with ajax but it would give me <user tehei>
@@ -182,21 +188,24 @@ function renderDashboardEvents(processed) {
   const now = new Date();
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
-  
-
-  // Find the next event
+  // find the events that are still upcoming (if there is 5 min left of the class then display the next one) and put them in the events array
   for (const ev of processed.flat) {
-     // if there is  5 min left of this class then display the next one 
-    if (ev.endMinutes > nowMinutes+5) {
+     // if we are 10 mins past the start of the event dont up it in the list
+    if (ev.startMinutes > nowMinutes-10) {
+      console.log("upcoming event", ev.title, "in", ev.startMinutes, "vs", nowMinutes, "minutes");
       events.push(ev);
     }
   }
-
-  // call function to render data for the big card
-  if (events.length > 0) bigCard(events[0]);
+  console.log("rendering")
+  // call function to render data for the big card, or clear it if nothing is left
+  if (events.length > 0) {
+    bigCard(events[0]);
+  } else {
+    bigCard(null);
+  }
 
   if (todays.length -1 <= 0) {
-    container.innerHTML = '<p class="text-sm text-gray-600">No events today.</p>';
+    container.innerHTML = '<p class="text-sm text-gray-600">All done! No more events today.</p>';
     return;
   }
   events.slice(1).forEach(ev => {
@@ -223,7 +232,7 @@ setInterval(updateTime, 1000);
 
 // Every minute — re-render cards (handles event transitions)
 setInterval(() => {
-  if (processedEvs) renderDashboardEvents(processedEvs);
+    if (processedEvs) renderDashboardEvents(processedEvs);
 }, 60 * 1000);
 
 // Every 5 minutes — re-fetch from API (handles new/changed events)
@@ -231,6 +240,7 @@ setInterval(async () => {
   const fresh = await loadEvents();
   processedEvs = processEvents(fresh);
   renderDashboardEvents(processedEvs);
+  
 }, 5 * 60 * 1000);
 
 // run once immediately on load
