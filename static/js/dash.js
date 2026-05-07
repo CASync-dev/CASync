@@ -172,27 +172,34 @@ function renderDashboardEvents(processed) {
   // put the username in the header (just take it from any event, since they should all be the same user)
   // could be an easier way to do it with ajax but it would give me <user tehei>
 
-
   // render the list of today's sub events in the bottom left panel
-  const container = document.getElementById('dashboard-sub-events');
+  const container = document.getElementById("dashboard-sub-events");
   if (!container) return;
-  container.innerHTML = '';
-  const todayISO = new Date().toISOString().slice(0,10);
+  container.innerHTML = "";
+  const todayISO = new Date().toISOString().slice(0, 10);
   const todays = processed.byDate[todayISO] || [];
 
-  let events  = []
+  let events = [];
   const now = new Date();
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
   // find the events that are still upcoming (if there is 5 min left of the class then display the next one) and put them in the events array
   for (const ev of processed.flat) {
-     // if we are 10 mins past the start of the event dont up it in the list
-    if (ev.startMinutes > nowMinutes-10) {
-      console.log("upcoming event", ev.title, "in", ev.startMinutes, "vs", nowMinutes, "minutes");
+    // if we are 10 mins past the start of the event dont up it in the list
+    if (ev.startMinutes > nowMinutes - 10) {
+      console.log(
+        "upcoming event",
+        ev.title,
+        "in",
+        ev.startMinutes,
+        "vs",
+        nowMinutes,
+        "minutes",
+      );
       events.push(ev);
     }
   }
-  console.log("rendering")
+  console.log("rendering");
   // call function to render data for the big card, or clear it if nothing is left
   if (events.length > 0) {
     bigCard(events[0]);
@@ -200,13 +207,14 @@ function renderDashboardEvents(processed) {
     bigCard(null);
   }
 
-  if (todays.length -1 <= 0) {
-    container.innerHTML = '<p class="text-sm text-gray-600">All done! No more events today.</p>';
+  if (todays.length - 1 <= 0) {
+    container.innerHTML =
+      '<p class="text-sm text-gray-600">All done! No more events today.</p>';
     return;
   }
-  events.slice(1).forEach(ev => {
-    const el = document.createElement('div');
-    el.className = 'flex items-center bg-slate-200 rounded-2xl p-6 gap-4';
+  events.slice(1).forEach((ev) => {
+    const el = document.createElement("div");
+    el.className = "flex items-center bg-slate-200 rounded-2xl p-6 gap-4";
     el.innerHTML = `
               <span class="text-xl font-medium flex-1"
                 >${ev.title}</span
@@ -245,3 +253,4 @@ loadEvents().then(events => {
   processedEvs = processEvents(events);
   renderDashboardEvents(processedEvs);
 });
+

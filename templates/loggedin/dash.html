@@ -3,21 +3,21 @@
   <!-- Main dashboard layout: top header row and bottom two-column content -->
   <div class="container-loggedin flex flex-col">
     <!-- Top row: username/date on the left, live clock on the right -->
-    <div class="flex flex-row justify-between">
+    <div class="flex flex-col sm:flex-row justify-between gap-2 sm:gap-4">
       <!-- Top-left: day/date and username header -->
-      <div class="p-8 space-y-4 mb-4">
-        <h1 id="title_username" class="text-4xl font-normal text-gray-900">
+      <div class="p-4 sm:p-6 md:p-8 space-y-2 sm:space-y-4 mb-4">
+        <h1 id="title_username" class="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-900">
           Hello, <span  class="text-blue-600"> {{ current_user.username }}</span>!
         </h1>
 
-        <h2 class="text-7xl text-black mt-10">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-black mt-4 sm:mt-6 md:mt-10">
           <span id="day" class="text-blue-600"></span>,
           <span id="current-date"></span>
         </h2>
       </div>
       <!-- Top-right: live clock display -->
-      <div class="border-5 rounded-2xl border-gray-300 h-full mx-4 mt-10">
-        <h2 class="text-7xl p-10">
+      <div class="border-5 rounded-2xl border-gray-300 mx-2 sm:mx-4 mt-2 sm:mt-8">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl p-4 sm:p-6 md:p-8 lg:p-10">
           <span id="time" class="text-blue-600"> 2:30</span>
           <span id="period" class="text-black">PM</span>
         </h2>
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Bottom row: events panel on the left, friends panel on the right -->
-    <div class="mt-2 flex flex-col gap-4 lg:flex-row">
+    <div class="mt-1 sm:mt-2 flex flex-col gap-4 lg:flex-row">
       <div class="flex-1 min-w-0 p-4">
         <!-- Left panel: next event and event list -->
         <div class="flex flex-col gap-4">
