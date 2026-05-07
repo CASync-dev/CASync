@@ -171,11 +171,7 @@ function bigCard(nextEvent) {
 function renderDashboardEvents(processed) {
   // put the username in the header (just take it from any event, since they should all be the same user)
   // could be an easier way to do it with ajax but it would give me <user tehei>
-  const usernameEl = document.getElementById('username');
-  if (usernameEl) {
-    const anyEvent = processed.flat[0];
-    usernameEl.innerText = anyEvent ? anyEvent.username : 'User';
-  }
+
 
   // render the list of today's sub events in the bottom left panel
   const container = document.getElementById('dashboard-sub-events');
