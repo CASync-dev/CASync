@@ -188,7 +188,7 @@ function renderDashboardEvents(processed) {
       events.push(ev);
     }
   }
-  events.slice(0, 5); // limit to 5 events for performance and to avoid overwhelming the user
+  events = events.slice(0, 5); // limit to 5 events for performance and to avoid overwhelming the user
   // call function to render data for the big card, or clear it if nothing is left
   if (events.length > 0) {
     bigCard(events[0]);
