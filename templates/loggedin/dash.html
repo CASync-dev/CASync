@@ -3,21 +3,21 @@
   <!-- Main dashboard layout: top header row and bottom two-column content -->
   <div class="container-loggedin flex flex-col">
     <!-- Top row: username/date on the left, live clock on the right -->
-    <div class="flex flex-row justify-between">
+    <div class="flex flex-col sm:flex-row justify-between gap-2 sm:gap-4">
       <!-- Top-left: day/date and username header -->
-      <div class="p-8 space-y-4 mb-4">
-        <h1 id="title_username" class="text-4xl font-normal text-gray-900">
-          Hello, <span class="text-blue-600">{{ current_user }}</span>!
+      <div class="p-4 sm:p-6 md:p-8 space-y-2 sm:space-y-4 mb-4">
+        <h1 id="title_username" class="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-900">
+          Hello, <span  class="text-blue-600"> {{ current_user.username }}</span>!
         </h1>
 
-        <h2 class="text-7xl text-black mt-10">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-black mt-4 sm:mt-6 md:mt-10">
           <span id="day" class="text-blue-600"></span>,
           <span id="current-date"></span>
         </h2>
       </div>
       <!-- Top-right: live clock display -->
-      <div class="border-5 rounded-2xl border-gray-300 h-full mx-4 mt-10">
-        <h2 class="text-7xl p-10">
+      <div class="flex items-center justify-center border-5 rounded-2xl border-gray-300 mx-2 sm:mx-4 my-2 sm:my-8">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl p-4 sm:p-6 md:p-8 lg:p-10 text-center">
           <span id="time" class="text-blue-600"> 2:30</span>
           <span id="period" class="text-black">PM</span>
         </h2>
@@ -25,62 +25,23 @@
     </div>
 
     <!-- Bottom row: events panel on the left, friends panel on the right -->
-    <div class="flex flex-row gap-4">
-      <div class="p-4 flex-1">
+    <div class="mt-1 sm:mt-2 flex flex-col gap-4 lg:flex-row">
+      <div class="flex-1 min-w-0 p-4">
         <!-- Left panel: next event and event list -->
         <div class="flex flex-col gap-4">
           <!-- Primary event card -->
-          <div class="flex flex-col bg-slate-200 rounded-2xl p-6">
-            <h3 class="text-4xl font-medium text-dark space-y-4 mb-4">
-              Next Event:
-            </h3>
-            <h4 class="text-3xl text-dark space-y-4 mb-4">
-              in <span class="text-blue-600">30 minutes</span> at 2:00 PM
-            </h4>
-            <span class="text-3xl flex-1">Agile Web Development: Test 01</span>
-            <span class="text-lg text-gray-500 shrink-0"
-              >1:00 PM – 2:00 PM</span
-            >
-            <span class="text-lg text-gray-500 shrink-0"
-              >The location of this class is very long in the building words
-              words words</span
-            >
-            <div class="flex"><!-- avatars --></div>
+          <div id="big-card" class="flex flex-col bg-slate-200 rounded-2xl p-6">
+            <!-- big card content rendered from dash.js -->
           </div>
 
           <!-- Sub-events (slightly indented) -->
-          <div class="flex flex-col gap-3 ml-8">
-            <div class="flex items-center bg-slate-200 rounded-2xl p-6 gap-4">
-              <span class="text-xl font-medium flex-1"
-                >Computer Networks Lecture-01</span
-              >
-              <span class="text-lg text-gray-500 w-50 text-right shrink-0"
-                >2:00 PM – 3:00 PM</span
-              >
-              <div class="flex"><!-- avatars --></div>
-            </div>
-
-            <div class="flex items-center bg-slate-200 rounded-2xl p-6 gap-4">
-              <span class="text-xl font-medium flex-1">Study session</span>
-              <span class="text-lg text-gray-500 w-50 text-right shrink-0"
-                >3:00 PM – 4:00 PM</span
-              >
-              <div class="flex"><!-- avatars --></div>
-            </div>
-
-            <div class="flex items-center bg-slate-200 rounded-2xl p-6 gap-4">
-              <span class="text-xl font-medium flex-1"
-                >Com-sci Networking Event</span
-              >
-              <span class="text-lg text-gray-500 w-50 text-right shrink-0"
-                >4:00 PM – 5:00 PM</span
-              >
-              <div class="flex"><!-- avatars --></div>
-            </div>
+          <div id="dashboard-sub-events" class="flex flex-col gap-3 ml-8">
+            <!-- sub-event cards rendered from dash.js -->
           </div>
         </div>
       </div>
-      <div class="p-4 flex-1 mt-3.5 mr-4 mb-4 bg-slate-200 rounded-2xl">
+
+      <div class="flex-1 min-w-0 p-4 mt-3.5 mr-4 mb-4 bg-slate-200 rounded-2xl">
         <!-- Right panel: friends who are available now -->
         <h3 class="text-4xl text-dark space-y-4 mb-4">
           Friends available now:
@@ -88,41 +49,31 @@
         <div class="flex flex-col gap-3">
           <div class="flex items-center bg-red-500 rounded-2xl p-6 gap-4">
             <span class="text-xl font-medium flex-1">Itachi</span>
-            <span class="text-lg text-gray-500 w-50 text-right shrink-0"
-              >Online</span
-            >
+            <span class="text-lg text-gray-500 w-50 text-right shrink-0">Online</span>
             <div class="flex"><!-- avatar --></div>
           </div>
 
           <div class="flex items-center bg-orange-500 rounded-2xl p-6 gap-4">
             <span class="text-xl font-medium flex-1">Pain</span>
-            <span class="text-lg text-gray-500 w-50 text-right shrink-0"
-              >Online</span
-            >
+            <span class="text-lg text-gray-500 w-50 text-right shrink-0">Online</span>
             <div class="flex"><!-- avatar --></div>
           </div>
 
           <div class="flex items-center bg-green-500 rounded-2xl p-6 gap-4">
             <span class="text-xl font-medium flex-1">Obito</span>
-            <span class="text-lg text-gray-500 w-50 text-right shrink-0"
-              >Offline</span
-            >
+            <span class="text-lg text-gray-500 w-50 text-right shrink-0">Offline</span>
             <div class="flex"><!-- avatar --></div>
           </div>
 
           <div class="flex items-center bg-yellow-500 rounded-2xl p-6 gap-4">
             <span class="text-xl font-medium flex-1">Kisame</span>
-            <span class="text-lg text-gray-500 w-50 text-right shrink-0"
-              >Offline</span
-            >
+            <span class="text-lg text-gray-500 w-50 text-right shrink-0">Offline</span>
             <div class="flex"><!-- avatar --></div>
           </div>
 
           <div class="flex items-center bg-purple-500 rounded-2xl p-6 gap-4">
             <span class="text-xl font-medium flex-1">Diedara</span>
-            <span class="text-lg text-gray-500 w-50 text-right shrink-0"
-              >Offline</span
-            >
+            <span class="text-lg text-gray-500 w-50 text-right shrink-0">Offline</span>
             <div class="flex"><!-- avatar --></div>
           </div>
         </div>
