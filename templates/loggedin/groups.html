@@ -1,123 +1,135 @@
-{% extends "loggedin/layout.html" %} 
+{% extends "loggedin/layout.html" %}
 {% block content %}
-<!-- TODO: Add functionability to group creation -->
-<div
-  class="mx-4 2xl:max-w-7xl 2xl:mx-auto px-4 py-8 mt-6 rounded-xl"
->
-  <!-- top bar -->
-  <div class="flex items-center pb-3 border-b border-gray-300">
-    <h1 class="text-3xl font-bold">Groups</h1>
-    <button
-      class="btn-primary shadow-black  px-4 ml-auto mr-2 h-10 whitespace-nowrap cursor-pointer"
-      onclick="return loadCreateGroup()"
-    >
-      Create Group
-    </button>
-  </div>
-
-  <!-- Question for later: What is this for? Not showing up on website yet (future implementation?)-->
-  <div class = "mt-6">
-    <ul> <!-- FFilter through groups table to find group with current user in done in app pkg?-->
-        {% for group in groups %}
-      <li
-        class="py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200"
+  <!-- TODO: Add functionability to group creation -->
+  <div class="mx-4 2xl:max-w-7xl 2xl:mx-auto px-4 py-8 mt-6 rounded-xl">
+    <!-- top bar -->
+    <div class="flex items-center pb-3 border-b border-gray-300">
+      <h1 class="text-3xl font-bold">Groups</h1>
+      <button
+        class="btn-primary shadow-black  px-4 ml-auto mr-2 h-10 whitespace-nowrap cursor-pointer"
+        onclick="return loadCreateGroup()"
       >
-        <div class="flex items-center">
-            <div class="ml-4">
-              <p class="text-sm font-medium text-white">{{ group.group_name }}</p>
-              <i class="fas fa-calendar-alt"></i>
-              Schedule
-        </div>
-      </li>
-        {% endfor %}
-    </ul>
-  </div>
-</div>
+        Create Group
+      </button>
+    </div>
 
-<!-- Dialog Modal for Create Group Button -->
-<dialog 
-  id = "create-group"
-  class="fixed mx-auto size-auto max-h-none max-w-none overflow-y-auto sm:my-8 sm:w-full sm:max-w-2xl bg-transparent backdrop:bg-gray-900/50 backdrop:backdrop-blur-sm"
->
-  <div
-      class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
-    >
-    <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100 items-center">
-      <div class="sm:flex sm:items-start">
-        <div
-          class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-nearwhite sm:mx-0 sm:h-10 sm:w-10"
-        >
-          <i class="fa-solid fa-people-group" style="color: #4741f7;"></i>
-        </div>
-        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-          <h3
-            class="text-lg font-medium leading-6 text-gray-900"
-            id="modal-title"
+    <!-- Adding groups to the page -->
+    <div class="mt-6">
+      <ul>
+        <!-- FFilter through groups table to find group with current user in done in app pkg?-->
+        {% for group in groups %}
+          <li
+            class="py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200"
           >
-            Create a Group
-          </h3>
-          <div class="mt-2">
-            <p class="text-sm text-gray-500">
-              Name your new group
-            </p>
-            <div id = "create-group-name" class="mt-3 flex-col w-full items-stretch gap-2">
-              <input
-                id="group-name-input"
-                type="text"
-                class="flex-1 rounded-md border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                placeholder="My Chill Group"
-                autocomplete="off"
-              />
-              <button
-                type="button"
-                class="btn-plain cursor-pointer shrink-0 rounded-md border border-transparent bg-primary px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                onclick = "return loadSelectFriends()"
-              >
-              <i class="fa-solid fa-angle-right" style="color: rgb(255, 255, 255);"></i>
-              </button>
+            <div class="flex items-center">
+              <div class="ml-4">
+                <p class="text-sm font-medium text-white">
+                  {{ group.group_name }}
+                </p>
+                <i class="fas fa-calendar-alt"></i>
+                Schedule
               </div>
             </div>
-            <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Dialog Modal for Create Group Button -->
+  <dialog
+    id="create-group"
+    class="fixed mx-auto size-auto max-h-none max-w-none overflow-y-auto sm:my-8 sm:w-full sm:max-w-2xl bg-transparent backdrop:bg-gray-900/50 backdrop:backdrop-blur-sm"
+  >
+    <div
+      class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+    >
+      <div
+        class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100 items-center"
+      >
+        <div class="sm:flex sm:items-start">
+          <div
+            class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-nearwhite sm:mx-0 sm:h-10 sm:w-10"
+          >
+            <i class="fa-solid fa-people-group" style="color: #4741f7;"></i>
+          </div>
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <h3
+              class="text-lg font-medium leading-6 text-gray-900"
+              id="modal-title"
+            >
+              Create a Group
+            </h3>
+            <div class="mt-2">
+              <p class="text-sm text-gray-500">Name your new group</p>
+              <div
+                id="create-group-name"
+                class="mt-3 flex-col w-full items-stretch gap-2"
+              >
+                <input
+                  id="group-name-input"
+                  type="text"
+                  class="flex-1 rounded-md border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  placeholder="My Chill Group"
+                  autocomplete="off"
+                />
+                <button
+                  type="button"
+                  class="btn-plain cursor-pointer shrink-0 rounded-md border border-transparent bg-primary px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  onclick="return loadSelectFriends()"
+                >
+                  <i
+                    class="fa-solid fa-angle-right"
+                    style="color: rgb(255, 255, 255);"
+                  ></i>
+                </button>
+              </div>
+            </div>
+            <div
+              class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+            >
               <button
                 type="button"
                 class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-                onclick = "return closeLoadCreateGroup()"
+                onclick="return closeLoadCreateGroup()"
               >
                 Close
               </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</dialog>
+  </dialog>
 
-<!-- Dialog Modal for Selecting Friends (after group name is picked) -->
-<dialog 
-  id = "select-friend"
-  class="fixed mx-auto size-auto max-h-none max-w-none overflow-y-auto sm:my-8 sm:w-full sm:max-w-2xl bg-transparent backdrop:bg-gray-900/50 backdrop:backdrop-blur-sm"
->
-  <div
+  <!-- Dialog Modal for Selecting Friends (after group name is picked) -->
+  <dialog
+    id="select-friend"
+    class="fixed mx-auto size-auto max-h-none max-w-none overflow-y-auto sm:my-8 sm:w-full sm:max-w-2xl bg-transparent backdrop:bg-gray-900/50 backdrop:backdrop-blur-sm"
+  >
+    <div
       class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
     >
-    <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100 items-center">
-      <div class="sm:flex sm:items-start">
-        <div
-          class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-nearwhite sm:mx-0 sm:h-10 sm:w-10"
-        >
-          <i class="fa-solid fa-people-group" style="color: #4741f7;"></i>
-        </div>
-        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-          <h3
-            class="text-lg font-medium leading-6 text-gray-900"
-            id="modal-title"
+      <div
+        class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100 items-center"
+      >
+        <div class="sm:flex sm:items-start">
+          <div
+            class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-nearwhite sm:mx-0 sm:h-10 sm:w-10"
           >
-            Create a Group
-          </h3>
-          <div class="mt-2">
-            <p class="text-sm text-gray-500">
-              Add your friends to the <span id="gname"></span>!
-            </p>
+            <i class="fa-solid fa-people-group" style="color: #4741f7;"></i>
+          </div>
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <h3
+              class="text-lg font-medium leading-6 text-gray-900"
+              id="modal-title"
+            >
+              Create a Group
+            </h3>
+            <div class="mt-2">
+              <p class="text-sm text-gray-500">
+                Add your friends to the <span id="gname"></span>!
+              </p>
               <div class="mt-3 flex w-full items-stretch gap-2">
                 <input
                   id="friend-search-input"
@@ -133,37 +145,40 @@
                 >
                   Search
                 </button>
+              </div>
             </div>
-        </div>
-        <div id="friend-search-results" class="mt-4 hidden">
-          <p class="text-sm text-gray-500">Search Results:</p>
-          <ul id="friend-search-list" class="mt-2"></ul>
-        </div>
-        <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+            <div id="friend-search-results" class="mt-4 hidden">
+              <p class="text-sm text-gray-500">Search Results:</p>
+              <ul id="friend-search-list" class="mt-2"></ul>
+            </div>
+            <div
+              class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+            >
               <button
                 type="button"
                 class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-                onclick = "return testSubmit()"
+                onclick="return submitGroupCreation()"
               >
                 Complete
               </button>
               <button
                 type="button"
                 class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-                onclick = "return closeLoadSelectFriends()"
+                onclick="return closeLoadSelectFriends()"
               >
                 Close
               </button>
+            </div>
           </div>
+        </div>
       </div>
     </div>
-  </div>
-</dialog>
+  </dialog>
 {% endblock %}
 
 {% block scripts %}
   <script src="{{ url_for('static', filename='js/groups.js') }}"></script>
-  
+
   <!-- Tailwind Elements -->
   <script
     src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"
