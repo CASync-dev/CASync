@@ -20,8 +20,9 @@ def create_group():
 @api_groups.route("/api/group/friends", methods=['GET'])
 @login_required
 def group_get_friends():
-    friends = current_user.get_friends()
+    friends = current_user.get_friends() # list of user objects
     
+    # Format response to JSON for browsers
     return jsonify({
-        "friends": [friend.to_doct() for friend in friends]
+        "friends": [friend.to_dict() for friend in friends]
     }), 200
