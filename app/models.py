@@ -28,7 +28,6 @@ class User(UserMixin, db.Model):
     events = db.relationship('Event', backref='owner', lazy='dynamic')
     # Many to many relationship with groups
 
-
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
@@ -147,7 +146,7 @@ class Friendship(db.Model):
     
 # Holds groups | We'll use another table to hold user_ids.
 class Group(db.Model):
-    __tablename__ = 'group'
+    __tablename__ = 'groups'
 
     id         = db.Column(db.Integer, primary_key=True, autoincrement=True)
     group_name = db.Column(db.String(500), nullable=False)
@@ -156,14 +155,22 @@ class Group(db.Model):
 
     def __repr__(self):
         return f'<Group {self.group_name}>'
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'group_name': self.group_name,
+            'members': [user.public_dict() for user in self.members]
+        }
 
 # Association table for Many-Many relationship between User and Groups
 user_group_association = db.Table(
     "user_group_association",
-    Base.metadata,
-    db.Column('user_id', ForeignKey(User.id), primary_key=True),
-    db.Column('group_id', ForeignKey(Group.id), primary_key=True)
+    db.Model.metadata,
+    db.Column('user_id', db.ForeignKey('users.id'), primary_key=True),
+    db.Column('group_id', db.ForeignKey('groups.id'), primary_key=True)
 )
 
-User.groups = db.relationship("Group", secondary = user_group_association, back_populates = "user_ids")
-Group.user_ids   = db.relationship("User", secondary = user_group_association, back_populates = "groups")
+# Adds the relationships
+User.groups = db.relationship("Group", secondary = user_group_association, back_populates = "members")
+Group.members   = db.relationship("User", secondary = user_group_association, back_populates = "groups")
