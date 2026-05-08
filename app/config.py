@@ -27,5 +27,5 @@ class TestConfig(Config):
     # This is our config used for running any tests.
 
     # Creates a non persistent database in the memory
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory' #'sqlite://' should also work but will stick to :memory for now
     TESTING = True
