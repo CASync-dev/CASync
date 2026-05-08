@@ -24,9 +24,9 @@ async function loadSelectFriends() {
   // Validate empty group name
   if (!groupname) {
     const errorMsg = document.createElement("p");
-    errorMsg.id = "group-name-error"
+    errorMsg.id = "group-name-error";
     errorMsg.className = "text-red-600 text-sm mt-2";
-    errorMsg.textContent = "Please enter a group name"
+    errorMsg.textContent = "Please enter a group name";
     const groupInputDiv = document.getElementById("create-group-name");
     groupInputDiv.appendChild(errorMsg);
 
@@ -86,8 +86,8 @@ async function loadFriends() {
   try {
     // Send HTTP GET request to Flask, runs api route
     const response = await fetch("api/group/friends", {
-      method: 'GET',
-      headers: { 'X-CSRFToken': token, 'Content-Type': 'application/json' },
+      method: "GET",
+      headers: { "X-CSRFToken": token, "Content-Type": "application/json" },
     });
 
     if (!response.ok) {
@@ -96,10 +96,10 @@ async function loadFriends() {
 
     // Flask sends JSON, JS converts to JS object
     const data = await response.json();
-    const friendsList = document.getElementById("friend-search-list")
+    const friendsList = document.getElementById("friend-search-list");
     friendsList.innerHTML = "";
 
-    data.friends.forEach(friend => {
+    data.friends.forEach((friend) => {
       const friendDiv = document.createElement("div");
       friendDiv.innerHTML = `
         <li class="flex items-center justify-between py-2 px-4 hover:bg-gray-100 rounded-md">
@@ -109,12 +109,14 @@ async function loadFriends() {
           </div>
           <button id = '${friend.username}' onclick="return added(this)" class="text-sm bg-primary text-white px-3 py-1 rounded-md hover:bg-blue-800 cursor-pointer">+</button>
       </li>
-      `
+      `;
       friendsList.appendChild(friendDiv);
-      document.getElementById("friend-search-results").classList.remove("hidden");
-    })
+      document
+        .getElementById("friend-search-results")
+        .classList.remove("hidden");
+    });
   } catch (err) {
-      console.error('Error:', err);
+    console.error("Error:", err);
   }
 }
 
@@ -130,12 +132,12 @@ function setupSearchFriend() {
       const username = li.querySelector("span").textContent.toLowerCase();
 
       if (username.includes(query)) {
-        li.classList.remove('hidden');
+        li.classList.remove("hidden");
       } else {
-        li.classList.add('hidden');
+        li.classList.add("hidden");
       }
-    })
-  })
+    });
+  });
 }
 
 function added(button) {
