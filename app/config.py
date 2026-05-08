@@ -20,3 +20,10 @@ class Config:
 
     # It's generally bad practice to hardcode a key even on the chance that environment variable is inaccessable.
     # If a SECRET_KEY can't be retrieved from env, the app should raise an error instead.
+
+class TestConfig(Config):
+    # This is our config used for running any tests.
+
+    # Creates a non persistent database in the memory
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory'
+    TESTING = True
