@@ -1,8 +1,11 @@
 import unittest
+
+from flask_login import login_user
 from app import create_app, db
 from app.config import TestConfig
 from app.models import User
-from app.loggedout.loggedout import register, login
+
+# TODO: Test other apis that use user.
 
 # Tests User functionability: registering, logging, password hashing, apis, etc.
 class UserTestCase(unittest.TestCase):
@@ -13,7 +16,6 @@ class UserTestCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
-        self.populate_db()
         self.client = self.app.test_client()
 
     def tearDown(self):
@@ -23,11 +25,18 @@ class UserTestCase(unittest.TestCase):
         self.app = None
         self.app_context = None
 
-    def populate_db(self):
-        user = User(username='gerald', email='sekai@hotmail.com')
-        user.password = 'foo'
+    # Liam's test function from the old test branch/pr
+    def text_user_creation(self):
+        # Create a user and verify it was saved correctly
+        user = User(username='textuser', email='test@example.com')
         db.session.add(user)
         db.session.commit()
+        self.assertEqual(User.query.count(), 1)
+        fetched = User.query.first()
+        # Verify the fields were saved correctly
+        self.assertEqual(fetched.username, 'testuser')
+        self.assertEqual(fetched.email, 'test@example.com')
+        self.assertIsNotNone(fetched.created_at)
 
     def test_password_hashing(self):
         u = User(username='greg', email='abcde@fghi.com')
@@ -39,10 +48,14 @@ class UserTestCase(unittest.TestCase):
         u = User(username='john', email='john@example.com')
         self.assertEqual(u.avatar(128), ('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?d=identicon&s=128'))
 
+    # How would we test actual avatars? System tests?
+
     def test_change_username(self):
         user = User(username='bot1', email='bottingmail@user.com')
         user.password = 'foobar'
-
+        db.session.add(user)
+        db.session.commit()
+        login_user(user)
         response = self.client.post('/api/changeusername', data={
             'newuser': 'bot',
         })
@@ -59,8 +72,13 @@ class UserTestCase(unittest.TestCase):
 
     def test_change_email(self):
         user = User(username='bot2', email='bottingbox@user.com')
+        user2 = User(username='bot3', email="sekai@hotmail.com")
+        db.session.add(user)
+        db.session.add(user2)
+        db.session.commit()
         user.password = 'foobar'
 
+        login_user(user)
         response = self.client.post('/api/changeemail', data={
             'newemailaddress': 'boxxingbot@user.com',
         })
@@ -82,6 +100,6 @@ class UserTestCase(unittest.TestCase):
         assert len(response.json['error']) == 1
         assert response.json['error'] == 'Not an Email'
 
-        
+
 
 
