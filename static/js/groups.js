@@ -104,7 +104,7 @@ async function loadFriends() {
       friendDiv.innerHTML = `
         <li class="flex items-center justify-between py-2 px-4 hover:bg-gray-100 rounded-md">
           <div class="flex items-center gap-3">
-            <img src="https://placehold.co/200x200" class="h-8 w-8 rounded-full" />
+            <img src="${friend.pfp}" class="h-8 w-8 rounded-full" />
             <span class="text-sm font-medium text-gray-800">${friend.username}</span>
           </div>
           <button id = '${friend.username}' onclick="return added(this)" class="text-sm bg-primary text-white px-3 py-1 rounded-md hover:bg-blue-800 cursor-pointer">+</button>

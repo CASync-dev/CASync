@@ -24,5 +24,5 @@ def group_get_friends():
     
     # Format response to JSON for browsers
     return jsonify({
-        "friends": [friend.to_dict() for friend in friends]
+        "friends": [friend.public_dict() for friend in friends]
     }), 200
