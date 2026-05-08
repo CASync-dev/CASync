@@ -2,14 +2,14 @@
 {% block content %}
 <!-- TODO: Add functionability to group creation -->
 <div
-  class="mx-4 2xl:max-w-7xl 2xl:mx-auto px-4 bg-primary py-8 mt-6 rounded-xl"
+  class="mx-4 2xl:max-w-7xl 2xl:mx-auto px-4 py-8 mt-6 rounded-xl"
 >
   <!-- top bar -->
   <div class="flex items-center pb-3 border-b border-gray-300">
-    <h1 class="text-3xl font-bold text-white">Groups</h1>
+    <h1 class="text-3xl font-bold">Groups</h1>
     <button
-      class="btn-white px-4 ml-auto mr-2 h-10 whitespace-nowrap cursor-pointer"
-      onclick="return loadcreategroup()"
+      class="btn-primary shadow-black  px-4 ml-auto mr-2 h-10 whitespace-nowrap cursor-pointer"
+      onclick="return loadCreateGroup()"
     >
       Create Group
     </button>
@@ -71,7 +71,7 @@
               <button
                 type="button"
                 class="btn-plain cursor-pointer shrink-0 rounded-md border border-transparent bg-primary px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                onclick = "return loadselectfriends()"
+                onclick = "return loadSelectFriends()"
               >
               <i class="fa-solid fa-angle-right" style="color: rgb(255, 255, 255);"></i>
               </button>
@@ -81,7 +81,7 @@
               <button
                 type="button"
                 class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-                onclick = "return closeloadcreategroup()"
+                onclick = "return closeLoadCreateGroup()"
               >
                 Close
               </button>
@@ -128,7 +128,7 @@
                 />
                 <button
                   type="button"
-                  onclick="searchFriends()"
+                  onclick="loadFriends()"
                   class="btn-plain cursor-pointer shrink-0 rounded-md border border-transparent bg-primary px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   Search
@@ -143,14 +143,14 @@
               <button
                 type="button"
                 class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-                onclick = "return testsubmit()"
+                onclick = "return testSubmit()"
               >
                 Complete
               </button>
               <button
                 type="button"
                 class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-                onclick = "return closeloadselectfriends()"
+                onclick = "return closeLoadSelectFriends()"
               >
                 Close
               </button>
