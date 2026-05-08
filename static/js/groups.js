@@ -19,7 +19,13 @@ async function loadSelectFriends() {
 
   // Validate empty group name
   if (!groupname) {
-    alert("Please enter a group name");
+    const errorMsg = document.createElement("p");
+    errorMsg.id = "group-name-error"
+    errorMsg.className = "text-red-600 text-sm mt-2";
+    errorMsg.textContent = "Please enter a group name"
+    const groupInputDiv = document.getElementById("create-group-name");
+    groupInputDiv.appendChild(errorMsg);
+
     return false;
   }
 
