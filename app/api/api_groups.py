@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from flask_login import current_user, login_required
 from sqlalchemy import select
 from app import db
@@ -16,3 +16,12 @@ def create_group():
     group = Group(group_name = data['name'])
     for name in data['list']:
         print("Not finished, here to get rid of stupid python error")
+
+@api_groups.route("/api/group/friends", methods=['GET'])
+@login_required
+def group_get_friends():
+    friends = current_user.get_friends()
+    
+    return jsonify({
+        "friends": [friend.to_doct() for friend in friends]
+    }), 200
