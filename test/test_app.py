@@ -1,21 +1,50 @@
-import os
-os.environ['DATABASE_URL'] = 'sqlite:///:memory'
+import unittest
+from app import create_app
+from flask import current_app
+
+from app.config import TestConfig
 # Do tests on this non-persistent database
 
-from datetime import datetime, timezone, timedelta
-import unittest
-from app import app, db
-from app.models import User
-from app.loggedout.loggedout import register, login
-
-# Tests User functionability: registering, logging, password hashing, etc.
-class UserTestCase(unittest.TestCase):
+# Tests App functionability
+class AppTestCase(unittest.TestCase):
     def setUp(self):
-        self.app_context = app.app_context()
+        self.app = create_app(config_class=TestConfig())
+        self.app_context = self.app.app_context()
         self.app_context.push()
-        db.create_all()
+        self.client = self.app.test_client()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
         self.app_context.pop()
+        self.app = None
+        self.app_context = None
+
+    def test_app(self):
+        assert self.app is not None
+        assert current_app == self.app
+
+    # Testing if auth only pages block users that aren't logged in.
+    def test_dash_redirect(self):
+        response = self.client.get('/dash', follow_redirects=True)
+        assert response.status_code == 200
+        assert response.request.path == '/login'
+
+    def test_schedule_redirect(self):
+        response = self.client.get('/schedule', follow_redirects=True)
+        assert response.status_code == 200
+        assert response.request.path == '/login'
+
+    def test_schedule_redirect(self):
+        response = self.client.get('/groups', follow_redirects=True)
+        assert response.status_code == 200
+        assert response.request.path == '/login'
+
+    def test_schedule_redirect(self):
+        response = self.client.get('/friends', follow_redirects=True)
+        assert response.status_code == 200
+        assert response.request.path == '/login'
+
+    def test_schedule_redirect(self):
+        response = self.client.get('/settings', follow_redirects=True)
+        assert response.status_code == 200
+        assert response.request.path == '/login'
+    
