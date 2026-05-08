@@ -19,4 +19,3 @@ class UserTestCase(unittest.TestCase):
         db.session.remove()
         db.drop_all()
         self.app_context.pop()
-
