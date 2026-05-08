@@ -15,10 +15,14 @@ function closeLoadCreateGroup() {
 // Functions for Friends Dialog Modal
 async function loadSelectFriends() {
   const GroupModal = document.getElementById("create-group");
-  groupname = document.getElementById("group-name-input").value;
+  const groupname = document.getElementById("group-name-input");
+  const existingError = document.getElementById("group-name-error");
+
+  // Remove previous error so only one error is shown
+  if (existingError) existingError.remove();
 
   // Validate empty group name
-  if (!groupname) {
+  if (!groupname.value) {
     const errorMsg = document.createElement("p");
     errorMsg.id = "group-name-error"
     errorMsg.className = "text-red-600 text-sm mt-2";
