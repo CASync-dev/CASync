@@ -6,5 +6,5 @@ from app.config import DeploymentConfig
 # ie. using the CLI tool.
 
 if __name__ == '__main__':
-    app = create_app(DeploymentConfig)
+    app = create_app(DeploymentConfig())
     app.run(debug=True, port=8080)
