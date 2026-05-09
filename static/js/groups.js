@@ -1,5 +1,5 @@
 // Variables
-let groupname = "My Group";
+let groupname = document.getElementById("group-name-input").value;
 let grouplist = [];
 
 // Functions for Group Dialog Modal
@@ -60,13 +60,63 @@ function testSubmit() {
   alert(grouplist);
 }
 
-function submitGroupCreation() {
-  let url = "/api/group/create";
-  fetch(url, {
-    method: "POST",
-    body: JSON.stringify({ name: groupname, list: grouplist }),
-  });
-  // Gotta add a error catch here for any group creation issues!
+async function submitGroupCreation() {
+  // Reads CSRF token from token and sends with data
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+
+  try {
+    // Send request to Flask
+    const response = await fetch("/api/group/create", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ 
+        name: groupname, 
+        list: grouplist 
+      }),
+    });
+
+    //  Flask returns JSON response
+    const data = await response.json();
+
+    // Error
+    if (!response.ok) {
+      throw new Error(data.error || "Something went wrong");
+    }
+
+    // // Add new group to page
+    addGroupToPage(data.group);
+
+    // // Close the modal to return back to groups page
+    closeLoadSelectFriends();
+
+  } catch (err) {
+    // Gotta add a error catch here for any group creation issues!
+    console.error(err);
+    alert("Failed to create group"); // temporary error msg, will replace
+  }
+}
+
+function addGroupToPage(group) {
+  const groupList = document.getElementById("groups-list");
+  const liGroup = document.createElement("li");
+
+  liGroup.className = "py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200";
+  liGroup.innerHTML = `
+    <div class="flex items-center">
+      <div class="ml-4">
+        <p class="text-sm font-medium">
+          ${ group.group_name }
+        </p>
+        <i class="fas fa-calendar-alt"></i>
+        Schedule
+      </div>
+    </div>
+  `;
+
+  groupList.appendChild(liGroup);
 }
 
 // TODO: Yoinking Search Friends from the finished Friends Page
