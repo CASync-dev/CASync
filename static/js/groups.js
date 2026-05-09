@@ -119,7 +119,7 @@ function addGroupToPage(group) {
         </p>
 
         <!-- Member Avatars -->
-        <div class = "flex items-center">
+        <div class = "flex items-center mt-2">
           ${memberAvatars}
         </div>
       </div>
