@@ -113,16 +113,38 @@ function addGroupToPage(group) {
   liGroup.innerHTML = `
     <div class="flex items-center">
       <div class="ml-4">
-        <p class="text-sm font-medium">
+        <!-- Group Name -->
+        <p class="text-xl font-medium">
           ${ group.group_name }
         </p>
-        <i class="fas fa-calendar-alt"></i>
-        Schedule
+
+        <!-- Member Avatars -->
         <div class = "flex items-center">
           ${memberAvatars}
         </div>
       </div>
     </div>
+
+    <!-- Buttons -->
+    <button
+      class="btn-plain mt-2 px-3 ml-auto py-2 bg-red-300 text-white rounded-lg hover:bg-red-400"
+      onclick="leaveGroup('{{ group.id }}')"
+    >
+      <i class="fas fa-sign-out-alt"></i>
+      Leave
+    </button>
+    <button
+      class="btn-plain mt-2 px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400"
+      onclick="openSchedule()"
+    >
+      <i class="fas fa-calendar-alt"></i>
+      Schedule
+  </button>
+  <button
+    class = "btn-plain border-black border-2 bg-dark rounded-full px-4 py-3"
+    onclick = "openGroupDetail(); loadGroupMembers('{{ group.id }}')">
+    <i class = "fas fa-info text-nearwhite"></i>
+  </button>
   `;
 
   groupList.appendChild(liGroup);
