@@ -150,6 +150,39 @@ function addGroupToPage(group) {
   groupList.appendChild(liGroup);
 }
 
+async function updateGroupAvatarsInPage(groupId) {
+  try {
+    const response = await fetch(`/api/group/${groupId}`);
+    if (!response.ok) {
+      throw new Error("Could not fetch group members");
+    }
+    const group = await response.json();
+
+    // Referencing addGroupToPage, but only for avatars
+    const memberAvatars = group.members.map(member => {
+    return `
+      <img
+        src = "${ member.pfp }"
+        class = "w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
+        alt = "${ member.username }'s profile picture"
+        title = "${ member.username }"
+      />
+    `
+  }).join('');
+
+  // Updates the avatars to include new members
+  const groupElement = document.getElementById(`group-${groupId}`);
+  const avatarDiv = groupElement.querySelector(".group-avatars");
+
+  if (avatarDiv) {
+    avatarDiv.innerHTML = memberAvatars;
+  }
+  } catch (err) {
+    console.log(err);
+    alert(err);
+  }
+}
+
 // TODO: Yoinking Search Friends from the finished Friends Page
 // Finding friends script courtesy of Liam
 // const DEV_USERS = [
@@ -285,7 +318,7 @@ async function confirmLeaveGroup() {
 }
 
 // Group Details
-function get_group_details(groupId) { 
+function getGroupId(groupId) { 
   // Set global group ID for reuse in other functions
   // Gets its own function so it's not reliant on having group members to get the global var
   window.currentGroupId = groupId;
@@ -301,25 +334,11 @@ function closeGroupDetail() {
   x.close();
 }
 
-async function addMember() {
-  const groupDetails = document.getElementById("group-details");
-  groupDetails.close();
-
-  const friendModal = document.getElementById("select-friend");
-  friendModal.showModal();
-  document.getElementById("gname").innerText = groupname;
-
-  // Immediately loads and displays friends when switching modals
-  await loadFriends();
-
-  return false;
-}
-
-async function loadGroupMembers(groupId) {
+async function loadGroupMembers() {
   const gnameTitle = document.getElementById("group-detail-gname");
 
   try {
-    const response = await fetch(`/api/group/${groupId}`);
+    const response = await fetch(`/api/group/${window.currentGroupId}`);
     if (!response.ok) {
       throw new Error("Could not fetch group members");
     }
@@ -404,12 +423,17 @@ async function submitAddMember() {
     });
 
     if (!response.ok) {
-      throw new Error(data.error || "Something went wrong");
+      throw new Error(data.error || "Something went wrong when submitting new members");
     }
     const data = await response.json();
 
     // Refresh group details
     loadGroupMembers(window.currentGroupId);
+
+    // Refresh group avatars in page (the only thing that gets updated)
+    updateGroupAvatarsInPage(window.currentGroupId);
+
+    // Closes the model (same as select friends, so just reuse the function)
     closeLoadSelectFriends();
 
   } catch (err) {

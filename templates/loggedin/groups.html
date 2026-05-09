@@ -31,7 +31,7 @@
                 </p>
 
                 <!-- Member Avatars -->
-                <div class = "flex items-center mt-2">
+                <div class = "flex items-center mt-2 group-avatars">
                   {% for user in group.members %}
                     <img
                       src = "{{ user.avatar(200) }}"
@@ -60,7 +60,7 @@
               </button>
               <button
                 class = "btn-plain bg-dark rounded-full px-4 py-3 hover:bg-gray-800"
-                onclick = "openGroupDetail(); get_group_details('{{ group.id }}'); loadGroupMembers('{{ group.id }}')">
+                onclick = "openGroupDetail(); getGroupId('{{ group.id }}'); loadGroupMembers()">
                 <i class = "fas fa-info text-nearwhite"></i>
               </button>
           </li>
