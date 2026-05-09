@@ -21,19 +21,21 @@ async function loadSelectFriends() {
   // Remove previous error so only one error is shown
   if (existingError) existingError.remove();
 
-  // Validate empty group name
-  if (!groupname) {
-    const errorMsg = document.createElement("p");
-    errorMsg.id = "group-name-error";
-    errorMsg.className = "text-red-600 text-sm mt-2";
-    errorMsg.textContent = "Please enter a group name";
-    const groupInputDiv = document.getElementById("create-group-name");
-    groupInputDiv.appendChild(errorMsg);
+  if (!window.addMemberMode) {
+    // Validate empty group name
+    if (!groupname) {
+      const errorMsg = document.createElement("p");
+      errorMsg.id = "group-name-error";
+      errorMsg.className = "text-red-600 text-sm mt-2";
+      errorMsg.textContent = "Please enter a group name";
+      const groupInputDiv = document.getElementById("create-group-name");
+      groupInputDiv.appendChild(errorMsg);
 
-    return false;
+      return false;
+    }
+
+    GroupModal.close();
   }
-
-  GroupModal.close();
 
   const friendModal = document.getElementById("select-friend");
   friendModal.showModal();
@@ -50,6 +52,7 @@ function closeLoadSelectFriends() {
   // Reset all saved values.
   groupname = "";
   grouplist = [];
+  window.addMemberMode = false // reset flag
   x.close();
 }
 
@@ -88,7 +91,7 @@ async function submitGroupCreation() {
   } catch (err) {
     // Gotta add a error catch here for any group creation issues!
     console.error(err);
-    alert("Failed to create group"); // temporary error msg, will replace
+    alert("Failed to create group"); // temporary error handling, will replace
   }
 }
 
@@ -136,7 +139,7 @@ function addGroupToPage(group) {
 // ];
 
 // Displays current users friends
-async function loadFriends() {
+async function loadFriends(excludeIds = []) {
   // Reads CSRF token from token and sends with data
   const token = document.querySelector('meta[name="csrf-token"]').content;
   try {
@@ -146,31 +149,34 @@ async function loadFriends() {
       headers: { "X-CSRFToken": token, "Content-Type": "application/json" },
     });
 
-    if (!response.ok) {
-      throw new Error("Could not load friends");
-    }
-
     // Flask sends JSON, JS converts to JS object
     const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Could not load friends");
+    }
+
     const friendsList = document.getElementById("friend-search-list");
     friendsList.innerHTML = "";
 
-    data.friends.forEach((friend) => {
-      const friendDiv = document.createElement("div");
-      friendDiv.innerHTML = `
-        <li class="flex items-center justify-between py-2 px-4 hover:bg-gray-100 rounded-md">
-          <div class="flex items-center gap-3">
-            <img src="${friend.pfp}" class="h-8 w-8 rounded-full" />
-            <span class="text-sm font-medium text-gray-800">${friend.username}</span>
-          </div>
-          <button id = '${friend.username}' onclick="return added(this)" class="text-sm bg-primary text-white px-3 py-1 rounded-md hover:bg-blue-800 cursor-pointer">+</button>
-      </li>
-      `;
-      friendsList.appendChild(friendDiv);
-      document
-        .getElementById("friend-search-results")
-        .classList.remove("hidden");
-    });
+    data.friends
+      .filter(friend => !excludeIds.includes(friend.id)) // skips existing group members
+      .forEach((friend) => {
+        const friendDiv = document.createElement("div");
+        friendDiv.innerHTML = `
+          <li class="flex items-center justify-between py-2 px-4 hover:bg-gray-100 rounded-md">
+            <div class="flex items-center gap-3">
+              <img src="${friend.pfp}" class="h-8 w-8 rounded-full" />
+              <span class="text-sm font-medium text-gray-800">${friend.username}</span>
+            </div>
+            <button id = '${friend.username}' onclick="return added(this)" class="text-sm bg-primary text-white px-3 py-1 rounded-md hover:bg-blue-800 cursor-pointer">+</button>
+        </li>
+        `;
+        friendsList.appendChild(friendDiv);
+        document
+          .getElementById("friend-search-results")
+          .classList.remove("hidden");
+      });
   } catch (err) {
     console.error("Error:", err);
   }
@@ -242,12 +248,12 @@ async function confirmLeaveGroup() {
       body: JSON.stringify({ group_id: groupId }),
     })
 
-    if (!response.ok) {
-      throw new Error("Could not delete group");
-    }
-
     // Flask sends JSON, JS converts to JS object
     const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Could not delete group");
+    }
 
     document.getElementById(`group-${groupId}`).remove();
     document.getElementById('remove-confirmation').close();
@@ -282,13 +288,17 @@ async function addMember() {
 }
 
 async function loadGroupMembers(groupId) {
+  // Set global group ID for reuse in other functions
+  window.currentGroupId = groupId;
+
   try {
     const response = await fetch(`/api/group/${groupId}`);
+
+    const group = await response.json();
+
     if (!response.ok) {
       throw new Error("Could not fetch group members");
     }
-
-    const group = await response.json();
 
     // Render members
     const container = document.getElementById('add-members-list');
@@ -312,6 +322,70 @@ async function loadGroupMembers(groupId) {
   } catch (err) {
     console.error(err);
     // alert("Could not fetch group members");
+  }
+}
+
+async function openAddMemberModal() {
+  // Reusing loadSelectFriends() for modal setup since it's basically the same functionality
+  // Adapting it for adding members tho
+  window.addMemberMode = true;
+
+  // Fetch current group member details
+  try {
+    const response = await fetch(`/api/group/${window.currentGroupId}`);
+    const group = await response.json();
+    if (!response.ok) {
+      throw new Error("Could not fetch group details");
+    }
+
+    // Set group name for display (reuses groupname variable)
+    groupname = group.group_name;
+
+    // Update modal title for add member mode (reuses select friends modal elements)
+    document.getElementById("modal-title").innerText = "Add Members to Group";
+    document.getElementById("gname").innerText = groupname;
+
+    // Get existing member IDs to exclude
+    const existingMemberIds = group.members.map(m => m.id);
+
+    // Open the modal and load friends (reuses loadSelectFriends and loadFriends)
+    loadSelectFriends();  // opens modal, skips creating group validation
+    loadFriends(existingMemberIds);  // Excludes current members
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function submitAddMember() {
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+
+  try {
+    const response = await fetch("/api/group/add_member", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ 
+        group_id: window.currentGroupId,  
+        list: grouplist  
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Something went wrong");
+    }
+
+    // Refresh group details
+    loadGroupMembers(window.currentGroupId);
+    closeLoadSelectFriends();
+
+  } catch (err) {
+    console.error(err);
+    alert("Failed to add members"); // Temporary error handling
   }
 }
 

@@ -202,7 +202,7 @@
                 <button
                   type="button"
                   class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-                  onclick="return submitGroupCreation()"
+                  onclick="return window.addMemberMode ? submitAddMember() : submitGroupCreation()"
                 >
                   Complete
                 </button>
@@ -341,7 +341,7 @@
 
                   <!-- Try to reuse already existing friend modal? -->
                   <button
-                      onclick="loadSelectFriends()"
+                      onclick="openAddMemberModal()"
                       class="btn-primary px-4 py-2 text-sm"
                   >
                       <i class="fas fa-user-plus mr-2"></i>
