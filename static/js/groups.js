@@ -109,7 +109,7 @@ function addGroupToPage(group) {
     `
   }).join('');
 
-  liGroup.className = "py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200";
+  liGroup.className = "py-4 flex items-center bg-white justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200";
   liGroup.innerHTML = `
     <div class="flex items-center">
       <div class="ml-4">
@@ -285,6 +285,12 @@ async function confirmLeaveGroup() {
 }
 
 // Group Details
+function get_group_details(groupId) { 
+  // Set global group ID for reuse in other functions
+  // Gets its own function so it's not reliant on having group members to get the global var
+  window.currentGroupId = groupId;
+}
+
 async function openGroupDetail() {
   const x = document.getElementById("group-details");
   x.showModal();
@@ -310,9 +316,6 @@ async function addMember() {
 }
 
 async function loadGroupMembers(groupId) {
-  // Set global group ID for reuse in other functions
-  window.currentGroupId = groupId;
-
   const gnameTitle = document.getElementById("group-detail-gname");
 
   try {
