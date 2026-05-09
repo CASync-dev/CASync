@@ -141,7 +141,7 @@ function addGroupToPage(group) {
       Schedule
   </button>
   <button
-    class = "btn-plain border-black border-2 bg-dark rounded-full px-4 py-3"
+    class = "btn-plain bg-dark rounded-full px-4 py-3"
     onclick = "openGroupDetail(); loadGroupMembers('{{ group.id }}')">
     <i class = "fas fa-info text-nearwhite"></i>
   </button>
