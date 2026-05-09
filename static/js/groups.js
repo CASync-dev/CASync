@@ -196,6 +196,7 @@ function setupSearchFriend() {
   });
 }
 
+// Adding or removing friends in Select Friend Modal
 function added(button) {
   if (button.innerHTML == "+") {
     button.innerHTML = "-";
@@ -216,6 +217,7 @@ function added(button) {
   grouplist.pop(idToPop);
 }
 
+// Leaving group functions
 function leaveGroup(groupId) {
   // Open the confirmation dialog
   const dialog = document.getElementById('remove-confirmation');
@@ -254,6 +256,32 @@ async function confirmLeaveGroup() {
   }
 }
 
+// Group Details
+function openGroupDetail() {
+  const x = document.getElementById("group-details");
+  x.showModal();
+}
+
+function closeGroupDetail() {
+  const x = document.getElementById("group-details");
+  x.close();
+}
+
+async function addMember() {
+  const groupDetails = document.getElementById("group-details");
+  groupDetails.close();
+  
+  const friendModal = document.getElementById("select-friend");
+  friendModal.showModal();
+  document.getElementById("gname").innerText = groupname;
+
+  // Immediately loads and displays friends when switching modals
+  await loadFriends();
+
+  return false;
+}
+
+// Schedule stuff
 function openSchedule() {
   alert("Not yet implemented");
 }

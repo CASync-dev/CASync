@@ -21,7 +21,7 @@
         {% for group in groups %}
           <li
             id = "group-{{ group.id }}"
-            class="py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200"
+            class="py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow hover:border-gray-400 hover:border-2 shadow-xl hover:cursor-pointer ring-white transition duration-200"
           >
             <div class="flex items-center">
               <div class="ml-4">
@@ -49,7 +49,7 @@
                   onclick="leaveGroup('{{ group.id }}')"
                 >
                   <i class="fas fa-sign-out-alt"></i>
-                  Leave Group
+                  Leave
                 </button>
                 <button
                   class="btn-plain mt-2 px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400"
@@ -58,13 +58,18 @@
                   <i class="fas fa-calendar-alt"></i>
                   Schedule
               </button>
+              <button
+                class = "btn-plain border-black border-2 bg-dark rounded-full px-4 py-3"
+                onclick = "openGroupDetail()">
+                <i class = "fas fa-info text-nearwhite"></i>
+              </button>
           </li>
         {% endfor %}
       </ul>
     </div>
   </div>
 
-  <!-- Dialog Modal for Create Group Button -->
+  <!-- Create Group Modal -->
   <el-dialog>
     <dialog
       id="create-group"
@@ -137,7 +142,7 @@
     </dialog>
   </el-dialog>
 
-  <!-- Dialog Modal for Selecting Friends (after group name is picked) -->
+  <!-- Selecting Friends Modal (after group name is picked) -->
   <el-dialog>
     <dialog
       id="select-friend"
@@ -216,7 +221,7 @@
     </dialog>
   </el-dialog>
 
-  <!-- Dialog Modal for Confirmation of Leaving Group -->
+  <!-- Confirmation of Leaving Group Modal-->
   <el-dialog>
     <dialog
       id="remove-confirmation"
@@ -231,7 +236,7 @@
         class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
       >
         <el-dialog-panel
-          class="relative transform overflow-hidden rounded-lg bg-blue-800 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+          class="relative transform overflow-hidden rounded-lg bg-blue-900 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
         >
           <div class=" px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div class="sm:flex sm:items-start">
@@ -259,7 +264,7 @@
             </div>
           </div>
           <div
-            class="bg-blue-700/25 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+            class="bg-blue-500/25 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
           >
             <button
               id="confirm-delete-btn"
@@ -281,6 +286,76 @@
               Cancel
             </button>
           </div>
+        </el-dialog-panel>
+      </div>
+    </dialog>
+  </el-dialog>
+
+  <!-- Group Details Modal -->
+  <el-dialog>
+    <dialog 
+      id = "group-details"
+      class = "fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent border-none p-0"
+    >
+
+      <el-dialog-backdrop
+        class="fixed  bg-gray-900/50  inset-0 transition-opacity data-closed:opacity-0"
+      ></el-dialog-backdrop>
+
+      <div
+        class="flex flex-col min-h-full max-w-6xl w-full overflow-hidden items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+      >
+        <el-dialog-panel
+          class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        >
+        
+          <!-- Header -->
+          <div class="p-6 border-b border-dark bg-primary-light">
+            <div class = "flex items-center justify-between">
+              <div>
+                <h2 id = "group-detail-gname"
+                    class = "h2 text-2xl font-bold m-0">
+                    Test Title
+                </h2>
+              </div>
+              <button
+                  onclick="closeGroupDetail()"
+                  class="w-10 h-10 rounded-full transition-smooth flex items-center justify-center"
+              >
+                  <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class = "flex-1 overflow-y-auto custom-scrollbar">
+            <div class = "p-6">
+              <!-- Group Members -->
+               <div id = "group-members">
+                <div class = "flex items-center justify-between mb-4">
+                  <h3 class = "text-xl font-bold">
+                    Group Members
+                    <span id = "member-count"
+                          class = "text-primary"></span>
+                  </h3>
+
+                  <!-- Try to reuse already existing friend modal? -->
+                  <button
+                      onclick="loadSelectFriends()"
+                      class="btn-primary px-4 py-2 text-sm"
+                  >
+                      <i class="fas fa-user-plus mr-2"></i>
+                      Add Member
+                  </button>
+
+                </div>
+
+               </div>
+            </div>
+
+          </div>
+
+
         </el-dialog-panel>
       </div>
     </dialog>
