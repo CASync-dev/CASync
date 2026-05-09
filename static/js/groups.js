@@ -109,7 +109,10 @@ function addGroupToPage(group) {
     `
   }).join('');
 
-  liGroup.className = "py-4 flex items-center bg-white justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200";
+  liGroup.className = `
+    py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between 
+    bg-white border border-gray-300 rounded-2xl mb-2 px-3 shadow-xl
+    hover:ring-1 hover:shadow hover:border-gray-400 hover:border-2 hover:cursor-pointer ring-white transition duration-200`;
   liGroup.innerHTML = `
     <div class="flex items-center">
       <div class="ml-4">
@@ -127,23 +130,26 @@ function addGroupToPage(group) {
 
     <!-- Buttons -->
     <button
-      class="btn-plain mt-2 px-3 ml-auto py-2 bg-red-300 text-white rounded-lg hover:bg-red-400"
+      class="btn-plain mt-2 px-3 sm:ml-auto py-2 bg-red-300 text-nearwhite rounded-lg hover:bg-red-400"
       onclick="leaveGroup('{{ group.id }}')"
     >
       <i class="fas fa-sign-out-alt"></i>
       Leave
     </button>
     <button
-      class="btn-plain mt-2 px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400"
+      class="btn-plain mt-2 px-3 py-2 bg-blue-300 text-nearwhite rounded-lg hover:bg-blue-400"
       onclick="openSchedule()"
     >
       <i class="fas fa-calendar-alt"></i>
       Schedule
   </button>
   <button
-    class = "btn-plain bg-dark rounded-full px-4 py-3"
+    class = "btn-plain bg-dark rounded-lg sm:rounded-full px-4 py-3"
     onclick = "openGroupDetail(); loadGroupMembers('{{ group.id }}')">
-    <i class = "fas fa-info text-nearwhite"></i>
+    <i class = "fas fa-info text-nearwhite text-center"></i>
+    <div class = "text-nearwhite sm:hidden">
+      Details
+    </div>
   </button>
   `;
 
