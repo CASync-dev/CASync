@@ -51,6 +51,7 @@ class User(UserMixin, db.Model):
             'username': self.username,
             'email': self.email,
             'created_at': self.created_at.isoformat(),
+            'pfp': self.avatar(200)
         }
     
     def gravatar(self, size):
@@ -160,7 +161,7 @@ class Group(db.Model):
         return {
             'id': self.id,
             'group_name': self.group_name,
-            'members': [user.public_dict() for user in self.members]
+            'members': [user.to_dict() for user in self.members]
         }
 
 # Association table for Many-Many relationship between User and Groups
