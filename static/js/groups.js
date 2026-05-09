@@ -270,7 +270,7 @@ function closeGroupDetail() {
 async function addMember() {
   const groupDetails = document.getElementById("group-details");
   groupDetails.close();
-  
+
   const friendModal = document.getElementById("select-friend");
   friendModal.showModal();
   document.getElementById("gname").innerText = groupname;
@@ -279,6 +279,40 @@ async function addMember() {
   await loadFriends();
 
   return false;
+}
+
+async function loadGroupMembers(groupId) {
+  try {
+    const response = await fetch(`/api/group/${groupId}`);
+    if (!response.ok) {
+      throw new Error("Could not fetch group members");
+    }
+
+    const group = await response.json();
+
+    // Render members
+    const container = document.getElementById('add-members-list');
+    container.innerHTML = group.members.map(member => `
+      <li id="friend-${member.id}" class="py-4 flex items-center justify-between bg-lightgray border border-gray-400 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200">
+        <div class="flex items-center">
+          <img class="h-15 w-15 rounded-full" src="${member.pfp}" alt="${member.username}'s avatar" />
+          <div class="ml-4">
+            <p class="text-sm font-medium">${member.username}</p>
+            <p class="text-sm">${member.email}</p>
+          </div>
+        </div>
+      </li>
+    `).join('');
+
+      // Undecided whether want to add removal or not, or just let them leave by themselves (cuz anyone can remove from group)
+      // <button class="btn-plain px-3 ml-auto py-2 bg-red-300 text-white rounded-lg hover:bg-red-400" onclick="removeFriend('${member.id}')">
+      //     <i class="fas fa-user-times"></i>
+      // </button>
+
+  } catch (err) {
+    console.error(err);
+    // alert("Could not fetch group members");
+  }
 }
 
 // Schedule stuff
