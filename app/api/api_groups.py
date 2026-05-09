@@ -16,6 +16,16 @@ def group_get_friends():
     # Format response to JSON for browsers
     return jsonify({"friends": [friend.public_dict() for friend in friends]}), 200
 
+@api_groups.route("/api/group/<int:group_id>", methods=["GET"])
+@login_required
+def get_group_details(group_id):
+    group = Group.query.get(group_id)
+
+    if not group:
+        return jsonify({"error": "Could not find group"}), 404
+
+    return jsonify(group.to_dict()), 200
+
 @api_groups.route("/api/group/create", methods=["POST"])
 @login_required
 def create_group():
