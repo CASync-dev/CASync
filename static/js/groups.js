@@ -223,6 +223,44 @@ function added(button) {
   grouplist.pop(idToPop);
 }
 
+function leaveGroup(groupId) {
+  // Open the confirmation dialog
+  const dialog = document.getElementById('remove-confirmation');
+  dialog.showModal();
+
+  // Store groupID as attribute on button for access in confirmLeaveGroup()
+  document
+    .getElementById('confirm-delete-btn')
+    .setAttribute('data-group-id', groupId);
+}
+
+async function confirmLeaveGroup() {
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+  const groupId = document
+    .getElementById('confirm-delete-btn')
+    .getAttribute('data-group-id');
+
+  try {
+    const response = await fetch("api/group/leave", {
+      method: 'POST',
+      headers: { 'X-CSRFToken': token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ group_id: groupId }),
+    })
+
+    if (!response.ok) {
+      throw new Error("Could not delete group");
+    }
+
+    // Flask sends JSON, JS converts to JS object
+    const data = await response.json();
+
+    document.getElementById(`group-${groupId}`).remove();
+    document.getElementById('remove-confirmation').close();
+  } catch (err) {
+    console.error('Error: ', err);
+  }
+}
+
 // Calls search setup once instead of creating a new event listener every search
 document.addEventListener("DOMContentLoaded", () => {
   setupSearchFriend();
