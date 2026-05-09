@@ -27,8 +27,19 @@
                 <p class="text-sm font-medium">
                   {{ group.group_name }}
                 </p>
-                <i class="fas fa-calendar-alt"></i>
+                <i class="fas fa-calendar-alt mt-2"></i>
                 Schedule
+
+                <div class = "flex items-center mt-2">
+                  {% for user in group.members %}
+                    <img
+                      src = "{{ user.avatar(200) }}"
+                      class = "w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-white"
+                      alt = "{{ user.username }}'s profile picture"
+                      title = "{{ user.username }}"
+                    />
+                  {% endfor %}
+                </div>
               </div>
             </div>
           </li>

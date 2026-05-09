@@ -102,6 +102,16 @@ async function submitGroupCreation() {
 function addGroupToPage(group) {
   const groupList = document.getElementById("groups-list");
   const liGroup = document.createElement("li");
+  const memberAvatars = group.members.map(member => {
+    return `
+      <img
+        src = "${ member.pfp }"
+        class = "w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-white"
+        alt = "${ member.username }'s profile picture"
+        title = "${ member.username }"
+      />
+    `
+  }).join('');
 
   liGroup.className = "py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200";
   liGroup.innerHTML = `
@@ -112,6 +122,9 @@ function addGroupToPage(group) {
         </p>
         <i class="fas fa-calendar-alt"></i>
         Schedule
+        <div class = "flex items-center">
+          ${memberAvatars}
+        </div>
       </div>
     </div>
   `;
