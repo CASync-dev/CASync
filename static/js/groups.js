@@ -148,7 +148,7 @@ async function loadFriends() {
   const token = document.querySelector('meta[name="csrf-token"]').content;
   try {
     // Send HTTP GET request to Flask, runs api route
-    const response = await fetch("api/group/friends", {
+    const response = await fetch("/api/group/friends", {
       method: "GET",
       headers: { "X-CSRFToken": token, "Content-Type": "application/json" },
     });
@@ -241,7 +241,7 @@ async function confirmLeaveGroup() {
     .getAttribute('data-group-id');
 
   try {
-    const response = await fetch("api/group/leave", {
+    const response = await fetch("/api/group/leave", {
       method: 'POST',
       headers: { 'X-CSRFToken': token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ group_id: groupId }),

@@ -51,21 +51,29 @@ def create_group():
 @login_required
 def leave_group():
     data = request.get_json()
-    if 'group_id' not in data:
-        return jsonify({"Error: Invalid group_id"}), 400
-    group_id = int(data['group_id'])
+    group_id = data.get("group_id")
+    if not group_id:
+        return jsonify({"error: Invalid group_id"}), 400
+    
+    try:
+        group_id = int(data['group_id'])
+    except (TypeError, ValueError):
+        return jsonify({"error: Invalid group_id"}), 400
 
     # Check if current user exists in the given group (find relationship row)
     # Uses .delete because user_group_association is a raw SQL table, not a python ORM object
-    relationship_row = user_group_association.delete().where(
-        user_group_association.c.user_id  == current_user.id,
-        user_group_association.c.group_id == group_id
-    )
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({"error": "Group not found"}), 404
 
-    result = db.session.execute(relationship_row)
+    if current_user not in group.members:
+        return jsonify({"error": "You are not in this group"}), 404
+    
+    group.members.remove(current_user)
 
-    if result.rowcount == 0:
-        return jsonify({"Error": "You are not in this group"}), 404
+    # Check if group has any remaining members
+    if len(group.members) == 0:
+        db.session.delete(group)
 
     db.session.commit()
 
