@@ -53,13 +53,6 @@ function closeLoadSelectFriends() {
   x.close();
 }
 
-// TODO: Remember to actually change this later so that groups will show up on page
-// Dev function to check data
-function testSubmit() {
-  alert(groupname);
-  alert(grouplist);
-}
-
 async function submitGroupCreation() {
   // Reads CSRF token from token and sends with data
   const token = document.querySelector('meta[name="csrf-token"]').content;
@@ -259,6 +252,10 @@ async function confirmLeaveGroup() {
   } catch (err) {
     console.error('Error: ', err);
   }
+}
+
+function openSchedule() {
+  alert("Not yet implemented");
 }
 
 // Calls search setup once instead of creating a new event listener every search
