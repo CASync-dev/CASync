@@ -106,7 +106,7 @@ function addGroupToPage(group) {
     return `
       <img
         src = "${ member.pfp }"
-        class = "w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-white"
+        class = "w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
         alt = "${ member.username }'s profile picture"
         title = "${ member.username }"
       />

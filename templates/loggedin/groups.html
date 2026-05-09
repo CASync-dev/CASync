@@ -24,17 +24,17 @@
           >
             <div class="flex items-center">
               <div class="ml-4">
-                <p class="text-sm font-medium">
+                <!-- Group Name -->
+                <p class="text-xl font-medium">
                   {{ group.group_name }}
                 </p>
-                <i class="fas fa-calendar-alt mt-2"></i>
-                Schedule
 
+                <!-- Member Avatars -->
                 <div class = "flex items-center mt-2">
                   {% for user in group.members %}
                     <img
                       src = "{{ user.avatar(200) }}"
-                      class = "w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-white"
+                      class = "w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
                       alt = "{{ user.username }}'s profile picture"
                       title = "{{ user.username }}"
                     />
@@ -42,6 +42,21 @@
                 </div>
               </div>
             </div>
+                <!-- Buttons -->
+                <button
+                  class="btn-plain mt-2 px-3 ml-auto py-2 bg-red-300 text-white rounded-lg hover:bg-red-400"
+                  onclick=""
+                >
+                  <i class="fas fa-sign-out-alt"></i>
+                  Leave Group
+                </button>
+                <button
+                  class="btn-plain mt-2 px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400"
+                  onclick=""
+                >
+                  <i class="fas fa-calendar-alt"></i>
+                  Schedule
+              </button>
           </li>
         {% endfor %}
       </ul>
