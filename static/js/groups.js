@@ -355,23 +355,25 @@ async function openAddMemberModal() {
   // Fetch current group member details
   try {
     const response = await fetch(`/api/group/${window.currentGroupId}`);
-    const group = await response.json();
     if (!response.ok) {
       throw new Error("Could not fetch group details");
     }
+
+    const group = await response.json();
 
     // Set group name for display (reuses groupname variable)
     groupname = group.group_name;
 
     // Update modal title for add member mode (reuses select friends modal elements)
-    document.getElementById("modal-title").innerText = "Add Members to Group";
+    document.getElementById("friend-modal-title").innerText = "Add Members to Group";
     document.getElementById("gname").innerText = groupname;
 
     // Get existing member IDs to exclude
     const existingMemberIds = group.members.map(m => m.id);
 
-    // Open the modal and load friends (reuses loadSelectFriends and loadFriends)
-    loadSelectFriends();  // opens modal, skips creating group validation
+    // Open the modal and load friends
+    const selectFriendModal = document.getElementById("select-friend");
+    selectFriendModal.showModal();  // opens modal, skips creating group validation
     loadFriends(existingMemberIds);  // Excludes current members
 
   } catch (err) {
