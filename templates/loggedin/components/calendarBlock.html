@@ -415,6 +415,9 @@ The general flow of it is:
       card.appendChild(details);
 
       // if the event has no ical_id, it means it was created by the user and can be edited/deleted
+      const buttonStack = document.createElement('div');
+      buttonStack.className = 'flex flex-col gap-1 ml-auto';
+
       if (event.ical_id === null) {
         // we add a little badge to the top right corner to indicate it is a custom event
         const badge = document.createElement('span');
@@ -423,15 +426,25 @@ The general flow of it is:
         card.children[0].appendChild(badge);
 
         // delete + edit btns stacked vertically
-        details.innerHTML += `<div class="flex flex-col gap-1 ml-auto">
+        buttonStack.innerHTML = `
           <button class="bg-red-500 text-white rounded p-1 hover:bg-red-600" onclick="deleteEvent('${event.id}')">
             <i class="fa-solid fa-trash"></i>
           </button>
           <button class="bg-blue-500 text-white rounded p-1 hover:bg-blue-600" onclick="editEvent('${event.id}')">
             <i class="fa-solid fa-pen-to-square"></i>
-          </button>
-        </div>`;
+          </button>`;
       }
+
+      const goingToggle = document.createElement('button');
+      goingToggle.className = 'bg-green-500 text-white rounded p-1 hover:bg-green-600';
+      goingToggle.innerHTML = event.going ? `<i class="fa-solid fa-check"></i>` : `<i class="fa-solid fa-xmark"></i>`;
+      goingToggle.title = event.going ? 'Mark as not going' : 'Mark as going';
+      goingToggle.addEventListener('click', () => toggleGoing(event.id, goingToggle));
+      buttonStack.appendChild(goingToggle);
+      details.appendChild(buttonStack);
+      
+        
+      
 
       card.addEventListener('click', () => {
         const isExpanded = card.classList.contains('expanded');
