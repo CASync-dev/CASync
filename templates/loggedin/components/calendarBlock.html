@@ -58,7 +58,7 @@ The general flow of it is:
       {% if allowEventCreation %}
       <!-- New Activity Button -->
       <button
-        class="btn-primary hidden md:block flex gap-2 transition-all duration-300"
+        class="btn-primary hidden md:flex gap-2 transition-all duration-300"
         command="show-modal"
         commandfor="drawer"
       >
@@ -175,7 +175,7 @@ The general flow of it is:
       gray: { bg: 'bg-gray-100', border: 'border-gray-500', text: 'text-gray-800' },
       yellow: { bg: 'bg-yellow-100', border: 'border-yellow-500', text: 'text-yellow-800' },
     };
-    event_color_map = {};
+    const event_color_map = {};
 
     // CSRF token for API requests, we read it from the meta tag that the server renders into the page
     const CSRF = document.querySelector('meta[name="csrf-token"]').content;
@@ -317,7 +317,7 @@ The general flow of it is:
       } else {
         // if adaptive data calls is not enabled it means the url provided expects no date query param and will return all events
         let apiUrl = calendarBaseUrl;
-                fetch(apiUrl)
+          fetch(apiUrl)
           .then((response) => response.json())
           .then((data) => {
             lastFetchedStart = startDate;
@@ -329,16 +329,6 @@ The general flow of it is:
             console.error('Error loading events:', error);
           });
       }
-
-      fetch(apiUrl)
-        .then((response) => response.json())
-        .then((data) => {
-          events = data;
-          renderDesktopEvents();
-        })
-        .catch((error) => {
-          console.error('Error loading events:', error);
-        });
     }
 
     // ── Event card builder
@@ -346,7 +336,7 @@ The general flow of it is:
     // The card is positioned absolutely inside its host cell and sized to span
     // the correct number of rows based on the event duration.
     function buildEventCard(event, heightPx, id) {
-      event_class = event.title.split(',')[0].toLowerCase(); // get the first part of the title as the class (e.g. "CS 101, Lecture" → "cs 101")
+      let event_class = event.title.split(',')[0].toLowerCase(); // get the first part of the title as the class (e.g. "CS 101, Lecture" → "cs 101")
       if (!event_color_map[event_class]) {
         // If this class doesn't have a color assigned yet, assign the next available color from COLOR_MAP
         const usedColors = new Set(Object.values(event_color_map));
@@ -362,11 +352,11 @@ The general flow of it is:
       const card = document.createElement('div');
       card.id = id;
       if (!event.color) {
-        colors = COLOR_MAP[event_color_map[event_class]];
+        var colors = COLOR_MAP[event_color_map[event_class]];
       } else if (event.color && COLOR_MAP[event.color]) {
-        colors = COLOR_MAP[event.color];
+        var colors = COLOR_MAP[event.color];
       } else {
-        colors = COLOR_MAP['gray'];
+        var colors = COLOR_MAP['gray'];
       }
       card.className = [
         'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
@@ -435,16 +425,14 @@ The general flow of it is:
           </button>`;
       }
 
+      // going/not going toggle (all event get one)
       const goingToggle = document.createElement('button');
       goingToggle.className = 'bg-green-500 text-white rounded p-1 hover:bg-green-600';
       goingToggle.innerHTML = event.going ? `<i class="fa-solid fa-check"></i>` : `<i class="fa-solid fa-xmark"></i>`;
       goingToggle.title = event.going ? 'Mark as not going' : 'Mark as going';
-      goingToggle.addEventListener('click', () => toggleGoing(event.id, goingToggle));
+      goingToggle.addEventListener('click', () => toggleGoing(event.id));
       buttonStack.appendChild(goingToggle);
       details.appendChild(buttonStack);
-      
-        
-      
 
       card.addEventListener('click', () => {
         const isExpanded = card.classList.contains('expanded');
@@ -587,6 +575,7 @@ The general flow of it is:
 
       return card;
     }
+    
 
     // ── Grid helpers
 
