@@ -100,6 +100,9 @@ class UserTestCase(unittest.TestCase):
         assert len(response.json['error']) == 1
         assert response.json['error'] == 'Not an Email'
 
-
+    def test_change_password(self):
+        user = User(username='bot4', email="random@email.net")
+        user.password = 'foobar'
+        # How do we test multiple forms on one route..?
 
 
