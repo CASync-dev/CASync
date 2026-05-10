@@ -52,7 +52,7 @@ function closeLoadSelectFriends() {
   // Reset all saved values.
   groupname = "";
   grouplist = [];
-  window.addMemberMode = false // reset flag
+  window.addMemberMode = false; // reset flag
   x.close();
 }
 
@@ -68,9 +68,9 @@ async function submitGroupCreation() {
         "X-CSRFToken": token,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ 
-        name: groupname, 
-        list: grouplist 
+      body: JSON.stringify({
+        name: groupname,
+        list: grouplist,
       }),
     });
 
@@ -87,7 +87,6 @@ async function submitGroupCreation() {
 
     // // Close the modal to return back to groups page
     closeLoadSelectFriends();
-
   } catch (err) {
     // Gotta add a error catch here for any group creation issues!
     console.error(err);
@@ -100,16 +99,18 @@ function addGroupToPage(group) {
   const liGroup = document.createElement("li");
   liGroup.id = `group-${group.id}`;
 
-  const memberAvatars = group.members.map(member => {
-    return `
+  const memberAvatars = group.members
+    .map((member) => {
+      return `
       <img
-        src = "${ member.pfp }"
+        src = "${member.pfp}"
         class = "w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
-        alt = "${ member.username }'s profile picture"
-        title = "${ member.username }"
+        alt = "${member.username}'s profile picture"
+        title = "${member.username}"
       />
-    `
-  }).join('');
+    `;
+    })
+    .join("");
 
   liGroup.className = `
     py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between 
@@ -168,24 +169,26 @@ async function updateGroupAvatarsInPage(groupId) {
     }
 
     // Referencing addGroupToPage, but only for avatars
-    const memberAvatars = group.members.map(member => {
-    return `
+    const memberAvatars = group.members
+      .map((member) => {
+        return `
       <img
-        src = "${ member.pfp }"
+        src = "${member.pfp}"
         class = "w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
-        alt = "${ member.username }'s profile picture"
-        title = "${ member.username }"
+        alt = "${member.username}'s profile picture"
+        title = "${member.username}"
       />
-    `
-  }).join('');
+    `;
+      })
+      .join("");
 
-  // Updates the avatars to include new members
-  const groupElement = document.getElementById(`group-${groupId}`);
-  const avatarDiv = groupElement.querySelector(".group-avatars");
+    // Updates the avatars to include new members
+    const groupElement = document.getElementById(`group-${groupId}`);
+    const avatarDiv = groupElement.querySelector(".group-avatars");
 
-  if (avatarDiv) {
-    avatarDiv.innerHTML = memberAvatars;
-  }
+    if (avatarDiv) {
+      avatarDiv.innerHTML = memberAvatars;
+    }
   } catch (err) {
     console.log(err);
     alert(err);
@@ -224,7 +227,7 @@ async function loadFriends(excludeIds = []) {
     friendsList.innerHTML = "";
 
     data.friends
-      .filter(friend => !excludeIds.includes(friend.id)) // skips existing group members
+      .filter((friend) => !excludeIds.includes(friend.id)) // skips existing group members
       .forEach((friend) => {
         const friendDiv = document.createElement("div");
         friendDiv.innerHTML = `
@@ -290,27 +293,27 @@ function added(button) {
 // Leaving group functions
 function leaveGroup(groupId) {
   // Open the confirmation dialog
-  const dialog = document.getElementById('remove-confirmation');
+  const dialog = document.getElementById("remove-confirmation");
   dialog.showModal();
 
   // Store groupID as attribute on button for access in confirmLeaveGroup()
   document
-    .getElementById('confirm-delete-btn')
-    .setAttribute('data-group-id', groupId);
+    .getElementById("confirm-delete-btn")
+    .setAttribute("data-group-id", groupId);
 }
 
 async function confirmLeaveGroup() {
   const token = document.querySelector('meta[name="csrf-token"]').content;
   const groupId = document
-    .getElementById('confirm-delete-btn')
-    .getAttribute('data-group-id');
+    .getElementById("confirm-delete-btn")
+    .getAttribute("data-group-id");
 
   try {
     const response = await fetch("/api/group/leave", {
-      method: 'POST',
-      headers: { 'X-CSRFToken': token, 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "X-CSRFToken": token, "Content-Type": "application/json" },
       body: JSON.stringify({ group_id: groupId }),
-    })
+    });
 
     // Flask sends JSON, JS converts to JS object
     const data = await response.json();
@@ -320,14 +323,14 @@ async function confirmLeaveGroup() {
     }
 
     document.getElementById(`group-${groupId}`).remove();
-    document.getElementById('remove-confirmation').close();
+    document.getElementById("remove-confirmation").close();
   } catch (err) {
-    console.error('Error: ', err);
+    console.error("Error: ", err);
   }
 }
 
 // Group Details
-function getGroupId(groupId) { 
+function getGroupId(groupId) {
   // Set global group ID for reuse in other functions
   // Gets its own function so it's not reliant on having group members to get the global var
   window.currentGroupId = groupId;
@@ -354,8 +357,10 @@ async function loadGroupMembers() {
     }
 
     // Render members
-    const container = document.getElementById('add-members-list');
-    container.innerHTML = group.members.map(member => `
+    const container = document.getElementById("add-members-list");
+    container.innerHTML = group.members
+      .map(
+        (member) => `
       <li id="friend-${member.id}" class="py-4 flex items-center justify-between bg-lightgray border border-gray-400 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200">
         <div class="flex items-center">
           <img class="h-15 w-15 rounded-full" src="${member.pfp}" alt="${member.username}'s avatar" />
@@ -365,7 +370,9 @@ async function loadGroupMembers() {
           </div>
         </div>
       </li>
-    `).join('');
+    `,
+      )
+      .join("");
 
     // Render title
     gnameTitle.innerText = group.group_name;
@@ -374,11 +381,10 @@ async function loadGroupMembers() {
     const memberCount = document.getElementById("member-count");
     memberCount.innerText = `(${group.members.length})`;
 
-      // Undecided whether want to add removal or not, or just let them leave by themselves (cuz anyone can remove from group)
-      // <button class="btn-plain px-3 ml-auto py-2 bg-red-300 text-white rounded-lg hover:bg-red-400" onclick="removeFriend('${member.id}')">
-      //     <i class="fas fa-user-times"></i>
-      // </button>
-
+    // Undecided whether want to add removal or not, or just let them leave by themselves (cuz anyone can remove from group)
+    // <button class="btn-plain px-3 ml-auto py-2 bg-red-300 text-white rounded-lg hover:bg-red-400" onclick="removeFriend('${member.id}')">
+    //     <i class="fas fa-user-times"></i>
+    // </button>
   } catch (err) {
     console.error(err);
     // alert("Could not fetch group members");
@@ -402,17 +408,17 @@ async function openAddMemberModal() {
     groupname = group.group_name;
 
     // Update modal title for add member mode (reuses select friends modal elements)
-    document.getElementById("friend-modal-title").innerText = "Add Members to Group";
+    document.getElementById("friend-modal-title").innerText =
+      "Add Members to Group";
     document.getElementById("gname").innerText = groupname;
 
     // Get existing member IDs to exclude
-    const existingMemberIds = group.members.map(m => m.id);
+    const existingMemberIds = group.members.map((m) => m.id);
 
     // Open the modal and load friends
     const selectFriendModal = document.getElementById("select-friend");
-    selectFriendModal.showModal();  // opens modal, skips creating group validation
-    loadFriends(existingMemberIds);  // Excludes current members
-
+    selectFriendModal.showModal(); // opens modal, skips creating group validation
+    loadFriends(existingMemberIds); // Excludes current members
   } catch (err) {
     console.error(err);
   }
@@ -428,16 +434,18 @@ async function submitAddMember() {
         "X-CSRFToken": token,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ 
-        group_id: window.currentGroupId,  
-        list: grouplist  
+      body: JSON.stringify({
+        group_id: window.currentGroupId,
+        list: grouplist,
       }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || "Something went wrong when submitting new members");
+      throw new Error(
+        data.error || "Something went wrong when submitting new members",
+      );
     }
 
     // Refresh group details
@@ -448,12 +456,13 @@ async function submitAddMember() {
 
     // Closes the model (same as select friends, so just reuse the function)
     closeLoadSelectFriends();
-
   } catch (err) {
     console.error(err);
     // alert("Failed to add members"); // Temporary error handling
     const addMemberErrorDiv = document.getElementById("add-member-error-div");
-    const addMemberErrorMsg = document.getElementById("add-member-error-message");
+    const addMemberErrorMsg = document.getElementById(
+      "add-member-error-message",
+    );
     addMemberErrorDiv.className = "text-red-600 text-sm mt-3 sm:mt-2";
     addMemberErrorMsg.textContent = err.message;
   }
@@ -467,7 +476,8 @@ function handleEnter(e, action) {
   }
 }
 
-document.getElementById("group-name-input")
+document
+  .getElementById("group-name-input")
   .addEventListener("keydown", (e) => handleEnter(e, loadSelectFriends));
 
 // Schedule stuff

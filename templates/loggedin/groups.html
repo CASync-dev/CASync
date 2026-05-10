@@ -15,12 +15,12 @@
 
     <!-- Adding groups to the page -->
     <div class="mt-6">
-      <ul id = "groups-list">
+      <ul id="groups-list">
         <!-- FFilter through groups table to find group with current user in done in app pkg?-->
         <!-- Displays groups when page is first loaded  -->
         {% for group in groups %}
           <li
-            id = "group-{{ group.id }}"
+            id="group-{{ group.id }}"
             class="py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between 
                 bg-white border border-gray-300 rounded-2xl mb-2 px-3 shadow-xl
                   hover:ring-1 hover:shadow hover:border-gray-400 hover:border-2 hover:cursor-pointer ring-white transition duration-200"
@@ -28,46 +28,43 @@
             <div class="flex items-center">
               <div class="ml-4">
                 <!-- Group Name -->
-                <p class="text-xl font-medium">
-                  {{ group.group_name }}
-                </p>
+                <p class="text-xl font-medium">{{ group.group_name }}</p>
 
                 <!-- Member Avatars -->
-                <div class = "flex items-center my-2 group-avatars">
+                <div class="flex items-center my-2 group-avatars">
                   {% for user in group.members %}
                     <img
-                      src = "{{ user.avatar(200) }}"
-                      class = "w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
-                      alt = "{{ user.username }}'s profile picture"
-                      title = "{{ user.username }}"
+                      src="{{ user.avatar(200) }}"
+                      class="w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
+                      alt="{{ user.username }}'s profile picture"
+                      title="{{ user.username }}"
                     />
                   {% endfor %}
                 </div>
               </div>
             </div>
-                <!-- Buttons -->
-                <button
-                  class="btn-plain mt-2 px-3 py-2 sm:ml-auto bg-red-300 text-nearwhite rounded-lg hover:bg-red-400"
-                  onclick="leaveGroup('{{ group.id }}')"
-                >
-                  <i class="fas fa-sign-out-alt"></i>
-                  Leave
-                </button>
-                <button
-                  class="btn-plain mt-2 px-3 py-2 bg-blue-300 text-nearwhite rounded-lg hover:bg-blue-400"
-                  onclick="openSchedule()"
-                >
-                  <i class="fas fa-calendar-alt"></i>
-                  Schedule
-              </button>
-              <button
-                class = "btn-plain bg-dark rounded-lg sm:rounded-full px-4 py-3 hover:bg-gray-800"
-                onclick = "openGroupDetail(); getGroupId('{{ group.id }}'); loadGroupMembers()">
-                <i class = "fas fa-info text-nearwhite text-center"></i>
-                <div class = "text-nearwhite sm:hidden">
-                  Details
-                </div>
-              </button>
+            <!-- Buttons -->
+            <button
+              class="btn-plain mt-2 px-3 py-2 sm:ml-auto bg-red-300 text-nearwhite rounded-lg hover:bg-red-400"
+              onclick="leaveGroup('{{ group.id }}')"
+            >
+              <i class="fas fa-sign-out-alt"></i>
+              Leave
+            </button>
+            <button
+              class="btn-plain mt-2 px-3 py-2 bg-blue-300 text-nearwhite rounded-lg hover:bg-blue-400"
+              onclick="openSchedule()"
+            >
+              <i class="fas fa-calendar-alt"></i>
+              Schedule
+            </button>
+            <button
+              class="btn-plain bg-dark rounded-lg sm:rounded-full px-4 py-3 hover:bg-gray-800"
+              onclick="openGroupDetail(); getGroupId('{{ group.id }}'); loadGroupMembers()"
+            >
+              <i class="fas fa-info text-nearwhite text-center"></i>
+              <div class="text-nearwhite sm:hidden">Details</div>
+            </button>
           </li>
         {% endfor %}
       </ul>
@@ -80,12 +77,12 @@
       id="create-group"
       class="fixed mx-auto size-auto max-h-none max-w-none overflow-y-auto sm:my-8 sm:w-full sm:max-w-2xl bg-transparent backdrop:bg-transparent"
     >
-
       <el-dialog-backdrop
         class="fixed bg-gray-900/50 inset-0 transition-opacity data-closed:opacity-0"
       ></el-dialog-backdrop>
 
-      <div class = "flex min-h-full items-center justify-center p-4 text-center focus:outline-none sm:p-0"
+      <div
+        class="flex min-h-full items-center justify-center p-4 text-center focus:outline-none sm:p-0"
       >
         <el-dialog-panel
           class="
@@ -97,7 +94,6 @@
           <div
             class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100 items-center"
           >
-
             <!-- Header -->
             <div class="sm:flex sm:items-start">
               <!-- Group Icon -->
@@ -108,7 +104,9 @@
               </div>
 
               <!-- Title -->
-              <div class="mt-3 text-center w-full sm:mt-0 sm:ml-4 sm: mr-12 sm:text-left">
+              <div
+                class="mt-3 text-center w-full sm:mt-0 sm:ml-4 sm: mr-12 sm:text-left"
+              >
                 <h3
                   class="text-lg font-medium leading-6 text-gray-900"
                   id="modal-title"
@@ -123,9 +121,7 @@
                     class="mt-3 flex flex-col sm:flex-row w-full gap-2"
                   >
                     <!-- Input -->
-                    <div
-                      id = "group-input-wrapper"
-                      class = "flex-1">
+                    <div id="group-input-wrapper" class="flex-1">
                       <input
                         id="group-name-input"
                         type="text"
@@ -137,7 +133,7 @@
                       />
                     </div>
                     <button
-                      id = "group-name-next"
+                      id="group-name-next"
                       type="button"
                       class="
                         btn-plain inline-flex sm:w-12 m-0 justify-center cursor-pointer shrink-0 rounded-md border border-transparent 
@@ -149,29 +145,30 @@
                         class="fa-solid fa-angle-right"
                         style="color: rgb(255, 255, 255);"
                       ></i>
-                      <div class = "flex justify-center items-center text-nearwhite text-center sm:hidden">
+                      <div
+                        class="flex justify-center items-center text-nearwhite text-center sm:hidden"
+                      >
                         Next
                       </div>
                     </button>
                   </div>
                   <!-- Error Message -->
-                  <div id = "group-error-div">
-                    <p id = "group-error-message"></p>
+                  <div id="group-error-div">
+                    <p id="group-error-message"></p>
                   </div>
                 </div>
                 <div
                   class="w-full px-4 py-3 sm:flex sm:justify-end sm:px-6"
-                >
-                </div>
-                <div class = "flex justify-end">
+                ></div>
+                <div class="flex justify-end">
                   <button
-                      type="button"
-                      class="
+                    type="button"
+                    class="
                         cursor-pointer mt-3 mx-0 sm:flex sm:justify-end sm:px-6 inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm
                         hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 w-auto sm:text-sm"
-                      onclick="return closeLoadCreateGroup()"
-                    >
-                      Close
+                    onclick="return closeLoadCreateGroup()"
+                  >
+                    Close
                   </button>
                 </div>
               </div>
@@ -192,7 +189,7 @@
         class="fixed bg-gray-900/50 inset-0 transition-opacity data-closed:opacity-0"
       ></el-dialog-backdrop>
 
-      <div class = "flex min-h-full items-center justify-center p-4 sm:p-0">
+      <div class="flex min-h-full items-center justify-center p-4 sm:p-0">
         <el-dialog-panel
           class="
               relative transform overflow-hidden justify-center items-center rounded-lg
@@ -209,7 +206,9 @@
               >
                 <i class="fa-solid fa-people-group" style="color: #4741f7;"></i>
               </div>
-              <div class="mt-3 sm:mr-12 text-center flex-1 w-full sm:mt-0 sm:ml-4 sm:text-left">
+              <div
+                class="mt-3 sm:mr-12 text-center flex-1 w-full sm:mt-0 sm:ml-4 sm:text-left"
+              >
                 <h3
                   class="text-lg font-medium leading-6 text-gray-900"
                   id="friend-modal-title"
@@ -222,14 +221,14 @@
                   </p>
                   <div class="mt-3 flex w-full items-stretch gap-2">
                     <input
-                      id = "friend-search-input"
+                      id="friend-search-input"
                       type="text"
                       class="flex-1 rounded-md border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                       placeholder="Friend's Username/Email"
                       autocomplete="off"
                     />
                     <button
-                      id = "select-friends-search"
+                      id="select-friends-search"
                       type="button"
                       onclick="loadFriends()"
                       class="btn-plain cursor-pointer shrink-0 rounded-md border border-transparent bg-primary px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -244,12 +243,10 @@
                 </div>
 
                 <!-- Error Message -->
-               <div id = "add-member-error-div" class = "py-4">
-                <p id = "add-member-error-message"></p>
-              </div>
-                <div
-                  class="py-3 sm:flex sm:flex-row-reverse"
-                >
+                <div id="add-member-error-div" class="py-4">
+                  <p id="add-member-error-message"></p>
+                </div>
+                <div class="py-3 sm:flex sm:flex-row-reverse">
                   <button
                     id="friend-search-submit"
                     type="button"
@@ -346,11 +343,10 @@
 
   <!-- Group Details Modal -->
   <el-dialog>
-    <dialog 
-      id = "group-details"
-      class = "fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent border-none p-0"
+    <dialog
+      id="group-details"
+      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent border-none p-0"
     >
-
       <el-dialog-backdrop
         class="fixed  bg-gray-900/50  inset-0 transition-opacity data-closed:opacity-0"
       ></el-dialog-backdrop>
@@ -361,58 +357,51 @@
         <el-dialog-panel
           class="relative transform overflow-hidden overflow-y-auto justify-center items-center rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
         >
-        
           <!-- Header -->
           <div class="p-6 border-b border-dark bg-gray-400">
-            <div class = "flex items-center justify-between">
+            <div class="flex items-center justify-between">
               <div>
-                <h2 id = "group-detail-gname"
-                    class = "h2 text-2xl font-bold m-0">
-                </h2>
+                <h2
+                  id="group-detail-gname"
+                  class="h2 text-2xl font-bold m-0"
+                ></h2>
               </div>
               <button
-                  onclick="closeGroupDetail()"
-                  class="w-10 h-10 rounded-full transition-smooth flex items-center justify-center"
+                onclick="closeGroupDetail()"
+                class="w-10 h-10 rounded-full transition-smooth flex items-center justify-center"
               >
-                  <i class="fas fa-times text-xl cursor-pointer hover:bg-red-500 hover:p-2 hover:text-nearwhite"></i>
+                <i
+                  class="fas fa-times text-xl cursor-pointer hover:bg-red-500 hover:p-2 hover:text-nearwhite"
+                ></i>
               </button>
             </div>
           </div>
 
           <!-- Body -->
-          <div class = "flex-1 overflow-y-auto custom-scrollbar">
-            <div class = "p-6">
+          <div class="flex-1 overflow-y-auto custom-scrollbar">
+            <div class="p-6">
               <!-- Group Members -->
-               <div id = "group-members">
-                <div class = "flex items-center justify-between mb-4">
-                  <h3 class = "text-xl font-bold">
+              <div id="group-members">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-xl font-bold">
                     Group Members
-                    <span id = "member-count"
-                          class = "text-primary"></span>
+                    <span id="member-count" class="text-primary"></span>
                   </h3>
 
                   <!-- Try to reuse already existing friend modal? -->
                   <button
-                      onclick="openAddMemberModal()"
-                      class="btn-primary px-4 py-2 text-sm text-center"
+                    onclick="openAddMemberModal()"
+                    class="btn-primary px-4 py-2 text-sm text-center"
                   >
-                      <i class="fas fa-user-plus"></i>
+                    <i class="fas fa-user-plus"></i>
                   </button>
-
                 </div>
 
                 <!-- Friends listed -->
-                 <div id = "add-members-list"
-                      class = "space-y-3">
-
-                 </div>
-
-               </div>
+                <div id="add-members-list" class="space-y-3"></div>
+              </div>
             </div>
-
           </div>
-
-
         </el-dialog-panel>
       </div>
     </dialog>
