@@ -9,6 +9,8 @@ function loadCreateGroup() {
 }
 function closeLoadCreateGroup() {
   const x = document.getElementById("create-group");
+  const errorMsg = document.getElementById("group-error-message");
+  errorMsg.textContent = "";
   x.close();
 }
 
@@ -24,12 +26,10 @@ async function loadSelectFriends() {
   if (!window.addMemberMode) {
     // Validate empty group name
     if (!groupname) {
-      const errorMsg = document.createElement("p");
-      errorMsg.id = "group-name-error";
-      errorMsg.className = "text-red-600 text-sm mt-2";
+      const groupErrorDiv = document.getElementById("group-error-message");
+      const errorMsg = document.getElementById("group-error-message");
+      groupErrorDiv.className = "text-red-600 text-sm mt-3 sm:mt-2";
       errorMsg.textContent = "Please enter a group name";
-      const groupInputDiv = document.getElementById("group-error-message");
-      groupInputDiv.appendChild(errorMsg);
 
       return false;
     }
