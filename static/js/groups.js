@@ -432,10 +432,11 @@ async function submitAddMember() {
       }),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
       throw new Error(data.error || "Something went wrong when submitting new members");
     }
-    const data = await response.json();
 
     // Refresh group details
     loadGroupMembers(window.currentGroupId);
@@ -452,7 +453,7 @@ async function submitAddMember() {
     const addMemberErrorDiv = document.getElementById("add-member-error-div");
     const addMemberErrorMsg = document.getElementById("add-member-error-message");
     addMemberErrorDiv.className = "text-red-600 text-sm mt-3 sm:mt-2";
-    addMemberErrorMsg.textContent = "Failed to add members";
+    addMemberErrorMsg.textContent = err.message;
   }
 }
 

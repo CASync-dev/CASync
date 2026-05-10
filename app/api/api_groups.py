@@ -78,7 +78,7 @@ def add_member():
          # If no users were actually added, return error
     if len(added_users) == 0:
         return jsonify({
-            "error": "No valid users were added",
+            "error": "No valid users were added. User(s) may already be in the group.",
             "skipped": skipped_users,
             "not_found": not_found_users
         }), 400
