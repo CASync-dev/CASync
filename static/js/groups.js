@@ -452,6 +452,17 @@ async function submitAddMember() {
   }
 }
 
+// Buttons to be pressed via Enter for convenience
+function handleEnter(e, action) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    action();
+  }
+}
+
+document.getElementById("group-name-input")
+  .addEventListener("keydown", (e) => handleEnter(e, loadSelectFriends));
+
 // Schedule stuff
 function openSchedule() {
   alert("Not yet implemented");

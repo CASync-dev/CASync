@@ -137,6 +137,7 @@
                       />
                     </div>
                     <button
+                      id = "group-name-next"
                       type="button"
                       class="
                         btn-plain inline-flex sm:w-12 m-0 justify-center cursor-pointer shrink-0 rounded-md border border-transparent 
@@ -161,15 +162,6 @@
                 <div
                   class="w-full px-4 py-3 sm:flex sm:justify-end sm:px-6"
                 >
-                  <!-- <button
-                    type="button"
-                    class="
-                      cursor-pointer mt-3 mx-0 inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm 
-                      hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 w-auto sm:text-sm"
-                    onclick="return closeLoadCreateGroup()"
-                  >
-                    Close
-                  </button> -->
                 </div>
                 <div class = "flex justify-end">
                   <button
@@ -230,13 +222,13 @@
                   </p>
                   <div class="mt-3 flex w-full items-stretch gap-2">
                     <input
-                      id="friend-search-input"
                       type="text"
                       class="flex-1 rounded-md border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                       placeholder="Friend's Username/Email"
                       autocomplete="off"
                     />
                     <button
+                      id = "select-friends-search"
                       type="button"
                       onclick="loadFriends()"
                       class="btn-plain cursor-pointer shrink-0 rounded-md border border-transparent bg-primary px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -253,6 +245,7 @@
                   class="px-4 py-3 sm:flex sm:flex-row-reverse"
                 >
                   <button
+                    id="friend-search-submit"
                     type="button"
                     class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
                     onclick="return window.addMemberMode ? submitAddMember() : submitGroupCreation()"
