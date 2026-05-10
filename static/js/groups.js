@@ -448,7 +448,11 @@ async function submitAddMember() {
 
   } catch (err) {
     console.error(err);
-    alert("Failed to add members"); // Temporary error handling
+    // alert("Failed to add members"); // Temporary error handling
+    const addMemberErrorDiv = document.getElementById("add-member-error-div");
+    const addMemberErrorMsg = document.getElementById("add-member-error-message");
+    addMemberErrorDiv.className = "text-red-600 text-sm mt-3 sm:mt-2";
+    addMemberErrorMsg.textContent = "Failed to add members";
   }
 }
 
