@@ -24,9 +24,98 @@ function updateTime() {
   document.getElementById("period").innerText = timeParts[1] ?? "";
 }
 
+// ----------------------dynamic stuff for the friends list -------------------------------------
 
+// craft the url for fetching events: format is /api/friends_status?now
+function getFriendsBaseUrl() {
+  let apiUrl = "/api/friendsstatus";
+  const now = new Date();
+  
+  apiUrl += `?now=${now.toISOString()}`;
+  
+  return apiUrl;
+}
 
-// dynamic stuff for the calendar events -------------------------------------
+async function getFriends_status() {
+  let friends_status = null;
+  try {
+    const res = await fetch(getFriendsBaseUrl());
+    if (!res.ok) throw new Error(res.statusText);
+    friends_status = await res.json(); // store it here
+    // renderCalendar(events);
+    return friends_status;
+  } catch (err) {
+    console.error('fetch error', err);
+  }
+}
+
+function renderFriendsStatus(friends_status) {
+  const container = document.getElementById("friends-list");
+  if (!container) return;
+  container.innerHTML = "";
+
+  for (const friend of friends_status) {
+    if (friend.status === "offline") continue;
+
+    const li = document.createElement("li");
+    li.className = "py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200";
+    li.innerHTML = `
+      <div class="flex items-center">
+        <img class="h-15 w-15 rounded-full" src="${friend.avatar_url}" alt="${friend.username}'s avatar" />
+        <div class="ml-4">
+          <p class="text-sm font-medium text-white">${friend.username}</p>
+          <p class="text-sm text-gray-300">${friend.email}</p>
+        </div>
+      </div>
+      <button class="btn-plain px-3 ml-auto py-2 bg-red-300 text-white rounded-lg hover:bg-red-400">
+        <i class="fas fa-user-times"></i>
+      </button>
+      <button class="btn-plain px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400">
+        <i class="fas fa-calendar-alt"></i>
+        Schedule
+      </button>
+    `;
+    container.appendChild(li);
+  }
+}
+
+/*
+<li
+        id="friend-{{friend.id}}"
+        class="py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200"
+      >
+        <div class="flex items-center">
+          <img
+            class="h-15 w-15 rounded-full"
+            src="{{friend.avatar_url }}"
+            alt="{{ friend.username }}'s avatar"
+          />
+          <div class="ml-4">
+            <p class="text-sm font-medium text-white">{{ friend.username }}</p>
+            <p class="text-sm text-gray-300">{{ friend.email }}</p>
+          </div>
+        </div>
+        <button
+          class="btn-plain px-3 ml-auto py-2 bg-red-300 text-white rounded-lg hover:bg-red-400"
+          onclick="removeFriend('{{ friend.id }}')"
+        >
+          <i class="fas fa-user-times"></i>
+        </button>
+        <button
+          class="btn-plain px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400"
+          onclick="openFriendSchedule('{{ friend.id }}', '{{ friend.username }}')"
+        >
+          <i class="fas fa-calendar-alt"></i>
+          Schedule
+        </button>
+      </li>
+*/
+
+(async () => {
+  const status = await getFriends_status();
+  renderFriendsStatus(status);
+})();
+// -------------------- dynamic stuff for the calendar events -------------------------------------
 
 // craft the url for fetching events: format is /api/events/me?start=2026-05-06&end=2026-05-07
 function getCalendarBaseUrl() {
@@ -42,8 +131,8 @@ function getCalendarBaseUrl() {
 
 
 //  GET /api/events/me?start=2026-05-06&end=2026-05-07 
-let events = null;
 async function loadEvents() {
+  let events = null;
   try {
     const res = await fetch(getCalendarBaseUrl());
     if (!res.ok) throw new Error(res.statusText);
@@ -218,7 +307,6 @@ function renderDashboardEvents(processed) {
 }
 
 let processedEvs = null;
-
 
 // Every second — clock only
 setInterval(updateTime, 1000);
