@@ -35,7 +35,8 @@ document.getElementById("add-event-form").addEventListener("submit", (e) => {
     const currentTimeMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
     const startTimeMinutes = parseTime(start_time);
     if (startTimeMinutes <= currentTimeMinutes) {
-      errorElement.textContent = "Start time must be after the current time for today's events.";
+      errorElement.textContent =
+        "Events have to be in the future. Please select a start time later than the current time.";
       errorElement.classList.remove("hidden");
       return;
     }
