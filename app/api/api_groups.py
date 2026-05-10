@@ -130,15 +130,17 @@ def create_group():
         return jsonify({"error": "Group name required"}), 400
 
     group = Group(group_name=name)
-    group.members.append(current_user)  # adds current user (creator of group) to group
+    db.session.add(group) # attaches (new) group instance to the current session
+
+    # adds current user (creator of group) to group
+    group.members.append(current_user) 
 
     # Adds the rest of friends to group
     for friend_username in friends_added:
-        user = User.query.filter_by(username=friend_username).first()
+        user = User.query.filter_by(username=friend_username).first() # triggers autoflush before query executes, which caused error to happen previously
         if user and user != current_user:
             group.members.append(user)  # populates many-to-many relationship
 
-    db.session.add(group)
     db.session.commit()
 
     return jsonify({"success": True, "group": group.to_dict()})
