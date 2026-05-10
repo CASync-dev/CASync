@@ -28,7 +28,7 @@ async function loadSelectFriends() {
       errorMsg.id = "group-name-error";
       errorMsg.className = "text-red-600 text-sm mt-2";
       errorMsg.textContent = "Please enter a group name";
-      const groupInputDiv = document.getElementById("create-group-name");
+      const groupInputDiv = document.getElementById("group-error-message");
       groupInputDiv.appendChild(errorMsg);
 
       return false;

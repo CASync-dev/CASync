@@ -85,65 +85,106 @@
         class="fixed  bg-gray-900/50 inset-0 transition-opacity data-closed:opacity-0"
       ></el-dialog-backdrop>
 
-      <el-dialog-panel
-        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+      <div class = "flex min-h-full items-center justify-center p-4 text-center focus:outline-none sm:p-0"
       >
-        <div
-          class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100 items-center"
+        <el-dialog-panel
+          class="
+            relative transform overflow-hidden justify-center items-center rounded-lg 
+            bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 
+            transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in 
+            sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
         >
-          <div class="sm:flex sm:items-start">
-            <div
-              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-nearwhite sm:mx-0 sm:h-10 sm:w-10"
-            >
-              <i class="fa-solid fa-people-group" style="color: #4741f7;"></i>
-            </div>
-            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-              <h3
-                class="text-lg font-medium leading-6 text-gray-900"
-                id="modal-title"
+          <div
+            class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100 items-center"
+          >
+
+            <!-- Header -->
+            <div class="sm:flex sm:items-start">
+              <!-- Group Icon -->
+              <div
+                class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-nearwhite sm:mx-0 sm:h-10 sm:w-10"
               >
-                Create a Group
-              </h3>
-              <div class="mt-2">
-                <p class="text-sm text-gray-500">Name your new group</p>
-                <div
-                  id="create-group-name"
-                  class="mt-3 flex-col w-full items-stretch gap-2"
+                <i class="fa-solid fa-people-group" style="color: #4741f7;"></i>
+              </div>
+
+              <!-- Title -->
+              <div class="mt-3 text-center w-full sm:mt-0 sm:ml-4 sm: mr-12 sm:text-left">
+                <h3
+                  class="text-lg font-medium leading-6 text-gray-900"
+                  id="modal-title"
                 >
-                  <input
-                    id="group-name-input"
-                    type="text"
-                    class="flex-1 rounded-md border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                    placeholder="My Chill Group"
-                    autocomplete="off"
-                  />
-                  <button
-                    type="button"
-                    class="btn-plain cursor-pointer shrink-0 rounded-md border border-transparent bg-primary px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    onclick="return loadSelectFriends()"
+                  Create a Group
+                </h3>
+                <div class="mt-2">
+                  <!-- Subtitle -->
+                  <p class="text-sm text-gray-500">Name your new group</p>
+                  <div
+                    id="create-group-name"
+                    class="mt-3 flex flex-col sm:flex-row w-full gap-2"
                   >
-                    <i
-                      class="fa-solid fa-angle-right"
-                      style="color: rgb(255, 255, 255);"
-                    ></i>
+                    <!-- Input -->
+                    <div
+                      id = "group-input-wrapper"
+                      class = "flex-1">
+                      <input
+                        id="group-name-input"
+                        type="text"
+                        class="
+                            w-full rounded-md border border-gray-300 px-4 py-3 text-base
+                            focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                        placeholder="My Chill Group"
+                        autocomplete="off"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      class="
+                        btn-plain inline-flex sm:w-12 m-0 justify-center cursor-pointer shrink-0 rounded-md border border-transparent 
+                        bg-primary px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-800 
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      onclick="return loadSelectFriends()"
+                    >
+                      <i
+                        class="fa-solid fa-angle-right"
+                        style="color: rgb(255, 255, 255);"
+                      ></i>
+                      <div class = "flex justify-center items-center text-nearwhite text-center sm:hidden">
+                        Next
+                      </div>
+                    </button>
+                    <!-- Error Message -->
+                  </div>
+                  <div id = "group-error-message"></div>
+                </div>
+                <div
+                  class="w-full px-4 py-3 sm:flex sm:justify-end sm:px-6"
+                >
+                  <!-- <button
+                    type="button"
+                    class="
+                      cursor-pointer mt-3 mx-0 inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm 
+                      hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 w-auto sm:text-sm"
+                    onclick="return closeLoadCreateGroup()"
+                  >
+                    Close
+                  </button> -->
+                </div>
+                <div class = "flex justify-end">
+                  <button
+                      type="button"
+                      class="
+                        cursor-pointer mt-3 mx-0 sm:flex sm:justify-end sm:px-6 inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm
+                        hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 w-auto sm:text-sm"
+                      onclick="return closeLoadCreateGroup()"
+                    >
+                      Close
                   </button>
                 </div>
               </div>
-              <div
-                class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
-              >
-                <button
-                  type="button"
-                  class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-                  onclick="return closeLoadCreateGroup()"
-                >
-                  Close
-                </button>
-              </div>
             </div>
           </div>
-        </div>
-      </el-dialog-panel>
+        </el-dialog-panel>
+      </div>
     </dialog>
   </el-dialog>
 
@@ -158,7 +199,7 @@
       ></el-dialog-backdrop>
 
       <el-dialog-panel
-        class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        class="relative w-full transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
       >
         <div
           class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100 items-center"
@@ -169,7 +210,7 @@
             >
               <i class="fa-solid fa-people-group" style="color: #4741f7;"></i>
             </div>
-            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <div class="mt-3 text-center flex-1 w-full sm:mt-0 sm:ml-4 sm:text-left">
               <h3
                 class="text-lg font-medium leading-6 text-gray-900"
                 id="friend-modal-title"
