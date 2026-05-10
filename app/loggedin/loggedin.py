@@ -27,7 +27,7 @@ def schedule():
 @loggedin.route("/groups")
 @login_required
 def groups():
-    return render_template("loggedin/groups.html")
+    return render_template("loggedin/groups.html", groups = current_user.groups)
 
 
 @loggedin.route("/friends")

@@ -84,18 +84,18 @@
             <span class="font-medium">Your Schedule</span>
           </a>
           <a
-            href="{{ url_for('loggedin.groups') }}"
-            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.groups' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
-          >
-            <i class="fas fa-solid fa-people-group w-5 mr-3"></i>
-            <span class="font-medium">Groups</span>
-          </a>
-          <a
             href="{{ url_for('loggedin.friends') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.friends' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
           >
             <i class="fas fa-solid fa-user-group w-5 mr-3"></i>
             <span class="font-medium">Friends</span>
+          </a>
+          <a
+            href="{{ url_for('loggedin.groups') }}"
+            class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.groups' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
+          >
+            <i class="fas fa-solid fa-people-group w-5 mr-3"></i>
+            <span class="font-medium">Groups</span>
           </a>
 
           <!-- Settings and user -->
