@@ -29,13 +29,15 @@ document.getElementById("add-event-form").addEventListener("submit", (e) => {
     return;
   }
   // if event is today, start time must be after current time
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
   if (date === today) {
     const currentTime = new Date();
-    const currentTimeMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+    const currentTimeMinutes =
+      currentTime.getHours() * 60 + currentTime.getMinutes();
     const startTimeMinutes = parseTime(start_time);
     if (startTimeMinutes <= currentTimeMinutes) {
-      errorElement.textContent = "Start time must be after the current time for today's events.";
+      errorElement.textContent =
+        "Start time must be after the current time for today's events.";
       errorElement.classList.remove("hidden");
       return;
     }
@@ -202,3 +204,5 @@ function editEvent(eventId) {
       .catch((err) => console.error("Error updating event:", err));
   };
 }
+
+function toggleGoing(eventId) {}
