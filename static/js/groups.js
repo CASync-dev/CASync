@@ -98,6 +98,8 @@ async function submitGroupCreation() {
 function addGroupToPage(group) {
   const groupList = document.getElementById("groups-list");
   const liGroup = document.createElement("li");
+  liGroup.id = `group-${group.id}`;
+
   const memberAvatars = group.members.map(member => {
     return `
       <img
@@ -118,7 +120,7 @@ function addGroupToPage(group) {
       <div class="ml-4">
         <!-- Group Name -->
         <p class="text-xl font-medium">
-          ${ group.group_name }
+          ${group.group_name}
         </p>
 
         <!-- Member Avatars -->
@@ -131,7 +133,7 @@ function addGroupToPage(group) {
     <!-- Buttons -->
     <button
       class="btn-plain mt-2 px-3 sm:ml-auto py-2 bg-red-300 text-nearwhite rounded-lg hover:bg-red-400"
-      onclick="leaveGroup('{{ group.id }}')"
+      onclick="leaveGroup(${group.id})"
     >
       <i class="fas fa-sign-out-alt"></i>
       Leave
@@ -145,7 +147,7 @@ function addGroupToPage(group) {
   </button>
   <button
     class = "btn-plain bg-dark rounded-lg sm:rounded-full px-4 py-3"
-    onclick = "openGroupDetail(); loadGroupMembers('{{ group.id }}')">
+    onclick = "getGroupId(${group.id}); openGroupDetail(); loadGroupMembers()">
     <i class = "fas fa-info text-nearwhite text-center"></i>
     <div class = "text-nearwhite sm:hidden">
       Details
