@@ -367,6 +367,10 @@ async function loadGroupMembers() {
     // Render title
     gnameTitle.innerText = group.group_name;
 
+    // Render member count
+    const memberCount = document.getElementById("member-count");
+    memberCount.innerText = `(${group.members.length})`;
+
       // Undecided whether want to add removal or not, or just let them leave by themselves (cuz anyone can remove from group)
       // <button class="btn-plain px-3 ml-auto py-2 bg-red-300 text-white rounded-lg hover:bg-red-400" onclick="removeFriend('${member.id}')">
       //     <i class="fas fa-user-times"></i>
