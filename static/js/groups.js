@@ -74,13 +74,13 @@ async function submitGroupCreation() {
       }),
     });
 
+    //  Flask returns JSON response
+    const data = await response.json();
+
     // Error
     if (!response.ok) {
       throw new Error(data.error || "Something went wrong");
     }
-
-    //  Flask returns JSON response
-    const data = await response.json();
 
     // // Add new group to page
     addGroupToPage(data.group);
@@ -159,10 +159,11 @@ function addGroupToPage(group) {
 async function updateGroupAvatarsInPage(groupId) {
   try {
     const response = await fetch(`/api/group/${groupId}`);
-    if (!response.ok) {
-      throw new Error("Could not fetch group members");
-    }
     const group = await response.json();
+
+    if (!response.ok) {
+      throw new Error(group.error || "Could not fetch group members");
+    }
 
     // Referencing addGroupToPage, but only for avatars
     const memberAvatars = group.members.map(member => {
@@ -210,12 +211,12 @@ async function loadFriends(excludeIds = []) {
       headers: { "X-CSRFToken": token, "Content-Type": "application/json" },
     });
 
+    // Flask sends JSON, JS converts to JS object
+    const data = await response.json();
+
     if (!response.ok) {
       throw new Error(data.error || "Could not load friends");
     }
-
-    // Flask sends JSON, JS converts to JS object
-    const data = await response.json();
 
     const friendsList = document.getElementById("friend-search-list");
     friendsList.innerHTML = "";
@@ -309,12 +310,12 @@ async function confirmLeaveGroup() {
       body: JSON.stringify({ group_id: groupId }),
     })
 
+    // Flask sends JSON, JS converts to JS object
+    const data = await response.json();
+
     if (!response.ok) {
       throw new Error(data.error || "Could not delete group");
     }
-
-    // Flask sends JSON, JS converts to JS object
-    const data = await response.json();
 
     document.getElementById(`group-${groupId}`).remove();
     document.getElementById('remove-confirmation').close();
@@ -345,10 +346,10 @@ async function loadGroupMembers() {
 
   try {
     const response = await fetch(`/api/group/${window.currentGroupId}`);
-    if (!response.ok) {
-      throw new Error("Could not fetch group members");
-    }
     const group = await response.json();
+    if (!response.ok) {
+      throw new Error(group.error || "Could not fetch group members");
+    }
 
     // Render members
     const container = document.getElementById('add-members-list');
@@ -390,11 +391,10 @@ async function openAddMemberModal() {
   // Fetch current group member details
   try {
     const response = await fetch(`/api/group/${window.currentGroupId}`);
-    if (!response.ok) {
-      throw new Error("Could not fetch group details");
-    }
-
     const group = await response.json();
+    if (!response.ok) {
+      throw new Error(group.error || "Could not fetch group details");
+    }
 
     // Set group name for display (reuses groupname variable)
     groupname = group.group_name;
