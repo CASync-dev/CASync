@@ -178,6 +178,7 @@ def friends_status():
         result.append({
             'id': friend.id,
             'username': friend.username,
+            "email": friend.email,
             'avatar_url': friend.avatar(150),
             'in_class': in_class
         })

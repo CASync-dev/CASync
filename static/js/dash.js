@@ -58,18 +58,17 @@ function renderFriendsStatus(friends_status) {
     if (friend.status === "offline") continue;
 
     const li = document.createElement("li");
-    li.className = "py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200";
+    li.className =
+      "py-4 flex items-center bg-blue-600 justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200";
     li.innerHTML = `
-      <div class="flex items-center">
+      <div class="flex items-center ">
         <img class="h-15 w-15 rounded-full" src="${friend.avatar_url}" alt="${friend.username}'s avatar" />
         <div class="ml-4">
           <p class="text-sm font-medium text-white">${friend.username}</p>
-          <p class="text-sm text-gray-300">${friend.email}</p>
+          <p class="text-sm text-gray-600">${friend.email}</p>
         </div>
       </div>
-      <button class="btn-plain px-3 ml-auto py-2 bg-red-300 text-white rounded-lg hover:bg-red-400">
-        <i class="fas fa-user-times"></i>
-      </button>
+
       <button class="btn-plain px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400">
         <i class="fas fa-calendar-alt"></i>
         Schedule
