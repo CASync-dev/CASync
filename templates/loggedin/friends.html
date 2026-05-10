@@ -1,10 +1,9 @@
 {% extends "loggedin/layout.html" %} {% block content %}
-<div
-  class="mx-4 2xl:max-w-7xl 2xl:mx-auto px-4 bg-primary py-8 mt-6 rounded-xl"
->
-  <!-- top bar -->
-  <div class="flex items-center pb-3 border-b border-gray-300">
-    <h1 class="text-3xl font-bold text-white">Friends</h1>
+<!-- TODO: Add schedules to groups -->
+  <div class="mx-4 2xl:max-w-7xl 2xl:mx-auto px-4 py-8 mt-6 rounded-xl">
+    <!-- top bar -->
+    <div class="flex max-sm:flex-col items-center pb-3 border-b border-gray-300">
+      <h1 class="text-3xl font-bold">Friends</h1>
     <!-- search bar -->
     <div class="relative ml-4">
       <input
@@ -15,17 +14,17 @@
       />
     </div>
     <div
-      class="flex ml-auto gap-2 sm:flex-row flex-col items-end sm:items-center mt-2 sm:mt-0"
+      class="flex ml-auto max-sm:ml-0 gap-2 flex-row max-lg:flex-col max-sm:inline items-end max-sm:items-center mt-2 sm:mt-0"
     >
       <button
-        class="btn-white px-4 mr-2 h-10 whitespace-nowrap"
+        class="btn-primary shadow-black max-sm:w-full px-4 ml-auto max-sm:ml-0 mr-2 max-sm:mr-0  h-10 whitespace-nowrap cursor-pointer"
         command="show-modal"
         commandfor="friend-requests-modal"
       >
         Friend Requests ({{ friend_requests|length }})
       </button>
       <button
-        class="btn-white px-4 h-10 whitespace-nowrap"
+        class="btn-primary shadow-black max-sm:w-full px-4 ml-auto mr-2 max-sm:ml-0 max-sm:mr-0 h-10 whitespace-nowrap cursor-pointer"
         command="show-modal"
         commandfor="add-friend-modal"
       >
@@ -48,8 +47,8 @@
             alt="{{ friend.username }}'s avatar"
           />
           <div class="ml-4">
-            <p class="text-sm font-medium text-white">{{ friend.username }}</p>
-            <p class="text-sm text-gray-300">{{ friend.email }}</p>
+            <p class="text-sm font-medium text-gray-700">{{ friend.username }}</p>
+            <p class="text-sm text-gray-300 max-sm:hidden">{{ friend.email }}</p>
           </div>
         </div>
         <button
@@ -63,7 +62,7 @@
           onclick="openFriendSchedule('{{ friend.id }}', '{{ friend.username }}')"
         >
           <i class="fas fa-calendar-alt"></i>
-          Schedule
+          <span class="max-sm:hidden">Schedule</span>
         </button>
       </li>
       {% endfor %}
