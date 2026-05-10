@@ -49,6 +49,17 @@ async function getFriends_status() {
   }
 }
 
+function displayTimeTillNextClass(time) {
+  if (time === null) return `No more classes today`;
+
+  const hours = Math.floor(time / 60);
+  const minutes = time % 60;
+
+  if (hours === 0 && minutes > 0) return `${minutes} minutes`;
+  if (minutes === 0 && hours > 0) return `${hours} hour`;
+  return `${hours}:${String(minutes).padStart(2, "0")} minutes`;
+}
+
 function renderFriendsStatus(friends_status) {
   const container = document.getElementById("friends-list");
   if (!container) return;
@@ -75,10 +86,9 @@ function renderFriendsStatus(friends_status) {
         </div>
       </div>
 
-      <button class="btn-plain px-3 py-2 bg-slate-200 text-dark rounded-lg hover:bg-blue-400">
-        <i class="fas fa-calendar-alt"></i>
-        Schedule
-      </button>
+      <p class=" px-3 py-2 text-gray-700 text-sm sm:text-base">
+        ${displayTimeTillNextClass(friend.minutes_next_class)}
+      </p>
     `;
     container.appendChild(li);
   }
