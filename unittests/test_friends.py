@@ -5,7 +5,7 @@ from app.config import TestConfig
 class FriendsTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app(config_class=TestConfig())
-        self.app.config['WTF_CSRF_ENABLED'] # Disables CSRF during tests
+        self.app.config['WTF_CSRF_ENABLED'] = False # Disables CSRF during tests
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
