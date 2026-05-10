@@ -8,7 +8,7 @@
       <h2 class="text-2xl font-semibold text-gray-800 mb-1"><i class="fa-solid fa-address-book text-black"></i> Profile</h2>
        
     <div id="profile-settings" class="mt-2 sm:mx-auto py-3">
-      <div class="flex flex-row gap-6 items-center">
+      <div class="flex flex-row max-sm:flex-col gap-6 items-center">
         <button class="relative group cursor-pointer shrink-0 rounded-full" command="show-modal" commandfor="changepfp-modal">
           <img id = "pfp" src="{{current_user.avatar(150)}}" class="h-24 w-24 rounded-full" />
           <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200">
@@ -16,22 +16,22 @@
           </div>
         </button>
         <div class="flex flex-col gap-3 flex-1">
-          <div class="flex flex-row justify-between items-center">
+          <div class="flex flex-row max-sm:flex-col justify-between items-center">
             <p class="text-gray-500">Username: <span id = "username"> {{current_user.username}} </span></p>
             <button
               command="show-modal"
               commandfor="changeuser-modal"
-              class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer shadow-2xl hover:shadow transition duration-200 w-1/2"
+              class="bg-gray-300 rounded-2xl inline-block max-sm:w-full py-2 px-2 cursor-pointer shadow-2xl hover:shadow transition duration-200 w-1/2"
             >
               Change Username
             </button>
           </div>
-          <div class="flex flex-row justify-between items-center">
+          <div class="flex flex-row max-sm:flex-col justify-between items-center">
             <p class="text-gray-500">Email: <span id = "email"> {{current_user.email}} </span></p>
             <button
               command="show-modal"
               commandfor="changemail-modal"
-              class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer shadow-2xl hover:shadow transition duration-200 w-1/2"
+              class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer max-sm:w-full shadow-2xl hover:shadow transition duration-200 w-1/2"
             >
               Change Email
             </button>
@@ -74,7 +74,7 @@
         class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm" ) }}
         <div class="flex ml-4">
           {{ form.submit(class="ml-4 bg-green-600 text-white py-2 px-4
-          rounded-md text-sm hover:bg-green-700 cursor-pointer") }}
+          rounded-md text-sm hover:bg-green-700 cursor-pointer max-sm:ml-2") }}
         </div>
       </div>
       {% with messages = get_flashed_messages(with_categories=true) %} {% for
