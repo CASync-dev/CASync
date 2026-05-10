@@ -197,6 +197,7 @@ function editEvent(eventId) {
         return response.json();
       })
       .then((updatedEvent) => {
+        // After successfully updating the event, we dispatch a custom event that the cal block listens for to update our local list and re-render the calendar
         document.dispatchEvent(
           new CustomEvent("calendar:event-updated", { detail: updatedEvent }),
         );
@@ -205,4 +206,19 @@ function editEvent(eventId) {
   };
 }
 
-function toggleGoing(eventId) {}
+function toggleGoing(eventId) {
+  fetch(`/api/events/${eventId}/toggle_going`, {
+    method: "POST",
+    headers: { "X-CSRFToken": CSRF },
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("Failed to toggle going");
+      return response.json();
+    })
+    .then((updatedEvent) => {
+      document.dispatchEvent(
+        new CustomEvent("calendar:event-updated", { detail: updatedEvent }),
+      );
+    })
+    .catch((err) => console.error("Error toggling going:", err));
+}

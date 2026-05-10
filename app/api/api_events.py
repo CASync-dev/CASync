@@ -254,3 +254,16 @@ def api_edit_event(event_id):
     event.color = data.get('color', 'indigo')
     db.session.commit()
     return jsonify(event.to_dict()), 200
+
+@api_events.route("/api/events/<int:event_id>/toggle_going", methods=["POST"])
+@login_required
+def api_toggle_going(event_id):
+    event = Event.query.get(event_id)
+    if not event:
+        return jsonify({"error": "Event not found"}), 404
+    if event.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized"}), 403
+    # toggle the going status
+    event.going = not event.going
+    db.session.commit()
+    return jsonify({"going": event.going}), 200
