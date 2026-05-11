@@ -24,7 +24,77 @@ function updateTime() {
   document.getElementById("period").innerText = timeParts[1] ?? "";
 }
 
-// dynamic stuff for the calendar events -------------------------------------
+// ----------------------dynamic stuff for the friends list -------------------------------------
+
+// craft the url for fetching events: format is /api/friends_status?now
+function getFriendsBaseUrl() {
+  let apiUrl = "/api/friendsstatus";
+  const now = new Date();
+  
+  apiUrl += `?now=${now.toISOString()}`;
+  
+  return apiUrl;
+}
+
+async function getFriends_status() {
+  let friends_status = null;
+  try {
+    const res = await fetch(getFriendsBaseUrl());
+    if (!res.ok) throw new Error(res.statusText);
+    friends_status = await res.json(); // store it here
+    // renderCalendar(events);
+    return friends_status;
+  } catch (err) {
+    console.error('fetch error', err);
+  }
+}
+
+function displayTimeTillNextClass(time) {
+  if (time === null) return `No more classes today`;
+
+  const hours = Math.floor(time / 60);
+  const minutes = time % 60;
+
+  if (hours === 0 && minutes > 0) return `${minutes} minutes`;
+  if (minutes === 0 && hours > 0) return `${hours} hour`;
+  return `${hours}:${String(minutes).padStart(2, "0")} hours`;
+}
+
+function renderFriendsStatus(friends_status) {
+  const container = document.getElementById("friends-list");
+  if (!container) return;
+  container.innerHTML = "";
+
+  if (!Array.isArray(friends_status) || friends_status.length === 0) {
+    container.innerHTML =
+      '<p class="text-sm text-gray-600">No friends :( add some friends in the friends section.</p>';
+    return;
+  }
+
+  for (const friend of friends_status) {
+    if (friend.status === "offline") continue;
+
+    const li = document.createElement("li");
+    li.className =
+      "py-4 flex items-center bg-blue-600 justify-between rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-md ring-white transition duration-200";
+    li.innerHTML = `
+      <div class="flex items-center ">
+        <img class="h-15 w-15 rounded-full" src="${friend.avatar_url}" alt="${friend.username}'s avatar" />
+        <div class="ml-4">
+          <p class="text-sm font-medium text-white">${friend.username}</p>
+          <p class="hidden sm:block text-sm text-white">${friend.email}</p>
+        </div>
+      </div>
+
+      <p class=" px-3 py-2 text-white text-sm sm:text-base">
+        ${displayTimeTillNextClass(friend.minutes_next_class)}
+      </p>
+    `;
+    container.appendChild(li);
+  }
+}
+
+// -------------------- dynamic stuff for the calendar events -------------------------------------
 
 // craft the url for fetching events: format is /api/events/me?start=2026-05-06&end=2026-05-07
 function getCalendarBaseUrl() {
@@ -38,8 +108,8 @@ function getCalendarBaseUrl() {
 }
 
 //  GET /api/events/me?start=2026-05-06&end=2026-05-07
-let events = null;
 async function loadEvents() {
+  let events = null;
   try {
     const res = await fetch(getCalendarBaseUrl());
     if (!res.ok) throw new Error(res.statusText);
@@ -128,7 +198,7 @@ function formatTime(totalMinutes) {
   if (hours === 0 && minutes > 0) return `${minutes} minutes`;
   if (minutes === 0 && hours > 0) return `${hours} hour`;
   if (minutes === 0 && hours === 0) return `RIGHT NOW`;
-  return `${hours}:${String(minutes).padStart(2, "0")} minutes`;
+  return `${hours}:${String(minutes).padStart(2, "0")} hours`;
 }
 
 // function for renderign the big card on the dashboard with the next upcoming event
@@ -137,7 +207,8 @@ function bigCard(nextEvent) {
   if (!bigCardEl) return;
 
   if (!nextEvent) {
-    bigCardEl.innerHTML = '<p class="text-gray-600">No upcoming events.</p>';
+    bigCardEl.innerHTML =
+      '<p class="text-gray-600">All done! No more events today.</p>';
     return;
   }
 
@@ -184,7 +255,7 @@ function renderDashboardEvents(processed) {
       events.push(ev);
     }
   }
-  events = events.slice(0, 5); // limit to 5 events for performance and to avoid overwhelming the user
+  //events = events.slice(0, 5); // limit to 5 events for performance and to avoid overwhelming the user
   // call function to render data for the big card, or clear it if nothing is left
   if (events.length > 0) {
     bigCard(events[0]);
@@ -193,8 +264,7 @@ function renderDashboardEvents(processed) {
   }
 
   if (todays.length - 1 <= 0) {
-    container.innerHTML =
-      '<p class="text-sm text-gray-600">All done! No more events today.</p>';
+    container.innerHTML = "";
     return;
   }
   events.slice(1).forEach((ev) => {
