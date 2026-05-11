@@ -57,7 +57,7 @@ function displayTimeTillNextClass(time) {
 
   if (hours === 0 && minutes > 0) return `${minutes} minutes`;
   if (minutes === 0 && hours > 0) return `${hours} hour`;
-  return `${hours}:${String(minutes).padStart(2, "0")} minutes`;
+  return `${hours}:${String(minutes).padStart(2, "0")} hours`;
 }
 
 function renderFriendsStatus(friends_status) {
@@ -82,11 +82,11 @@ function renderFriendsStatus(friends_status) {
         <img class="h-15 w-15 rounded-full" src="${friend.avatar_url}" alt="${friend.username}'s avatar" />
         <div class="ml-4">
           <p class="text-sm font-medium text-white">${friend.username}</p>
-          <p class="text-sm text-gray-700">${friend.email}</p>
+          <p class="hidden sm:block text-sm text-white">${friend.email}</p>
         </div>
       </div>
 
-      <p class=" px-3 py-2 text-gray-700 text-sm sm:text-base">
+      <p class=" px-3 py-2 text-white text-sm sm:text-base">
         ${displayTimeTillNextClass(friend.minutes_next_class)}
       </p>
     `;
@@ -198,7 +198,7 @@ function formatTime(totalMinutes) {
   if (hours === 0 && minutes > 0) return `${minutes} minutes`;
   if (minutes === 0 && hours > 0) return `${hours} hour`;
   if (minutes === 0 && hours === 0) return `RIGHT NOW`;
-  return `${hours}:${String(minutes).padStart(2, "0")} minutes`;
+  return `${hours}:${String(minutes).padStart(2, "0")} hours`;
 }
 
 // function for renderign the big card on the dashboard with the next upcoming event
