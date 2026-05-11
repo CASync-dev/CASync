@@ -266,4 +266,4 @@ def api_toggle_going(event_id):
     # toggle the going status
     event.going = not event.going
     db.session.commit()
-    return jsonify({"going": event.going}), 200
+    return jsonify({"id": event.id, "user_id": event.user_id, "going": event.going}), 200

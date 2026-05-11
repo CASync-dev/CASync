@@ -428,11 +428,13 @@ The general flow of it is:
 
       // going/not going toggle (all event get one)
       const goingToggle = document.createElement('button');
-      goingToggle.className = 'bg-green-500 text-white rounded p-1 hover:bg-green-600';
+      goingToggle.className = event.going ? 'bg-green-500 text-white rounded p-1 hover:bg-green-600' : 'bg-gray-500 text-white rounded p-1 hover:bg-gray-600';
       goingToggle.innerHTML = event.going ? `<i class="fa-solid fa-check"></i>` : `<i class="fa-solid fa-xmark"></i>`;
       goingToggle.title = event.going ? 'Mark as not going' : 'Mark as going';
       // toggleGoing is defined in static/js/schedule.js
-      goingToggle.addEventListener('click', () => toggleGoing(event.id));
+      goingToggle.classList.add('going-toggle');
+      goingToggle.dataset.eventId = event.id;
+      goingToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleGoing(event.id); });
       buttonStack.appendChild(goingToggle);
       details.appendChild(buttonStack);
 
@@ -685,7 +687,7 @@ The general flow of it is:
       // Route to the correct builder based on event type: multi-events get their own card builder.
       const cardHeight = ((endMinutes - startMinutes) / 60) * cellHeight;
       const builder = event.type === 'multi' ? buildMultiEventCard : buildEventCard;
-      const card = builder(event, cardHeight, `event-${index}`);
+      const card = builder(event, cardHeight, `event-${event.id || index}`); // use event ID if available, otherwise fallback to index for multi-events
       // We store the day index and start/end minutes as data attributes on the card for later use in overlap calculations and expand direction.
       card.dataset.col = dayIndex;
       cell.appendChild(card);
@@ -815,7 +817,7 @@ The general flow of it is:
     setCalendarDates();
     updateTodayButton();
 
-    // Event listners to listen to the event mutaion features on schedule.html
+    // -- Event listeners to listen to the event changes from pages outside this block (edit, delete, update)
     document.addEventListener('calendar:event-created', (event) => {
       const newEvent = event.detail;
       const userId = String(newEvent.user_id);
@@ -832,6 +834,27 @@ The general flow of it is:
       );
       if (key) events[userId].events[key] = updatedEvent;
       renderDesktopEvents();
+    });
+
+    document.addEventListener('calendar:going-toggled', (event) => {
+      const updatedEvent = event.detail;
+      const userId = String(updatedEvent.user_id);
+      const key = Object.keys(events[userId]?.events ?? {}).find(
+        k => events[userId].events[k].id === updatedEvent.id
+      );
+      if (key) events[userId].events[key] = updatedEvent;
+
+      const btn = document.querySelector(`[data-event-id="${updatedEvent.id}"].going-toggle`);
+      if (btn) {
+        btn.className = updatedEvent.going
+          ? 'going-toggle bg-green-500 text-white rounded p-1 hover:bg-green-600'
+          : 'going-toggle bg-gray-500 text-white rounded p-1 hover:bg-gray-600';
+        btn.innerHTML = updatedEvent.going
+          ? '<i class="fa-solid fa-check"></i>'
+          : '<i class="fa-solid fa-xmark"></i>';
+        btn.title = updatedEvent.going ? 'Mark as not going' : 'Mark as going';
+        btn.dataset.eventId = updatedEvent.id;
+      }
     });
 
     document.addEventListener('calendar:event-deleted', (event) => {

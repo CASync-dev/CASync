@@ -217,7 +217,7 @@ function toggleGoing(eventId) {
     })
     .then((updatedEvent) => {
       document.dispatchEvent(
-        new CustomEvent("calendar:event-updated", { detail: updatedEvent }),
+        new CustomEvent("calendar:going-toggled", { detail: updatedEvent }),
       );
     })
     .catch((err) => console.error("Error toggling going:", err));
