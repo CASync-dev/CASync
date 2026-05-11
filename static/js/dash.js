@@ -81,9 +81,10 @@ function renderFriendsStatus(friends_status) {
       '<p class="text-sm text-gray-600">No friends :( add some friends in the friends section.</p>';
     return;
   }
-
+  let isfree = false;
   for (const friend of friends_status) {
     if (friend.status === "offline") continue;
+    isfree = true;
 
     const li = document.createElement("li");
     li.className =
@@ -102,6 +103,10 @@ function renderFriendsStatus(friends_status) {
       </p>
     `;
     container.appendChild(li);
+  }
+  if (!isfree) {
+    container.innerHTML =
+      '<p class="text-sm text-gray-600">No friends are free.</p>';
   }
 }
 
