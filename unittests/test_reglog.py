@@ -177,7 +177,8 @@ class RegLogTestCase(unittest.TestCase):
         html = response.get_data(as_text=True)
         assert 'Password must contain: one number.' in html
 
-        # Might want to expand this but uh....
+        # Might want to expand this (Just basically same things as above, only a slight change to try to detect 
+        # different variations of bad passwords)
 
     
 
