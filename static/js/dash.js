@@ -24,24 +24,20 @@ function updateTime() {
   document.getElementById("period").innerText = timeParts[1] ?? "";
 }
 
-
-
 // dynamic stuff for the calendar events -------------------------------------
 
 // craft the url for fetching events: format is /api/events/me?start=2026-05-06&end=2026-05-07
 function getCalendarBaseUrl() {
   let apiUrl = "/api/events/me";
   const now = new Date();
-  
-  const fmt = d => d.toLocaleDateString('en-CA');
+
+  const fmt = (d) => d.toLocaleDateString("en-CA");
   apiUrl += `?start=${fmt(now)}&end=${fmt(now)}`;
-  
+
   return apiUrl;
 }
 
-
-
-//  GET /api/events/me?start=2026-05-06&end=2026-05-07 
+//  GET /api/events/me?start=2026-05-06&end=2026-05-07
 let events = null;
 async function loadEvents() {
   try {
@@ -51,18 +47,15 @@ async function loadEvents() {
     // renderCalendar(events);
     return events;
   } catch (err) {
-    console.error('fetch error', err);
+    console.error("fetch error", err);
   }
 }
 
-
 // helper: parse "HH:MM" to minutes since midnight
-function parseTimeToMinutes(hhmm = '00:00') {
-  const [h, m] = hhmm.split(':').map(Number);
+function parseTimeToMinutes(hhmm = "00:00") {
+  const [h, m] = hhmm.split(":").map(Number);
   return (h || 0) * 60 + (m || 0);
 }
-
-
 
 /*
     {
@@ -90,60 +83,64 @@ function processEvents(eventsData) {
   if (!eventsData) return { flat: [], byDate: {} };
 
   // 1) flatten all users' events into an array
-  const flat = Object.values(eventsData).flatMap(user => Object.values(user.events)).map(e => {
-    const dateISO = e.date; // e.g. "2026-05-06"
-    const start = e.startTime ?? e.start_time ?? e.start ?? '00:00';
-    const end = e.endTime ?? e.end_time ?? e.end ?? '00:00';
-    return {
-      ...e,
-      dateISO,
-      dateObj: new Date(dateISO + 'T00:00'),
-      startMinutes: parseTimeToMinutes(start),
-      endMinutes: parseTimeToMinutes(end),
-    };
-  }).sort((a, b) => a.startMinutes - b.startMinutes);
+  const flat = Object.values(eventsData)
+    .flatMap((user) => Object.values(user.events))
+    .map((e) => {
+      const dateISO = e.date; // e.g. "2026-05-06"
+      const start = e.startTime ?? e.start_time ?? e.start ?? "00:00";
+      const end = e.endTime ?? e.end_time ?? e.end ?? "00:00";
+      return {
+        ...e,
+        dateISO,
+        dateObj: new Date(dateISO + "T00:00"),
+        startMinutes: parseTimeToMinutes(start),
+        endMinutes: parseTimeToMinutes(end),
+      };
+    })
+    .sort((a, b) => a.startMinutes - b.startMinutes);
 
   // 2) group by date and sort each day's events by start time
   const byDate = flat.reduce((acc, ev) => {
     (acc[ev.dateISO] ??= []).push(ev);
     return acc;
   }, {});
-  Object.values(byDate).forEach(arr => arr.sort((a, b) => a.startMinutes - b.startMinutes));
+  Object.values(byDate).forEach((arr) =>
+    arr.sort((a, b) => a.startMinutes - b.startMinutes),
+  );
 
   return { flat, byDate };
 }
 
 // Convert 24-hour time (HH:MM) to 12-hour format with AM/PM
-function formatHHMM(hhmm = '00:00') {
-  const [h, m] = (hhmm || '00:00').split(':').map(Number);
-  const period = (h || 0) < 12 ? 'AM' : 'PM';
+function formatHHMM(hhmm = "00:00") {
+  const [h, m] = (hhmm || "00:00").split(":").map(Number);
+  const period = (h || 0) < 12 ? "AM" : "PM";
   const hour = (h || 0) % 12 || 12;
-  return `${hour}:${String(m || 0).padStart(2,'0')} ${period}`;
+  return `${hour}:${String(m || 0).padStart(2, "0")} ${period}`;
 }
 
-// Convert minutes to human-readable time remaining (e.g., "45 minutes" or "1:30 minutes") 
+// Convert minutes to human-readable time remaining (e.g., "45 minutes" or "1:30 minutes")
 // for the big card event in minutes until the next event starts
 function formatTime(totalMinutes) {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  
+
   if (hours === 0 && minutes > 0) return `${minutes} minutes`;
   if (minutes === 0 && hours > 0) return `${hours} hour`;
   if (minutes === 0 && hours === 0) return `RIGHT NOW`;
-  return `${hours}:${String(minutes).padStart(2, '0')} minutes`;
+  return `${hours}:${String(minutes).padStart(2, "0")} minutes`;
 }
 
 // function for renderign the big card on the dashboard with the next upcoming event
 function bigCard(nextEvent) {
-  const bigCardEl = document.getElementById('big-card');
+  const bigCardEl = document.getElementById("big-card");
   if (!bigCardEl) return;
 
   if (!nextEvent) {
-
     bigCardEl.innerHTML = '<p class="text-gray-600">No upcoming events.</p>';
     return;
   }
-  
+
   const now = new Date();
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
   let minutesUntil = nextEvent.startMinutes - nowMinutes;
@@ -158,9 +155,8 @@ function bigCard(nextEvent) {
       </h4>
       <span class="text-3xl flex-1">${nextEvent.title}</span>
       <span class="text-lg text-gray-500 shrink-0">${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)} – ${formatHHMM(nextEvent.endTime ?? nextEvent.end_time)}</span>
-      <span class="text-lg text-gray-500 shrink-0">
-          ${nextEvent.location ? `@ ${nextEvent.location}` : ''}
-      </span>
+      ${nextEvent.going === false ? `<span class="text-lg text-red-500 shrink-0">[Not Going]</span>` : `<span class="text-lg text-gray-500 shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`}
+      
       <div class="flex"><!-- avatars --></div>
   `;
 }
@@ -219,27 +215,27 @@ function renderDashboardEvents(processed) {
 
 let processedEvs = null;
 
-
 // Every second — clock only
 setInterval(updateTime, 1000);
 
 // Every minute — re-render cards (handles event transitions)
 setInterval(() => {
-    if (processedEvs) renderDashboardEvents(processedEvs);
+  if (processedEvs) renderDashboardEvents(processedEvs);
 }, 60 * 1000);
 
 // Every 5 minutes — re-fetch from API (handles new/changed events)
-setInterval(async () => {
-  const fresh = await loadEvents();
-  processedEvs = processEvents(fresh);
-  renderDashboardEvents(processedEvs);
-  
-}, 5 * 60 * 1000);
+setInterval(
+  async () => {
+    const fresh = await loadEvents();
+    processedEvs = processEvents(fresh);
+    renderDashboardEvents(processedEvs);
+  },
+  5 * 60 * 1000,
+);
 
 // run once immediately on load
 updateTime();
-loadEvents().then(events => {
+loadEvents().then((events) => {
   processedEvs = processEvents(events);
   renderDashboardEvents(processedEvs);
 });
-
