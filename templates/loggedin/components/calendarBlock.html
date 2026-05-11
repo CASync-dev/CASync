@@ -7,7 +7,7 @@ A component is a reusable piece of code that can be used to create a specific UI
 - days: an array of day names (e.g. ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
 - timeRange: a range of time in 24 hour digits (e.g. 8, 18 for 8am to 6pm)
 - includeNav: a boolean that determines whether to include navigation buttons for switching between weeks
-- allowEventCreation: a boolean that determines whether to include a "New Event" button that opens the event creation drawer (note the drawer is not included in this component)
+- isSchedulePage: a boolean that determines whether to include a "New Event" button that opens the event creation drawer (note the drawer is not included in this component) aswell as mutation buttons
 - eventUrl: the api endpoint to fetch events from, the component will handle fetching and rendering events onto the calendar grid
 - enableAdaptiveDateCalls: Many api routes will require a date range to be parsed as a query paramater in the format ?start=YYYY-MM-DD&end=YYYY-MM-DD
   If this is enabled, the component will automatically calculate the correct start and end dates based on the current week being viewed and include those in the api call to fetch events.
@@ -37,7 +37,7 @@ The general flow of it is:
   - Handle week navigation by updating the header and re-rendering events for the new week
 -->
 
-{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true, timeRange=(8, 18), allowEventCreation=false, clipVerticalOverflow=false) -%}
+{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true, timeRange=(8, 18), isSchedulePage=false, clipVerticalOverflow=false) -%}
 <div class="container-loggedin">
   <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
   <div class="sticky top-0 z-20 bg-stone-50 ">
@@ -55,10 +55,10 @@ The general flow of it is:
           Today, Month YYYY
         </h6>
       </div>
-      {% if allowEventCreation %}
+      {% if isSchedulePage %}
       <!-- New Activity Button -->
       <button
-        class="btn-primary hidden md:block flex gap-2 transition-all duration-300"
+        class="btn-primary hidden md:flex gap-2 transition-all duration-300"
         command="show-modal"
         commandfor="drawer"
       >
@@ -175,7 +175,7 @@ The general flow of it is:
       gray: { bg: 'bg-gray-100', border: 'border-gray-500', text: 'text-gray-800' },
       yellow: { bg: 'bg-yellow-100', border: 'border-yellow-500', text: 'text-yellow-800' },
     };
-    event_color_map = {};
+    const event_color_map = {};
 
     // CSRF token for API requests, we read it from the meta tag that the server renders into the page
     const CSRF = document.querySelector('meta[name="csrf-token"]').content;
@@ -317,7 +317,7 @@ The general flow of it is:
       } else {
         // if adaptive data calls is not enabled it means the url provided expects no date query param and will return all events
         let apiUrl = calendarBaseUrl;
-                fetch(apiUrl)
+          fetch(apiUrl)
           .then((response) => response.json())
           .then((data) => {
             lastFetchedStart = startDate;
@@ -329,16 +329,6 @@ The general flow of it is:
             console.error('Error loading events:', error);
           });
       }
-
-      fetch(apiUrl)
-        .then((response) => response.json())
-        .then((data) => {
-          events = data;
-          renderDesktopEvents();
-        })
-        .catch((error) => {
-          console.error('Error loading events:', error);
-        });
     }
 
     // ── Event card builder
@@ -346,7 +336,7 @@ The general flow of it is:
     // The card is positioned absolutely inside its host cell and sized to span
     // the correct number of rows based on the event duration.
     function buildEventCard(event, heightPx, id) {
-      event_class = event.title.split(',')[0].toLowerCase(); // get the first part of the title as the class (e.g. "CS 101, Lecture" → "cs 101")
+      let event_class = event.title.split(',')[0].toLowerCase(); // get the first part of the title as the class (e.g. "CS 101, Lecture" → "cs 101")
       if (!event_color_map[event_class]) {
         // If this class doesn't have a color assigned yet, assign the next available color from COLOR_MAP
         const usedColors = new Set(Object.values(event_color_map));
@@ -362,11 +352,11 @@ The general flow of it is:
       const card = document.createElement('div');
       card.id = id;
       if (!event.color) {
-        colors = COLOR_MAP[event_color_map[event_class]];
+        var colors = COLOR_MAP[event_color_map[event_class]];
       } else if (event.color && COLOR_MAP[event.color]) {
-        colors = COLOR_MAP[event.color];
+        var colors = COLOR_MAP[event.color];
       } else {
-        colors = COLOR_MAP['gray'];
+        var colors = COLOR_MAP['gray'];
       }
       card.className = [
         'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
@@ -376,6 +366,11 @@ The general flow of it is:
       ].join(' ');
       card.style.height = `${heightPx - 4}px`;
       card.dataset.collapsedHeight = `${heightPx - 4}px`;
+
+      // If event marked as not going, gray it out to indicate this
+      if (event.going === false) {
+        card.classList.add('opacity-50');
+      }
 
       // Event title — always shown
       const title = document.createElement('p');
@@ -414,24 +409,42 @@ The general flow of it is:
       `;
       card.appendChild(details);
 
-      // if the event has no ical_id, it means it was created by the user and can be edited/deleted
-      if (event.ical_id === null) {
-        // we add a little badge to the top right corner to indicate it is a custom event
-        const badge = document.createElement('span');
-        badge.className = 'inline-block w-2 h-2 bg-blue-500 rounded-full ml-2';
-        badge.title = 'User-created event';
-        card.children[0].appendChild(badge);
+      {# Mutation buttons are only shown on the schedule page #}
+      {% if isSchedulePage %}
+        // if the event has no ical_id, it means it was created by the user and can be edited/deleted
+        const buttonStack = document.createElement('div');
+        buttonStack.className = 'flex flex-col gap-1 ml-auto';
 
-        // delete + edit btns stacked vertically
-        details.innerHTML += `<div class="flex flex-col gap-1 ml-auto">
-          <button class="bg-red-500 text-white rounded p-1 hover:bg-red-600" onclick="deleteEvent('${event.id}')">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-          <button class="bg-blue-500 text-white rounded p-1 hover:bg-blue-600" onclick="editEvent('${event.id}')">
-            <i class="fa-solid fa-pen-to-square"></i>
-          </button>
-        </div>`;
-      }
+        if (event.ical_id === null) {
+          // we add a little badge to the top right corner to indicate it is a custom event
+          const badge = document.createElement('span');
+          badge.className = 'inline-block w-2 h-2 bg-blue-500 rounded-full ml-2';
+          badge.title = 'User-created event';
+          card.children[0].appendChild(badge);
+
+          // delete + edit btns stacked vertically
+          // deleteEvent and editEvent are defined in static/js/schedule.js
+          buttonStack.innerHTML = `
+            <button class="bg-red-500 text-white rounded p-1 hover:bg-red-600" onclick="deleteEvent('${event.id}')">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+            <button class="bg-blue-500 text-white rounded p-1 hover:bg-blue-600" onclick="editEvent('${event.id}')">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>`;
+        }
+
+        // going/not going toggle (all event get one)
+        const goingToggle = document.createElement('button');
+        goingToggle.className = event.going ? 'bg-gray-500 text-white rounded p-1 hover:bg-gray-600 mt-auto' : 'bg-green-500 text-white rounded p-1 hover:bg-green-600 mt-auto';
+        goingToggle.innerHTML = event.going ? `<i class="fa-solid fa-xmark"></i>` : `<i class="fa-solid fa-check"></i>`;
+        goingToggle.title = event.going ? 'Mark as not going' : 'Mark as going';
+        // toggleGoing is defined in static/js/schedule.js
+        goingToggle.classList.add('going-toggle');
+        goingToggle.dataset.eventId = event.id;
+        goingToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleGoing(event.id); });
+        buttonStack.appendChild(goingToggle);
+        details.appendChild(buttonStack);
+      {% endif %}
 
       card.addEventListener('click', () => {
         const isExpanded = card.classList.contains('expanded');
@@ -574,6 +587,7 @@ The general flow of it is:
 
       return card;
     }
+    
 
     // ── Grid helpers
 
@@ -681,7 +695,7 @@ The general flow of it is:
       // Route to the correct builder based on event type: multi-events get their own card builder.
       const cardHeight = ((endMinutes - startMinutes) / 60) * cellHeight;
       const builder = event.type === 'multi' ? buildMultiEventCard : buildEventCard;
-      const card = builder(event, cardHeight, `event-${index}`);
+      const card = builder(event, cardHeight, `event-${event.id || index}`); // use event ID if available, otherwise fallback to index for multi-events
       // We store the day index and start/end minutes as data attributes on the card for later use in overlap calculations and expand direction.
       card.dataset.col = dayIndex;
       cell.appendChild(card);
@@ -811,7 +825,7 @@ The general flow of it is:
     setCalendarDates();
     updateTodayButton();
 
-    // Event listners to listen to the event mutaion features on schedule.html
+    // -- Event listeners to listen to the event changes from pages outside this block (edit, delete, update)
     document.addEventListener('calendar:event-created', (event) => {
       const newEvent = event.detail;
       const userId = String(newEvent.user_id);
@@ -828,6 +842,39 @@ The general flow of it is:
       );
       if (key) events[userId].events[key] = updatedEvent;
       renderDesktopEvents();
+    });
+
+    document.addEventListener('calendar:going-toggled', (event) => {
+      // detect changes to toggle from schedule.js and update the button state without needing to refetch and rerender everything
+      const updatedEvent = event.detail;
+      const userId = String(updatedEvent.user_id);
+      const key = Object.keys(events[userId]?.events ?? {}).find(
+        k => events[userId].events[k].id === updatedEvent.id
+      );
+      if (key) events[userId].events[key] = updatedEvent;
+      // change the button state
+      const btn = document.querySelector(`[data-event-id="${updatedEvent.id}"].going-toggle`);
+      if (btn) {
+        btn.className = updatedEvent.going
+          ? 'going-toggle bg-gray-500 text-white rounded p-1 hover:bg-gray-600 mt-auto'
+          : 'going-toggle bg-green-500 text-white rounded p-1 hover:bg-green-600 mt-auto';
+        btn.innerHTML = updatedEvent.going
+          ? '<i class="fa-solid fa-xmark"></i>'
+          : '<i class="fa-solid fa-check"></i>';
+        btn.title = updatedEvent.going ? 'Mark as not going' : 'Mark as going';
+        btn.dataset.eventId = updatedEvent.id;
+      }
+      // change the div opacity
+      const card = document.getElementById(`event-${updatedEvent.id}`);
+      if (card) {
+        if (updatedEvent.going === false) {
+          card.classList.add('opacity-50');
+          card.title = 'You are not going to this event';
+        } else {
+          card.classList.remove('opacity-50');
+          card.title = '';
+        }
+      }
     });
 
     document.addEventListener('calendar:event-deleted', (event) => {

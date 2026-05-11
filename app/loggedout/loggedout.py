@@ -8,6 +8,10 @@ from app import db
 loggedout = Blueprint('loggedout', __name__, template_folder='../templates/loggedout', static_folder='../static')
 
 @loggedout.route("/")
+def root():
+    if current_user.is_authenticated:
+        return redirect(url_for('loggedin.dash'))
+    return redirect(url_for('loggedout.index'))
 @loggedout.route("/index")
 def index():
     return render_template('loggedout/homepage.html')
