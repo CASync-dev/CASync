@@ -175,9 +175,17 @@ def friends_status():
             Event.end_time >= current_time
         ).first() is not None
 
-        # If not in class, find the next event for the friend and calculate minutes until it starts
+        # If in class, return negative minutes remaining so the frontend knows to show "In Class Now"
         next_start = None
-        if not in_class:
+        if in_class:
+            current_event = Event.query.filter_by(user_id=friend.id, date=today, going=True).filter(
+                Event.start_time <= current_time,
+                Event.end_time >= current_time
+            ).first()
+            if current_event:
+                end_dt = datetime.combine(today, current_event.end_time)
+                next_start = -int((end_dt - now).total_seconds() // 60)
+        elif not in_class:
             next_event = Event.query.filter_by(user_id=friend.id, date=today, going=True).filter(
                 Event.start_time > current_time
             ).order_by(Event.start_time.asc()).first()
