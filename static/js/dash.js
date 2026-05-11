@@ -31,7 +31,11 @@ function getFriendsBaseUrl() {
   let apiUrl = "/api/friendsstatus";
   const now = new Date();
 
-  apiUrl += `?now=${now.toISOString()}`;
+  // convert to local ISO format without timezone (e.g. "2024-06-30T14:48:00") and append as query param
+  const localISO = new Date(now - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, -1);
+  apiUrl += `?now=${localISO}`;
 
   return apiUrl;
 }
@@ -49,15 +53,20 @@ async function getFriends_status() {
   }
 }
 
-function displayTimeTillNextClass(time) {
-  if (time === null) return `No more classes today`;
+function displayTimeTillNextClass(mins) {
+  if (mins === null || mins === undefined) return "No more classes today";
+  if (mins < 0) return "In Class Now";
 
-  const hours = Math.floor(time / 60);
-  const minutes = time % 60;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
 
-  if (hours === 0 && minutes > 0) return `${minutes} minutes`;
-  if (minutes === 0 && hours > 0) return `${hours} hour`;
-  return `${hours}:${String(minutes).padStart(2, "0")} hours`;
+  const parts = [];
+  // handle pluralization, add "s" if not 1
+  if (h > 0) parts.push(`${h} hr${h !== 1 ? "s" : ""}`);
+  if (m > 0) parts.push(`${m} min${m !== 1 ? "s" : ""}`);
+  if (parts.length === 0) return "Next class starting now";
+
+  return `Next class in ${parts.join(" ")}`;
 }
 
 function renderFriendsStatus(friends_status) {
@@ -87,7 +96,7 @@ function renderFriendsStatus(friends_status) {
       </div>
 
       <p class=" px-3 py-2 text-white text-sm sm:text-base">
-        ${displayTimeTillNextClass(friend.minutes_next_class)}
+        ${displayTimeTillNextClass(friend.minutes_until_next)}
       </p>
     `;
     container.appendChild(li);
