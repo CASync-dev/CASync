@@ -103,6 +103,8 @@ class UserTestCase(unittest.TestCase):
     def test_change_password(self):
         user = User(username='bot4', email="random@email.net")
         user.password = 'foobar'
+        db.session.add(user)
+        db.session.commit()
         # Testing on new password not being strong enough.
         # changePassform ="" tells the server that the data being sent is for that form.
         response = self.client.post("/settings", data = dict(current_password="foobar", new_password='badpass', repeat_new='badpass', changePassform=""), follow_redirects=True)
@@ -132,9 +134,39 @@ class UserTestCase(unittest.TestCase):
         assert user.verify_password('P@ssw01d') == True
 
     def test_del_acc(self):
-        print()
+        user = User(username='testsubject', email= 'testing@yahoo.com')
+        user.password = 'foobar'
+        db.session.add(user)
+        db.session.commit()
+        # Testing incorrect email
+        response = self.client.post('settings', data = dict(email = 'myreal@mail.com', username= 'testsubject', password='foobar', acdform=""), follow_redirects=True)
+        assert response.request.path == '/settings'
+        html = response.get_data(as_text=True)
+        assert 'Error in account deletion: Incorrect email.' in html
+        
+        # Testing incorrect username
+        response = self.client.post('settings', data = dict(email = 'testing@yahoo.com', username= 'fakeuser', password='foobar', acdform=""), follow_redirects=True)
+        assert response.request.path == '/settings'
+        html = response.get_data(as_text=True)
+        assert 'Error in account deletion: Incorrect username.' in html
 
+        # Testing incorrect password
+        response = self.client.post('settings', data = dict(email = 'testing@yahoo.com', username= 'testsubject', password='barfoo', acdform=""), follow_redirects=True)
+        assert response.request.path == '/settings'
+        html = response.get_data(as_text=True)
+        assert 'Error in account deletion: Incorrect password.' in html
+
+        # Testing actual deletion
+        response = self.client.post('settings', data = dict(email = 'testing@yahoo.com', username= 'testsubject', password='foobar', acdform=""), follow_redirects=True)
+        assert response.request.path == '/login'
+        html = response.get_data(as_text=True)
+        assert 'Your account has been deleted.' in html
+        user = User.query.filter_by('testsubject').first()
+        assert user == False
+
+        
     # iCal Link imports to be handled by test_ical.py.
+
         
         
 
