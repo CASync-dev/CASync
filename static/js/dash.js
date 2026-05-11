@@ -30,9 +30,9 @@ function updateTime() {
 function getFriendsBaseUrl() {
   let apiUrl = "/api/friendsstatus";
   const now = new Date();
-  
+
   apiUrl += `?now=${now.toISOString()}`;
-  
+
   return apiUrl;
 }
 
@@ -45,7 +45,7 @@ async function getFriends_status() {
     // renderCalendar(events);
     return friends_status;
   } catch (err) {
-    console.error('fetch error', err);
+    console.error("fetch error", err);
   }
 }
 
@@ -226,8 +226,7 @@ function bigCard(nextEvent) {
       </h4>
       <span class="text-3xl flex-1">${nextEvent.title}</span>
       <span class="text-lg text-gray-500 shrink-0">${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)} – ${formatHHMM(nextEvent.endTime ?? nextEvent.end_time)}</span>
-      ${nextEvent.going === false ? `<span class="text-lg text-red-500 shrink-0">[Not Going]</span>` : `<span class="text-lg text-gray-500 shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`}
-      
+            ${nextEvent.going === false ? `<span class="text-lg text-red-500 shrink-0">Not Going</span>` : `<span class="text-lg text-gray-500 shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`}
       <div class="flex"><!-- avatars --></div>
   `;
 }
@@ -289,8 +288,10 @@ let processedEvs = null;
 setInterval(updateTime, 1000);
 
 // Every minute — re-render cards (handles event transitions)
-setInterval(() => {
+setInterval(async () => {
   if (processedEvs) renderDashboardEvents(processedEvs);
+  const status = await getFriends_status();
+  renderFriendsStatus(status);
 }, 60 * 1000);
 
 // Every 5 minutes — re-fetch from API (handles new/changed events)
@@ -309,3 +310,8 @@ loadEvents().then((events) => {
   processedEvs = processEvents(events);
   renderDashboardEvents(processedEvs);
 });
+// run once friends status immediately on load
+(async () => {
+  const status = await getFriends_status();
+  renderFriendsStatus(status);
+})();
