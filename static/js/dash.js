@@ -24,26 +24,92 @@ function updateTime() {
   document.getElementById("period").innerText = timeParts[1] ?? "";
 }
 
+// ----------------------dynamic stuff for the friends list -------------------------------------
 
+// craft the url for fetching events: format is /api/friends_status?now
+function getFriendsBaseUrl() {
+  let apiUrl = "/api/friendsstatus";
+  const now = new Date();
+  
+  apiUrl += `?now=${now.toISOString()}`;
+  
+  return apiUrl;
+}
 
-// dynamic stuff for the calendar events -------------------------------------
+async function getFriends_status() {
+  let friends_status = null;
+  try {
+    const res = await fetch(getFriendsBaseUrl());
+    if (!res.ok) throw new Error(res.statusText);
+    friends_status = await res.json(); // store it here
+    // renderCalendar(events);
+    return friends_status;
+  } catch (err) {
+    console.error('fetch error', err);
+  }
+}
+
+function displayTimeTillNextClass(time) {
+  if (time === null) return `No more classes today`;
+
+  const hours = Math.floor(time / 60);
+  const minutes = time % 60;
+
+  if (hours === 0 && minutes > 0) return `${minutes} minutes`;
+  if (minutes === 0 && hours > 0) return `${hours} hour`;
+  return `${hours}:${String(minutes).padStart(2, "0")} hours`;
+}
+
+function renderFriendsStatus(friends_status) {
+  const container = document.getElementById("friends-list");
+  if (!container) return;
+  container.innerHTML = "";
+
+  if (!Array.isArray(friends_status) || friends_status.length === 0) {
+    container.innerHTML =
+      '<p class="text-sm text-gray-600">No friends :( add some friends in the friends section.</p>';
+    return;
+  }
+
+  for (const friend of friends_status) {
+    if (friend.status === "offline") continue;
+
+    const li = document.createElement("li");
+    li.className =
+      "py-4 flex items-center bg-blue-600 justify-between rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-md ring-white transition duration-200";
+    li.innerHTML = `
+      <div class="flex items-center ">
+        <img class="h-15 w-15 rounded-full" src="${friend.avatar_url}" alt="${friend.username}'s avatar" />
+        <div class="ml-4">
+          <p class="text-sm font-medium text-white">${friend.username}</p>
+          <p class="hidden sm:block text-sm text-white">${friend.email}</p>
+        </div>
+      </div>
+
+      <p class=" px-3 py-2 text-white text-sm sm:text-base">
+        ${displayTimeTillNextClass(friend.minutes_next_class)}
+      </p>
+    `;
+    container.appendChild(li);
+  }
+}
+
+// -------------------- dynamic stuff for the calendar events -------------------------------------
 
 // craft the url for fetching events: format is /api/events/me?start=2026-05-06&end=2026-05-07
 function getCalendarBaseUrl() {
   let apiUrl = "/api/events/me";
   const now = new Date();
-  
-  const fmt = d => d.toLocaleDateString('en-CA');
+
+  const fmt = (d) => d.toLocaleDateString("en-CA");
   apiUrl += `?start=${fmt(now)}&end=${fmt(now)}`;
-  
+
   return apiUrl;
 }
 
-
-
-//  GET /api/events/me?start=2026-05-06&end=2026-05-07 
-let events = null;
+//  GET /api/events/me?start=2026-05-06&end=2026-05-07
 async function loadEvents() {
+  let events = null;
   try {
     const res = await fetch(getCalendarBaseUrl());
     if (!res.ok) throw new Error(res.statusText);
@@ -51,18 +117,15 @@ async function loadEvents() {
     // renderCalendar(events);
     return events;
   } catch (err) {
-    console.error('fetch error', err);
+    console.error("fetch error", err);
   }
 }
 
-
 // helper: parse "HH:MM" to minutes since midnight
-function parseTimeToMinutes(hhmm = '00:00') {
-  const [h, m] = hhmm.split(':').map(Number);
+function parseTimeToMinutes(hhmm = "00:00") {
+  const [h, m] = hhmm.split(":").map(Number);
   return (h || 0) * 60 + (m || 0);
 }
-
-
 
 /*
     {
@@ -90,60 +153,65 @@ function processEvents(eventsData) {
   if (!eventsData) return { flat: [], byDate: {} };
 
   // 1) flatten all users' events into an array
-  const flat = Object.values(eventsData).flatMap(user => Object.values(user.events)).map(e => {
-    const dateISO = e.date; // e.g. "2026-05-06"
-    const start = e.startTime ?? e.start_time ?? e.start ?? '00:00';
-    const end = e.endTime ?? e.end_time ?? e.end ?? '00:00';
-    return {
-      ...e,
-      dateISO,
-      dateObj: new Date(dateISO + 'T00:00'),
-      startMinutes: parseTimeToMinutes(start),
-      endMinutes: parseTimeToMinutes(end),
-    };
-  }).sort((a, b) => a.startMinutes - b.startMinutes);
+  const flat = Object.values(eventsData)
+    .flatMap((user) => Object.values(user.events))
+    .map((e) => {
+      const dateISO = e.date; // e.g. "2026-05-06"
+      const start = e.startTime ?? e.start_time ?? e.start ?? "00:00";
+      const end = e.endTime ?? e.end_time ?? e.end ?? "00:00";
+      return {
+        ...e,
+        dateISO,
+        dateObj: new Date(dateISO + "T00:00"),
+        startMinutes: parseTimeToMinutes(start),
+        endMinutes: parseTimeToMinutes(end),
+      };
+    })
+    .sort((a, b) => a.startMinutes - b.startMinutes);
 
   // 2) group by date and sort each day's events by start time
   const byDate = flat.reduce((acc, ev) => {
     (acc[ev.dateISO] ??= []).push(ev);
     return acc;
   }, {});
-  Object.values(byDate).forEach(arr => arr.sort((a, b) => a.startMinutes - b.startMinutes));
+  Object.values(byDate).forEach((arr) =>
+    arr.sort((a, b) => a.startMinutes - b.startMinutes),
+  );
 
   return { flat, byDate };
 }
 
 // Convert 24-hour time (HH:MM) to 12-hour format with AM/PM
-function formatHHMM(hhmm = '00:00') {
-  const [h, m] = (hhmm || '00:00').split(':').map(Number);
-  const period = (h || 0) < 12 ? 'AM' : 'PM';
+function formatHHMM(hhmm = "00:00") {
+  const [h, m] = (hhmm || "00:00").split(":").map(Number);
+  const period = (h || 0) < 12 ? "AM" : "PM";
   const hour = (h || 0) % 12 || 12;
-  return `${hour}:${String(m || 0).padStart(2,'0')} ${period}`;
+  return `${hour}:${String(m || 0).padStart(2, "0")} ${period}`;
 }
 
-// Convert minutes to human-readable time remaining (e.g., "45 minutes" or "1:30 minutes") 
+// Convert minutes to human-readable time remaining (e.g., "45 minutes" or "1:30 minutes")
 // for the big card event in minutes until the next event starts
 function formatTime(totalMinutes) {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  
+
   if (hours === 0 && minutes > 0) return `${minutes} minutes`;
   if (minutes === 0 && hours > 0) return `${hours} hour`;
   if (minutes === 0 && hours === 0) return `RIGHT NOW`;
-  return `${hours}:${String(minutes).padStart(2, '0')} minutes`;
+  return `${hours}:${String(minutes).padStart(2, "0")} hours`;
 }
 
 // function for renderign the big card on the dashboard with the next upcoming event
 function bigCard(nextEvent) {
-  const bigCardEl = document.getElementById('big-card');
+  const bigCardEl = document.getElementById("big-card");
   if (!bigCardEl) return;
 
   if (!nextEvent) {
-
-    bigCardEl.innerHTML = '<p class="text-gray-600">No upcoming events.</p>';
+    bigCardEl.innerHTML =
+      '<p class="text-gray-600">All done! No more events today.</p>';
     return;
   }
-  
+
   const now = new Date();
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
   let minutesUntil = nextEvent.startMinutes - nowMinutes;
@@ -159,7 +227,7 @@ function bigCard(nextEvent) {
       <span class="text-3xl flex-1">${nextEvent.title}</span>
       <span class="text-lg text-gray-500 shrink-0">${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)} – ${formatHHMM(nextEvent.endTime ?? nextEvent.end_time)}</span>
       <span class="text-lg text-gray-500 shrink-0">
-          ${nextEvent.location ? `@ ${nextEvent.location}` : ''}
+          ${nextEvent.location ? `@ ${nextEvent.location}` : ""}
       </span>
       <div class="flex"><!-- avatars --></div>
   `;
@@ -188,7 +256,7 @@ function renderDashboardEvents(processed) {
       events.push(ev);
     }
   }
-  events = events.slice(0, 5); // limit to 5 events for performance and to avoid overwhelming the user
+  //events = events.slice(0, 5); // limit to 5 events for performance and to avoid overwhelming the user
   // call function to render data for the big card, or clear it if nothing is left
   if (events.length > 0) {
     bigCard(events[0]);
@@ -197,8 +265,7 @@ function renderDashboardEvents(processed) {
   }
 
   if (todays.length - 1 <= 0) {
-    container.innerHTML =
-      '<p class="text-sm text-gray-600">All done! No more events today.</p>';
+    container.innerHTML = "";
     return;
   }
   events.slice(1).forEach((ev) => {
@@ -219,27 +286,35 @@ function renderDashboardEvents(processed) {
 
 let processedEvs = null;
 
-
 // Every second — clock only
 setInterval(updateTime, 1000);
 
 // Every minute — re-render cards (handles event transitions)
-setInterval(() => {
-    if (processedEvs) renderDashboardEvents(processedEvs);
+setInterval(async () => {
+  if (processedEvs) renderDashboardEvents(processedEvs);
+  const status = await getFriends_status();
+  renderFriendsStatus(status);
 }, 60 * 1000);
 
 // Every 5 minutes — re-fetch from API (handles new/changed events)
-setInterval(async () => {
-  const fresh = await loadEvents();
-  processedEvs = processEvents(fresh);
-  renderDashboardEvents(processedEvs);
-  
-}, 5 * 60 * 1000);
+setInterval(
+  async () => {
+    const fresh = await loadEvents();
+    processedEvs = processEvents(fresh);
+    renderDashboardEvents(processedEvs);
+  },
+  5 * 60 * 1000,
+);
 
 // run once immediately on load
 updateTime();
-loadEvents().then(events => {
+loadEvents().then((events) => {
   processedEvs = processEvents(events);
   renderDashboardEvents(processedEvs);
 });
+// run once friends status immediately on load
+(async () => {
+  const status = await getFriends_status();
+  renderFriendsStatus(status);
+})();
 

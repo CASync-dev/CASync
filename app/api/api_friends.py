@@ -2,7 +2,8 @@ from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
 from sqlalchemy import select, text
 from app import db
-from app.models import User, Friendship
+from app.models import User, Friendship, Event
+from datetime import datetime, timezone
 
 api_friends = Blueprint("api_friends", __name__)
 
@@ -150,3 +151,52 @@ def removefriend():
     db.session.delete(friendship)
     db.session.commit()
     return jsonify({"message": "Friend removed."}), 200
+
+
+# friends status api
+@api_friends.route("/api/friendsstatus", methods=["GET"])
+@login_required
+def friends_status():
+    now_str = request.args.get('now')
+    if not now_str:
+        return jsonify({"Error": "Missing 'now' parameter"}), 400
+    
+    now = datetime.fromisoformat(now_str.replace('Z', '+00:00'))
+    today = now.date()
+    current_time = now.time()
+    
+    friends = current_user.get_friends()
+    result = []
+    
+    for friend in friends:
+        # Check if friend has an event right now
+        in_class = Event.query.filter_by(user_id=friend.id, date=today).filter(
+            Event.start_time <= current_time,
+            Event.end_time >= current_time
+        ).first() is not None
+
+        if not in_class:
+            # check how long until their next event if they dont have one right now
+            next_event = Event.query.filter_by(user_id=friend.id, date=today).filter(
+            Event.start_time > current_time
+            ).order_by(Event.start_time.asc()).first()
+
+            if next_event:
+                # combines it with today's date to get the datetime object
+                next_start = datetime.combine(now.date(), next_event.start_time).replace(tzinfo=timezone.utc)
+                time_until = next_start - now
+                minutes_until = time_until.total_seconds() / 60
+            else:
+                minutes_until = None  # no more classes today
+            
+        
+        result.append({
+            'id': friend.id,
+            'username': friend.username,
+            "email": friend.email,
+            'avatar_url': friend.avatar(150),
+            'in_class': in_class,
+            'minutes_next_class': minutes_until 
+        })
+    
+    return jsonify(result)
