@@ -103,6 +103,39 @@ class UserTestCase(unittest.TestCase):
     def test_change_password(self):
         user = User(username='bot4', email="random@email.net")
         user.password = 'foobar'
-        # How do we test multiple forms on one route..?
+        # Testing on new password not being strong enough.
+        # changePassform ="" tells the server that the data being sent is for that form.
+        response = self.client.post("/settings", data = dict(current_password="foobar", new_password='badpass', repeat_new='badpass', changePassform=""), follow_redirects=True)
+        assert response.status_code == 200
+        assert response.request.path == '/settings'
+        # The pass strength is already tested in test_reglog.py, so won't repeat it here.
+        # Instead we'll just check the password has not been affected.
+        assert user.verify_password('foobar') == True
+
+        # Testing on not matching new passwords
+        response = self.client.post("/settings", data = dict(current_password="foobar", new_password='P@ssw01d', repeat_new='d10wss@P', changePassform=""), follow_redirects=True)
+        assert response.request.path == '/settings'
+        html = response.get_data(as_text=True)
+        assert 'Passwords must match' in html
+        
+        # Testing on current password being incorrect
+        response = self.client.post("/settings", data = dict(current_password="barfoo", new_password='P@ssw01d', repeat_new='P@ssw01d', changePassform=""), follow_redirects=True)
+        assert response.request.path == '/settings'
+        html = response.get_data(as_text=True)
+        assert "Error changing password: Incorrect password." in html
+
+        # Testing if password change works
+        response = self.client.post("/settings", data = dict(current_password="foobar", new_password='P@ssw01d', repeat_new='P@ssw01d', changePassform=""), follow_redirects=True)
+        assert response.request.path == '/settings'
+        html = response.get_data(as_text=True)
+        assert "Successfully changed user's password." in html
+        assert user.verify_password('P@ssw01d') == True
+
+    def test_del_acc(self):
+        print()
+
+    # iCal Link imports to be handled by test_ical.py.
+        
+        
 
 
