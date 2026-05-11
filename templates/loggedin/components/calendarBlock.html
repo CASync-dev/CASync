@@ -430,7 +430,7 @@ The general flow of it is:
 
         // going/not going toggle (all event get one)
         const goingToggle = document.createElement('button');
-        goingToggle.className = event.going ? 'bg-green-500 text-white rounded p-1 hover:bg-green-600' : 'bg-gray-500 text-white rounded p-1 hover:bg-gray-600';
+        goingToggle.className = event.going ? 'bg-green-500 text-white rounded p-1 hover:bg-green-600 mt-auto' : 'bg-gray-500 text-white rounded p-1 hover:bg-gray-600 mt-auto';
         goingToggle.innerHTML = event.going ? `<i class="fa-solid fa-check"></i>` : `<i class="fa-solid fa-xmark"></i>`;
         goingToggle.title = event.going ? 'Mark as not going' : 'Mark as going';
         // toggleGoing is defined in static/js/schedule.js
@@ -850,8 +850,8 @@ The general flow of it is:
       const btn = document.querySelector(`[data-event-id="${updatedEvent.id}"].going-toggle`);
       if (btn) {
         btn.className = updatedEvent.going
-          ? 'going-toggle bg-green-500 text-white rounded p-1 hover:bg-green-600'
-          : 'going-toggle bg-gray-500 text-white rounded p-1 hover:bg-gray-600';
+          ? 'going-toggle bg-green-500 text-white rounded p-1 hover:bg-green-600 mt-auto'
+          : 'going-toggle bg-gray-500 text-white rounded p-1 hover:bg-gray-600 mt-auto';
         btn.innerHTML = updatedEvent.going
           ? '<i class="fa-solid fa-check"></i>'
           : '<i class="fa-solid fa-xmark"></i>';
