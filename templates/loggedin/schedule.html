@@ -9,7 +9,7 @@
   <section class="relative bg-lightgray">
     {% from 'loggedin/components/calendarBlock.html' import calendarBlock %}
 
-    {{ calendarBlock(days=['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], eventsUrl='/api/events/me', allowEventCreation=true) }}
+    {{ calendarBlock(days=['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], eventsUrl='/api/events/me', isSchedulePage=true) }}
 
     <!-- Add Event Drawer-->
     <el-dialog>

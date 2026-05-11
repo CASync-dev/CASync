@@ -161,7 +161,7 @@ def friends_status():
     if not now_str:
         return jsonify({"Error": "Missing 'now' parameter"}), 400
     
-    now = datetime.fromisoformat(now_str.replace('Z', '+00:00'))
+    now = datetime.fromisoformat(now_str)
     today = now.date()
     current_time = now.time()
     
@@ -170,24 +170,29 @@ def friends_status():
     
     for friend in friends:
         # Check if friend has an event right now
-        in_class = Event.query.filter_by(user_id=friend.id, date=today).filter(
+        in_class = Event.query.filter_by(user_id=friend.id, date=today, going=True).filter(
             Event.start_time <= current_time,
             Event.end_time >= current_time
         ).first() is not None
 
-        if not in_class:
-            # check how long until their next event if they dont have one right now
-            next_event = Event.query.filter_by(user_id=friend.id, date=today).filter(
-            Event.start_time > current_time
+        # If in class, return negative minutes remaining so the frontend knows to show "In Class Now"
+        next_start = None
+        if in_class:
+            current_event = Event.query.filter_by(user_id=friend.id, date=today, going=True).filter(
+                Event.start_time <= current_time,
+                Event.end_time >= current_time
+            ).first()
+            if current_event:
+                end_dt = datetime.combine(today, current_event.end_time)
+                next_start = -int((end_dt - now).total_seconds() // 60)
+        elif not in_class:
+            next_event = Event.query.filter_by(user_id=friend.id, date=today, going=True).filter(
+                Event.start_time > current_time
             ).order_by(Event.start_time.asc()).first()
-
             if next_event:
-                # combines it with today's date to get the datetime object
-                next_start = datetime.combine(now.date(), next_event.start_time).replace(tzinfo=timezone.utc)
-                time_until = next_start - now
-                minutes_until = time_until.total_seconds() / 60
-            else:
-                minutes_until = None  # no more classes today
+                # Calculate minutes until next event starts
+                next_dt = datetime.combine(today, next_event.start_time)
+                next_start = int((next_dt - now).total_seconds() // 60)
             
         
         result.append({
@@ -196,7 +201,7 @@ def friends_status():
             "email": friend.email,
             'avatar_url': friend.avatar(150),
             'in_class': in_class,
-            'minutes_next_class': minutes_until 
+            'minutes_until_next': next_start
         })
     
     return jsonify(result)

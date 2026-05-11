@@ -29,10 +29,11 @@ document.getElementById("add-event-form").addEventListener("submit", (e) => {
     return;
   }
   // if event is today, start time must be after current time
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
   if (date === today) {
     const currentTime = new Date();
-    const currentTimeMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+    const currentTimeMinutes =
+      currentTime.getHours() * 60 + currentTime.getMinutes();
     const startTimeMinutes = parseTime(start_time);
     if (startTimeMinutes <= currentTimeMinutes) {
       errorElement.textContent =
@@ -196,10 +197,28 @@ function editEvent(eventId) {
         return response.json();
       })
       .then((updatedEvent) => {
+        // After successfully updating the event, we dispatch a custom event that the cal block listens for to update our local list and re-render the calendar
         document.dispatchEvent(
           new CustomEvent("calendar:event-updated", { detail: updatedEvent }),
         );
       })
       .catch((err) => console.error("Error updating event:", err));
   };
+}
+
+function toggleGoing(eventId) {
+  fetch(`/api/events/${eventId}/toggle_going`, {
+    method: "POST",
+    headers: { "X-CSRFToken": CSRF },
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("Failed to toggle going");
+      return response.json();
+    })
+    .then((updatedEvent) => {
+      document.dispatchEvent(
+        new CustomEvent("calendar:going-toggled", { detail: updatedEvent }),
+      );
+    })
+    .catch((err) => console.error("Error toggling going:", err));
 }

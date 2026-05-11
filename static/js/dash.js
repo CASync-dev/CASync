@@ -30,9 +30,13 @@ function updateTime() {
 function getFriendsBaseUrl() {
   let apiUrl = "/api/friendsstatus";
   const now = new Date();
-  
-  apiUrl += `?now=${now.toISOString()}`;
-  
+
+  // convert to local ISO format without timezone (e.g. "2024-06-30T14:48:00") and append as query param
+  const localISO = new Date(now - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, -1);
+  apiUrl += `?now=${localISO}`;
+
   return apiUrl;
 }
 
@@ -45,19 +49,26 @@ async function getFriends_status() {
     // renderCalendar(events);
     return friends_status;
   } catch (err) {
-    console.error('fetch error', err);
+    console.error("fetch error", err);
   }
 }
 
-function displayTimeTillNextClass(time) {
-  if (time === null) return `No more classes today`;
+function displayTimeTillNextClass(mins) {
+  // handle edge cases first
+  if (mins === null || mins === undefined) return "No more classes today";
+  if (mins < 0) return "In class, Ending in " + formatTime(-mins);
 
-  const hours = Math.floor(time / 60);
-  const minutes = time % 60;
+  // convert minutes to hours and minutes
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
 
-  if (hours === 0 && minutes > 0) return `${minutes} minutes`;
-  if (minutes === 0 && hours > 0) return `${hours} hour`;
-  return `${hours}:${String(minutes).padStart(2, "0")} hours`;
+  const parts = [];
+  // handle pluralization, add "s" if not 1
+  if (h > 0) parts.push(`${h} hr${h !== 1 ? "s" : ""}`);
+  if (m > 0) parts.push(`${m} min${m !== 1 ? "s" : ""}`);
+  if (parts.length === 0) return "Next class starting now";
+
+  return `Next class in ${parts.join(" ")}`;
 }
 
 function renderFriendsStatus(friends_status) {
@@ -87,7 +98,7 @@ function renderFriendsStatus(friends_status) {
       </div>
 
       <p class=" px-3 py-2 text-white text-sm sm:text-base">
-        ${displayTimeTillNextClass(friend.minutes_next_class)}
+        ${displayTimeTillNextClass(friend.minutes_until_next)}
       </p>
     `;
     container.appendChild(li);
@@ -226,9 +237,7 @@ function bigCard(nextEvent) {
       </h4>
       <span class="text-3xl flex-1">${nextEvent.title}</span>
       <span class="text-lg text-gray-500 shrink-0">${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)} – ${formatHHMM(nextEvent.endTime ?? nextEvent.end_time)}</span>
-      <span class="text-lg text-gray-500 shrink-0">
-          ${nextEvent.location ? `@ ${nextEvent.location}` : ""}
-      </span>
+            ${nextEvent.going === false ? `<span class="text-lg text-red-500 shrink-0">Not Going</span>` : `<span class="text-lg text-gray-500 shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`}
       <div class="flex"><!-- avatars --></div>
   `;
 }
@@ -317,4 +326,3 @@ loadEvents().then((events) => {
   const status = await getFriends_status();
   renderFriendsStatus(status);
 })();
-

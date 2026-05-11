@@ -113,6 +113,7 @@ class Event(db.Model):
     ical_id = db.Column(
         db.Integer, db.ForeignKey("calendars.id")
     )  # is the id of the calendar in the ical, we can use this to link events to a calendar and update them later if needed
+    going = db.Column(db.Boolean, default=True)  # whether the user is going to this event
 
     # Serialises the object to a plain dict — useful for returning JSON from a route
     # Note: date and time are converted to strings since JSON can't handle Python date/time objects
@@ -130,6 +131,7 @@ class Event(db.Model):
             "color": self.color,
             "ical_uid": self.ical_uid,
             "ical_id": self.ical_id,
+            "going": self.going,
         }
 
     def __repr__(self):
