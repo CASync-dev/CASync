@@ -182,6 +182,7 @@ def friends_status():
                 Event.start_time > current_time
             ).order_by(Event.start_time.asc()).first()
             if next_event:
+                # Calculate minutes until next event starts
                 next_dt = datetime.combine(today, next_event.start_time)
                 next_start = int((next_dt - now).total_seconds() // 60)
             

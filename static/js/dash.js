@@ -54,9 +54,11 @@ async function getFriends_status() {
 }
 
 function displayTimeTillNextClass(mins) {
+  // handle edge cases first
   if (mins === null || mins === undefined) return "No more classes today";
   if (mins < 0) return "In Class Now";
 
+  // convert minutes to hours and minutes
   const h = Math.floor(mins / 60);
   const m = mins % 60;
 
