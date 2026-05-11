@@ -85,14 +85,6 @@
         {{ message }}
       </p>
       {% endfor %} {% endwith %}
-          {% if cpform.errors %}{%
-            for field, errors in
-            cpform.errors.items()
-          %}
-            {% for error in errors %}
-              <p class="text-red-400 text-sm mt-1 max-w-sm">{{ error }}</p>
-            {% endfor %}
-      {% endfor %}{% endif %}
     </form>
           <button
         command="show-modal"
