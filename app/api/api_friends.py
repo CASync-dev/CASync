@@ -170,7 +170,7 @@ def friends_status():
     
     for friend in friends:
         # Check if friend has an event right now
-        in_class = Event.query.filter_by(user_id=friend.id, date=today).filter(
+        in_class = Event.query.filter_by(user_id=friend.id, date=today, going=True).filter(
             Event.start_time <= current_time,
             Event.end_time >= current_time
         ).first() is not None
