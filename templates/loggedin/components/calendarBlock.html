@@ -367,6 +367,11 @@ The general flow of it is:
       card.style.height = `${heightPx - 4}px`;
       card.dataset.collapsedHeight = `${heightPx - 4}px`;
 
+      // If event marked as not going, gray it out to indicate this
+      if (event.going === false) {
+        card.classList.add('opacity-50');
+      }
+
       // Event title — always shown
       const title = document.createElement('p');
       title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
@@ -430,8 +435,8 @@ The general flow of it is:
 
         // going/not going toggle (all event get one)
         const goingToggle = document.createElement('button');
-        goingToggle.className = event.going ? 'bg-green-500 text-white rounded p-1 hover:bg-green-600 mt-auto' : 'bg-gray-500 text-white rounded p-1 hover:bg-gray-600 mt-auto';
-        goingToggle.innerHTML = event.going ? `<i class="fa-solid fa-check"></i>` : `<i class="fa-solid fa-xmark"></i>`;
+        goingToggle.className = event.going ? 'bg-gray-500 text-white rounded p-1 hover:bg-gray-600 mt-auto' : 'bg-green-500 text-white rounded p-1 hover:bg-green-600 mt-auto';
+        goingToggle.innerHTML = event.going ? `<i class="fa-solid fa-xmark"></i>` : `<i class="fa-solid fa-check"></i>`;
         goingToggle.title = event.going ? 'Mark as not going' : 'Mark as going';
         // toggleGoing is defined in static/js/schedule.js
         goingToggle.classList.add('going-toggle');
@@ -840,23 +845,35 @@ The general flow of it is:
     });
 
     document.addEventListener('calendar:going-toggled', (event) => {
+      // detect changes to toggle from schedule.js and update the button state without needing to refetch and rerender everything
       const updatedEvent = event.detail;
       const userId = String(updatedEvent.user_id);
       const key = Object.keys(events[userId]?.events ?? {}).find(
         k => events[userId].events[k].id === updatedEvent.id
       );
       if (key) events[userId].events[key] = updatedEvent;
-
+      // change the button state
       const btn = document.querySelector(`[data-event-id="${updatedEvent.id}"].going-toggle`);
       if (btn) {
         btn.className = updatedEvent.going
-          ? 'going-toggle bg-green-500 text-white rounded p-1 hover:bg-green-600 mt-auto'
-          : 'going-toggle bg-gray-500 text-white rounded p-1 hover:bg-gray-600 mt-auto';
+          ? 'going-toggle bg-gray-500 text-white rounded p-1 hover:bg-gray-600 mt-auto'
+          : 'going-toggle bg-green-500 text-white rounded p-1 hover:bg-green-600 mt-auto';
         btn.innerHTML = updatedEvent.going
-          ? '<i class="fa-solid fa-check"></i>'
-          : '<i class="fa-solid fa-xmark"></i>';
+          ? '<i class="fa-solid fa-xmark"></i>'
+          : '<i class="fa-solid fa-check"></i>';
         btn.title = updatedEvent.going ? 'Mark as not going' : 'Mark as going';
         btn.dataset.eventId = updatedEvent.id;
+      }
+      // change the div opacity
+      const card = document.getElementById(`event-${updatedEvent.id}`);
+      if (card) {
+        if (updatedEvent.going === false) {
+          card.classList.add('opacity-50');
+          card.title = 'You are not going to this event';
+        } else {
+          card.classList.remove('opacity-50');
+          card.title = '';
+        }
       }
     });
 
