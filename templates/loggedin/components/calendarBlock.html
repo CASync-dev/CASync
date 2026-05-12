@@ -349,7 +349,7 @@ The general flow of it is:
       const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`;
 
       // The card sits inside the grid cell using absolute positioning.
-      // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
+      // A small pad (left-0.5 / right-0.5) keeps the grid lines visible around it.
       const card = document.createElement('div');
       card.id = id;
       if (!event.color) {
@@ -360,7 +360,7 @@ The general flow of it is:
         var colors = COLOR_MAP['gray'];
       }
       card.className = [
-        'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
+        'absolute left-0.5 right-0.5 rounded-md border-l-4 overflow-hidden',
         'cursor-pointer transition-shadow hover:shadow-md select-none z-10',
         colors.bg,
         colors.border,
