@@ -5,9 +5,9 @@ A component is a reusable piece of code that can be used to create a specific UI
 -->
 <!-- Accepts:
 - days: an array of day names (e.g. ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
-- timeRange: a range of time in 24 hour digits (e.g. 8, 18 for 8am to 6pm)
+- timeRange: a range of time in 24 hour digits (e.g. 8, 18 for 8am to 6pm). this defines the default and min time range to display. The grid is automaticly expanded if events fall outside of this range, but it will never show a smaller time range than this.
 - includeNav: a boolean that determines whether to include navigation buttons for switching between weeks
-- isSchedulePage: a boolean that determines whether to include a "New Event" button that opens the event creation drawer (note the drawer is not included in this component) aswell as mutation buttons
+- isSchedulePage: a boolean that determines whether to include a "New Event" button that opens the event creation drawer (note the drawer is not included in this component) aswell as mutation buttons on event cards
 - eventUrl: the api endpoint to fetch events from, the component will handle fetching and rendering events onto the calendar grid
 - enableAdaptiveDateCalls: Many api routes will require a date range to be parsed as a query paramater in the format ?start=YYYY-MM-DD&end=YYYY-MM-DD
   If this is enabled, the component will automatically calculate the correct start and end dates based on the current week being viewed and include those in the api call to fetch events.
@@ -156,9 +156,12 @@ The general flow of it is:
     // Overrideable base URL — set this before calling fetchAndRenderEvents() to change the data source
     let calendarBaseUrl = "{{ eventsUrl | safe }}";
 
-    // Grid Constants: these are parsed from the macro args
-    const GRID_START_HOUR = {{ timeRange[0] }}; // the grid start (7am = 7)
-    const GRID_TOTAL_SLOTS = {{ timeRange[1] - timeRange[0] }}; // total number of hour slots in the grid (7am-6pm = 11)
+    // Grid Constants: base values are baked in from the macro args and never change.
+    const GRID_BASE_START = {{ timeRange[0] }};
+    const GRID_BASE_END   = {{ timeRange[1] }};
+    // Effective bounds may expand to fit out-of-range events; reset each render via syncGridRows.
+    let effectiveStartHour = GRID_BASE_START;
+    let effectiveEndHour   = GRID_BASE_END;
 
     // ── Color themes
     // Each event has a color. This maps that name to the three
@@ -282,6 +285,7 @@ The general flow of it is:
       });
     }
     
+    // Track the date range of the last fetched events to avoid redundant requests
     let lastFetchedStart = null;
     let lastFetchedEnd = null;
     function fetchAndRenderEvents() {
@@ -679,10 +683,8 @@ The general flow of it is:
       // Determine the event's start and end times in minutes from midnight, and calculate its position and height in the grid
       const startMinutes = parseTime(event.startTime);
       const endMinutes = parseTime(event.endTime);
-      const hourIndex = Math.floor(startMinutes / 60) - GRID_START_HOUR;
-      // If the event starts before the grid start time or after the grid end time, we skip it.
-      // TODO: could be improved
-      if (hourIndex < 0 || hourIndex >= GRID_TOTAL_SLOTS) return null;
+      const hourIndex = Math.floor(startMinutes / 60) - effectiveStartHour;
+      if (hourIndex < 0 || hourIndex >= (effectiveEndHour - effectiveStartHour)) return null;
 
       // Find the corresponding grid cell and append the event card to it, positioned absolutely within the cell
       const cell = cellMap[`${dayIndex}-${hourIndex}`];
@@ -704,30 +706,105 @@ The general flow of it is:
       return { card, dayIndex, startMinutes, endMinutes, isMulti: event.type === 'multi' };
     }
 
+    // Scans events visible in the current week and returns the hour bounds needed to show all of them.
+    // Always starts from the base range so the grid never shrinks below it.
+    function computeWeekBounds(flatEvents, weekDates) {
+      let minHour = GRID_BASE_START;
+      let maxHour = GRID_BASE_END;
+      flatEvents.forEach(event => {
+        if (!weekDates.includes(event.date)) return;
+        const startHour = Math.floor(parseTime(event.startTime) / 60);
+        const endHour   = Math.ceil(parseTime(event.endTime) / 60);
+        if (startHour < minHour) minHour = startHour;
+        if (endHour   > maxHour) maxHour = endHour;
+      });
+      return { startHour: minHour, endHour: maxHour };
+    }
+
+    // Extends or resets the grid DOM to cover [startHour, endHour).
+    // Removes rows from the previous render, prepends earlier rows, appends later rows,
+    // then updates effectiveStartHour / effectiveEndHour.
+    // Must run before buildCellMap so the map reflects the updated DOM.
+    function syncGridRows(startHour, endHour) {
+      const grid = document.getElementById('desktop-grid');
+
+      // Remove any rows injected by a previous render.
+      grid.querySelectorAll('[data-extended]').forEach(el => el.remove());
+
+      // Helper to create a time label cell for the first column, with the hour label inside.
+      function makeTimeCell(hour) {
+        const cell = document.createElement('div');
+        cell.className = 'h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100';
+        cell.dataset.extended = 'true';
+        const label = document.createElement('span');
+        label.className = 'text-xs font-semibold text-gray-400';
+        label.textContent = hour < 12 ? `${hour}:00 am` : hour === 12 ? '12:00 pm' : `${hour - 12}:00 pm`;
+        cell.appendChild(label);
+        return cell;
+      }
+
+      // Helper to create a day cell for the other columns, with an optional right border for all but the last column.
+      function makeDayCell(isLast) {
+        const cell = document.createElement('div');
+        cell.className = `h-24 lg:h-20 p-0.5 md:p-3.5 border-t ${isLast ? '' : 'border-r '}border-gray-200 transition-all hover:bg-stone-100`;
+        cell.dataset.extended = 'true';
+        return cell;
+      }
+
+      // Prepend rows for hours earlier than the base start.
+      // Build all cells in final top-to-bottom order first, then prepend as one batch
+      // so the earliest hour ends up at the top of the grid.
+      if (startHour < GRID_BASE_START) {
+        const cells = [];
+        for (let h = startHour; h < GRID_BASE_START; h++) {
+          cells.push(makeTimeCell(h));
+          // day cells for this hour: we mark the last one so it gets no right border
+          for (let d = 0; d < 5; d++) cells.push(makeDayCell(d === 4));
+        }
+        grid.prepend(...cells);
+      }
+
+      // Append rows for hours later than the base end.
+      if (endHour > GRID_BASE_END) {
+        for (let h = GRID_BASE_END; h < endHour; h++) {
+          grid.appendChild(makeTimeCell(h));
+          // day cells for this hour: we mark the last one so it gets no right border
+          for (let d = 0; d < 5; d++) grid.appendChild(makeDayCell(d === 4));
+        }
+      }
+      // Update the effective hour range for the next render.
+      effectiveStartHour = startHour;
+      effectiveEndHour   = endHour;
+    }
+
 
     // ── Render events onto the desktop grid
     function renderDesktopEvents() {
-      // Clear existing event cards before re-rendering
       const grid = document.getElementById('desktop-grid');
       grid.querySelectorAll('[id^="event-"]').forEach(el => el.remove());
 
-      // Build a cell map for quick lookup, get the current week's dates, and place each event onto the grid
-      const cellMap = buildCellMap(grid);
-      if (!cellMap['0-0']) return;
-      // we get the height based on the first sell TODO: this could be dynamic evnetually
-      const cellHeight = cellMap['0-0'].offsetHeight;
       const weekDates = getWeekDates();
 
-      // Route to multi-user parser if more than one user is present, otherwise use the simple flatten
+      // Route to multi-user parser if more than one user is present, otherwise use the simple flatten.
       const isMultiUser = Object.keys(events).length > 1;
       const flatEvents = isMultiUser ? multiUserParser(events) : flattenEvents(events);
 
-      // Place each event and log it to placed for overlap calcualtions.
+      // Compute bounds across this week's events and extend the grid DOM if needed.
+      // syncGridRows must run before buildCellMap so the map reflects the updated DOM.
+      const { startHour, endHour } = computeWeekBounds(flatEvents, weekDates);
+      syncGridRows(startHour, endHour);
+
+      // Build a cell map for quick lookup of grid cells by day/hour, then place each event in the grid.
+      const cellMap = buildCellMap(grid);
+      if (!cellMap['0-0']) return;
+      const cellHeight = cellMap['0-0'].offsetHeight;
+
+      // Place each event and collect placement data for overlap calculations.
       const placed = flatEvents
         .map((event, i) => placeEvent(event, cellMap, weekDates, cellHeight, i))
-        .filter(Boolean); // remove null (events outside visible range)
+        .filter(Boolean);
 
-      // Multi-events are already grouped and dont need overlap.
+      // Multi-events are already grouped and don't need overlap offsets.
       applyOverlapOffsets(placed.filter(p => !p.isMulti));
     }
 
