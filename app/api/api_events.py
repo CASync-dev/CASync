@@ -180,6 +180,7 @@ def api_user_events(user_id):
 @login_required
 def api_group_events(group_id):
     # This route gets all the events for a group of users in the groups table. Also accepts a start and end date as query parameters to limit the events returned to a specific date range, same format as above routes
+    # Unlike the above route this one includes the pfp and username of the user in the response as well, to make it easier for the frontend to display the events on the calendar with the correct user information without needing to make additional requests to get the user info
     start_str = request.args.get('start')
     end_str = request.args.get('end')
     if not start_str or not end_str:
@@ -203,7 +204,8 @@ def api_group_events(group_id):
         Event.date <= end_date
     ).all()
     # format the events in the standard format specified above
-    user_dict = {str(user_id): {"events": {}} for user_id in user_ids}
+    # A user
+    user_dict = {str(user.id): {"username": user.username, "pfp": user.avatar(200), "events": {}} for user in group.members}
     for event in events:
         user_dict[str(event.user_id)]["events"][str(event.id)] = event.to_dict()
     return jsonify(user_dict)
