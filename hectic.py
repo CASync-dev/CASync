@@ -2,22 +2,22 @@
 hectic.py — seeds a varied dataset for stress-testing the group schedule view.
 
 Creates (or refreshes):
-- ~38 'hectic_*' users with varied weekly schedules
-- 3 groups, sized differently so we can see how the view scales:
-    'Low Clash'  -> 3 users + liam   (small group)
-    'Mid Clash'  -> 10 users + liam  (medium group)
-    'High Clash' -> 25 users + liam  (large group)
-- ~4 weeks of events around today's date
+- A pool of 'hectic_*' users with varied weekly schedules
+- 3 groups sized differently so we can see how the view scales
+- Several weeks of events around today's date
 
 Each user picks a different handful of weekly slots from a large pool covering
 lectures, labs, tutorials, work shifts, gym sessions, club meetings, study
 blocks, social events, etc. — so no two users look the same. Clashes happen
 naturally from random overlap, not by design.
 
-liam is preserved if already in the DB; his events inside the seed window are
-replaced with a known baseline schedule.
+The dev user defined in CONFIG is preserved if already in the DB and added to
+all three groups; their events inside the seed window are replaced with a known
+baseline schedule.
 
-Usage:
+Tweak the CONFIG block below to change who the dev user is, how big each group
+is, the date range, etc., then run:
+
     python hectic.py
 """
 import random
@@ -26,13 +26,47 @@ from datetime import date, time, timedelta
 from app import app, db
 from app.models import User, Event, Group
 
+# ---------------------------------------------------------------------------
+# CONFIG — tweak these to taste, then run the script
+# ---------------------------------------------------------------------------
+
+# Your own user. Preserved if it already exists; otherwise created with the
+# password below. Added as a member of every group.
+DEV_USERNAME = 'liam'
+DEV_EMAIL    = '24083063@student.uwa.edu.au'
+
+# Default password for any user this script creates.
 DEFAULT_PASSWORD = 'password123'
+
+# Group sizes (number of hectic_* members, excluding the dev user).
+# Group name -> member count. Order is preserved.
+GROUPS = {
+    'Low Clash':  3,
+    'Mid Clash':  10,
+    'High Clash': 25,
+}
+
+# Seed window. WEEKS_BEFORE/AFTER are relative to today; the window is snapped
+# back to a Monday so weekday math is clean.
+WEEKS_BEFORE = 2
+WEEKS_AFTER  = 2
+
+# Each hectic user gets a random number of weekly slots in this range.
+EVENTS_PER_USER_MIN = 4
+EVENTS_PER_USER_MAX = 9
+
+# Random seed — change for different layouts, or set to None for fresh chaos.
 SEED = 42
 
+# Prefix used for generated usernames + the purge filter on re-runs.
+HECTIC_PREFIX = 'hectic_'
+
+# ---------------------------------------------------------------------------
+
 TODAY = date.today()
-RANGE_START = TODAY - timedelta(days=14)
+RANGE_START = TODAY - timedelta(weeks=WEEKS_BEFORE)
 RANGE_START -= timedelta(days=RANGE_START.weekday())
-RANGE_DAYS = 28
+RANGE_DAYS = (WEEKS_BEFORE + WEEKS_AFTER) * 7
 RANGE_END = RANGE_START + timedelta(days=RANGE_DAYS - 1)
 
 COLORS = [
@@ -105,8 +139,8 @@ SLOT_POOL = [
     (6, 19, 21, 'Movie Night',             'Luna Leederville'),
 ]
 
-# liam's baseline: (weekday, start_hour, end_hour, title, location, color)
-LIAM_SCHEDULE = [
+# Dev user's baseline: (weekday, start_hour, end_hour, title, location, color)
+DEV_SCHEDULE = [
     (0,  9, 11, 'Algorithms Lecture',     'CSSE: [1.24] Ross LT',         'indigo'),
     (0, 14, 16, 'Agile Web Dev Lecture',  'ENGL: [G12] Lecture Theatre',  'blue'),
     (1, 10, 12, 'Databases Lecture',      'CSSE: [G09] Fay Gale Studio',  'emerald'),
@@ -160,23 +194,28 @@ def varied_schedule(rng, n_events):
     return chosen
 
 
-def get_or_create_liam():
-    liam = User.query.filter_by(username='liam').first()
-    if not liam:
-        liam = User(
-            username='liam',
-            email='24083063@student.uwa.edu.au',
+def slugify(name):
+    """'Low Clash' -> 'low_clash' — used as the username segment per group."""
+    return ''.join(c.lower() if c.isalnum() else '_' for c in name).strip('_')
+
+
+def get_or_create_dev_user():
+    user = User.query.filter_by(username=DEV_USERNAME).first()
+    if not user:
+        user = User(
+            username=DEV_USERNAME,
+            email=DEV_EMAIL,
             password=DEFAULT_PASSWORD,
         )
-        db.session.add(liam)
+        db.session.add(user)
         db.session.flush()
-    return liam
+    return user
 
 
 def purge_previous_hectic_data(group_names):
     for g in Group.query.filter(Group.group_name.in_(group_names)).all():
         db.session.delete(g)
-    for u in User.query.filter(User.username.like('hectic_%')).all():
+    for u in User.query.filter(User.username.like(f'{HECTIC_PREFIX}%')).all():
         u.groups.clear()
         Event.query.filter_by(user_id=u.id).delete()
         db.session.delete(u)
@@ -185,37 +224,32 @@ def purge_previous_hectic_data(group_names):
 
 with app.app_context():
     rng = random.Random(SEED)
-
-    group_specs = [
-        ('Low Clash',   'low',   3),
-        ('Mid Clash',   'mid',  10),
-        ('High Clash',  'high', 25),
-    ]
-    group_names = [name for name, _, _ in group_specs]
+    group_names = list(GROUPS.keys())
 
     print(f'Seed window: {RANGE_START} -> {RANGE_END}')
     print('Purging previous hectic data...')
     purge_previous_hectic_data(group_names)
 
-    liam = get_or_create_liam()
+    dev_user = get_or_create_dev_user()
 
     Event.query.filter(
-        Event.user_id == liam.id,
+        Event.user_id == dev_user.id,
         Event.date >= RANGE_START,
         Event.date <= RANGE_END,
     ).delete(synchronize_session=False)
     db.session.flush()
 
-    print("Seeding liam's baseline schedule...")
-    add_events(liam, LIAM_SCHEDULE)
+    print(f"Seeding {dev_user.username}'s baseline schedule...")
+    add_events(dev_user, DEV_SCHEDULE)
 
-    for gname, prefix, n_members in group_specs:
+    for gname, n_members in GROUPS.items():
         group = Group(group_name=gname)
         db.session.add(group)
         db.session.flush()
-        group.members.append(liam)
+        group.members.append(dev_user)
+        prefix = slugify(gname)
         for i in range(n_members):
-            uname = f'hectic_{prefix}_{i + 1:02d}'
+            uname = f'{HECTIC_PREFIX}{prefix}_{i + 1:02d}'
             user = User(
                 username=uname,
                 email=f'{uname}@test.local',
@@ -223,13 +257,14 @@ with app.app_context():
             )
             db.session.add(user)
             db.session.flush()
-            add_events(user, varied_schedule(rng, rng.randint(4, 9)))
+            n_events = rng.randint(EVENTS_PER_USER_MIN, EVENTS_PER_USER_MAX)
+            add_events(user, varied_schedule(rng, n_events))
             group.members.append(user)
-        print(f'  "{gname}": {n_members} members + liam')
+        print(f'  "{gname}": {n_members} members + {dev_user.username}')
 
     db.session.commit()
 
     total_users = User.query.count()
     total_events = Event.query.count()
     print(f'Done. {total_users} users, {total_events} events.')
-    print(f'Login as liam / {DEFAULT_PASSWORD} and open the Groups page to compare.')
+    print(f'Login as {dev_user.username} / {DEFAULT_PASSWORD} and open the Groups page to compare.')
