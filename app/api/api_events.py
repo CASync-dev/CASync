@@ -176,7 +176,21 @@ def api_user_events(user_id):
     indexed_events = {str(i + 1): e.to_dict() for i, e in enumerate(events)}
     return jsonify({user_id: {"events": indexed_events}})
 
-
+@api_events.route("/api/events/group/<int:group_id>", methods=["POST"])
+@login_required
+def api_group_events(group_id):
+    # This route gets all the events for a group of users in the groups table. Also accepts a start and end date as query parameters to limit the events returned to a specific date range, same format as above routes
+    start_str = request.args.get('start')
+    end_str = request.args.get('end')
+    if not start_str or not end_str:
+        return jsonify({"error": "Missing start or end date"}), 400
+    try:
+        start_date = datetime.strptime(start_str, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_str, '%Y-%m-%d').date()
+    except ValueError:
+        return jsonify({"error": "Invalid date format, should be YYYY-MM-DD"}), 400
+    # check if the user is in the group provided, if not return an error message
+    
 
 # -- Manipulation routes (create, edit, delete) --
 
