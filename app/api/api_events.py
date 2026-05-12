@@ -1,7 +1,7 @@
 from datetime import datetime
 from app import db
 from flask import Blueprint, jsonify, request
-from app.models import Calendar, User, Event
+from app.models import Calendar, User, Event, Group
 from flask_login import current_user, login_required
 
 api_events = Blueprint('api_events', __name__)
@@ -176,7 +176,7 @@ def api_user_events(user_id):
     indexed_events = {str(i + 1): e.to_dict() for i, e in enumerate(events)}
     return jsonify({user_id: {"events": indexed_events}})
 
-@api_events.route("/api/events/group/<int:group_id>", methods=["POST"])
+@api_events.route("/api/events/group/<int:group_id>", methods=["GET"])
 @login_required
 def api_group_events(group_id):
     # This route gets all the events for a group of users in the groups table. Also accepts a start and end date as query parameters to limit the events returned to a specific date range, same format as above routes
@@ -189,8 +189,25 @@ def api_group_events(group_id):
         end_date = datetime.strptime(end_str, '%Y-%m-%d').date()
     except ValueError:
         return jsonify({"error": "Invalid date format, should be YYYY-MM-DD"}), 400
-    # check if the user is in the group provided, if not return an error message
-    
+    # check if the user is in the group provided, if not return an error messag
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({"error": "Group not found"}), 404
+    if not group.is_member():
+        return jsonify({"error": "Unauthorized"}), 403
+    # get all the user ids in the group and return all events for those users in the specified date range
+    user_ids = [user.id for user in group.members]
+    events = Event.query.where(
+        Event.user_id.in_(user_ids),
+        Event.date >= start_date,
+        Event.date <= end_date
+    ).all()
+    # format the events in the standard format specified above
+    user_dict = {str(user_id): {"events": {}} for user_id in user_ids}
+    for event in events:
+        user_dict[str(event.user_id)]["events"][str(event.id)] = event.to_dict()
+    return jsonify(user_dict)
+
 
 # -- Manipulation routes (create, edit, delete) --
 

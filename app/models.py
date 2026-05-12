@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from flask import current_app, url_for
 from app import db
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Column, Table, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, relationship
@@ -196,6 +196,9 @@ class Group(db.Model):
             "group_name": self.group_name,
             "members": [user.to_dict() for user in self.members],
         }
+    def is_member(self):
+        # Checks if logged in user is a member of the group, used for authorisation on group routes
+        return any(user.id == current_user.id for user in self.members)
 
 
 # Association table for Many-Many relationship between User and Groups
