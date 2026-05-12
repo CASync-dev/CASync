@@ -693,11 +693,11 @@ The general flow of it is:
 
       // Calculate the card height based on the event duration, with a minimum height to ensure short events are still visible.
       // Route to the correct builder based on event type: multi-events get their own card builder.
-      const cardHeight = ((endMinutes - startMinutes) / 60) * cellHeight;
+      const cardHeight = ((endMinutes - startMinutes) / 60) * cellHeight -2; // subtract 2px to account for the top padding of the card
       const builder = event.type === 'multi' ? buildMultiEventCard : buildEventCard;
       const card = builder(event, cardHeight, `event-${event.id || index}`); // use event ID if available, otherwise fallback to index for multi-events
       // Override the hardcoded top-0.5 with an accurate offset for the minutes within the hour
-      card.style.top = `${(startMinutes % 60) / 60 * cellHeight}px`;
+      card.style.top = `${(startMinutes % 60) / 60 * cellHeight +2}px`; // add 2px to account for the card's top padding (makes lines visible)
       card.dataset.col = dayIndex;
       cell.appendChild(card);
 
