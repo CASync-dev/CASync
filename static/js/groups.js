@@ -481,7 +481,7 @@ document
   .addEventListener("keydown", (e) => handleEnter(e, loadSelectFriends));
 
 // Schedule stuff
-function openSchedule(groupId) {
+function openSchedule(groupId, groupname) {
   const token = document.querySelector('meta[name="csrf-token"]').content;
 
   calendarBaseUrl = `/api/events/group/${groupId}`;
@@ -491,7 +491,7 @@ function openSchedule(groupId) {
   fetchAndRenderEvents();
   // set the modal title to the group name
   document.getElementById("group-schedule-title").textContent =
-    `Group Schedule`;
+    `${groupname}'s Schedule`;
   // open the modal
   const modal = document.getElementById("group-schedule-modal");
   modal.showModal();
