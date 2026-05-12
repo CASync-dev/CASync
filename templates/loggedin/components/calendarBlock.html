@@ -384,7 +384,7 @@ The general flow of it is:
         const pfp = document.createElement('img');
         pfp.src = event.pfp;
         pfp.alt = `${event.username}'s profile picture`;
-        pfp.className = 'inline-block w-4 h-4 rounded-full mr-1';
+        pfp.className = 'inline-block w-5 h-5 rounded-full mr-1';
         title.appendChild(pfp);
       }
       title.appendChild(document.createTextNode(event.title));
@@ -518,20 +518,19 @@ The general flow of it is:
 
       const card = document.createElement('div');
       card.id = id;
+      // Clash block theme: dedicated teal accent (not used by any individual user)
+      // plus two offset shadows behind the card to read as a stack of overlapping events.
       card.className = [
-        'absolute left-0.5 right-0.5 top-0.5 rounded-md overflow-hidden',
+        'absolute left-0.5 right-0.5 top-0.5 rounded-md overflow-hidden border-l-4',
         'cursor-pointer transition-shadow hover:shadow-md select-none z-10',
+        'bg-teal-100 border-teal-500',
       ].join(' ');
       card.style.height = `${heightPx - 4}px`;
       card.dataset.collapsedHeight = `${heightPx - 4}px`;
+      card.style.boxShadow = '3px 3px 0 0 #5eead4, 6px 6px 0 0 #99f6e4';
 
-      // Clash block theme: a  color uniqe to clashes and a staccked card effect that is intuative and appealing
-      
-
-
-      // Content layer sits above the stripes
       const content = document.createElement('div');
-      content.className = 'relative z-10 px-1.5 pt-1';
+      content.className = 'px-1.5 pt-1';
       card.appendChild(content);
 
       // Avatar stack: slightly larger overlapping circles with a white ring so they read as a group
