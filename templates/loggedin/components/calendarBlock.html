@@ -14,9 +14,6 @@ A component is a reusable piece of code that can be used to create a specific UI
   We currently call data for two weeks before and after the current week to give some buffer for users navigating between weeks, but this can be adjusted as needed. 
   This way we can ensure that we are only fetching the events we need for the current view, and not overfetching data for events that are outside of the current week.
   Often api routes that dont require date ranges will ignore nay date ranges provided and just retrun the data, but it would be good practice to only provide date ranges when needed
-- clipVerticalOverflow: if disabled it allows cards that extend past the bottom of the calendar grid to be fully visible, if enabled it clips any overflow so cards will be cut off at 
-  the bottom edge of the calendar grid
-
 
 Standard Data Format Expectation
 - Parsing Events:
@@ -37,7 +34,7 @@ The general flow of it is:
   - Handle week navigation by updating the header and re-rendering events for the new week
 -->
 
-{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true, timeRange=(8, 18), isSchedulePage=false, clipVerticalOverflow=false) -%}
+{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true, timeRange=(8, 18), isSchedulePage=false) -%}
 <div class="container-loggedin">
   <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
   <div class="sticky top-0 z-20 bg-stone-50 ">
@@ -117,7 +114,7 @@ The general flow of it is:
 
   <!-- Calendar Grid Container -->
   <div class="relative">
-    <div id="grid-scroll" class="overflow-x-auto {{ 'overflow-y-hidden' if clipVerticalOverflow }}">
+    <div id="grid-scroll" class="overflow-x-auto}">
       <!--  Calendar Grid -->
       <!-- Grid structure: 6 columns (time + 5 weekdays), multiple rows for time slots -->
       <!-- Time range: 07:00 am to 06:00 pm -->
@@ -369,6 +366,7 @@ The general flow of it is:
         colors.border,
       ].join(' ');
       card.style.height = `${heightPx - 4}px`;
+      // Store the collapsed height in a data attribute so we can restore it when collapsing after expansion
       card.dataset.collapsedHeight = `${heightPx - 4}px`;
 
       // If event marked as not going, gray it out to indicate this
@@ -698,7 +696,8 @@ The general flow of it is:
       const cardHeight = ((endMinutes - startMinutes) / 60) * cellHeight;
       const builder = event.type === 'multi' ? buildMultiEventCard : buildEventCard;
       const card = builder(event, cardHeight, `event-${event.id || index}`); // use event ID if available, otherwise fallback to index for multi-events
-      // We store the day index and start/end minutes as data attributes on the card for later use in overlap calculations and expand direction.
+      // Override the hardcoded top-0.5 with an accurate offset for the minutes within the hour
+      card.style.top = `${(startMinutes % 60) / 60 * cellHeight}px`;
       card.dataset.col = dayIndex;
       cell.appendChild(card);
 
@@ -907,7 +906,7 @@ The general flow of it is:
       const newEvent = event.detail;
       const userId = String(newEvent.user_id);
       if (!events[userId]) events[userId] = { events: {} };
-      events[userId].events[String(newEvent.id)] = newEvent;
+      events[userId].events[String(newEvent.id)] = newEvent;      
       renderDesktopEvents();
     });
 
@@ -962,6 +961,7 @@ The general flow of it is:
         );
         if (key) { delete events[userId].events[key]; break; }
       }
+
       renderDesktopEvents();
     });
     fetchAndRenderEvents();
