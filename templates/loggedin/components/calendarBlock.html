@@ -523,7 +523,7 @@ The general flow of it is:
       card.className = [
         'absolute left-0.5 right-0.5 top-0.5 rounded-md overflow-hidden border-l-4',
         'cursor-pointer transition-shadow hover:shadow-md select-none z-10',
-        'bg-teal-100 border-teal-500',
+        'bg-emerald-100 ',
       ].join(' ');
       card.style.height = `${heightPx - 4}px`;
       card.dataset.collapsedHeight = `${heightPx - 4}px`;
@@ -532,24 +532,6 @@ The general flow of it is:
       const content = document.createElement('div');
       content.className = 'px-1.5 pt-1';
       card.appendChild(content);
-
-      // Avatar stack: slightly larger overlapping circles with a white ring so they read as a group
-      const pfpRow = document.createElement('div');
-      pfpRow.className = 'flex items-center';
-      event.participants.slice(0, 4).forEach((p, i) => {
-        const pfp = document.createElement('img');
-        pfp.src = p.pfp;
-        pfp.alt = `${p.name}'s profile picture`;
-        pfp.className = `w-5 h-5 rounded-full ring-2 ring-white ${i > 0 ? '-ml-1.5' : ''}`;
-        pfpRow.appendChild(pfp);
-      });
-      if (event.participants.length > 4) {
-        const extra = document.createElement('span');
-        extra.className = 'ml-1 text-[10px] font-semibold text-gray-800';
-        extra.textContent = `+${event.participants.length - 4}`;
-        pfpRow.appendChild(extra);
-      }
-      content.appendChild(pfpRow);
 
       // Time label as title
       const title = document.createElement('p');
@@ -562,6 +544,23 @@ The general flow of it is:
       summary.className = 'text-xs leading-tight text-gray-800 opacity-75 truncate';
       summary.textContent = event.participants.map(p => p.name).join(', ');
       content.appendChild(summary);
+      // Avatar stack: slightly larger overlapping circles with a white ring so they read as a group
+      const pfpRow = document.createElement('div');
+      pfpRow.className = 'flex items-center';
+      event.participants.slice(0, 4).forEach((p, i) => {
+        const pfp = document.createElement('img');
+        pfp.src = p.pfp;
+        pfp.alt = `${p.name}'s profile picture`;
+        pfp.className = `w-7 h-7 rounded-full ring-2 ring-white ${i > 0 ? '-ml-1.5' : ''}`;
+        pfpRow.appendChild(pfp);
+      });
+      if (event.participants.length > 4) {
+        const extra = document.createElement('span');
+        extra.className = 'ml-1 text-[10px] font-semibold text-gray-800';
+        extra.textContent = `+${event.participants.length - 4}`;
+        pfpRow.appendChild(extra);
+      }
+      content.appendChild(pfpRow);
 
       // Extra details - hidden till expanded.
       // Each participant gets a colored dot (their user color) + name and class.
