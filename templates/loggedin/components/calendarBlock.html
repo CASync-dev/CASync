@@ -955,7 +955,7 @@ The general flow of it is:
     });
 
     document.addEventListener('calendar:event-deleted', (event) => {
-      const deletedId = event.detail.id;
+      const deletedId = Number(event.detail.id);
       for (const userId of Object.keys(events)) {
         const key = Object.keys(events[userId].events).find(
           k => events[userId].events[k].id === deletedId
