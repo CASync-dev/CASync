@@ -198,7 +198,18 @@ def api_create_event():
     }
     """
     data = request.get_json()
-    # We should add some validation here to make sure the data is in the right format and all required fields are present, but for now we'll just assume it's correct
+    
+     # Required fields
+    if not data.get('title') or not data.get('date') or not data.get('start_time') or not data.get('end_time'):
+        return jsonify({"error": "Please fill in all required fields."}), 400
+    
+    # End time after start time
+    start = datetime.strptime(data['start_time'], '%H:%M').time()
+    end = datetime.strptime(data['end_time'], '%H:%M').time()
+    if end <= start:
+        return jsonify({"error": "End time must be after start time."}), 400
+    
+
     event = Event(
         title=data['title'],
         description=data.get('description', ''),
