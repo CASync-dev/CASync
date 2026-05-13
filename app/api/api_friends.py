@@ -14,7 +14,7 @@ def getusers():
     # Email search: Must be exact for privacy reasons
     data = request.get_json()
     if 'search' not in data or len(data['search']) < 1:
-        return jsonify({"Error": "Invalid search"}), 400
+        return jsonify({"Error: Invalid search"}), 400
     # If it's an email
     if '@' in data['search']:
         searchmail = data['search']
