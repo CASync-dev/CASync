@@ -135,13 +135,25 @@ class RegLogTestCase(unittest.TestCase):
         response = self.client.post('/register', data={
             'username': 'bobby',
             'email': 'randomUni@uni.edu.au',
-            'password': 'E',
-            'repeat_password': 'E',
+            'password': 'eE',
+            'repeat_password': 'eE',
         })
         assert response.status_code == 200
         assert response.request.path == '/register'
         html = response.get_data(as_text=True)
-        assert 'Password must contain: at least 8 characters, one lowercase letter, one number, one special character.' in html
+        assert 'Password must contain: at least 8 characters, one number, one special character.' in html
+
+        # No special char:
+        response = self.client.post('/register', data={
+            'username': 'bobby',
+            'email': 'randomUni@uni.edu.au',
+            'password': 'eE1',
+            'repeat_password': 'eE1',
+        })
+        assert response.status_code == 200
+        assert response.request.path == '/register'
+        html = response.get_data(as_text=True)
+        assert 'Password must contain: at least 8 characters, one special character.' in html
 
         # All but password length:
         response = self.client.post('/register', data={
