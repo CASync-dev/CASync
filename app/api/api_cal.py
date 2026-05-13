@@ -31,6 +31,8 @@ def api_import_ical():
     if not data:
         # If the body isn't valid JSON, get_json returns None. silent=True prevents it from raising an error.
         return jsonify({"error": "Request body must be JSON."}), 400
+    if 'url' not in data or len(data['url']) < 1:
+        return jsonify({"error": "Invalid iCal URL."}), 400
 
     # Call the main import function in services/ical.py, which returns (result, error)
     result, error = import_ical(data.get('url'), user_id)
@@ -77,7 +79,7 @@ def api_remove_cal():
     Removes iCal link from user.
     '''
     data = request.get_json()
-    if 'id' not in data or len(data['id']) < 1:
+    if not data.get('id'):
         return jsonify({"error": "Invalid iCal Link"})
     icalid = data['id']
     user_id = current_user.id
