@@ -116,3 +116,104 @@ class EventsTestCase(unittest.TestCase):
         assert response.status_code == 200
         assert response.json['message'] == 'Event deleted'
         assert Event.query.get(self.event.id) is None
+
+# ----------------------- create event edge cases -----------------------
+    def test_create_event_missing_fields(self):
+        self.login_as(self.user)
+
+        response = self.client.post('/api/events', json={
+            'title': '',
+            'description': 'Created in test',
+            'date': '2026-05-13',
+            'start_time': '14:00',
+            'end_time': '15:00',
+            'location': 'Library',
+            'color': 'emerald',
+        })
+
+        assert response.status_code == 400
+        assert 'Please fill in all required fields.' in response.json['error']
+    
+    
+
+        response = self.client.post('/api/events', json={
+            'title': 'new event',
+            'description': 'Created in test',
+            'date': '',
+            'start_time': '14:00',
+            'end_time': '15:00',
+            'location': 'Library',
+            'color': 'emerald',
+        })
+
+        assert response.status_code == 400
+        assert 'Please fill in all required fields.' in response.json['error']
+
+        response = self.client.post('/api/events', json={
+            'title': 'new event',
+            'description': 'Created in test',
+            'date': '2026-05-13',
+            'start_time': '',
+            'end_time': '15:00',
+            'location': 'Library',
+            'color': 'emerald',
+        })
+
+        assert response.status_code == 400
+        assert 'Please fill in all required fields.' in response.json['error']
+
+        response = self.client.post('/api/events', json={
+            'title': 'new event',
+            'description': 'Created in test',
+            'date': '2026-05-13',
+            'start_time': '14:00',
+            'end_time': '',
+            'location': 'Library',
+            'color': 'emerald',
+        })
+
+        assert response.status_code == 400
+        assert 'Please fill in all required fields.' in response.json['error']
+
+    def test_create_event_end_time_before_start_time(self):
+        self.login_as(self.user)
+
+        response = self.client.post('/api/events', json={
+            'title': 'new event',
+            'description': 'Created in test',
+            'date': '2026-05-13',
+            'start_time': '15:00',
+            'end_time': '14:00',
+            'location': 'Library',
+            'color': 'emerald',
+        })
+
+        assert response.status_code == 400
+        assert 'End time must be after start time.' in response.json['error']
+
+# ----------------------- create event edge cases -----------------------
+
+    def test_delete_event_not_found(self):
+        self.login_as(self.user)
+
+        response = self.client.delete(f'/api/events/{99999999}')
+
+        assert response.status_code == 404
+        assert response.json['error'] == 'Event not found'
+        assert Event.query.get(self.event.id) is None
+
+@api_events.route("/api/events/<int:event_id>", methods=["DELETE"])
+@login_required
+def api_delete_event(event_id):
+    # check if event exists and belongs to the user
+    event = Event.query.get(event_id)
+    if not event:
+        return jsonify({"error": "Event not found"}), 404
+    if event.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized"}), 403
+    # check if event is custom (not imported from ical) - we don't want to allow deletion of imported events through this route
+    if event.ical_id:
+        return jsonify({"error": "Cannot delete imported events"}), 400
+    db.session.delete(event)
+    db.session.commit()
+    return jsonify({"message": "Event deleted"}), 200

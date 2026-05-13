@@ -254,6 +254,17 @@ def api_edit_event(event_id):
     # check if event is custom (not imported from ical) - we don't want to allow editing of imported events through this route
     if event.ical_id:
         return jsonify({"error": "Cannot edit imported events"}), 400
+    
+     # Required fields
+    if not data.get('title') or not data.get('date') or not data.get('start_time') or not data.get('end_time'):
+        return jsonify({"error": "Please fill in all required fields."}), 400
+    
+    # End time after start time
+    start = datetime.strptime(data['start_time'], '%H:%M').time()
+    end = datetime.strptime(data['end_time'], '%H:%M').time()
+    if end <= start:
+        return jsonify({"error": "End time must be after start time."}), 400
+    
     data = request.get_json()
     # update the event details - again we should add some validation here but we'll assume the data is correct for now
     event.title = data['title']
