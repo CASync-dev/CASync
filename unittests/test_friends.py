@@ -31,32 +31,34 @@ class FriendsTestCase(unittest.TestCase):
         db.session.add(user)
         db.session.add(friend)
         db.session.commit()
-        login_user(user) # Is this the right way to login as a user..?
+        with self.client.session_transaction() as session:
+            session['_user_id'] = str(user.id)
+            session['_fresh'] = True # Copied from Tehei's example.
 
     def test_getuser(self):
         # Test wrong data being submitted to the api
-        response = self.client.post('/api/getusers', data={
+        response = self.client.post('/api/getusers', json={
             'username': 'bob'
         }, follow_redirects=True)
         assert response.status_code == 400
         assert response == {"Error: Invalid search"}
         
         # Test no data associated with 'search'
-        response = self.client.post('/api/getusers', data={
+        response = self.client.post('/api/getusers', json={
             'search': ""
         })
         assert response.status_code == 400
         assert response == {"Error: Invalid search"}
 
         # Test email; Does not exist
-        response = self.client.post('/api/getusers', data={
+        response = self.client.post('/api/getusers', json={
             'search': "fakeemail@mail.com"
         })
         assert response.status_code == 200
         assert response['results'] == 0
 
         # Test email; Is current users
-        response = self.client.post('/api/getusers', data={
+        response = self.client.post('/api/getusers', json={
             'search': 'sekai@hotmail.com'
         })
         assert response.status_code == 200
@@ -64,28 +66,28 @@ class FriendsTestCase(unittest.TestCase):
 
         # Test email; User exists
 
-        response = self.client.post('/api/getusers', data={
+        response = self.client.post('/api/getusers', json={
             'search': 'friend@fun.net'
         })
         assert response.status_code == 200
         assert response['results'] == { 2: 'allen'} # Don't know if this is the right format, check prior to merge
 
         # Test Username; user does not exist
-        response = self.client.post('/api/getusers', data={
+        response = self.client.post('/api/getusers', json={
             'search': 'fakeuser'
         })
         assert response.status_code == 200
         assert response['results'] == 0
 
         # Test username; Is current users
-        response = self.client.post('/api/getusers', data={
+        response = self.client.post('/api/getusers', json={
             'search': 'gerald'
         })
         assert response.status_code == 200
         assert response['results'] == 0
 
         # Test Username; User exists
-        response = self.client.post('/api/getusers', data={
+        response = self.client.post('/api/getusers', json={
             'search': 'allen'
         })
         assert response.status_code == 200
@@ -93,28 +95,28 @@ class FriendsTestCase(unittest.TestCase):
 
     def test_requestfriend(self):
         # Wrong data sent to api
-        response = self.client.post('/api/requestfriend', data={
+        response = self.client.post('/api/requestfriend', json={
             'wrongdata': 'whatspopping'
         })
         assert response.status_code == 400
         assert response == {"Error: Invalid user_id"}
 
         # User does not exist (Just in case somehow the webpage sends a non-existent user id)
-        response = self.client.post('/api/requestfriend', data={
+        response = self.client.post('/api/requestfriend', json={
             'user_id': '50'
         })
         assert response.status_code == 404
         assert response == {"Error: User not found"}
 
         # User exists and no existing friend request exists between them.
-        response = self.client.post('/api/requestfriend', data={
+        response = self.client.post('/api/requestfriend', json={
             'user_id': '2'
         })
         assert response.status_code == 200
         assert response['message'] == "Friend request sent to allen!"
 
         # User exists, and an existing friend request already exists
-        response = self.client.post('/api/requestfriend', data={
+        response = self.client.post('/api/requestfriend', json={
             'user_id': '2'
         })
         assert response.status_code == 400
@@ -123,14 +125,14 @@ class FriendsTestCase(unittest.TestCase):
         # Should really test making req on a uesr who's already friends, but might be easier to do that in test_acceptfriend()
         
         # Testing searching when a request has already been made (Email)--------------------------
-        response = self.client.post('/api/getusers', data={
+        response = self.client.post('/api/getusers', json={
             'search': 'friend@fun.net'
         })
         assert response.status_code == 200
         assert response['results'] == 0
 
         # User
-        response = self.client.post('/api/getusers', data={
+        response = self.client.post('/api/getusers', json={
             'search': 'allen'
         })
         assert response.status_code == 200
@@ -152,26 +154,35 @@ class FriendsTestCase(unittest.TestCase):
 
         request_id = new_request.id
         # Testing not valid id submitted
-        response = self.client.post('/api/acceptfriend', data={
+        response = self.client.post('/api/acceptfriend', json={
             'notrelated': 'to this api :('
         })
         assert response.status_code == 400
         assert response == {"Error: Invalid request_id"}
 
         # Testing request does not exist
-        response = self.client.post('/api/acceptfriend', data={
-            'request_id': '105'
+        response = self.client.post('/api/acceptfriend', json={
+            'request_id': 105
         })
         assert response.status_code == 404
         assert response == {"Error: No pending friend request found"}
 
         # Testing request does not belong to us
-        
+        notourid = not_our_request.id
+        response = self.client.post('/api/acceptfriend', json={
+            'request_id': notourid
+        })
+        assert response.status_code == 403
+        assert response == {"Error: You can only accept friend requests sent to you"}
 
         # Testing accept request (actuals)
-
-
-
+        realfriendshipid = new_request.id
+        response = self.client.post('/api/acceptfriend', json={
+            'request_id': realfriendshipid
+        })
+        assert response.status_code == 200
+        assert response['message'] == "Friend request accepted from allen!"
+        assert Friendship.query.filter(Friendship.id == request_id).first.status == 'accepted'
 
     def test_rejectfriend(self):
         print()
