@@ -11,7 +11,7 @@ from app.models import User
 class UserTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app(config_class=TestConfig())
-        self.app.config['WTF_CSRF_ENABLED'] # Disables CSRF during tests
+        self.app.config['WTF_CSRF_ENABLED'] = False # Disables CSRF during tests
         self.app.config['LOGIN_DISABLED'] = True # Disable @login_required flags, so we can access the apis.
         self.app_context = self.app.app_context()
         self.app_context.push()
@@ -26,9 +26,9 @@ class UserTestCase(unittest.TestCase):
         self.app_context = None
 
     # Liam's test function from the old test branch/pr
-    def text_user_creation(self):
+    def test_user_creation(self):
         # Create a user and verify it was saved correctly
-        user = User(username='textuser', email='test@example.com')
+        user = User(username='testuser', email='test@example.com')
         db.session.add(user)
         db.session.commit()
         self.assertEqual(User.query.count(), 1)
@@ -55,19 +55,19 @@ class UserTestCase(unittest.TestCase):
         user.password = 'foobar'
         db.session.add(user)
         db.session.commit()
-        login_user(user)
-        response = self.client.post('/api/changeusername', data={
+        with self.client.session_transaction() as session:
+            session['_user_id'] = str(user.id)
+            session['_fresh'] = True
+        response = self.client.post('/api/changeusername', json={
             'newuser': 'bot',
         })
         assert response.status_code == 200
-        assert len(response.json['success']) == 1
         assert response.json['success'] == 'bot'
 
-        response = self.client.post('/api/changeusername', data={
+        response = self.client.post('/api/changeusername', json={
             'newuser': 'gerald',
         })
         assert response.status_code == 200
-        assert len(response.json['error']) == 1
         assert response.json['error'] == "Username already taken."
 
     def test_change_email(self):
@@ -78,26 +78,25 @@ class UserTestCase(unittest.TestCase):
         db.session.commit()
         user.password = 'foobar'
 
-        login_user(user)
-        response = self.client.post('/api/changeemail', data={
+        with self.client.session_transaction() as session:
+            session['_user_id'] = str(user.id)
+            session['_fresh'] = True
+        response = self.client.post('/api/changeemail', json={
             'newemailaddress': 'boxxingbot@user.com',
         })
         assert response.status_code == 200
-        assert len(response.json['success']) == 1
         assert response.json['success'] == 'boxxingbot@user.com'
 
-        response = self.client.post('/api/changeemail', data={
+        response = self.client.post('/api/changeemail', json={
             'newemailaddress': 'sekai@hotmail.com',
         })
         assert response.status_code == 200
-        assert len(response.json['error']) == 1
         assert response.json['error'] == 'Email already associated with another account.'
 
-        response = self.client.post('/api/changeemail', data={
+        response = self.client.post('/api/changeemail', json={
             'newemailaddress': 'notanemail',
         })
         assert response.status_code == 200
-        assert len(response.json['error']) == 1
         assert response.json['error'] == 'Not an Email'
 
     def test_change_password(self):
@@ -139,29 +138,29 @@ class UserTestCase(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
         # Testing incorrect email
-        response = self.client.post('settings', data = dict(email = 'myreal@mail.com', username= 'testsubject', password='foobar', acdform=""), follow_redirects=True)
+        response = self.client.post('/settings', data = dict(email = 'myreal@mail.com', username= 'testsubject', password='foobar', acdform=""), follow_redirects=True)
         assert response.request.path == '/settings'
         html = response.get_data(as_text=True)
         assert 'Error in account deletion: Incorrect email.' in html
         
         # Testing incorrect username
-        response = self.client.post('settings', data = dict(email = 'testing@yahoo.com', username= 'fakeuser', password='foobar', acdform=""), follow_redirects=True)
+        response = self.client.post('/settings', data = dict(email = 'testing@yahoo.com', username= 'fakeuser', password='foobar', acdform=""), follow_redirects=True)
         assert response.request.path == '/settings'
         html = response.get_data(as_text=True)
         assert 'Error in account deletion: Incorrect username.' in html
 
         # Testing incorrect password
-        response = self.client.post('settings', data = dict(email = 'testing@yahoo.com', username= 'testsubject', password='barfoo', acdform=""), follow_redirects=True)
+        response = self.client.post('/settings', data = dict(email = 'testing@yahoo.com', username= 'testsubject', password='barfoo', acdform=""), follow_redirects=True)
         assert response.request.path == '/settings'
         html = response.get_data(as_text=True)
         assert 'Error in account deletion: Incorrect password.' in html
 
         # Testing actual deletion
-        response = self.client.post('settings', data = dict(email = 'testing@yahoo.com', username= 'testsubject', password='foobar', acdform=""), follow_redirects=True)
+        response = self.client.post('/settings', data = dict(email = 'testing@yahoo.com', username= 'testsubject', password='foobar', acdform=""), follow_redirects=True)
         assert response.request.path == '/login'
         html = response.get_data(as_text=True)
         assert 'Your account has been deleted.' in html
-        user = User.query.filter_by('testsubject').first()
+        user = User.query.filter_by(username='testsubject').first()
         assert user == False
 
         
