@@ -48,3 +48,9 @@ class AppTestCase(unittest.TestCase):
         assert response.status_code == 200
         assert response.request.path == '/login'
     
+    def test_404error(self):
+        response = self.client.get('/notarealroute', follow_redirects = True)
+        html = response.get_data(as_text=True)
+        assert response.status_code == 404
+        assert 'Sorry, we couldn’t find the page you’re looking for.' in html
+        assert 'Page not found' in html
