@@ -28,7 +28,7 @@ def getusers():
             ((Friendship.sender_id == current_user.id) & (Friendship.recipient_id == mail.id)) |
             ((Friendship.sender_id == mail.id) & (Friendship.recipient_id == current_user.id))
         ).first()
-        if existing_friendship:
+        if existing_friendship and existing_friendship.status != 'rejected':
             return jsonify({'results': 0})
         # We call the public_dict method to only return the id and username of the user from the USer object.
         return jsonify({'results': [mail.public_dict()]})
@@ -43,8 +43,8 @@ def getusers():
         users = [u for u in users if u.id != current_user.id]
         # Filter out users that already have a friendship with the current user
         users = [u for u in users if not Friendship.query.filter(
-            ((Friendship.sender_id == current_user.id) & (Friendship.recipient_id == u.id)) |
-            ((Friendship.sender_id == u.id) & (Friendship.recipient_id == current_user.id))
+            ((Friendship.sender_id == current_user.id) & (Friendship.recipient_id == u.id) & (Friendship.status != 'rejected')) |
+            ((Friendship.sender_id == u.id) & (Friendship.recipient_id == current_user.id) & (Friendship.status != 'rejected'))
         ).first()]
         if users == []:
             return jsonify({'results': 0})
