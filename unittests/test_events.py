@@ -200,7 +200,7 @@ class EventsTestCase(unittest.TestCase):
 
         assert response.status_code == 404
         assert response.json['error'] == 'Event not found'
-        assert Event.query.get(self.event.id) is None
+        assert Event.query.get(self.event.id).title == 'Existing event'
 
     def test_delete_event_unauthorized(self):
         self.login_as(self.other_user)  # login as the OTHER user
