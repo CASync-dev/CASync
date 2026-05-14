@@ -33,17 +33,17 @@ class AppTestCase(unittest.TestCase):
         assert response.status_code == 200
         assert response.request.path == '/login'
 
-    def test_schedule_redirect(self):
+    def test_groups_redirect(self):
         response = self.client.get('/groups', follow_redirects=True)
         assert response.status_code == 200
         assert response.request.path == '/login'
 
-    def test_schedule_redirect(self):
+    def test_friends_redirect(self):
         response = self.client.get('/friends', follow_redirects=True)
         assert response.status_code == 200
         assert response.request.path == '/login'
 
-    def test_schedule_redirect(self):
+    def test_settings_redirect(self):
         response = self.client.get('/settings', follow_redirects=True)
         assert response.status_code == 200
         assert response.request.path == '/login'
