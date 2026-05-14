@@ -259,7 +259,9 @@ function renderDashboardEvents(processed) {
   const container = document.getElementById("dashboard-sub-events");
   if (!container) return;
   container.innerHTML = "";
-  const todayISO = new Date().toISOString().slice(0, 10);
+  // Build the key from local date parts to match how processEvents keys byDate;
+  const d = new Date();
+  const todayISO = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const todays = processed.byDate[todayISO] || [];
 
   let events = [];
