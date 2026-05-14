@@ -214,14 +214,15 @@ The general flow of it is:
     }
 
     // Builds the "start – end" label shown on event cards. For multi-day events,
-    // a segment that doesn't actually start/end on this day shows "yesterday" or
-    // "tomorrow" instead of the clamped 00:00 / 23:59 placeholder time.
+    // a segment that doesn't actually start/end on this day shows the short weekday
+    // of the real start or end day (e.g. "Mon") instead of the clamped 00:00 / 23:59.
     function eventTimeLabel(event) {
       const isSegment = event.segmentIndex !== undefined;
       const startsEarlier = isSegment && event.segmentIndex > 0;
       const endsLater = isSegment && event.segmentIndex < event.segmentCount - 1;
-      const start = startsEarlier ? 'yesterday' : formatTime(event.startTime);
-      const end = endsLater ? 'tomorrow' : formatTime(event.endTime);
+      const shortDay = (iso) => new Date(iso).toLocaleDateString('default', { weekday: 'short' });
+      const start = startsEarlier && event.startIso ? shortDay(event.startIso) : formatTime(event.startTime);
+      const end = endsLater && event.endIso ? shortDay(event.endIso) : formatTime(event.endTime);
       return `${start} – ${end}`;
     }
 
@@ -823,11 +824,11 @@ The general flow of it is:
         // Solo events pass through as-is; same-slot clusters become a single multi-event
         if (cluster.length === 1) return cluster[0];
         // Segment fields are shared across the cluster because grouping keys on date+start+end,
-        // so cards built from a multi-day cluster still get "yesterday"/"tomorrow" labels.
-        const { date, startTime, endTime, segmentIndex, segmentCount } = cluster[0];
+        // so cards built from a multi-day cluster still get the short-day labels.
+        const { date, startTime, endTime, segmentIndex, segmentCount, startIso, endIso } = cluster[0];
         return {
           type: 'multi',
-          date, startTime, endTime, segmentIndex, segmentCount,
+          date, startTime, endTime, segmentIndex, segmentCount, startIso, endIso,
           participants: cluster.map(e => ({ name: e.username, class: e.title, color: e.color })),
         };
       });
