@@ -213,6 +213,41 @@ The general flow of it is:
       return `${hour}:${String(m).padStart(2, '0')} ${period}`;
     }
 
+    // The API sends startTime/endTime as full ISO datetimes (e.g. "2026-05-14T14:00:00+00:00").
+    // The rest of this file expects:
+    //   - event.date as a YYYY-MM-DD string (so it can match against weekDates)
+    //   - event.startTime / event.endTime as HH:MM strings (so parseTime/formatTime work)
+    // So we convert the incoming ISO datetime into local-time pieces once on receipt,
+    // and replace the fields in place. Everything downstream stays the same.
+
+    // Given an ISO datetime string, return its local-time YYYY-MM-DD and HH:MM pieces.
+    function isoToLocalParts(iso) {
+      const d = new Date(iso);
+      const year  = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day   = String(d.getDate()).padStart(2, '0');
+      const hour  = String(d.getHours()).padStart(2, '0');
+      const min   = String(d.getMinutes()).padStart(2, '0');
+      return { date: `${year}-${month}-${day}`, time: `${hour}:${min}` };
+    }
+
+    // Replace event.startTime/endTime ISO strings with HH:MM strings and add event.date.
+    function normaliseEvent(ev) {
+      const start = isoToLocalParts(ev.startTime);
+      const end   = isoToLocalParts(ev.endTime);
+      return { ...ev, date: start.date, startTime: start.time, endTime: end.time };
+    }
+
+    // Walk the {userId: {events: {id: event}}} response and normalise each event in place.
+    function normaliseEventsResponse(data) {
+      for (const userBlock of Object.values(data)) {
+        for (const key of Object.keys(userBlock.events)) {
+          userBlock.events[key] = normaliseEvent(userBlock.events[key]);
+        }
+      }
+      return data;
+    }
+
     // Get a list of ISO date strings for Monday through Friday of the current week, adjusted by weekOffset.
     function getWeekDates() {
       // Always start from the real current date so navigation never accumulates errors
@@ -323,7 +358,7 @@ The general flow of it is:
           .then((data) => {
             lastFetchedStart = startDate;
             lastFetchedEnd = endDate;
-            events = data;
+            events = normaliseEventsResponse(data);
             renderDesktopEvents();
           })
           .catch((error) => {
@@ -338,7 +373,7 @@ The general flow of it is:
           .then((data) => {
             lastFetchedStart = startDate;
             lastFetchedEnd = endDate;
-            events = data;
+            events = normaliseEventsResponse(data);
             renderDesktopEvents();
           })
           .catch((error) => {
@@ -959,15 +994,15 @@ The general flow of it is:
 
     // -- Event listeners to listen to the event changes from pages outside this block (edit, delete, update)
     document.addEventListener('calendar:event-created', (event) => {
-      const newEvent = event.detail;
+      const newEvent = normaliseEvent(event.detail);
       const userId = String(newEvent.user_id);
       if (!events[userId]) events[userId] = { events: {} };
-      events[userId].events[String(newEvent.id)] = newEvent;      
+      events[userId].events[String(newEvent.id)] = newEvent;
       renderDesktopEvents();
     });
 
     document.addEventListener('calendar:event-updated', (event) => {
-      const updatedEvent = event.detail;
+      const updatedEvent = normaliseEvent(event.detail);
       const userId = String(updatedEvent.user_id);
       const key = Object.keys(events[userId]?.events ?? {}).find(
         k => events[userId].events[k].id === updatedEvent.id
