@@ -257,8 +257,8 @@ def api_edit_event(event_id):
     
     data = request.get_json()
     
-    # VALDATE input feilds
-     # Required fields
+    # VALIDATE input fields
+    # Required fields
     if not data.get('title') or not data.get('date') or not data.get('start_time') or not data.get('end_time'):
         return jsonify({"error": "Please fill in all required fields."}), 400
     
