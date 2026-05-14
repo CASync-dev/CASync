@@ -17,7 +17,7 @@ A component is a reusable piece of code that can be used to create a specific UI
 
 - isGroupSchedule: A boolean that tells the function if the calendar is being rendered for a group schedule page. If true, the calendar includes a see availbility button on the schedule page that toggles the calender 
   between showing evyerones shceudle (standard and default behaviour) and just showing blocks of avialibilty where all members are free. Tapping on any time cell in this mode reveals who is free at that time.
-
+  !not yet implmented!
 
 Standard Data Format Expectation
 - Parsing Events:
@@ -74,7 +74,7 @@ The general flow of it is:
         <i class="fa-solid fa-plus text-sm"></i>
       </button>
       {% endif %}
-      {% if isGroupSchedule %}
+      {# {% if isGroupSchedule %}
       <button
         id="availability-toggle"
         class="btn-plain bg-emerald-500 flex items-center gap-2 text-white transition-all duration-300 hover:bg-primary-dark shadow-dark shadow-md"
@@ -82,7 +82,7 @@ The general flow of it is:
         <i class="fa-solid fa-users"></i>
         See Availability
       </button>
-      {% endif %}
+      {% endif %} #}
     </div>
 
     <!-- Week navigation buttons -->
