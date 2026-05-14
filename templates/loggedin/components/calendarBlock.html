@@ -258,6 +258,42 @@ The general flow of it is:
       return data;
     }
 
+    // Multi-day events (date !== endDate) need to render on each day they cover.
+    // We split a single event into one segment per day, with start/end clamped to that day:
+    //   first day  → original startTime  → '23:59'
+    //   middle day → '00:00'             → '23:59'
+    //   last day   → '00:00'             → original endTime
+    // Each segment carries its index so DOM ids stay unique and the original id is kept
+    // for live-update lookups.
+    function splitMultiDayEvents(flatEvents) {
+      const result = [];
+      for (const ev of flatEvents) {
+        if (!ev.endDate || ev.date === ev.endDate) {
+          result.push(ev);
+          continue;
+        }
+        const start = new Date(`${ev.date}T00:00:00`);
+        const end = new Date(`${ev.endDate}T00:00:00`);
+        const dayCount = Math.round((end - start) / 86400000) + 1;
+        for (let i = 0; i < dayCount; i++) {
+          const d = new Date(start);
+          d.setDate(start.getDate() + i);
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          result.push({
+            ...ev,
+            date: `${year}-${month}-${day}`,
+            startTime: i === 0 ? ev.startTime : '00:00',
+            endTime: i === dayCount - 1 ? ev.endTime : '23:59',
+            segmentIndex: i,
+            segmentCount: dayCount,
+          });
+        }
+      }
+      return result;
+    }
+
     // Get a list of ISO date strings for Monday through Friday of the current week, adjusted by weekOffset.
     function getWeekDates() {
       // Always start from the real current date so navigation never accumulates errors
@@ -433,6 +469,8 @@ The general flow of it is:
       card.style.height = `${heightPx - 4}px`;
       // Store the collapsed height in a data attribute so we can restore it when collapsing after expansion
       card.dataset.collapsedHeight = `${heightPx - 4}px`;
+      // Tag the card with the underlying event id so live update listeners can find all segments of a multi-day event.
+      if (event.id !== undefined) card.dataset.eventId = event.id;
 
       // If event marked as not going, gray it out to indicate this
       if (event.going === false) {
@@ -716,8 +754,10 @@ The general flow of it is:
     }
 
     // Flattens the API response json to an array of event objects {userId: {events: {id: event}}} → [event, ...]
+    // Multi-day events are split here so each day gets its own segment to render.
     function flattenEvents(eventsData) {
-      return Object.values(eventsData).flatMap(u => Object.values(u.events));
+      const allEvents = Object.values(eventsData).flatMap(u => Object.values(u.events));
+      return splitMultiDayEvents(allEvents);
     }
 
     // Parses a multi-user API response into a flat list of typed event objects.
@@ -736,7 +776,7 @@ The general flow of it is:
       // without it (i.e in single user mode) the card does not show the username
       // to do this we use tags: simple key value pairs added to the event object
       // it parses the json reponse to an array of key value pairs where the key is the user id and the value is the user data (including events)
-      const tagged = Object.entries(eventsData).flatMap(([userId, userData]) =>
+      const taggedRaw = Object.entries(eventsData).flatMap(([userId, userData]) =>
         // then for each event of each user we create a new event object thatt includes the og data aswell as the tags for color and showUsername
         Object.values(userData.events).map(event => ({
           ...event, // new event object with all the og data, uses Spread syntax because we are in a arrow function
@@ -747,6 +787,8 @@ The general flow of it is:
           pfp: userData.pfp,
         }))
       );
+      // Split multi-day events first so each day's segment can group with same-slot segments from other users.
+      const tagged = splitMultiDayEvents(taggedRaw);
 
       // Group by exact date + startTime + endTime.
       // Only events with identical time slots become multi-events
@@ -797,7 +839,9 @@ The general flow of it is:
       // Route to the correct builder based on event type: multi-events get their own card builder.
       const cardHeight = ((endMinutes - startMinutes) / 60) * cellHeight -2; // subtract 2px to account for the top padding of the card
       const builder = event.type === 'multi' ? buildMultiEventCard : buildEventCard;
-      const card = builder(event, cardHeight, `event-${event.id || index}`); // use event ID if available, otherwise fallback to index for multi-events
+      // Multi-day events render one card per day, so append the segment index to keep DOM ids unique.
+      const segmentSuffix = event.segmentIndex !== undefined ? `-d${event.segmentIndex}` : '';
+      const card = builder(event, cardHeight, `event-${event.id || index}${segmentSuffix}`);
       // Override the hardcoded top-0.5 with an accurate offset for the minutes within the hour
       card.style.top = `${(startMinutes % 60) / 60 * cellHeight +2}px`; // add 2px to account for the card's top padding (makes lines visible)
       card.dataset.col = dayIndex;
