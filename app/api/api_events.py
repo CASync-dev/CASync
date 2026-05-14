@@ -6,6 +6,38 @@ from flask_login import current_user, login_required
 
 api_events = Blueprint('api_events', __name__)
 
+VALID_COLORS = {'indigo', 'red', 'orange', 'yellow', 'green', 'blue'}
+
+def _validate_event_data(data):
+    errors = []
+    title = data.get('title', '')
+    if not title or not title.strip():
+        errors.append("Title is required.")
+    elif len(title) > 200:
+        errors.append("Title must be 200 characters or fewer.")
+    if not data.get('date'):
+        errors.append("Date is required.")
+    if not data.get('start_time'):
+        errors.append("Start time is required.")
+    if not data.get('end_time'):
+        errors.append("End time is required.")
+    if data.get('start_time') and data.get('end_time'):
+        try:
+            start = datetime.strptime(data['start_time'], '%H:%M').time()
+            end = datetime.strptime(data['end_time'], '%H:%M').time()
+            if end <= start:
+                errors.append("End time must be after start time.")
+        except ValueError:
+            errors.append("Invalid time format, expected HH:MM.")
+    color = data.get('color')
+    if color and color not in VALID_COLORS:
+        errors.append(f"Invalid color. Must be one of: {', '.join(sorted(VALID_COLORS))}.")
+    if data.get('description') and len(data['description']) > 500:
+        errors.append("Description must be 500 characters or fewer.")
+    if data.get('location') and len(data['location']) > 300:
+        errors.append("Location must be 300 characters or fewer.")
+    return errors
+
 # -- API EVENT ROUTES
 """
    Standard Get Events Response:
@@ -231,7 +263,9 @@ def api_create_event():
     }
     """
     data = request.get_json()
-    # We should add some validation here to make sure the data is in the right format and all required fields are present, but for now we'll just assume it's correct
+    errors = _validate_event_data(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
     event = Event(
         title=data['title'],
         description=data.get('description', ''),
@@ -277,14 +311,16 @@ def api_edit_event(event_id):
     if event.ical_id:
         return jsonify({"error": "Cannot edit imported events"}), 400
     data = request.get_json()
-    # update the event details - again we should add some validation here but we'll assume the data is correct for now
+    errors = _validate_event_data(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
     event.title = data['title']
     event.description = data.get('description', '')
     event.date = datetime.strptime(data['date'], '%Y-%m-%d').date()
     event.start_time = datetime.strptime(data['start_time'], '%H:%M').time()
     event.end_time = datetime.strptime(data['end_time'], '%H:%M').time()
     event.location = data.get('location')
-    event.color = data.get('color', 'indigo')
+    event.color = data.get('color') or 'indigo'
     db.session.commit()
     return jsonify(event.to_dict()), 200
 

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, URLField, DateField, TimeField, EmailField, PasswordField
-from wtforms.validators import EqualTo, InputRequired, Regexp, Length, ValidationError
+from wtforms.validators import EqualTo, InputRequired, Optional, Regexp, Length, ValidationError
 import re
 from app.models import User
 
@@ -61,14 +61,23 @@ class IcalImportForm(FlaskForm):
     ical_url = URLField('iCal URL', validators=[InputRequired()])
     submit = SubmitField('Import')
 
+VALID_EVENT_COLORS = {'indigo', 'red', 'orange', 'yellow', 'green', 'blue'}
+
 class EventForm(FlaskForm):
-    title = StringField(validators=[InputRequired()])
+    title = StringField(validators=[InputRequired(), Length(min=1, max=200)])
     date = DateField(validators=[InputRequired()])
     start_time = TimeField(validators=[InputRequired()])
     end_time = TimeField(validators=[InputRequired()])
-    location = StringField()
-    description = StringField()
-    color = StringField()
+    location = StringField(validators=[Optional(), Length(max=300)])
+    description = StringField(validators=[Optional(), Length(max=500)])
+    color = StringField(validators=[Optional(), Regexp(
+        f'^({"|".join(VALID_EVENT_COLORS)})$', message="Invalid color."
+    )])
+
+    def validate_end_time(self, field):
+        if self.start_time.data and field.data and field.data <= self.start_time.data:
+            raise ValidationError("End time must be after start time.")
+
 
 # Settings' Changing details forms
 
