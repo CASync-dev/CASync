@@ -1,8 +1,9 @@
+from datetime import date, datetime, time
 import unittest
 from flask_login import current_user, login_user
 from app import create_app, db
 from app.config import TestConfig
-from app.models import Friendship, User
+from app.models import Event, Friendship, User
 
 class FriendsTestCase(unittest.TestCase):
     def setUp(self):
@@ -249,6 +250,7 @@ class FriendsTestCase(unittest.TestCase):
         user = User(username="coolnotfriend", email="abcde@fg.com")
         user.password = 'foobar' # Not required but why not :')
         db.session.add(user)
+        self.user = user
         not_our_request = Friendship(sender_id=user.id, recipient_id=2, status='pending', created_at=db.func.now()) # Request that the current user did not send and not for.
         db.session.add(new_request)
         db.session.add(not_our_request)
@@ -307,7 +309,7 @@ class FriendsTestCase(unittest.TestCase):
         assert response == {"Error: You are not friends with this user"}
 
         # Friendship has not been accepted yet
-        fq = Friendship(sender_id=current_user.id, recipient_id=2, status='pending', created_at=db.func.now(), accepted_at=db.func.now())
+        fq = Friendship(sender_id=self.user.id, recipient_id=2, status='pending', created_at=db.func.now())
         db.session.add(fq)
         db.session.commit()
         response = self.client.post('/api/removefriend', json={
@@ -328,6 +330,7 @@ class FriendsTestCase(unittest.TestCase):
 
         # Friendship exists & accepted
         fq.status = 'accepted'
+        fq.accepted_at=db.func.now()
         db.session.add(fq)
         db.session.commit()
         response = self.client.post('/api/removefriend', json={
@@ -338,10 +341,82 @@ class FriendsTestCase(unittest.TestCase):
 
     # Hm..
     def test_friends_status(self):
-        response = self.client.post('/api/friendsstatus', json={
-            'notrelated': 'to this api :('
-        })
+        # Testing parameter not being sent
+        response = self.client.get('/api/friendsstatus')
         assert response.status_code == 400
-        assert response == {"Error: Invalid friend_id"}
+        assert response["Error"] == "Missing 'now' parameter"
+
+        # Testing no friends (thus no status)
+        response = self.client.get('/api/friendsstatus?now=2026-05-14T14:08:23.425')
+        assert response.status_code == 200
+        assert response == {}
+
+        # Testing with friends but they are free (No events exist under the friend)
+        fq = Friendship(sender_id=self.user.id, recipient_id=2, status='accepted', created_at=db.func.now(), accepted_at=db.func.now())
+        db.session.add(fq)
+        db.session.commit()
+
+        response = self.client.get('/api/friendsstatus?now=2026-05-14T14:08:23.425')
+        assert response.status_code == 200
+        assert len(response) == 1
+        assert response[0]['email'] ==  'friend@fun.net'
+        assert response[0]['id'] == 2
+        assert response[0]['in_class'] == False
+        assert response[0]['minutes_until_next'] == None
+        assert response[0]['username'] == 'allen'
+
+        # Friend has event in 30min.
+        event = Event(
+        title='name',
+        date=date(2026, 5, 13),
+        start_time=time(10, 0),
+        end_time=time(11, 0),
+        color='indigo',
+        user_id=2
+
+        )
+        db.session.add(event)
+        db.session.commit()
+
+        response = self.client.get('/api/friendsstatus?now=2026-05-13T09:30:00.00')
+        assert response.status_code == 200
+        assert len(response) == 1
+        assert response[0]['email'] ==  'friend@fun.net'
+        assert response[0]['id'] == 2
+        assert response[0]['in_class'] == False
+        assert response[0]['minutes_until_next'] == 30
+        assert response[0]['username'] == 'allen'
+
+        # Friend is currently in an event that ends in 30 min
+        response = self.client.get('/api/friendsstatus?now=2026-05-13T10:30:00.00')
+        assert response.status_code == 200
+        assert len(response) == 1
+        assert response[0]['email'] ==  'friend@fun.net'
+        assert response[0]['id'] == 2
+        assert response[0]['in_class'] == True
+        assert response[0]['minutes_until_next'] == -30
+        assert response[0]['username'] == 'allen'
+
+        # Testing multiple friends
+        user = User(username="coolfriend", email="abcde@fg.com")
+        db.session.commit(user)
+        fq = Friendship(sender_id=self.user.id, recipient_id=user.id, status='accepted', created_at=db.func.now(), accepted_at=db.func.now())
+        db.session.commit(fq)
+
+        response = self.client.get('/api/friendsstatus?now=2026-05-13T10:30:00.00')
+        assert response.status_code == 200
+        assert len(response) == 2
+        assert response[0]['email'] ==  'friend@fun.net'
+        assert response[0]['id'] == 2
+        assert response[0]['in_class'] == True
+        assert response[0]['minutes_until_next'] == -30
+        assert response[0]['username'] == 'allen'
+        assert response[1]['email'] ==  "abcde@fg.com"
+        assert response[1]['id'] == user.id
+        assert response[1]['in_class'] == False
+        assert response[1]['minutes_until_next'] == None
+        assert response[1]['username'] == 'coolfriend'
+
+        return
 
     
