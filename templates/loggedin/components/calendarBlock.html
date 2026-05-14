@@ -232,10 +232,20 @@ The general flow of it is:
     }
 
     // Replace event.startTime/endTime ISO strings with HH:MM strings and add event.date.
+    // The original ISO datetimes are kept on startIso/endIso for code that needs the full
+    // start and end (e.g. the edit modal, which has its own datetime-local inputs).
     function normaliseEvent(ev) {
       const start = isoToLocalParts(ev.startTime);
       const end   = isoToLocalParts(ev.endTime);
-      return { ...ev, date: start.date, startTime: start.time, endTime: end.time };
+      return {
+        ...ev,
+        startIso: ev.startTime,
+        endIso: ev.endTime,
+        date: start.date,
+        endDate: end.date,
+        startTime: start.time,
+        endTime: end.time,
+      };
     }
 
     // Walk the {userId: {events: {id: event}}} response and normalise each event in place.
