@@ -64,6 +64,10 @@ class UserTestCase(unittest.TestCase):
         assert response.status_code == 200
         assert response.json['success'] == 'bot'
 
+        user = User(username='gerald', email='sekai@hotmail.com')
+        user.password = 'foo'
+        db.session.add(user)
+        db.session.commit()
         response = self.client.post('/api/changeusername', json={
             'newuser': 'gerald',
         })
@@ -104,6 +108,9 @@ class UserTestCase(unittest.TestCase):
         user.password = 'foobar'
         db.session.add(user)
         db.session.commit()
+        with self.client.session_transaction() as session:
+            session['_user_id'] = str(user.id)
+            session['_fresh'] = True
         # Testing on new password not being strong enough.
         # changePassform ="" tells the server that the data being sent is for that form.
         response = self.client.post("/settings", data = dict(current_password="foobar", new_password='badpass', repeat_new='badpass', changePassform=""), follow_redirects=True)
@@ -129,7 +136,7 @@ class UserTestCase(unittest.TestCase):
         response = self.client.post("/settings", data = dict(current_password="foobar", new_password='P@ssw01d', repeat_new='P@ssw01d', changePassform=""), follow_redirects=True)
         assert response.request.path == '/settings'
         html = response.get_data(as_text=True)
-        assert "Successfully changed user's password." in html
+        assert 'Successfully changed user&#39;s password.' in html
         assert user.verify_password('P@ssw01d') == True
 
     def test_del_acc(self):
@@ -137,6 +144,9 @@ class UserTestCase(unittest.TestCase):
         user.password = 'foobar'
         db.session.add(user)
         db.session.commit()
+        with self.client.session_transaction() as session:
+            session['_user_id'] = str(user.id)
+            session['_fresh'] = True
         # Testing incorrect email
         response = self.client.post('/settings', data = dict(email = 'myreal@mail.com', username= 'testsubject', password='foobar', acdform=""), follow_redirects=True)
         assert response.request.path == '/settings'
@@ -161,7 +171,7 @@ class UserTestCase(unittest.TestCase):
         html = response.get_data(as_text=True)
         assert 'Your account has been deleted.' in html
         user = User.query.filter_by(username='testsubject').first()
-        assert user == False
+        assert user == None
 
         
     # iCal Link imports to be handled by test_ical.py.
