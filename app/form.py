@@ -18,8 +18,7 @@ def strong_password(form, field):
     if not re.search(r'\d', password):
         errors.append("one number")
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-        errors.append("one special character")
-
+        errors.append("one special character")  
     if errors:
         raise ValidationError(f"Password must contain: {', '.join(errors)}.")
 
