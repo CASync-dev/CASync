@@ -100,6 +100,8 @@ class Event(db.Model):
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     # Full ISO datetimes (UTC) so events can span multiple days.
+    # NOTE: SQLite drops the tz offset on write, so values come back naive.
+    # By convention everything stored here is UTC clock-time; to_dict re-tags on read.
     start_time = db.Column(db.DateTime(timezone=True), nullable=False)
     end_time = db.Column(db.DateTime(timezone=True), nullable=False)
     location = db.Column(db.String(200))  # optional
