@@ -367,6 +367,10 @@ The general flow of it is:
         colors.bg,
         colors.border,
       ].join(' ');
+      // set a minimum height for a card as super small events become unreadbale
+      if (heightPx < 40) {
+        heightPx = 40;
+      }
       card.style.height = `${heightPx - 4}px`;
       // Store the collapsed height in a data attribute so we can restore it when collapsing after expansion
       card.dataset.collapsedHeight = `${heightPx - 4}px`;
@@ -525,6 +529,10 @@ The general flow of it is:
         'cursor-pointer transition-shadow hover:shadow-md select-none z-10',
         'bg-emerald-100 ',
       ].join(' ');
+      // set a minimum height for a card as super small events become unreadbale
+      if (heightPx < 40) {
+        heightPx = 40;
+      }
       card.style.height = `${heightPx - 4}px`;
       card.dataset.collapsedHeight = `${heightPx - 4}px`;
       card.style.boxShadow = '3px 3px 0 0 #5eead4, 6px 6px 0 0 #99f6e4';
