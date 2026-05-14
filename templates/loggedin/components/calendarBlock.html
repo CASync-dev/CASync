@@ -1073,9 +1073,9 @@ The general flow of it is:
         k => events[userId].events[k].id === updatedEvent.id
       );
       if (key) events[userId].events[key] = updatedEvent;
-      // change the button state
-      const btn = document.querySelector(`[data-event-id="${updatedEvent.id}"].going-toggle`);
-      if (btn) {
+      // Multi-day events render one card (and one going button) per day, so update them all.
+      const btns = document.querySelectorAll(`[data-event-id="${updatedEvent.id}"].going-toggle`);
+      btns.forEach((btn) => {
         btn.className = updatedEvent.going
           ? 'going-toggle bg-gray-500 text-white rounded p-1 hover:bg-gray-600 mt-auto'
           : 'going-toggle bg-green-500 text-white rounded p-1 hover:bg-green-600 mt-auto';
@@ -1083,11 +1083,11 @@ The general flow of it is:
           ? '<i class="fa-solid fa-xmark"></i>'
           : '<i class="fa-solid fa-check"></i>';
         btn.title = updatedEvent.going ? 'Mark as not going' : 'Mark as going';
-        btn.dataset.eventId = updatedEvent.id;
-      }
-      // change the div opacity
-      const card = document.getElementById(`event-${updatedEvent.id}`);
-      if (card) {
+      });
+      // change the div opacity on every card that belongs to this event
+      const cards = document.querySelectorAll(`[data-event-id="${updatedEvent.id}"]`);
+      cards.forEach((card) => {
+        if (card.classList.contains('going-toggle')) return; // skip the buttons we just updated
         if (updatedEvent.going === false) {
           card.classList.add('opacity-50');
           card.title = 'You are not going to this event';
@@ -1095,7 +1095,7 @@ The general flow of it is:
           card.classList.remove('opacity-50');
           card.title = '';
         }
-      }
+      });
     });
 
     document.addEventListener('calendar:event-deleted', (event) => {
