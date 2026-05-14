@@ -71,7 +71,7 @@ class User(UserMixin, db.Model):
         if self.avatarurl:
             return self.getavatar()
         else:
-            return self.gravatar(150)
+            return self.gravatar(size)
 
     def public_dict(self):
         return {"id": self.id, "username": self.username, "pfp": self.avatar(200)}
