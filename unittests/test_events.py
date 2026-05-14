@@ -255,30 +255,84 @@ class EventsTestCase(unittest.TestCase):
         assert response.json['error'] == 'Event not found'
         assert Event.query.get(self.event.id).title == 'Existing event'  # event not updated
 
+    def test_update_event_unauthorized(self):
+        self.login_as(self.other_user)
+
+        response = self.client.put(f'/api/events/{self.event.id}', json={
+            'title': 'Malicious update',
+            'description': 'should not work',
+            'date': '2026-05-14',
+            'start_time': '09:00',
+            'end_time': '10:00',
+            'location': 'Nowhere',
+            'color': 'rose',
+        })
+
+        assert response.status_code == 403
+        assert response.json['error'] == 'Unauthorized'
+        assert Event.query.get(self.event.id).title == 'Existing event'
+
+    def test_update_imported_event(self):
+        self.login_as(self.user)
+        imported = Event(
+            title='Imported edit',
+            description='ical imported',
+            date=date(2026, 5, 13),
+            start_time=time(12, 0),
+            end_time=time(13, 0),
+            location='Room 2',
+            color='blue',
+            user_id=self.user.id,
+            ical_id=77,
+        )
+        db.session.add(imported)
+        db.session.commit()
+
+        response = self.client.put(f'/api/events/{imported.id}', json={
+            'title': 'Attempt edit imported',
+            'date': '2026-05-13',
+            'start_time': '12:00',
+            'end_time': '13:00'
+        })
+        assert response.status_code == 400
+        assert response.json['error'] == 'Cannot edit imported events'
+
+    def test_toggle_going_not_found(self):
+        self.login_as(self.user)
+        response = self.client.post('/api/events/99999999/toggle_going')
+        assert response.status_code == 404
+        assert response.json['error'] == 'Event not found'
+
+    def test_toggle_going_unauthorized(self):
+        self.login_as(self.other_user)
+        response = self.client.post(f'/api/events/{self.event.id}/toggle_going')
+        assert response.status_code == 403
+        assert response.json['error'] == 'Unauthorized'
+
+    def test_api_events_me_missing_params(self):
+        self.login_as(self.user)
+        response = self.client.get('/api/events/me')
+        assert response.status_code == 400
+        assert response.json['error'] == 'Missing start or end date'
+
+    def test_api_events_me_invalid_date(self):
+        self.login_as(self.user)
+        response = self.client.get('/api/events/me?start=2026-99-99&end=2026-05-13')
+        assert response.status_code == 400
+        assert 'Invalid date format' in response.json['error']
+
+    def test_api_user_events_missing_params(self):
+        self.login_as(self.user)
+        response = self.client.get(f'/api/events/{self.user.id}')
+        assert response.status_code == 400
+        assert response.json['error'] == 'Missing start or end date'
+
+    def test_api_user_events_invalid_date(self):
+        self.login_as(self.user)
+        response = self.client.get(f'/api/events/{self.user.id}?start=bad&end=also')
+        assert response.status_code == 400
+        assert 'Invalid date format' in response.json['error']
 
 
 
-@api_events.route("/api/events/<int:event_id>", methods=["PUT", "GET"])
-@login_required
-def api_edit_event(event_id):
-    event = Event.query.get(event_id)
-    if not event:
-        return jsonify({"error": "Event not found"}), 404
-    if event.user_id != current_user.id:
-        return jsonify({"error": "Unauthorized"}), 403
-    # check if event is custom (not imported from ical) - we don't want to allow editing of imported events through this route
-    if event.ical_id:
-        return jsonify({"error": "Cannot edit imported events"}), 400
-    
-    data = request.get_json()
-    
-    # VALDATE input feilds
-     # Required fields
-    if not data.get('title') or not data.get('date') or not data.get('start_time') or not data.get('end_time'):
-        return jsonify({"error": "Please fill in all required fields."}), 400
-    
-    # End time after start time
-    start = datetime.strptime(data['start_time'], '%H:%M').time()
-    end = datetime.strptime(data['end_time'], '%H:%M').time()
-    if end <= start:
-        return jsonify({"error": "End time must be after start time."}), 400
+
