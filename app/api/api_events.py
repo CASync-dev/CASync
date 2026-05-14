@@ -230,7 +230,7 @@ def api_create_event():
 @login_required
 def api_delete_event(event_id):
     # check if event exists and belongs to the user
-    event = Event.query.get(event_id)
+    event = db.session.get(Event, event_id)
     if not event:
         return jsonify({"error": "Event not found"}), 404
     if event.user_id != current_user.id:
@@ -246,7 +246,7 @@ def api_delete_event(event_id):
 @api_events.route("/api/events/<int:event_id>", methods=["PUT", "GET"])
 @login_required
 def api_edit_event(event_id):
-    event = Event.query.get(event_id)
+    event = db.session.get(Event, event_id)
     if not event:
         return jsonify({"error": "Event not found"}), 404
     if event.user_id != current_user.id:
@@ -283,7 +283,7 @@ def api_edit_event(event_id):
 @api_events.route("/api/events/<int:event_id>/toggle_going", methods=["POST"])
 @login_required
 def api_toggle_going(event_id):
-    event = Event.query.get(event_id)
+    event = db.session.get(Event, event_id)
     if not event:
         return jsonify({"error": "Event not found"}), 404
     if event.user_id != current_user.id:

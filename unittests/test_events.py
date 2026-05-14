@@ -104,7 +104,7 @@ class EventsTestCase(unittest.TestCase):
 
         assert response.status_code == 200
         assert response.json['title'] == 'Updated event'
-        updated = Event.query.get(self.event.id)
+        updated = db.session.get(Event, self.event.id)
         assert updated.title == 'Updated event'
         assert updated.location == 'New room'
 
@@ -115,7 +115,7 @@ class EventsTestCase(unittest.TestCase):
 
         assert response.status_code == 200
         assert response.json['message'] == 'Event deleted'
-        assert Event.query.get(self.event.id) is None
+        assert db.session.get(Event, self.event.id) is None
 
 # ----------------------- create event edge cases -----------------------
     def test_create_event_missing_fields(self):
@@ -200,7 +200,7 @@ class EventsTestCase(unittest.TestCase):
 
         assert response.status_code == 404
         assert response.json['error'] == 'Event not found'
-        assert Event.query.get(self.event.id).title == 'Existing event'
+        assert db.session.get(Event, self.event.id).title == 'Existing event'
 
     def test_delete_event_unauthorized(self):
         self.login_as(self.other_user)  # login as the OTHER user
@@ -210,7 +210,7 @@ class EventsTestCase(unittest.TestCase):
         
         assert response.status_code == 403
         assert response.json['error'] == 'Unauthorized'
-        assert Event.query.get(self.event.id) is not None  # event still exists
+        assert db.session.get(Event, self.event.id) is not None  # event still exists
 
     
     def test_delete_imported_event(self):
@@ -234,7 +234,7 @@ class EventsTestCase(unittest.TestCase):
 
         assert response.status_code == 400
         assert response.json['error'] == 'Cannot delete imported events'
-        assert Event.query.get(imported_event.id) is not None
+        assert db.session.get(Event, imported_event.id) is not None
 
 # ----------------------- update event edge cases -----------------------
 
@@ -253,7 +253,7 @@ class EventsTestCase(unittest.TestCase):
 
         assert response.status_code == 404
         assert response.json['error'] == 'Event not found'
-        assert Event.query.get(self.event.id).title == 'Existing event'  # event not updated
+        assert db.session.get(Event, self.event.id).title == 'Existing event'  # event not updated
 
     # test updating an event that belongs to another user (should be unauthorized)
     def test_update_event_unauthorized(self):
@@ -271,7 +271,7 @@ class EventsTestCase(unittest.TestCase):
 
         assert response.status_code == 403
         assert response.json['error'] == 'Unauthorized'
-        assert Event.query.get(self.event.id).title == 'Existing event'
+        assert db.session.get(Event, self.event.id).title == 'Existing event'
 
     # test updating an imported event form ical (should not be allowed)
     def test_update_imported_event(self):
