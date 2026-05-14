@@ -191,7 +191,7 @@ class EventsTestCase(unittest.TestCase):
         assert response.status_code == 400
         assert 'End time must be after start time.' in response.json['error']
 
-# ----------------------- create event edge cases -----------------------
+# ----------------------- delete event edge cases -----------------------
 
     def test_delete_event_not_found(self):
         self.login_as(self.user)
@@ -202,18 +202,83 @@ class EventsTestCase(unittest.TestCase):
         assert response.json['error'] == 'Event not found'
         assert Event.query.get(self.event.id) is None
 
-@api_events.route("/api/events/<int:event_id>", methods=["DELETE"])
+    def test_delete_event_unauthorized(self):
+        self.login_as(self.other_user)  # login as the OTHER user
+        
+        # try to delete self.event which belongs to self.user
+        response = self.client.delete(f'/api/events/{self.event.id}')
+        
+        assert response.status_code == 403
+        assert response.json['error'] == 'Unauthorized'
+        assert Event.query.get(self.event.id) is not None  # event still exists
+
+    
+    def test_delete_imported_event(self):
+        self.login_as(self.user)
+
+        imported_event = Event(
+            title='Imported event',
+            description='Seeded imported event',
+            date=date(2026, 5, 13),
+            start_time=time(12, 0),
+            end_time=time(13, 0),
+            location='Room 202',
+            color='blue',
+            user_id=self.user.id,
+            ical_id=1,
+        )
+        db.session.add(imported_event)
+        db.session.commit()
+
+        response = self.client.delete(f'/api/events/{imported_event.id}')
+
+        assert response.status_code == 400
+        assert response.json['error'] == 'Cannot delete imported events'
+        assert Event.query.get(imported_event.id) is not None
+
+# ----------------------- update event edge cases -----------------------
+
+    def test_update_event_not_found(self):
+        self.login_as(self.user)
+
+        response = self.client.put(f'/api/events/{99999999}', json={
+            'title': 'Updated event',
+            'description': 'Updated description',
+            'date': '2026-05-14',
+            'start_time': '16:00',
+            'end_time': '17:00',
+            'location': 'New room',
+            'color': 'rose',
+        })
+
+        assert response.status_code == 404
+        assert response.json['error'] == 'Event not found'
+        assert Event.query.get(self.event.id).title == 'Existing event'  # event not updated
+
+
+
+
+@api_events.route("/api/events/<int:event_id>", methods=["PUT", "GET"])
 @login_required
-def api_delete_event(event_id):
-    # check if event exists and belongs to the user
+def api_edit_event(event_id):
     event = Event.query.get(event_id)
     if not event:
         return jsonify({"error": "Event not found"}), 404
     if event.user_id != current_user.id:
         return jsonify({"error": "Unauthorized"}), 403
-    # check if event is custom (not imported from ical) - we don't want to allow deletion of imported events through this route
+    # check if event is custom (not imported from ical) - we don't want to allow editing of imported events through this route
     if event.ical_id:
-        return jsonify({"error": "Cannot delete imported events"}), 400
-    db.session.delete(event)
-    db.session.commit()
-    return jsonify({"message": "Event deleted"}), 200
+        return jsonify({"error": "Cannot edit imported events"}), 400
+    
+    data = request.get_json()
+    
+    # VALDATE input feilds
+     # Required fields
+    if not data.get('title') or not data.get('date') or not data.get('start_time') or not data.get('end_time'):
+        return jsonify({"error": "Please fill in all required fields."}), 400
+    
+    # End time after start time
+    start = datetime.strptime(data['start_time'], '%H:%M').time()
+    end = datetime.strptime(data['end_time'], '%H:%M').time()
+    if end <= start:
+        return jsonify({"error": "End time must be after start time."}), 400
