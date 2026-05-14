@@ -213,6 +213,18 @@ The general flow of it is:
       return `${hour}:${String(m).padStart(2, '0')} ${period}`;
     }
 
+    // Builds the "start – end" label shown on event cards. For multi-day events,
+    // a segment that doesn't actually start/end on this day shows "yesterday" or
+    // "tomorrow" instead of the clamped 00:00 / 23:59 placeholder time.
+    function eventTimeLabel(event) {
+      const isSegment = event.segmentIndex !== undefined;
+      const startsEarlier = isSegment && event.segmentIndex > 0;
+      const endsLater = isSegment && event.segmentIndex < event.segmentCount - 1;
+      const start = startsEarlier ? 'yesterday' : formatTime(event.startTime);
+      const end = endsLater ? 'tomorrow' : formatTime(event.endTime);
+      return `${start} – ${end}`;
+    }
+
     // The API sends startTime/endTime as full ISO datetimes (e.g. "2026-05-14T14:00:00+00:00").
     // The rest of this file expects:
     //   - event.date as a YYYY-MM-DD string (so it can match against weekDates)
@@ -442,7 +454,7 @@ The general flow of it is:
         );
         event_color_map[event_class] = availableColors[0] || 'gray'; // default to gray if we run out of colors
       }
-      const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`;
+      const timeLabel = eventTimeLabel(event);
 
       // The card sits inside the grid cell using absolute positioning.
       // A small pad (left-0.5 / right-0.5) keeps the grid lines visible around it.
@@ -615,8 +627,11 @@ The general flow of it is:
       //   - class: the class they have during this time slot
       // those properties are detected and built by the multiUserParser function when it detects multiple events with the same time slot
 
-      const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`;
-
+      const timeLabel = eventTimeLabel(event);
+      // Multi-event cards are always gray TODO: cold be a lot niced
+      // The card sits inside the grid cell using absolute positioning.
+      // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
+      const colors = COLOR_MAP['gray'];
       const card = document.createElement('div');
       card.id = id;
       // Clash block theme: dedicated teal accent (not used by any individual user)
@@ -807,11 +822,13 @@ The general flow of it is:
       return Object.values(groups).map(cluster => {
         // Solo events pass through as-is; same-slot clusters become a single multi-event
         if (cluster.length === 1) return cluster[0];
-        const { date, startTime, endTime } = cluster[0];
+        // Segment fields are shared across the cluster because grouping keys on date+start+end,
+        // so cards built from a multi-day cluster still get "yesterday"/"tomorrow" labels.
+        const { date, startTime, endTime, segmentIndex, segmentCount } = cluster[0];
         return {
           type: 'multi',
-          date, startTime, endTime,
-          participants: cluster.map(e => ({ name: e.username, class: e.title, color: e.color, pfp: e.pfp })),
+          date, startTime, endTime, segmentIndex, segmentCount,
+          participants: cluster.map(e => ({ name: e.username, class: e.title, color: e.color })),
         };
       });
     }
