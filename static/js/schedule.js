@@ -43,12 +43,15 @@ document.getElementById("add-event-form").addEventListener("submit", (e) => {
     }
   }
 
+  // Combine the date and time inputs into a full ISO datetime (local → UTC).
+  // The API stores datetimes so events can span across midnight.
+  const toIso = (d, t) => new Date(`${d}T${t}`).toISOString();
+
   // Create event object in json format expected by the API
   const newEvent = {
     title: title,
-    date: date,
-    start_time: start_time,
-    end_time: end_time,
+    start_time: toIso(date, start_time),
+    end_time: toIso(date, end_time),
     location: location,
     description: description,
     color: color,
@@ -176,13 +179,15 @@ function editEvent(eventId) {
     document.getElementById("edit-event-modal").close();
     // We prevent the default form submission behavior
     e.preventDefault();
+    // Combine the date and time inputs into full ISO datetimes (local → UTC).
+    const editDate = document.getElementById("edit-event-date").value;
+    const toIso = (t) => new Date(`${editDate}T${t}`).toISOString();
     // We gather the updated event details from the form inputs as JSON
     const updatedEvent = {
       title: document.getElementById("edit-event-title").value,
       description: document.getElementById("edit-event-description").value,
-      date: document.getElementById("edit-event-date").value,
-      start_time: document.getElementById("edit-event-time-start").value,
-      end_time: document.getElementById("edit-event-time-end").value,
+      start_time: toIso(document.getElementById("edit-event-time-start").value),
+      end_time: toIso(document.getElementById("edit-event-time-end").value),
       location: document.getElementById("edit-event-location").value,
       color: document.getElementById("edit-event-color").value,
     };
