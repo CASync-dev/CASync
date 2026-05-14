@@ -15,6 +15,10 @@ A component is a reusable piece of code that can be used to create a specific UI
   This way we can ensure that we are only fetching the events we need for the current view, and not overfetching data for events that are outside of the current week.
   Often api routes that dont require date ranges will ignore nay date ranges provided and just retrun the data, but it would be good practice to only provide date ranges when needed
 
+- isGroupSchedule: A boolean that tells the function if the calendar is being rendered for a group schedule page. If true, the calendar includes a see availbility button on the schedule page that toggles the calender 
+  between showing evyerones shceudle (standard and default behaviour) and just showing blocks of avialibilty where all members are free. Tapping on any time cell in this mode reveals who is free at that time.
+
+
 Standard Data Format Expectation
 - Parsing Events:
   See the format defined in the api_events.py file for how the events are structured when fetched from the server.
@@ -34,7 +38,7 @@ The general flow of it is:
   - Handle week navigation by updating the header and re-rendering events for the new week
 -->
 
-{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true, timeRange=(8, 18), isSchedulePage=false) -%}
+{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true, timeRange=(8, 18), isSchedulePage=false, isGroupSchedule=false) -%}
 <div class="container-loggedin">
   <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
   <div class="sticky top-0 z-20 bg-stone-50 ">
@@ -68,6 +72,15 @@ The general flow of it is:
         commandfor="drawer"
       >
         <i class="fa-solid fa-plus text-sm"></i>
+      </button>
+      {% endif %}
+      {% if isGroupSchedule %}
+      <button
+        id="availability-toggle"
+        class="btn-plain bg-emerald-500 flex items-center gap-2 text-white transition-all duration-300 hover:bg-primary-dark shadow-dark shadow-md"
+      >
+        <i class="fa-solid fa-users"></i>
+        See Availability
       </button>
       {% endif %}
     </div>
