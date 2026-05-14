@@ -162,37 +162,30 @@ def friends_status():
         return jsonify({"Error": "Missing 'now' parameter"}), 400
     
     now = datetime.fromisoformat(now_str)
-    today = now.date()
-    current_time = now.time()
-    
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=timezone.utc)
+
     friends = current_user.get_friends()
     result = []
-    
+
     for friend in friends:
         # Check if friend has an event right now
-        in_class = Event.query.filter_by(user_id=friend.id, date=today, going=True).filter(
-            Event.start_time <= current_time,
-            Event.end_time >= current_time
-        ).first() is not None
+        current_event = Event.query.filter_by(user_id=friend.id, going=True).filter(
+            Event.start_time <= now,
+            Event.end_time >= now
+        ).first()
+        in_class = current_event is not None
 
         # If in class, return negative minutes remaining so the frontend knows to show "In Class Now"
         next_start = None
         if in_class:
-            current_event = Event.query.filter_by(user_id=friend.id, date=today, going=True).filter(
-                Event.start_time <= current_time,
-                Event.end_time >= current_time
-            ).first()
-            if current_event:
-                end_dt = datetime.combine(today, current_event.end_time)
-                next_start = -int((end_dt - now).total_seconds() // 60)
-        elif not in_class:
-            next_event = Event.query.filter_by(user_id=friend.id, date=today, going=True).filter(
-                Event.start_time > current_time
+            next_start = -int((current_event.end_time - now).total_seconds() // 60)
+        else:
+            next_event = Event.query.filter_by(user_id=friend.id, going=True).filter(
+                Event.start_time > now
             ).order_by(Event.start_time.asc()).first()
             if next_event:
-                # Calculate minutes until next event starts
-                next_dt = datetime.combine(today, next_event.start_time)
-                next_start = int((next_dt - now).total_seconds() // 60)
+                next_start = int((next_event.start_time - now).total_seconds() // 60)
             
         
         result.append({
