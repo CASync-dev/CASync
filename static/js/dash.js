@@ -168,19 +168,29 @@ function parseTimeToMinutes(hhmm = "00:00") {
 function processEvents(eventsData) {
   if (!eventsData) return { flat: [], byDate: {} };
 
-  // 1) flatten all users' events into an array
+  // The API gives us full ISO datetimes for startTime/endTime. We pull out the
+  // pieces we use elsewhere on the dashboard: the local date (YYYY-MM-DD) and
+  // the minutes-since-midnight for the start and end of the event.
   const flat = Object.values(eventsData)
     .flatMap((user) => Object.values(user.events))
     .map((e) => {
-      const dateISO = e.date; // e.g. "2026-05-06"
-      const start = e.startTime ?? e.start_time ?? e.start ?? "00:00";
-      const end = e.endTime ?? e.end_time ?? e.end ?? "00:00";
+      const startDate = new Date(e.startTime);
+      const endDate = new Date(e.endTime);
+      const yyyy = startDate.getFullYear();
+      const mm = String(startDate.getMonth() + 1).padStart(2, "0");
+      const dd = String(startDate.getDate()).padStart(2, "0");
+      const dateISO = `${yyyy}-${mm}-${dd}`;
+      const startHM = `${String(startDate.getHours()).padStart(2, "0")}:${String(startDate.getMinutes()).padStart(2, "0")}`;
+      const endHM = `${String(endDate.getHours()).padStart(2, "0")}:${String(endDate.getMinutes()).padStart(2, "0")}`;
       return {
         ...e,
+        // Replace ISO startTime/endTime with HH:MM so the renderers below stay simple.
+        startTime: startHM,
+        endTime: endHM,
         dateISO,
         dateObj: new Date(dateISO + "T00:00"),
-        startMinutes: parseTimeToMinutes(start),
-        endMinutes: parseTimeToMinutes(end),
+        startMinutes: startDate.getHours() * 60 + startDate.getMinutes(),
+        endMinutes: endDate.getHours() * 60 + endDate.getMinutes(),
       };
     })
     .sort((a, b) => a.startMinutes - b.startMinutes);
