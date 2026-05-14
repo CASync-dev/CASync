@@ -99,9 +99,9 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
-    date = db.Column(db.Date, nullable=False)
-    start_time = db.Column(db.Time, nullable=False)
-    end_time = db.Column(db.Time, nullable=False)
+    # Full ISO datetimes (UTC) so events can span multiple days.
+    start_time = db.Column(db.DateTime(timezone=True), nullable=False)
+    end_time = db.Column(db.DateTime(timezone=True), nullable=False)
     location = db.Column(db.String(200))  # optional
     color = db.Column(
         db.String(20)
@@ -113,10 +113,11 @@ class Event(db.Model):
     ical_id = db.Column(
         db.Integer, db.ForeignKey("calendars.id")
     )  # is the id of the calendar in the ical, we can use this to link events to a calendar and update them later if needed
-    going = db.Column(db.Boolean, default=True)  # whether the user is going to this event
+    going = db.Column(db.Boolean, nullable=False, default=True)  # whether the user is going to this event
 
     # Serialises the object to a plain dict — useful for returning JSON from a route
-    # Note: date and time are converted to strings since JSON can't handle Python date/time objects
+    # startTime/endTime are full ISO datetimes (UTC). The frontend derives the date and
+    # local HH:MM display from these.
     def to_dict(self):
         return {
             "id": self.id,
@@ -124,9 +125,8 @@ class Event(db.Model):
             "username": self.owner.username,
             "title": self.title,
             "description": self.description,
-            "date": self.date.isoformat(),
-            "startTime": self.start_time.strftime("%H:%M"),
-            "endTime": self.end_time.strftime("%H:%M"),
+            "startTime": self.start_time.isoformat(),
+            "endTime": self.end_time.isoformat(),
             "location": self.location,
             "color": self.color,
             "ical_uid": self.ical_uid,
@@ -135,7 +135,7 @@ class Event(db.Model):
         }
 
     def __repr__(self):
-        return f"<Event {self.title} on {self.date}>"
+        return f"<Event {self.title} at {self.start_time}>"
 
 
 class Calendar(db.Model):
