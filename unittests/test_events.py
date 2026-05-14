@@ -255,6 +255,7 @@ class EventsTestCase(unittest.TestCase):
         assert response.json['error'] == 'Event not found'
         assert Event.query.get(self.event.id).title == 'Existing event'  # event not updated
 
+    # test updating an event that belongs to another user (should be unauthorized)
     def test_update_event_unauthorized(self):
         self.login_as(self.other_user)
 
@@ -272,6 +273,7 @@ class EventsTestCase(unittest.TestCase):
         assert response.json['error'] == 'Unauthorized'
         assert Event.query.get(self.event.id).title == 'Existing event'
 
+    # test updating an imported event form ical (should not be allowed)
     def test_update_imported_event(self):
         self.login_as(self.user)
         imported = Event(
@@ -297,6 +299,85 @@ class EventsTestCase(unittest.TestCase):
         assert response.status_code == 400
         assert response.json['error'] == 'Cannot edit imported events'
 
+
+    def test_update_event_missing_fields(self):
+        self.login_as(self.user)
+
+        response = self.client.put(f'/api/events/{self.event.id}', json={
+            'title': '',
+            'description': 'Updated in test',
+            'date': '2026-05-13',
+            'start_time': '14:00',
+            'end_time': '15:00',
+            'location': 'Library',
+            'color': 'emerald',
+        })
+
+        assert response.status_code == 400
+        assert 'Please fill in all required fields.' in response.json['error']
+    
+    
+
+        response = self.client.put(f'/api/events/{self.event.id}', json={
+            'title': 'new event',
+            'description': 'Updated in test',
+            'date': '',
+            'start_time': '14:00',
+            'end_time': '15:00',
+            'location': 'Library',
+            'color': 'emerald',
+        })
+
+        assert response.status_code == 400
+        assert 'Please fill in all required fields.' in response.json['error']
+
+        response = self.client.put(f'/api/events/{self.event.id}', json={
+            'title': 'new event',
+            'description': 'Updated in test',
+            'date': '2026-05-13',
+            'start_time': '',
+            'end_time': '15:00',
+            'location': 'Library',
+            'color': 'emerald',
+        })
+
+        assert response.status_code == 400
+        assert 'Please fill in all required fields.' in response.json['error']
+
+        response = self.client.put(f'/api/events/{self.event.id}', json={
+            'title': 'new event',
+            'description': 'Updated in test',
+            'date': '2026-05-13',
+            'start_time': '14:00',
+            'end_time': '',
+            'location': 'Library',
+            'color': 'emerald',
+        })
+
+        assert response.status_code == 400
+        assert 'Please fill in all required fields.' in response.json['error']
+
+    def test_update_event_end_time_before_start_time(self):
+        self.login_as(self.user)
+
+        response = self.client.put(f'/api/events/{self.event.id}', json={
+            'title': 'Updated event',
+            'description': 'Updated in test',
+            'date': '2026-05-13',
+            'start_time': '15:00',
+            'end_time': '14:00',
+            'location': 'Library',
+            'color': 'emerald',
+        })
+
+        assert response.status_code == 400
+        assert 'End time must be after start time.' in response.json['error']
+
+
+
+# ----------------------- going/not going to event edge cases -----------------------
+
+
     def test_toggle_going_not_found(self):
         self.login_as(self.user)
         response = self.client.post('/api/events/99999999/toggle_going')
@@ -308,6 +389,8 @@ class EventsTestCase(unittest.TestCase):
         response = self.client.post(f'/api/events/{self.event.id}/toggle_going')
         assert response.status_code == 403
         assert response.json['error'] == 'Unauthorized'
+
+# ----------------------- events/me edge cases -----------------------
 
     def test_api_events_me_missing_params(self):
         self.login_as(self.user)
@@ -321,6 +404,9 @@ class EventsTestCase(unittest.TestCase):
         assert response.status_code == 400
         assert 'Invalid date format' in response.json['error']
 
+
+# ----------------------- /api/events/<int:user_id> edge cases -----------------------
+
     def test_api_user_events_missing_params(self):
         self.login_as(self.user)
         response = self.client.get(f'/api/events/{self.user.id}')
@@ -332,7 +418,3 @@ class EventsTestCase(unittest.TestCase):
         response = self.client.get(f'/api/events/{self.user.id}?start=bad&end=also')
         assert response.status_code == 400
         assert 'Invalid date format' in response.json['error']
-
-
-
-
