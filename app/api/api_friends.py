@@ -165,27 +165,31 @@ def friends_status():
     if now.tzinfo is None:
         now = now.replace(tzinfo=timezone.utc)
 
+    # SQLite strips the timezone on read, so events come back as naive UTC.
+    # Strip it from `now` too so the arithmetic below has matching awareness.
+    now_naive = now.astimezone(timezone.utc).replace(tzinfo=None)
+
     friends = current_user.get_friends()
     result = []
 
     for friend in friends:
         # Check if friend has an event right now
         current_event = Event.query.filter_by(user_id=friend.id, going=True).filter(
-            Event.start_time <= now,
-            Event.end_time >= now
+            Event.start_time <= now_naive,
+            Event.end_time >= now_naive
         ).first()
         in_class = current_event is not None
 
         # If in class, return negative minutes remaining so the frontend knows to show "In Class Now"
         next_start = None
         if in_class:
-            next_start = -int((current_event.end_time - now).total_seconds() // 60)
+            next_start = -int((current_event.end_time - now_naive).total_seconds() // 60)
         else:
             next_event = Event.query.filter_by(user_id=friend.id, going=True).filter(
-                Event.start_time > now
+                Event.start_time > now_naive
             ).order_by(Event.start_time.asc()).first()
             if next_event:
-                next_start = int((next_event.start_time - now).total_seconds() // 60)
+                next_start = int((next_event.start_time - now_naive).total_seconds() // 60)
             
         
         result.append({

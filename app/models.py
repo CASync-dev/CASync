@@ -118,15 +118,23 @@ class Event(db.Model):
     # Serialises the object to a plain dict — useful for returning JSON from a route
     # startTime/endTime are full ISO datetimes (UTC). The frontend derives the date and
     # local HH:MM display from these.
+    #
+    # SQLite has no native timezone storage, so DateTime(timezone=True) values come back
+    # as naive datetimes even though we always write UTC. Re-attach UTC here so the JSON
+    # string carries the offset and the browser converts to the user's local time.
     def to_dict(self):
+        def _iso(dt):
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt.isoformat()
         return {
             "id": self.id,
             "user_id": self.user_id,
             "username": self.owner.username,
             "title": self.title,
             "description": self.description,
-            "startTime": self.start_time.isoformat(),
-            "endTime": self.end_time.isoformat(),
+            "startTime": _iso(self.start_time),
+            "endTime": _iso(self.end_time),
             "location": self.location,
             "color": self.color,
             "ical_uid": self.ical_uid,
