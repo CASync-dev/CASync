@@ -32,7 +32,8 @@
 
                 <!-- Member Avatars -->
                 <div class="flex items-center my-2 group-avatars">
-                  {% for user in group.members %}
+                  {# For the first 8 members of the group, after show a +n #}
+                  {% for user in group.members[:8] %}
                     <img
                       src="{{ user.avatar(200) }}"
                       class="w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
@@ -40,6 +41,11 @@
                       title="{{ user.username }}"
                     />
                   {% endfor %}
+                  {% if group.members|length > 8 %}
+                    <div class="w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark flex items-center justify-center bg-gray-300 text-gray-600 font-bold">
+                      +{{ group.members|length - 8 }}
+                    </div>
+                  {% endif %}
                 </div>
               </div>
             </div>
