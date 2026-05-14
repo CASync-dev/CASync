@@ -28,16 +28,9 @@ function updateTime() {
 
 // craft the url for fetching events: format is /api/friends_status?now
 function getFriendsBaseUrl() {
-  let apiUrl = "/api/friendsstatus";
-  const now = new Date();
-
-  // convert to local ISO format without timezone (e.g. "2024-06-30T14:48:00") and append as query param
-  const localISO = new Date(now - now.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, -1);
-  apiUrl += `?now=${localISO}`;
-
-  return apiUrl;
+  // Send the real UTC instant (e.g. "2024-06-30T21:48:00.000Z"). The server
+  // compares this against event times stored as naive UTC.
+  return `/api/friendsstatus?now=${new Date().toISOString()}`;
 }
 
 async function getFriends_status() {
