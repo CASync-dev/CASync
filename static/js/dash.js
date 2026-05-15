@@ -81,7 +81,7 @@ function renderFriendsStatus(friends_status) {
 
     const li = document.createElement("li");
     li.className =
-      "py-4 flex items-center bg-blue-600 justify-between rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-md ring-white transition duration-200";
+      "py-4 flex items-center bg-blue-500 justify-between rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-md ring-white transition duration-200";
     li.innerHTML = `
       <div class="flex items-center ">
         <img class="h-15 w-15 rounded-full" src="${friend.avatar_url}" alt="${friend.username}'s avatar" />
