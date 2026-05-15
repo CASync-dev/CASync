@@ -157,6 +157,43 @@ function parseTimeToMinutes(hhmm = "00:00") {
                 ...
 */
 
+let COLOR_MAP = {
+  indigo: {
+    bg: "bg-indigo-100",
+    border: "border-indigo-500",
+    text: "text-indigo-800",
+  },
+  blue: { bg: "bg-blue-100", border: "border-blue-500", text: "text-blue-800" },
+  green: {
+    bg: "bg-green-100",
+    border: "border-green-500",
+    text: "text-green-800",
+  },
+  rose: { bg: "bg-rose-100", border: "border-rose-500", text: "text-rose-800" },
+  amber: {
+    bg: "bg-amber-100",
+    border: "border-amber-500",
+    text: "text-amber-800",
+  },
+  orange: {
+    bg: "bg-orange-100",
+    border: "border-orange-500",
+    text: "text-orange-800",
+  },
+  red: { bg: "bg-red-100", border: "border-red-500", text: "text-red-800" },
+  purple: {
+    bg: "bg-purple-100",
+    border: "border-purple-500",
+    text: "text-purple-800",
+  },
+  gray: { bg: "bg-gray-100", border: "border-gray-500", text: "text-gray-800" },
+  yellow: {
+    bg: "bg-yellow-100",
+    border: "border-yellow-500",
+    text: "text-yellow-800",
+  },
+};
+
 // process raw API JSON into useful structures
 function processEvents(eventsData) {
   if (!eventsData) return { flat: [], byDate: {} };
@@ -243,6 +280,8 @@ function bigCard(nextEvent) {
   const evEnd = nextEvent.endMinutes;
   const durationMinutes = Math.max(0, evEnd - evStart);
 
+  const colors = COLOR_MAP[ev.color] ?? COLOR_MAP.gray;
+
   const dMin = Math.max(0, Math.round(durationMinutes || 0));
   const dH = Math.floor(dMin / 60);
   const dR = dMin % 60;
@@ -302,7 +341,7 @@ function renderDashboardEvents(processed) {
       events.push(ev);
     }
   }
-  //events = events.slice(0, 5); // limit to 5 events for performance and to avoid overwhelming the user
+
   // call function to render data for the big card, or clear it if nothing is left
   if (events.length > 0) {
     bigCard(events[0]);
@@ -315,18 +354,15 @@ function renderDashboardEvents(processed) {
     return;
   }
   events.slice(1).forEach((ev) => {
-    const el = document.createElement("div");
-    el.className =
-      "flex items-center bg-slate-100 p-6 border rounded-2xl border-gray-300 gap-4";
+    const colors = COLOR_MAP[ev.color] ?? COLOR_MAP.gray;
+    el.className = `flex items-center ${colors.bg} ${colors.border} p-6 rounded-2xl gap-4`;
     el.innerHTML = `
-              <span class="text-xl font-medium flex-1"
-                >${ev.title}</span
-              >
-              <span class="text-lg text-gray-500 w-50 text-center shrink-0 bg-slate-200 rounded-2xl px-2 py-1 leading-none"
-                >${formatHHMM(ev.startTime ?? ev.start_time)} – ${formatHHMM(ev.endTime ?? ev.end_time)}</span
-              >
-              <div class="flex"><!-- avatars --></div>
-    `;
+    <span class="text-xl ${colors.text} font-medium flex-1">${ev.title}</span>
+    <span class="text-lg w-50 ${colors.text} text-center shrink-0  rounded-2xl px-2 py-1 leading-none">
+      ${formatHHMM(ev.startTime ?? ev.start_time)} – ${formatHHMM(ev.endTime ?? ev.end_time)}
+    </span>
+    <div class="flex"></div>
+  `;
     container.appendChild(el);
   });
 }
