@@ -280,7 +280,7 @@ function bigCard(nextEvent) {
   const evEnd = nextEvent.endMinutes;
   const durationMinutes = Math.max(0, evEnd - evStart);
 
-  const colors = COLOR_MAP[ev.color] ?? COLOR_MAP.gray;
+  const colors = COLOR_MAP[nextEvent.color] ?? COLOR_MAP.gray;
 
   const dMin = Math.max(0, Math.round(durationMinutes || 0));
   const dH = Math.floor(dMin / 60);
@@ -301,16 +301,19 @@ function bigCard(nextEvent) {
       ? `<span class="text-blue-600">RIGHT NOW</span>`
       : `IN <span class="ml-2 text-blue-600">${formatTime(minutesUntil)}</span>`;
 
+  // add the div colour
+  bigCardEl.classList.add(colors.bg, colors.border);
+
   bigCardEl.innerHTML = `
     <div class="flex items-center justify-between gap-4 mb-2">
       <h3 class="text-lg font-medium text-gray-500">NEXT EVENT</h3>
       <p class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-lg text-gray-700 shrink-0">${timeLabel}</p>
     </div>
-    <h2 class="text-4xl flex-1 mb-2">${nextEvent.title}</h2>
+    <h2 class="text-4xl ${colors.text} flex-1 mb-2">${nextEvent.title}</h2>
     <p class="text-xl text-gray-500 space-y-4 mb-4">
        Starts at ${startTime} and ends at ${endTime} <br />
-      <span class="text-lg text-gray-500 shrink-0 bg-slate-200 rounded-2xl p-2">${durationLabel}</span>
-      <span class="text-lg text-gray-500 shrink-0 bg-slate-200 rounded-2xl p-2">${locationOrStatus}</span>
+      <span class="text-lg ${colors.text} shrink-0 bg-slate-200 rounded-2xl p-2">${durationLabel}</span>
+      <span class="text-lg ${colors.text} shrink-0 bg-slate-200 rounded-2xl p-2">${locationOrStatus}</span>
     </p>
     <div class="flex"><!-- avatars --></div>
   `;
@@ -354,8 +357,9 @@ function renderDashboardEvents(processed) {
     return;
   }
   events.slice(1).forEach((ev) => {
+    el = document.createElement("div");
     const colors = COLOR_MAP[ev.color] ?? COLOR_MAP.gray;
-    el.className = `flex items-center ${colors.bg} ${colors.border} p-6 rounded-2xl gap-4`;
+    el.className = `flex items-center ${colors.bg}  border ${colors.border} p-6 rounded-2xl gap-4`;
     el.innerHTML = `
     <span class="text-xl ${colors.text} font-medium flex-1">${ev.title}</span>
     <span class="text-lg w-50 ${colors.text} text-center shrink-0  rounded-2xl px-2 py-1 leading-none">
