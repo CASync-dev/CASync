@@ -15,6 +15,10 @@ A component is a reusable piece of code that can be used to create a specific UI
   This way we can ensure that we are only fetching the events we need for the current view, and not overfetching data for events that are outside of the current week.
   Often api routes that dont require date ranges will ignore nay date ranges provided and just retrun the data, but it would be good practice to only provide date ranges when needed
 
+- isGroupSchedule: A boolean that tells the function if the calendar is being rendered for a group schedule page. If true, the calendar includes a see availbility button on the schedule page that toggles the calender 
+  between showing evyerones shceudle (standard and default behaviour) and just showing blocks of avialibilty where all members are free. Tapping on any time cell in this mode reveals who is free at that time.
+  !not yet implmented!
+
 Standard Data Format Expectation
 - Parsing Events:
   See the format defined in the api_events.py file for how the events are structured when fetched from the server.
@@ -34,10 +38,11 @@ The general flow of it is:
   - Handle week navigation by updating the header and re-rendering events for the new week
 -->
 
-{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true, timeRange=(8, 18), isSchedulePage=false) -%}
+{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true, timeRange=(8, 18), isSchedulePage=false, isGroupSchedule=false) -%}
 <div class="container-loggedin">
   <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
-  <div class="sticky top-0 z-20 bg-stone-50 ">
+  <!-- -mr-2 pr-2: extends the background a few px past the grid's right edge so multi-event card shadows don't leak above when scrolling -->
+  <div class="sticky top-0 z-20 bg-stone-50 -mr-2 pr-2">
     <!-- Calendar Header: Contains title and new activity button -->
     <div
       class="flex flex-col md:flex-row max-md:gap-3 items-center justify-between py-4"
@@ -70,6 +75,15 @@ The general flow of it is:
         <i class="fa-solid fa-plus text-sm"></i>
       </button>
       {% endif %}
+      {# {% if isGroupSchedule %}
+      <button
+        id="availability-toggle"
+        class="btn-plain bg-emerald-500 flex items-center gap-2 text-white transition-all duration-300 hover:bg-primary-dark shadow-dark shadow-md"
+      >
+        <i class="fa-solid fa-users"></i>
+        See Availability
+      </button>
+      {% endif %} #}
     </div>
 
     <!-- Week navigation buttons -->
@@ -152,6 +166,7 @@ The general flow of it is:
 
     // Overrideable base URL — set this before calling fetchAndRenderEvents() to change the data source
     let calendarBaseUrl = "{{ eventsUrl | safe }}";
+    let events = {};
 
     // Grid Constants: base values are baked in from the macro args and never change.
     const GRID_BASE_START = {{ timeRange[0] }};
@@ -196,6 +211,100 @@ The general flow of it is:
       const period = h < 12 ? 'am' : 'pm';
       const hour = h % 12 || 12;
       return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+    }
+
+    // Builds the "start – end" label shown on event cards. For multi-day events,
+    // a segment that doesn't actually start/end on this day shows the short weekday
+    // of the real start or end day (e.g. "Mon") instead of the clamped 00:00 / 23:59.
+    function eventTimeLabel(event) {
+      const isSegment = event.segmentIndex !== undefined;
+      const startsEarlier = isSegment && event.segmentIndex > 0;
+      const endsLater = isSegment && event.segmentIndex < event.segmentCount - 1;
+      const shortDay = (iso) => new Date(iso).toLocaleDateString('default', { weekday: 'short' });
+      const start = startsEarlier && event.startIso ? shortDay(event.startIso) : formatTime(event.startTime);
+      const end = endsLater && event.endIso ? shortDay(event.endIso) : formatTime(event.endTime);
+      return `${start} – ${end}`;
+    }
+
+    // The API sends startTime/endTime as full ISO datetimes (e.g. "2026-05-14T14:00:00+00:00").
+    // The rest of this file expects:
+    //   - event.date as a YYYY-MM-DD string (so it can match against weekDates)
+    //   - event.startTime / event.endTime as HH:MM strings (so parseTime/formatTime work)
+    // So we convert the incoming ISO datetime into local-time pieces once on receipt,
+    // and replace the fields in place. Everything downstream stays the same.
+
+    // Given an ISO datetime string, return its local-time YYYY-MM-DD and HH:MM pieces.
+    function isoToLocalParts(iso) {
+      const d = new Date(iso);
+      const year  = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day   = String(d.getDate()).padStart(2, '0');
+      const hour  = String(d.getHours()).padStart(2, '0');
+      const min   = String(d.getMinutes()).padStart(2, '0');
+      return { date: `${year}-${month}-${day}`, time: `${hour}:${min}` };
+    }
+
+    // Replace event.startTime/endTime ISO strings with HH:MM strings and add event.date.
+    // The original ISO datetimes are kept on startIso/endIso for code that needs the full
+    // start and end (e.g. the edit modal, which has its own datetime-local inputs).
+    function normaliseEvent(ev) {
+      const start = isoToLocalParts(ev.startTime);
+      const end   = isoToLocalParts(ev.endTime);
+      return {
+        ...ev,
+        startIso: ev.startTime,
+        endIso: ev.endTime,
+        date: start.date,
+        endDate: end.date,
+        startTime: start.time,
+        endTime: end.time,
+      };
+    }
+
+    // Walk the {userId: {events: {id: event}}} response and normalise each event in place.
+    function normaliseEventsResponse(data) {
+      for (const userBlock of Object.values(data)) {
+        for (const key of Object.keys(userBlock.events)) {
+          userBlock.events[key] = normaliseEvent(userBlock.events[key]);
+        }
+      }
+      return data;
+    }
+
+    // Multi-day events (date !== endDate) need to render on each day they cover.
+    // We split a single event into one segment per day, with start/end clamped to that day:
+    //   first day  → original startTime  → '23:59'
+    //   middle day → '00:00'             → '23:59'
+    //   last day   → '00:00'             → original endTime
+    // Each segment carries its index so DOM ids stay unique and the original id is kept
+    // for live-update lookups.
+    function splitMultiDayEvents(flatEvents) {
+      const result = [];
+      for (const ev of flatEvents) {
+        if (!ev.endDate || ev.date === ev.endDate) {
+          result.push(ev);
+          continue;
+        }
+        const start = new Date(`${ev.date}T00:00:00`);
+        const end = new Date(`${ev.endDate}T00:00:00`);
+        const dayCount = Math.round((end - start) / 86400000) + 1;
+        for (let i = 0; i < dayCount; i++) {
+          const d = new Date(start);
+          d.setDate(start.getDate() + i);
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          result.push({
+            ...ev,
+            date: `${year}-${month}-${day}`,
+            startTime: i === 0 ? ev.startTime : '00:00',
+            endTime: i === dayCount - 1 ? ev.endTime : '23:59',
+            segmentIndex: i,
+            segmentCount: dayCount,
+          });
+        }
+      }
+      return result;
     }
 
     // Get a list of ISO date strings for Monday through Friday of the current week, adjusted by weekOffset.
@@ -308,7 +417,7 @@ The general flow of it is:
           .then((data) => {
             lastFetchedStart = startDate;
             lastFetchedEnd = endDate;
-            events = data;
+            events = normaliseEventsResponse(data);
             renderDesktopEvents();
           })
           .catch((error) => {
@@ -321,9 +430,7 @@ The general flow of it is:
           fetch(apiUrl)
           .then((response) => response.json())
           .then((data) => {
-            lastFetchedStart = startDate;
-            lastFetchedEnd = endDate;
-            events = data;
+            events = normaliseEventsResponse(data);
             renderDesktopEvents();
           })
           .catch((error) => {
@@ -346,7 +453,7 @@ The general flow of it is:
         );
         event_color_map[event_class] = availableColors[0] || 'gray'; // default to gray if we run out of colors
       }
-      const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`;
+      const timeLabel = eventTimeLabel(event);
 
       // The card sits inside the grid cell using absolute positioning.
       // A small pad (left-0.5 / right-0.5) keeps the grid lines visible around it.
@@ -359,15 +466,22 @@ The general flow of it is:
       } else {
         var colors = COLOR_MAP['gray'];
       }
+
       card.className = [
         'absolute left-0.5 right-0.5 rounded-md border-l-4 overflow-hidden',
         'cursor-pointer transition-shadow hover:shadow-md select-none z-10',
         colors.bg,
         colors.border,
       ].join(' ');
+      // set a minimum height for a card as super small events become unreadbale
+      if (heightPx < 40) {
+        heightPx = 40;
+      }
       card.style.height = `${heightPx - 4}px`;
       // Store the collapsed height in a data attribute so we can restore it when collapsing after expansion
       card.dataset.collapsedHeight = `${heightPx - 4}px`;
+      // Tag the card with the underlying event id so live update listeners can find all segments of a multi-day event.
+      if (event.id !== undefined) card.dataset.eventId = event.id;
 
       // If event marked as not going, gray it out to indicate this
       if (event.going === false) {
@@ -377,7 +491,15 @@ The general flow of it is:
       // Event title — always shown
       const title = document.createElement('p');
       title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
-      title.textContent = event.title;
+      if (event.showUsername && event.username) {
+        // if the we are showing usernames we can also render the profile picture as a small circle in front of the event title.
+        const pfp = document.createElement('img');
+        pfp.src = event.pfp;
+        pfp.alt = `${event.username}'s profile picture`;
+        pfp.className = 'inline-block w-5 h-5 rounded-full mr-1';
+        title.appendChild(pfp);
+      }
+      title.appendChild(document.createTextNode(event.title));
       card.appendChild(title);
 
       const time = document.createElement('p');
@@ -396,7 +518,7 @@ The general flow of it is:
       // Location - show only if card is big enough, or if the location is exceptionally large, require an even bigger card
       // If we are in mulit user mode and showing usernames, we need more room to show the location since the title is taking up more space, so we increase the height thresholds by 25%
 
-      if ((heightPx >= 75 && event.location.length <= 50) || heightPx >= 100) {
+      if (event.location && ((heightPx >= 75 && event.location.length <= 50) || heightPx >= 100)) {
         const location = document.createElement('p');
         location.className = `text-xs leading-tight px-1.5 text-bold ${colors.text} opacity-75`;
         location.textContent = event.location;
@@ -504,47 +626,77 @@ The general flow of it is:
       //   - class: the class they have during this time slot
       // those properties are detected and built by the multiUserParser function when it detects multiple events with the same time slot
 
-      const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`;
+      const timeLabel = eventTimeLabel(event);
       // Multi-event cards are always gray TODO: cold be a lot niced
       // The card sits inside the grid cell using absolute positioning.
       // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
       const colors = COLOR_MAP['gray'];
       const card = document.createElement('div');
       card.id = id;
+      // Clash block theme: dedicated teal accent (not used by any individual user)
+      // plus three offset layers behind the card to read as a stack of overlapping events.
       card.className = [
-        'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
-        'cursor-pointer transition-shadow hover:shadow-md select-none z-10',
-        colors.bg,
-        colors.border,
+        'absolute left-0.5 right-0.5 top-0.5 rounded-md overflow-hidden border-l-4 border-teal-500',
+        'cursor-pointer transition-all duration-150 select-none z-10',
+        'bg-teal-50 ring-1 ring-teal-200/60',
       ].join(' ');
+      // set a minimum height for a card as super small events become unreadbale
+      if (heightPx < 40) {
+        heightPx = 40;
+      }
       card.style.height = `${heightPx - 4}px`;
       card.dataset.collapsedHeight = `${heightPx - 4}px`;
+      card.style.boxShadow =
+        '2px 2px 0 0 #ccfbf1, 2px 2px 0 1px #5eead4,' +
+        '4px 4px 0 0 #f0fdfa, 4px 4px 0 1px #99f6e4';
+
+      const content = document.createElement('div');
+      content.className = 'px-1.5 pt-1';
+      card.appendChild(content);
 
       // Time label as title
       const title = document.createElement('p');
-      title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
+      title.className = 'text-xs font-semibold leading-tight truncate text-gray-900 mt-0.5';
       title.textContent = timeLabel;
-      card.appendChild(title);
+      content.appendChild(title);
 
-      // Collapsed summary: just the participant names on one line
+      // Collapsed summary: participant names on one line
       const summary = document.createElement('p');
-      summary.className = `text-xs leading-tight px-1.5 ${colors.text} opacity-75 truncate`;
+      summary.className = 'text-xs leading-tight text-gray-800 opacity-75 truncate';
       summary.textContent = event.participants.map(p => p.name).join(', ');
-      card.appendChild(summary);
+      content.appendChild(summary);
+      // Avatar stack: slightly larger overlapping circles with a white ring so they read as a group
+      const pfpRow = document.createElement('div');
+      pfpRow.className = 'flex items-center';
+      event.participants.slice(0, 4).forEach((p, i) => {
+        const pfp = document.createElement('img');
+        pfp.src = p.pfp;
+        pfp.alt = `${p.name}'s profile picture`;
+        pfp.className = `w-7 h-7 rounded-full ring-2 ring-white ${i > 0 ? '-ml-1.5' : ''}`;
+        pfpRow.appendChild(pfp);
+      });
+      if (event.participants.length > 4) {
+        const extra = document.createElement('span');
+        extra.className = 'ml-1 text-[10px] font-semibold text-gray-800';
+        extra.textContent = `+${event.participants.length - 4}`;
+        pfpRow.appendChild(extra);
+      }
+      content.appendChild(pfpRow);
 
-      // Extra details - hidden till expanded
+      // Extra details - hidden till expanded.
       // Each participant gets a colored dot (their user color) + name and class.
       const details = document.createElement('div');
-      details.className = 'event-details hidden flex flex-col gap-0.5 mt-1 px-1.5 pb-1';
+      details.className = 'event-details hidden flex flex-col gap-0.5 mt-1 pb-1';
       details.innerHTML = event.participants.map(p => {
         // Convert the border color class (e.g. "border-indigo-500") to a solid bg dot ("bg-indigo-500")
         const dot = (COLOR_MAP[p.color]?.border ?? 'border-gray-500').replace('border-', 'bg-');
         return `<div class="flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full flex-shrink-0 ${dot}"></span>
-          <span class="text-xs ${colors.text} opacity-80">${p.name} — ${p.class}</span>
+          <img src="${p.pfp}" alt="${p.name}'s profile picture" class="inline-block w-4 h-4 rounded-full">
+          <span class="inline-block w-1.5 h-1.5 rounded-full ${dot}"></span>
+          <span class="text-xs text-gray-900 opacity-80">${p.name} — ${p.class}</span>
         </div>`;
       }).join('');
-      card.appendChild(details);
+      content.appendChild(details);
 
       card.addEventListener('click', () => {
         const isExpanded = card.classList.contains('expanded');
@@ -560,7 +712,7 @@ The general flow of it is:
           card.style.right = card.dataset.overlapRight ?? '';
           card.style.transform = '';
           details.classList.add('hidden');
-          card.children[0].classList.remove('text-wrap');
+          title.classList.remove('text-wrap');
         } else {
           // Expand: auto height (but never shrink below collapsed size), fixed width anchored left or right based on column
           card.classList.add('expanded', 'shadow-lg', 'z-20');
@@ -568,7 +720,7 @@ The general flow of it is:
           card.style.minHeight = card.dataset.collapsedHeight;
           card.style.height = 'auto';
           card.style.width = '280px';
-          card.children[0].classList.add('text-wrap');
+          title.classList.add('text-wrap');
           // Use the stored day index to determine expand direction:
           //   columns 1-3 expand centered, column 4+ expand leftward, column 0 expands rightward
           const col = parseInt(card.dataset.col ?? '0');
@@ -616,8 +768,10 @@ The general flow of it is:
     }
 
     // Flattens the API response json to an array of event objects {userId: {events: {id: event}}} → [event, ...]
+    // Multi-day events are split here so each day gets its own segment to render.
     function flattenEvents(eventsData) {
-      return Object.values(eventsData).flatMap(u => Object.values(u.events));
+      const allEvents = Object.values(eventsData).flatMap(u => Object.values(u.events));
+      return splitMultiDayEvents(allEvents);
     }
 
     // Parses a multi-user API response into a flat list of typed event objects.
@@ -636,15 +790,19 @@ The general flow of it is:
       // without it (i.e in single user mode) the card does not show the username
       // to do this we use tags: simple key value pairs added to the event object
       // it parses the json reponse to an array of key value pairs where the key is the user id and the value is the user data (including events)
-      const tagged = Object.entries(eventsData).flatMap(([userId, userData]) =>
+      const taggedRaw = Object.entries(eventsData).flatMap(([userId, userData]) =>
         // then for each event of each user we create a new event object thatt includes the og data aswell as the tags for color and showUsername
         Object.values(userData.events).map(event => ({
           ...event, // new event object with all the og data, uses Spread syntax because we are in a arrow function
           type: 'single',
           color: userColorMap[userId],
           showUsername: true,
+          // the username is included in the event object but pfp needs to be added as a tag since it is not part of the og event data and is needed for the multi user card details
+          pfp: userData.pfp,
         }))
       );
+      // Split multi-day events first so each day's segment can group with same-slot segments from other users.
+      const tagged = splitMultiDayEvents(taggedRaw);
 
       // Group by exact date + startTime + endTime.
       // Only events with identical time slots become multi-events
@@ -663,11 +821,13 @@ The general flow of it is:
       return Object.values(groups).map(cluster => {
         // Solo events pass through as-is; same-slot clusters become a single multi-event
         if (cluster.length === 1) return cluster[0];
-        const { date, startTime, endTime } = cluster[0];
+        // Segment fields are shared across the cluster because grouping keys on date+start+end,
+        // so cards built from a multi-day cluster still get the short-day labels.
+        const { date, startTime, endTime, segmentIndex, segmentCount, startIso, endIso } = cluster[0];
         return {
           type: 'multi',
-          date, startTime, endTime,
-          participants: cluster.map(e => ({ name: e.username, class: e.title, color: e.color })),
+          date, startTime, endTime, segmentIndex, segmentCount, startIso, endIso,
+          participants: cluster.map(e => ({ name: e.username, class: e.title, color: e.color, pfp: e.pfp })),
         };
       });
     }
@@ -695,7 +855,9 @@ The general flow of it is:
       // Route to the correct builder based on event type: multi-events get their own card builder.
       const cardHeight = ((endMinutes - startMinutes) / 60) * cellHeight -2; // subtract 2px to account for the top padding of the card
       const builder = event.type === 'multi' ? buildMultiEventCard : buildEventCard;
-      const card = builder(event, cardHeight, `event-${event.id || index}`); // use event ID if available, otherwise fallback to index for multi-events
+      // Multi-day events render one card per day, so append the segment index to keep DOM ids unique.
+      const segmentSuffix = event.segmentIndex !== undefined ? `-d${event.segmentIndex}` : '';
+      const card = builder(event, cardHeight, `event-${event.id || index}${segmentSuffix}`);
       // Override the hardcoded top-0.5 with an accurate offset for the minutes within the hour
       card.style.top = `${(startMinutes % 60) / 60 * cellHeight +2}px`; // add 2px to account for the card's top padding (makes lines visible)
       card.dataset.col = dayIndex;
@@ -787,7 +949,6 @@ The general flow of it is:
       // Route to multi-user parser if more than one user is present, otherwise use the simple flatten.
       const isMultiUser = Object.keys(events).length > 1;
       const flatEvents = isMultiUser ? multiUserParser(events) : flattenEvents(events);
-
       // Compute bounds across this week's events and extend the grid DOM if needed.
       // syncGridRows must run before buildCellMap so the map reflects the updated DOM.
       const { startHour, endHour } = computeWeekBounds(flatEvents, weekDates);
@@ -903,15 +1064,15 @@ The general flow of it is:
 
     // -- Event listeners to listen to the event changes from pages outside this block (edit, delete, update)
     document.addEventListener('calendar:event-created', (event) => {
-      const newEvent = event.detail;
+      const newEvent = normaliseEvent(event.detail);
       const userId = String(newEvent.user_id);
       if (!events[userId]) events[userId] = { events: {} };
-      events[userId].events[String(newEvent.id)] = newEvent;      
+      events[userId].events[String(newEvent.id)] = newEvent;
       renderDesktopEvents();
     });
 
     document.addEventListener('calendar:event-updated', (event) => {
-      const updatedEvent = event.detail;
+      const updatedEvent = normaliseEvent(event.detail);
       const userId = String(updatedEvent.user_id);
       const key = Object.keys(events[userId]?.events ?? {}).find(
         k => events[userId].events[k].id === updatedEvent.id
@@ -928,9 +1089,9 @@ The general flow of it is:
         k => events[userId].events[k].id === updatedEvent.id
       );
       if (key) events[userId].events[key] = updatedEvent;
-      // change the button state
-      const btn = document.querySelector(`[data-event-id="${updatedEvent.id}"].going-toggle`);
-      if (btn) {
+      // Multi-day events render one card (and one going button) per day, so update them all.
+      const btns = document.querySelectorAll(`[data-event-id="${updatedEvent.id}"].going-toggle`);
+      btns.forEach((btn) => {
         btn.className = updatedEvent.going
           ? 'going-toggle bg-gray-500 text-white rounded p-1 hover:bg-gray-600 mt-auto'
           : 'going-toggle bg-green-500 text-white rounded p-1 hover:bg-green-600 mt-auto';
@@ -938,11 +1099,11 @@ The general flow of it is:
           ? '<i class="fa-solid fa-xmark"></i>'
           : '<i class="fa-solid fa-check"></i>';
         btn.title = updatedEvent.going ? 'Mark as not going' : 'Mark as going';
-        btn.dataset.eventId = updatedEvent.id;
-      }
-      // change the div opacity
-      const card = document.getElementById(`event-${updatedEvent.id}`);
-      if (card) {
+      });
+      // change the div opacity on every card that belongs to this event
+      const cards = document.querySelectorAll(`[data-event-id="${updatedEvent.id}"]`);
+      cards.forEach((card) => {
+        if (card.classList.contains('going-toggle')) return; // skip the buttons we just updated
         if (updatedEvent.going === false) {
           card.classList.add('opacity-50');
           card.title = 'You are not going to this event';
@@ -950,7 +1111,7 @@ The general flow of it is:
           card.classList.remove('opacity-50');
           card.title = '';
         }
-      }
+      });
     });
 
     document.addEventListener('calendar:event-deleted', (event) => {
@@ -964,6 +1125,6 @@ The general flow of it is:
 
       renderDesktopEvents();
     });
-    fetchAndRenderEvents();
+    if (calendarBaseUrl) fetchAndRenderEvents();
 </script>
 {%- endmacro %}

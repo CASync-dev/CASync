@@ -1,16 +1,18 @@
 import json
-from datetime import date, time
+from datetime import date, datetime, time, timezone
 from app import app, db
 from app.models import User, Event
 import sys
 
-def parse_date(s):
-    return date.fromisoformat(s)  # "2026-03-26" -> date object
 
-
-def parse_time(s):
-    h, m = s.split(':')
-    return time(int(h), int(m))  # "11:00" -> time object
+def parse_datetime(date_str, time_str):
+    """Combine a YYYY-MM-DD date and HH:MM time into a UTC-aware datetime."""
+    h, m = time_str.split(':')
+    return datetime.combine(
+        date.fromisoformat(date_str),
+        time(int(h), int(m)),
+        tzinfo=timezone.utc,
+    )
 
 
 with app.app_context():
@@ -46,9 +48,8 @@ with app.app_context():
 
                 db.session.add(Event(
                     title      = e['title'],
-                    date       = parse_date(e['date']),
-                    start_time = parse_time(e['startTime']),
-                    end_time   = parse_time(e['endTime']),
+                    start_time = parse_datetime(e['date'], e['startTime']),
+                    end_time   = parse_datetime(e['date'], e['endTime']),
                     location   = e.get('location'),
                     color      = e.get('color', 'indigo'),
                     user_id    = user.id,

@@ -73,43 +73,35 @@
                       />
                     </div>
                     <div class="mb-3">
-                      <label for="event-date" class="block text-sm font-medium">
-                        Date
+                      <label
+                        for="event-start"
+                        class="block text-sm font-medium"
+                      >
+                        Starts
                       </label>
                       <input
-                        type="date"
-                        id="event-date"
-                        name="event-date"
+                        type="datetime-local"
+                        id="event-start"
+                        name="event-start"
                         class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        value="{{ now.strftime('%Y-%m-%d') }}"
+                        value="{{ now.strftime('%Y-%m-%dT%H:%M') }}"
                       />
                     </div>
                     <div class="mb-3">
-                      <label for="event-time" class="block text-sm font-medium">
-                        Time
+                      <label for="event-end" class="block text-sm font-medium">
+                        Ends
                       </label>
-                      <div class="flex">
-                        <input
-                          type="time"
-                          id="event-time-start"
-                          name="event-time-start"
-                          class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value="{{ now.strftime("%H:%M") }}"
-                        />
-                        <p class="mx-2">-</p>
-                        <input
-                          type="time"
-                          id="event-time-end"
-                          name="event-time-end"
-                          class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          {% if now.hour == 23 %}
-                            value= "{{ now.replace(hour=0).strftime('%H:%M') }}"
-                          {% else %}
-                            value =
-                            "{{ now.replace(hour=now.hour+1).strftime('%H:%M') }}"
-                          {% endif %}
-                        />
-                      </div>
+                      <input
+                        type="datetime-local"
+                        id="event-end"
+                        name="event-end"
+                        class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        {% if now.hour == 23 %}
+                          value="{{ (now + timedelta(hours=1, minutes=1)).strftime('%Y-%m-%dT%H:%M') }}"
+                        {% else %}
+                          value="{{ now.replace(hour=now.hour+1, minute=now.minute+1).strftime('%Y-%m-%dT%H:%M') }}"
+                        {% endif %}
+                      />
                     </div>
                     <div class="mb-3">
                       <label
@@ -338,40 +330,31 @@
                       </div>
                       <div class="mb-3">
                         <label
-                          for="edit-event-date"
+                          for="edit-event-start"
                           class="block text-sm font-medium"
                         >
-                          Date
+                          Starts
                         </label>
                         <input
-                          type="date"
-                          id="edit-event-date"
-                          name="event-date"
+                          type="datetime-local"
+                          id="edit-event-start"
+                          name="event-start"
                           class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                       </div>
                       <div class="mb-3">
                         <label
-                          for="edit-event-time-start"
+                          for="edit-event-end"
                           class="block text-sm font-medium"
                         >
-                          Time
+                          Ends
                         </label>
-                        <div class="flex">
-                          <input
-                            type="time"
-                            id="edit-event-time-start"
-                            name="event-time-start"
-                            class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          />
-                          <p class="mx-2">-</p>
-                          <input
-                            type="time"
-                            id="edit-event-time-end"
-                            name="event-time-end"
-                            class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          />
-                        </div>
+                        <input
+                          type="datetime-local"
+                          id="edit-event-end"
+                          name="event-end"
+                          class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        />
                       </div>
                       <div class="mb-3">
                         <label
@@ -409,11 +392,7 @@
                         >
                           Event Color
                         </label>
-                        <input
-                          type="hidden"
-                          id="edit-event-color"
-                          value="indigo"
-                        />
+                        <input type="hidden" id="edit-event-color" value="" />
                         <div
                           class="flex gap-1 mt-1"
                           id="edit-color-picker-buttons"
@@ -504,6 +483,17 @@
     gridScroll.addEventListener("scroll", () => {
       dayHeadersScroll.scrollLeft = gridScroll.scrollLeft;
     });
+
+    // Sets the default values for event creation to local time in the correct format
+    (function () {
+      const pad = (n) => String(n).padStart(2, "0");
+      const fmt = (d) =>
+        `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      const start = new Date();
+      const end = new Date(start.getTime() + 60 * 60 * 1000); // +1h
+      document.getElementById("event-start").value = fmt(start);
+      document.getElementById("event-end").value = fmt(end);
+    })();
   </script>
   <!-- tailwind js -->
   <script
