@@ -32,7 +32,8 @@
 
                 <!-- Member Avatars -->
                 <div class="flex items-center my-2 group-avatars">
-                  {% for user in group.members %}
+                  {# For the first 8 members of the group, after show a +n #}
+                  {% for user in group.members[:8] %}
                     <img
                       src="{{ user.avatar(200) }}"
                       class="w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
@@ -40,6 +41,11 @@
                       title="{{ user.username }}"
                     />
                   {% endfor %}
+                  {% if group.members|length > 8 %}
+                    <div class="w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark flex items-center justify-center bg-gray-300 text-gray-600 font-bold">
+                      +{{ group.members|length - 8 }}
+                    </div>
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -53,7 +59,7 @@
             </button>
             <button
               class="btn-plain mt-2 px-3 py-2 bg-blue-300 text-nearwhite rounded-lg hover:bg-blue-400"
-              onclick="openSchedule()"
+              onclick="openSchedule('{{ group.id }}', '{{ group.group_name }}')"
             >
               <i class="fas fa-calendar-alt"></i>
               Schedule
@@ -400,6 +406,59 @@
                 <!-- Friends listed -->
                 <div id="add-members-list" class="space-y-3"></div>
               </div>
+            </div>
+          </div>
+        </el-dialog-panel>
+      </div>
+    </dialog>
+  </el-dialog>
+  <!-- Schedule Modal -->
+  <el-dialog>
+    <dialog
+      id="group-schedule-modal"
+      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+    >
+      <el-dialog-backdrop
+        class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+      ></el-dialog-backdrop>
+
+      <div
+        tabindex="0"
+        class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+      >
+        <el-dialog-panel
+          class="relative transform overflow-hidden rounded-lg bg-stone-50 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-7xl max-h-[90vh] flex flex-col data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        >
+          <div
+            class="flex flex-col flex-1 overflow-hidden bg-stone-50 pt-5 sm:pt-6"
+          >
+            <div
+              class="shrink-0 flex items-center justify-between mb-4 px-4 sm:px-6"
+            >
+              <h3
+                class="text-lg font-medium leading-6 text-gray-900"
+                id="group-schedule-title"
+              >
+                group's Schedule
+              </h3>
+              <button
+                type="button"
+                class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:text-sm"
+                command="close"
+                commandfor="group-schedule-modal"
+              >
+                Close
+              </button>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+              {%
+                from 'loggedin/components/calendarBlock.html' import
+                calendarBlock
+              %}
+              {{
+                calendarBlock(days=['Mon', 'Tue', 'Wed',
+                'Thu','Fri'], eventsUrl='', isGroupSchedule=true)
+              }}
             </div>
           </div>
         </el-dialog-panel>

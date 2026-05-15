@@ -1,10 +1,42 @@
 from datetime import datetime
 from app import db
 from flask import Blueprint, jsonify, request
-from app.models import Calendar, User, Event
+from app.models import Calendar, User, Event, Group
 from flask_login import current_user, login_required
 
 api_events = Blueprint('api_events', __name__)
+
+VALID_COLORS = {'indigo', 'red', 'orange', 'yellow', 'green', 'blue'}
+
+def _validate_event_data(data):
+    errors = []
+    title = data.get('title', '')
+    if not title or not title.strip():
+        errors.append("Title is required.")
+    elif len(title) > 200:
+        errors.append("Title must be 200 characters or fewer.")
+    if not data.get('date'):
+        errors.append("Date is required.")
+    if not data.get('start_time'):
+        errors.append("Start time is required.")
+    if not data.get('end_time'):
+        errors.append("End time is required.")
+    if data.get('start_time') and data.get('end_time'):
+        try:
+            start = datetime.strptime(data['start_time'], '%H:%M').time()
+            end = datetime.strptime(data['end_time'], '%H:%M').time()
+            if end <= start:
+                errors.append("End time must be after start time.")
+        except ValueError:
+            errors.append("Invalid time format, expected HH:MM.")
+    color = data.get('color')
+    if color and color not in VALID_COLORS:
+        errors.append(f"Invalid color. Must be one of: {', '.join(sorted(VALID_COLORS))}.")
+    if data.get('description') and len(data['description']) > 500:
+        errors.append("Description must be 500 characters or fewer.")
+    if data.get('location') and len(data['location']) > 300:
+        errors.append("Location must be 300 characters or fewer.")
+    return errors
 
 # -- API EVENT ROUTES
 """
@@ -176,6 +208,39 @@ def api_user_events(user_id):
     indexed_events = {str(i + 1): e.to_dict() for i, e in enumerate(events)}
     return jsonify({user_id: {"events": indexed_events}})
 
+@api_events.route("/api/events/group/<int:group_id>", methods=["GET"])
+@login_required
+def api_group_events(group_id):
+    # This route gets all the events for a group of users in the groups table. Also accepts a start and end date as query parameters to limit the events returned to a specific date range, same format as above routes
+    # Unlike the above route this one includes the pfp and username of the user in the response as well, to make it easier for the frontend to display the events on the calendar with the correct user information without needing to make additional requests to get the user info
+    start_str = request.args.get('start')
+    end_str = request.args.get('end')
+    if not start_str or not end_str:
+        return jsonify({"error": "Missing start or end date"}), 400
+    try:
+        start_date = datetime.strptime(start_str, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_str, '%Y-%m-%d').date()
+    except ValueError:
+        return jsonify({"error": "Invalid date format, should be YYYY-MM-DD"}), 400
+    # check if the user is in the group provided, if not return an error messag
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({"error": "Group not found"}), 404
+    if not group.is_member():
+        return jsonify({"error": "Unauthorized"}), 403
+    # get all the user ids in the group and return all events for those users in the specified date range
+    user_ids = [user.id for user in group.members]
+    events = Event.query.where(
+        Event.user_id.in_(user_ids),
+        Event.date >= start_date,
+        Event.date <= end_date
+    ).all()
+    # format the events in the standard format specified above
+    # A user
+    user_dict = {str(user.id): {"username": user.username, "pfp": user.avatar(200), "events": {}} for user in group.members}
+    for event in events:
+        user_dict[str(event.user_id)]["events"][str(event.id)] = event.to_dict()
+    return jsonify(user_dict)
 
 
 # -- Manipulation routes (create, edit, delete) --
@@ -198,7 +263,9 @@ def api_create_event():
     }
     """
     data = request.get_json()
-    # We should add some validation here to make sure the data is in the right format and all required fields are present, but for now we'll just assume it's correct
+    errors = _validate_event_data(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
     event = Event(
         title=data['title'],
         description=data.get('description', ''),
@@ -244,14 +311,16 @@ def api_edit_event(event_id):
     if event.ical_id:
         return jsonify({"error": "Cannot edit imported events"}), 400
     data = request.get_json()
-    # update the event details - again we should add some validation here but we'll assume the data is correct for now
+    errors = _validate_event_data(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
     event.title = data['title']
     event.description = data.get('description', '')
     event.date = datetime.strptime(data['date'], '%Y-%m-%d').date()
     event.start_time = datetime.strptime(data['start_time'], '%H:%M').time()
     event.end_time = datetime.strptime(data['end_time'], '%H:%M').time()
     event.location = data.get('location')
-    event.color = data.get('color', 'indigo')
+    event.color = data.get('color') or 'indigo'
     db.session.commit()
     return jsonify(event.to_dict()), 200
 

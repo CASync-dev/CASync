@@ -15,6 +15,10 @@ A component is a reusable piece of code that can be used to create a specific UI
   This way we can ensure that we are only fetching the events we need for the current view, and not overfetching data for events that are outside of the current week.
   Often api routes that dont require date ranges will ignore nay date ranges provided and just retrun the data, but it would be good practice to only provide date ranges when needed
 
+- isGroupSchedule: A boolean that tells the function if the calendar is being rendered for a group schedule page. If true, the calendar includes a see availbility button on the schedule page that toggles the calender 
+  between showing evyerones shceudle (standard and default behaviour) and just showing blocks of avialibilty where all members are free. Tapping on any time cell in this mode reveals who is free at that time.
+  !not yet implmented!
+
 Standard Data Format Expectation
 - Parsing Events:
   See the format defined in the api_events.py file for how the events are structured when fetched from the server.
@@ -34,10 +38,11 @@ The general flow of it is:
   - Handle week navigation by updating the header and re-rendering events for the new week
 -->
 
-{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true, timeRange=(8, 18), isSchedulePage=false) -%}
+{% macro calendarBlock(days, eventsUrl, enableAdaptiveDateCalls=true, timeRange=(8, 18), isSchedulePage=false, isGroupSchedule=false) -%}
 <div class="container-loggedin">
   <!-- Sticky wrapper: title, nav buttons, and day column headers all stick together -->
-  <div class="sticky top-0 z-20 bg-stone-50 ">
+  <!-- -mr-2 pr-2: extends the background a few px past the grid's right edge so multi-event card shadows don't leak above when scrolling -->
+  <div class="sticky top-0 z-20 bg-stone-50 -mr-2 pr-2">
     <!-- Calendar Header: Contains title and new activity button -->
     <div
       class="flex flex-col md:flex-row max-md:gap-3 items-center justify-between py-4"
@@ -70,6 +75,15 @@ The general flow of it is:
         <i class="fa-solid fa-plus text-sm"></i>
       </button>
       {% endif %}
+      {# {% if isGroupSchedule %}
+      <button
+        id="availability-toggle"
+        class="btn-plain bg-emerald-500 flex items-center gap-2 text-white transition-all duration-300 hover:bg-primary-dark shadow-dark shadow-md"
+      >
+        <i class="fa-solid fa-users"></i>
+        See Availability
+      </button>
+      {% endif %} #}
     </div>
 
     <!-- Week navigation buttons -->
@@ -152,6 +166,7 @@ The general flow of it is:
 
     // Overrideable base URL — set this before calling fetchAndRenderEvents() to change the data source
     let calendarBaseUrl = "{{ eventsUrl | safe }}";
+    let events = {};
 
     // Grid Constants: base values are baked in from the macro args and never change.
     const GRID_BASE_START = {{ timeRange[0] }};
@@ -359,12 +374,17 @@ The general flow of it is:
       } else {
         var colors = COLOR_MAP['gray'];
       }
+
       card.className = [
         'absolute left-0.5 right-0.5 rounded-md border-l-4 overflow-hidden',
         'cursor-pointer transition-shadow hover:shadow-md select-none z-10',
         colors.bg,
         colors.border,
       ].join(' ');
+      // set a minimum height for a card as super small events become unreadbale
+      if (heightPx < 40) {
+        heightPx = 40;
+      }
       card.style.height = `${heightPx - 4}px`;
       // Store the collapsed height in a data attribute so we can restore it when collapsing after expansion
       card.dataset.collapsedHeight = `${heightPx - 4}px`;
@@ -377,7 +397,15 @@ The general flow of it is:
       // Event title — always shown
       const title = document.createElement('p');
       title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
-      title.textContent = event.title;
+      if (event.showUsername && event.username) {
+        // if the we are showing usernames we can also render the profile picture as a small circle in front of the event title.
+        const pfp = document.createElement('img');
+        pfp.src = event.pfp;
+        pfp.alt = `${event.username}'s profile picture`;
+        pfp.className = 'inline-block w-5 h-5 rounded-full mr-1';
+        title.appendChild(pfp);
+      }
+      title.appendChild(document.createTextNode(event.title));
       card.appendChild(title);
 
       const time = document.createElement('p');
@@ -396,7 +424,7 @@ The general flow of it is:
       // Location - show only if card is big enough, or if the location is exceptionally large, require an even bigger card
       // If we are in mulit user mode and showing usernames, we need more room to show the location since the title is taking up more space, so we increase the height thresholds by 25%
 
-      if ((heightPx >= 75 && event.location.length <= 50) || heightPx >= 100) {
+      if (event.location && ((heightPx >= 75 && event.location.length <= 50) || heightPx >= 100)) {
         const location = document.createElement('p');
         location.className = `text-xs leading-tight px-1.5 text-bold ${colors.text} opacity-75`;
         location.textContent = event.location;
@@ -505,46 +533,73 @@ The general flow of it is:
       // those properties are detected and built by the multiUserParser function when it detects multiple events with the same time slot
 
       const timeLabel = `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`;
-      // Multi-event cards are always gray TODO: cold be a lot niced
-      // The card sits inside the grid cell using absolute positioning.
-      // A small pad (left-0.5 / right-0.5 / top-0.5) keeps the grid lines visible around it.
-      const colors = COLOR_MAP['gray'];
+
       const card = document.createElement('div');
       card.id = id;
+      // Clash block theme: dedicated teal accent (not used by any individual user)
+      // plus three offset layers behind the card to read as a stack of overlapping events.
       card.className = [
-        'absolute left-0.5 right-0.5 top-0.5 rounded-md border-l-4 overflow-hidden',
-        'cursor-pointer transition-shadow hover:shadow-md select-none z-10',
-        colors.bg,
-        colors.border,
+        'absolute left-0.5 right-0.5 top-0.5 rounded-md overflow-hidden border-l-4 border-teal-500',
+        'cursor-pointer transition-all duration-150 select-none z-10',
+        'bg-teal-50 ring-1 ring-teal-200/60',
       ].join(' ');
+      // set a minimum height for a card as super small events become unreadbale
+      if (heightPx < 40) {
+        heightPx = 40;
+      }
       card.style.height = `${heightPx - 4}px`;
       card.dataset.collapsedHeight = `${heightPx - 4}px`;
+      card.style.boxShadow =
+        '2px 2px 0 0 #ccfbf1, 2px 2px 0 1px #5eead4,' +
+        '4px 4px 0 0 #f0fdfa, 4px 4px 0 1px #99f6e4';
+
+      const content = document.createElement('div');
+      content.className = 'px-1.5 pt-1';
+      card.appendChild(content);
 
       // Time label as title
       const title = document.createElement('p');
-      title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
+      title.className = 'text-xs font-semibold leading-tight truncate text-gray-900 mt-0.5';
       title.textContent = timeLabel;
-      card.appendChild(title);
+      content.appendChild(title);
 
-      // Collapsed summary: just the participant names on one line
+      // Collapsed summary: participant names on one line
       const summary = document.createElement('p');
-      summary.className = `text-xs leading-tight px-1.5 ${colors.text} opacity-75 truncate`;
+      summary.className = 'text-xs leading-tight text-gray-800 opacity-75 truncate';
       summary.textContent = event.participants.map(p => p.name).join(', ');
-      card.appendChild(summary);
+      content.appendChild(summary);
+      // Avatar stack: slightly larger overlapping circles with a white ring so they read as a group
+      const pfpRow = document.createElement('div');
+      pfpRow.className = 'flex items-center';
+      event.participants.slice(0, 4).forEach((p, i) => {
+        const pfp = document.createElement('img');
+        pfp.src = p.pfp;
+        pfp.alt = `${p.name}'s profile picture`;
+        pfp.className = `w-7 h-7 rounded-full ring-2 ring-white ${i > 0 ? '-ml-1.5' : ''}`;
+        pfpRow.appendChild(pfp);
+      });
+      if (event.participants.length > 4) {
+        const extra = document.createElement('span');
+        extra.className = 'ml-1 text-[10px] font-semibold text-gray-800';
+        extra.textContent = `+${event.participants.length - 4}`;
+        pfpRow.appendChild(extra);
+      }
+      content.appendChild(pfpRow);
 
-      // Extra details - hidden till expanded
+      // Extra details - hidden till expanded.
       // Each participant gets a colored dot (their user color) + name and class.
       const details = document.createElement('div');
-      details.className = 'event-details hidden flex flex-col gap-0.5 mt-1 px-1.5 pb-1';
+      details.className = 'event-details hidden flex flex-col gap-0.5 mt-1 pb-1';
       details.innerHTML = event.participants.map(p => {
         // Convert the border color class (e.g. "border-indigo-500") to a solid bg dot ("bg-indigo-500")
         const dot = (COLOR_MAP[p.color]?.border ?? 'border-gray-500').replace('border-', 'bg-');
         return `<div class="flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full flex-shrink-0 ${dot}"></span>
-          <span class="text-xs ${colors.text} opacity-80">${p.name} — ${p.class}</span>
+          <img src="${p.pfp}" alt="${p.name}'s profile picture" class="inline-block w-4 h-4 rounded-full">
+          <span class="inline-block w-1.5 h-1.5 rounded-full ${dot}"></span>
+          <span class="text-xs text-gray-900 opacity-80">${p.name} — ${p.class}</span>
         </div>`;
       }).join('');
-      card.appendChild(details);
+      content.appendChild(details);
 
       card.addEventListener('click', () => {
         const isExpanded = card.classList.contains('expanded');
@@ -560,7 +615,7 @@ The general flow of it is:
           card.style.right = card.dataset.overlapRight ?? '';
           card.style.transform = '';
           details.classList.add('hidden');
-          card.children[0].classList.remove('text-wrap');
+          title.classList.remove('text-wrap');
         } else {
           // Expand: auto height (but never shrink below collapsed size), fixed width anchored left or right based on column
           card.classList.add('expanded', 'shadow-lg', 'z-20');
@@ -568,7 +623,7 @@ The general flow of it is:
           card.style.minHeight = card.dataset.collapsedHeight;
           card.style.height = 'auto';
           card.style.width = '280px';
-          card.children[0].classList.add('text-wrap');
+          title.classList.add('text-wrap');
           // Use the stored day index to determine expand direction:
           //   columns 1-3 expand centered, column 4+ expand leftward, column 0 expands rightward
           const col = parseInt(card.dataset.col ?? '0');
@@ -643,6 +698,8 @@ The general flow of it is:
           type: 'single',
           color: userColorMap[userId],
           showUsername: true,
+          // the username is included in the event object but pfp needs to be added as a tag since it is not part of the og event data and is needed for the multi user card details
+          pfp: userData.pfp,
         }))
       );
 
@@ -667,7 +724,7 @@ The general flow of it is:
         return {
           type: 'multi',
           date, startTime, endTime,
-          participants: cluster.map(e => ({ name: e.username, class: e.title, color: e.color })),
+          participants: cluster.map(e => ({ name: e.username, class: e.title, color: e.color, pfp: e.pfp })),
         };
       });
     }
@@ -787,7 +844,6 @@ The general flow of it is:
       // Route to multi-user parser if more than one user is present, otherwise use the simple flatten.
       const isMultiUser = Object.keys(events).length > 1;
       const flatEvents = isMultiUser ? multiUserParser(events) : flattenEvents(events);
-
       // Compute bounds across this week's events and extend the grid DOM if needed.
       // syncGridRows must run before buildCellMap so the map reflects the updated DOM.
       const { startHour, endHour } = computeWeekBounds(flatEvents, weekDates);
@@ -964,6 +1020,6 @@ The general flow of it is:
 
       renderDesktopEvents();
     });
-    fetchAndRenderEvents();
+    if (calendarBaseUrl) fetchAndRenderEvents();
 </script>
 {%- endmacro %}
