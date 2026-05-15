@@ -1,6 +1,9 @@
 import multiprocessing
 import unittest
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from app import create_app, db
 from app.config import TestConfig # Just to use the TestCase! Not really an unit test...
 
@@ -15,7 +18,7 @@ class SeleniumTests(unittest.TestCase):
         db.create_all()
         self.populate_db()
 
-        self.server_thread = multiprocessing.Process(target=self.app.run)
+        self.server_thread = multiprocessing.Process(target=self.app.run, kwargs={"port": 9000}) # passes port=9000 as an argument to run()
         self.server_thread.start()
 
         self.driver = webdriver.Firefox()
@@ -38,10 +41,9 @@ class SeleniumTests(unittest.TestCase):
         
     def populate_db(self):
         pass
-
+        
     def test_index(self):
-        pass
-
+        self.driver.find_element()
     def test_faq(self):
         pass
 
