@@ -5,8 +5,6 @@ from app import create_app, db
 from app.config import TestConfig
 from app.models import User
 
-# TODO: Test other apis that use user.
-
 # Tests User functionability: registering, logging, password hashing, apis, etc.
 class UserTestCase(unittest.TestCase):
     def setUp(self):
