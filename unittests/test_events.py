@@ -53,14 +53,13 @@ class EventsTestCase(unittest.TestCase):
     def test_create_event(self):
         self.login_as(self.user)
         start = datetime(2026, 5, 13, 14, 0, tzinfo=timezone.utc).isoformat()
-        start = start.replace('+00:00', 'Z')
+        start = start.replace('+00:00', '.000Z')
         end = datetime(2026, 5, 13, 15, 0, tzinfo=timezone.utc).isoformat()
-        end = end.replace('+00:00', 'Z')
+        end = end.replace('+00:00', '.000Z')
 
         response = self.client.post('/api/events', json={
             'title': 'New event',
             'description': 'Created in test',
-            'date': '2026-05-13',
             'start_time': start,
             'end_time': end,
             'location': 'Library',
@@ -95,12 +94,16 @@ class EventsTestCase(unittest.TestCase):
     def test_update_event(self):
         self.login_as(self.user)
 
+        start = datetime(2026, 5, 14, 16, 0, tzinfo=timezone.utc).isoformat()
+        start = start.replace('+00:00', '.000Z')
+        end = datetime(2026, 5, 14, 17, 0, tzinfo=timezone.utc).isoformat()
+        end = end.replace('+00:00', '.000Z')
+
         response = self.client.put(f'/api/events/{self.event.id}', json={
             'title': 'Updated event',
             'description': 'Updated description',
-            'date': '2026-05-14',
-            'start_time': '16:00',
-            'end_time': '17:00',
+            'start_time': start,
+            'end_time': end,
             'location': 'New room',
             'color': 'rose',
         })
@@ -124,27 +127,16 @@ class EventsTestCase(unittest.TestCase):
     def test_create_event_missing_fields(self):
         self.login_as(self.user)
 
+        start = datetime(2026, 5, 13, 14, 0, tzinfo=timezone.utc).isoformat()
+        start = start.replace('+00:00', '.000Z')
+        end = datetime(2026, 5, 13, 15, 0, tzinfo=timezone.utc).isoformat()
+        end = end.replace('+00:00', '.000Z')
+
         response = self.client.post('/api/events', json={
             'title': '',
             'description': 'Created in test',
-            'date': '2026-05-13',
-            'start_time': '14:00',
-            'end_time': '15:00',
-            'location': 'Library',
-            'color': 'emerald',
-        })
-
-        assert response.status_code == 400
-        assert 'Please fill in all required fields.' in response.json['error']
-    
-    
-
-        response = self.client.post('/api/events', json={
-            'title': 'new event',
-            'description': 'Created in test',
-            'date': '',
-            'start_time': '14:00',
-            'end_time': '15:00',
+            'start_time': start,
+            'end_time': end,
             'location': 'Library',
             'color': 'emerald',
         })
@@ -155,9 +147,8 @@ class EventsTestCase(unittest.TestCase):
         response = self.client.post('/api/events', json={
             'title': 'new event',
             'description': 'Created in test',
-            'date': '2026-05-13',
             'start_time': '',
-            'end_time': '15:00',
+            'end_time': end,
             'location': 'Library',
             'color': 'emerald',
         })
@@ -168,8 +159,7 @@ class EventsTestCase(unittest.TestCase):
         response = self.client.post('/api/events', json={
             'title': 'new event',
             'description': 'Created in test',
-            'date': '2026-05-13',
-            'start_time': '14:00',
+            'start_time': start,
             'end_time': '',
             'location': 'Library',
             'color': 'emerald',
@@ -181,12 +171,16 @@ class EventsTestCase(unittest.TestCase):
     def test_create_event_end_time_before_start_time(self):
         self.login_as(self.user)
 
+        start = datetime(2026, 5, 13, 14, 0, tzinfo=timezone.utc).isoformat()
+        start = start.replace('+00:00', '.000Z')
+        end = datetime(2026, 5, 13, 15, 0, tzinfo=timezone.utc).isoformat()
+        end = end.replace('+00:00', '.000Z')
+
         response = self.client.post('/api/events', json={
             'title': 'new event',
             'description': 'Created in test',
-            'date': '2026-05-13',
-            'start_time': '15:00',
-            'end_time': '14:00',
+            'start_time': end,
+            'end_time': start,
             'location': 'Library',
             'color': 'emerald',
         })
@@ -219,12 +213,16 @@ class EventsTestCase(unittest.TestCase):
     def test_delete_imported_event(self):
         self.login_as(self.user)
 
+        start = datetime(2026, 5, 13, 12, 0, tzinfo=timezone.utc).isoformat()
+        start = start.replace('+00:00', '.000Z')
+        end = datetime(2026, 5, 13, 13, 0, tzinfo=timezone.utc).isoformat()
+        end = end.replace('+00:00', '.000Z')
+
         imported_event = Event(
             title='Imported event',
             description='Seeded imported event',
-            date=date(2026, 5, 13),
-            start_time=time(12, 0),
-            end_time=time(13, 0),
+            start_time=datetime.fromisoformat(start.replace('Z', '+00:00')),
+            end_time=datetime.fromisoformat(end.replace('Z', '+00:00')),
             location='Room 202',
             color='blue',
             user_id=self.user.id,
@@ -244,12 +242,16 @@ class EventsTestCase(unittest.TestCase):
     def test_update_event_not_found(self):
         self.login_as(self.user)
 
+        start = datetime(2026, 5, 13, 16, 0, tzinfo=timezone.utc).isoformat()
+        start = start.replace('+00:00', '.000Z')
+        end = datetime(2026, 5, 13, 17, 0, tzinfo=timezone.utc).isoformat()
+        end = end.replace('+00:00', '.000Z')
+        
         response = self.client.put(f'/api/events/{99999999}', json={
             'title': 'Updated event',
             'description': 'Updated description',
-            'date': '2026-05-14',
-            'start_time': '16:00',
-            'end_time': '17:00',
+            'start_time': start,
+            'end_time': end,
             'location': 'New room',
             'color': 'rose',
         })
@@ -262,12 +264,16 @@ class EventsTestCase(unittest.TestCase):
     def test_update_event_unauthorized(self):
         self.login_as(self.other_user)
 
+        start = datetime(2026, 5, 13, 9, 0, tzinfo=timezone.utc).isoformat()
+        start = start.replace('+00:00', '.000Z')
+        end = datetime(2026, 5, 13, 10, 0, tzinfo=timezone.utc).isoformat()
+        end = end.replace('+00:00', '.000Z')
+
         response = self.client.put(f'/api/events/{self.event.id}', json={
             'title': 'Malicious update',
             'description': 'should not work',
-            'date': '2026-05-14',
-            'start_time': '09:00',
-            'end_time': '10:00',
+            'start_time': start,
+            'end_time': end,
             'location': 'Nowhere',
             'color': 'rose',
         })
@@ -279,12 +285,17 @@ class EventsTestCase(unittest.TestCase):
     # test updating an imported event form ical (should not be allowed)
     def test_update_imported_event(self):
         self.login_as(self.user)
+
+        start = datetime(2026, 5, 13, 12, 0, tzinfo=timezone.utc).isoformat()
+        start = start.replace('+00:00', '.000Z')
+        end = datetime(2026, 5, 13, 13, 0, tzinfo=timezone.utc).isoformat()
+        end = end.replace('+00:00', '.000Z')
+
         imported = Event(
             title='Imported edit',
             description='ical imported',
-            date=date(2026, 5, 13),
-            start_time=time(12, 0),
-            end_time=time(13, 0),
+            start_time=datetime.fromisoformat(start.replace('Z', '+00:00')),
+            end_time=datetime.fromisoformat(end.replace('Z', '+00:00')),
             location='Room 2',
             color='blue',
             user_id=self.user.id,
@@ -295,9 +306,8 @@ class EventsTestCase(unittest.TestCase):
 
         response = self.client.put(f'/api/events/{imported.id}', json={
             'title': 'Attempt edit imported',
-            'date': '2026-05-13',
-            'start_time': '12:00',
-            'end_time': '13:00'
+            'start_time': start,
+            'end_time': end
         })
         assert response.status_code == 400
         assert response.json['error'] == 'Cannot edit imported events'
@@ -306,27 +316,16 @@ class EventsTestCase(unittest.TestCase):
     def test_update_event_missing_fields(self):
         self.login_as(self.user)
 
+        start = datetime(2026, 5, 13, 14, 0, tzinfo=timezone.utc).isoformat()
+        start = start.replace('+00:00', '.000Z')
+        end = datetime(2026, 5, 13, 15, 0, tzinfo=timezone.utc).isoformat()
+        end = end.replace('+00:00', '.000Z')
+
         response = self.client.put(f'/api/events/{self.event.id}', json={
             'title': '',
             'description': 'Updated in test',
-            'date': '2026-05-13',
-            'start_time': '14:00',
-            'end_time': '15:00',
-            'location': 'Library',
-            'color': 'emerald',
-        })
-
-        assert response.status_code == 400
-        assert 'Please fill in all required fields.' in response.json['error']
-    
-    
-
-        response = self.client.put(f'/api/events/{self.event.id}', json={
-            'title': 'new event',
-            'description': 'Updated in test',
-            'date': '',
-            'start_time': '14:00',
-            'end_time': '15:00',
+            'start_time': start,
+            'end_time': end,
             'location': 'Library',
             'color': 'emerald',
         })
@@ -337,9 +336,8 @@ class EventsTestCase(unittest.TestCase):
         response = self.client.put(f'/api/events/{self.event.id}', json={
             'title': 'new event',
             'description': 'Updated in test',
-            'date': '2026-05-13',
             'start_time': '',
-            'end_time': '15:00',
+            'end_time': end,
             'location': 'Library',
             'color': 'emerald',
         })
@@ -350,8 +348,7 @@ class EventsTestCase(unittest.TestCase):
         response = self.client.put(f'/api/events/{self.event.id}', json={
             'title': 'new event',
             'description': 'Updated in test',
-            'date': '2026-05-13',
-            'start_time': '14:00',
+            'start_time': start,
             'end_time': '',
             'location': 'Library',
             'color': 'emerald',
@@ -363,12 +360,16 @@ class EventsTestCase(unittest.TestCase):
     def test_update_event_end_time_before_start_time(self):
         self.login_as(self.user)
 
+        start = datetime(2026, 5, 13, 14, 0, tzinfo=timezone.utc).isoformat()
+        start = start.replace('+00:00', '.000Z')
+        end = datetime(2026, 5, 13, 15, 0, tzinfo=timezone.utc).isoformat()
+        end = end.replace('+00:00', '.000Z')
+
         response = self.client.put(f'/api/events/{self.event.id}', json={
             'title': 'Updated event',
             'description': 'Updated in test',
-            'date': '2026-05-13',
-            'start_time': '15:00',
-            'end_time': '14:00',
+            'start_time': end,
+            'end_time': start,
             'location': 'Library',
             'color': 'emerald',
         })
