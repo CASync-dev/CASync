@@ -236,17 +236,23 @@ function bigCard(nextEvent) {
   let minutesUntil = nextEvent.startMinutes - nowMinutes;
   if (minutesUntil < 0) minutesUntil = 0; // in case the event is currently happening
 
+  const startTime = formatHHMM(nextEvent.startTime ?? nextEvent.start_time);
+  const endTime = formatHHMM(nextEvent.endTime ?? nextEvent.end_time);
+  const timeRange = `${startTime} – ${endTime}`;
+  const locationOrStatus =
+    nextEvent.going === false
+      ? `<span class="text-lg text-red-500 shrink-0">Not Going</span>`
+      : `<span class="text-lg text-gray-500 shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`;
+
   bigCardEl.innerHTML = `
-      <h3 class="text-4xl font-medium text-dark space-y-4 mb-4">
-              Next Event:
-            </h3>
-      <h4 class="text-3xl text-dark space-y-4 mb-4">
-          in <span class="text-blue-600">${formatTime(minutesUntil)}</span> at ${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)}
-      </h4>
-      <span class="text-3xl flex-1">${nextEvent.title}</span>
-      <span class="text-lg text-gray-500 shrink-0">${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)} – ${formatHHMM(nextEvent.endTime ?? nextEvent.end_time)}</span>
-            ${nextEvent.going === false ? `<span class="text-lg text-red-500 shrink-0">Not Going</span>` : `<span class="text-lg text-gray-500 shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`}
-      <div class="flex"><!-- avatars --></div>
+    <h3 class="text-xl font-medium text-dark space-y-4 mb-4">NEXT EVENT</h3>
+    <h2 class="text-3xl flex-1">${nextEvent.title}</h2>
+    <p class="text-3xl text-dark space-y-4 mb-4">
+      in <span class="text-blue-600">${formatTime(minutesUntil)}</span> at ${startTime}
+      <span class="text-lg text-gray-500 shrink-0">${timeRange}</span>
+      ${locationOrStatus}
+    </p>
+    <div class="flex"><!-- avatars --></div>
   `;
 }
 
@@ -289,7 +295,8 @@ function renderDashboardEvents(processed) {
   }
   events.slice(1).forEach((ev) => {
     const el = document.createElement("div");
-    el.className = "flex items-center bg-slate-200 rounded-2xl p-6 gap-4";
+    el.className =
+      "flex items-centerbg-slate-100 p-6 border rounded-2xl border-gray-300 p-6 gap-4";
     el.innerHTML = `
               <span class="text-xl font-medium flex-1"
                 >${ev.title}</span
