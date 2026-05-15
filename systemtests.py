@@ -1,49 +1,68 @@
 import multiprocessing
+import threading
+import time
 import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from app import create_app, db
-from app.config import TestConfig # Just to use the TestCase! Not really an unit test...
+from app.config import TestConfig
+from app.models import User # Just to use the TestCase! Not really an unit test...
 
 localHost = "http://127.0.0.1:9000/" # localhost url to be passed to driver.
 # If Github won't run the app at this port since something else is using it, change the port until it does.
 
 class SeleniumTests(unittest.TestCase):
+    client = None
+    @classmethod
+    def setUpClass(cls):
+        try:
+            cls.client = webdriver.Firefox()
+        except:
+            pass
+
+        if cls.client:
+            cls.app = create_app(config_class=TestConfig)
+            cls.app_context = cls.app.app_context()
+            cls.app_context.push()
+
+            db.create_all()
+            cls.populate_db()
+
+            options = webdriver.FirefoxOptions()
+            options.add_argument("--headless")
+            cls.driver = webdriver.Firefox(options=options)
+
+            cls.server_thread = threading.Thread(target=cls.app.run, kwargs={'port':9000})
+            cls.server_thread.start()
+
+            time.sleep(1)
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls.client:
+            cls.client.close()
+            db.session.remove()
+            db.drop_all()
+            cls.app_context.pop()
+        
+    def populate_db():
+        user = User(username='gerald', email='gerald@hotmail.com') # userid = 1
+        user.password = 'foo'
+        db.session.add(user)
+        db.session.commit()
+
     def setUp(self):
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context
-        self.app_context.push()
-        db.create_all()
-        self.populate_db()
-
-        self.server_thread = multiprocessing.Process(target=self.app.run, kwargs={"port": 9000}) # passes port=9000 as an argument to run()
-        self.server_thread.start()
-
-        self.driver = webdriver.Firefox()
-        self.driver.get(localHost)
-        self.headlessMode() # Disable to enable creating browser window for test
-        return super().setUp()
-
-    def headlessMode(self):
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless=new")
-        self.driver = webdriver.Chrome(options=options)
+        if not self.client:
+            self.skipTest('Web browser not available')
 
     def tearDown(self):
-        self.server_thread.terminate()
-        self.driver.close()
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
-        return super().tearDown()
-        
-    def populate_db(self):
         pass
-        
+    
     def test_index(self):
-        self.driver.find_element()
+        pass
+
     def test_faq(self):
         pass
 
@@ -54,7 +73,19 @@ class SeleniumTests(unittest.TestCase):
         pass
 
     def test_login(self):
-        pass
+        self.driver.get(localHost + "login") #Gets login url
+
+        self.driver.find_element(By.ID, 'username').send_keys("gerald")
+        self.driver.find_element(By.ID, 'password').send_keys("foo")
+        self.driver.find_element(By.ID, 'log').click()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'title_username'))
+        )
+
+        greeting = self.driver.find_element(By.ID, 'title_username')
+        print(greeting)
+        self.assertEqual(greeting.text, 'Hello, gerald!')
 
     def test_dash(self):
         pass
