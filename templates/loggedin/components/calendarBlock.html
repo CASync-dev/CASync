@@ -430,8 +430,6 @@ The general flow of it is:
           fetch(apiUrl)
           .then((response) => response.json())
           .then((data) => {
-            lastFetchedStart = startDate;
-            lastFetchedEnd = endDate;
             events = normaliseEventsResponse(data);
             renderDesktopEvents();
           })
