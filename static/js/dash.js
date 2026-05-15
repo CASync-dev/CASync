@@ -81,7 +81,7 @@ function renderFriendsStatus(friends_status) {
 
     const li = document.createElement("li");
     li.className =
-      "py-4 flex items-center bg-blue-600 justify-between rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-md ring-white transition duration-200";
+      "py-4 flex items-center bg-blue-500 justify-between rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-md ring-white transition duration-200";
     li.innerHTML = `
       <div class="flex items-center ">
         <img class="h-15 w-15 rounded-full" src="${friend.avatar_url}" alt="${friend.username}'s avatar" />
@@ -156,6 +156,43 @@ function parseTimeToMinutes(hhmm = "00:00") {
                 },
                 ...
 */
+
+let COLOR_MAP = {
+  indigo: {
+    bg: "bg-indigo-100",
+    border: "border-indigo-500",
+    text: "text-indigo-800",
+  },
+  blue: { bg: "bg-blue-100", border: "border-blue-500", text: "text-blue-800" },
+  green: {
+    bg: "bg-green-100",
+    border: "border-green-500",
+    text: "text-green-800",
+  },
+  rose: { bg: "bg-rose-100", border: "border-rose-500", text: "text-rose-800" },
+  amber: {
+    bg: "bg-amber-100",
+    border: "border-amber-500",
+    text: "text-amber-800",
+  },
+  orange: {
+    bg: "bg-orange-100",
+    border: "border-orange-500",
+    text: "text-orange-800",
+  },
+  red: { bg: "bg-red-100", border: "border-red-500", text: "text-red-800" },
+  purple: {
+    bg: "bg-purple-100",
+    border: "border-purple-500",
+    text: "text-purple-800",
+  },
+  gray: { bg: "bg-gray-100", border: "border-gray-500", text: "text-gray-800" },
+  yellow: {
+    bg: "bg-yellow-100",
+    border: "border-yellow-500",
+    text: "text-yellow-800",
+  },
+};
 
 // process raw API JSON into useful structures
 function processEvents(eventsData) {
@@ -236,17 +273,49 @@ function bigCard(nextEvent) {
   let minutesUntil = nextEvent.startMinutes - nowMinutes;
   if (minutesUntil < 0) minutesUntil = 0; // in case the event is currently happening
 
+  const startTime = formatHHMM(nextEvent.startTime ?? nextEvent.start_time);
+  const endTime = formatHHMM(nextEvent.endTime ?? nextEvent.end_time);
+
+  const evStart = nextEvent.startMinutes;
+  const evEnd = nextEvent.endMinutes;
+  const durationMinutes = Math.max(0, evEnd - evStart);
+
+  const colors = COLOR_MAP[nextEvent.color] ?? COLOR_MAP.gray;
+
+  const dMin = Math.max(0, Math.round(durationMinutes || 0));
+  const dH = Math.floor(dMin / 60);
+  const dR = dMin % 60;
+  let durationLabel = "";
+  if (dH > 0) durationLabel += `${dH} hr${dH !== 1 ? "s" : ""}`;
+  if (dR > 0) durationLabel += (durationLabel ? " " : "") + `${dR} min`;
+  if (!durationLabel) durationLabel = `${dMin} min`;
+
+  const locationOrStatus =
+    nextEvent.going === false
+      ? `<span class="text-lg text-red-500 shrink-0">Not Going</span>`
+      : `<span class="text-lg  shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`;
+
+  // build the header time label: show "IN X" when upcoming, but just "RIGHT NOW" when ongoing
+  const timeLabel =
+    minutesUntil === 0
+      ? `<span class="text-blue-600">RIGHT NOW</span>`
+      : `IN <span class="ml-2 text-blue-600">${formatTime(minutesUntil)}</span>`;
+
+  // add the div colour
+  bigCardEl.classList.add(colors.bg, colors.border);
+
   bigCardEl.innerHTML = `
-      <h3 class="text-4xl font-medium text-dark space-y-4 mb-4">
-              Next Event:
-            </h3>
-      <h4 class="text-3xl text-dark space-y-4 mb-4">
-          in <span class="text-blue-600">${formatTime(minutesUntil)}</span> at ${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)}
-      </h4>
-      <span class="text-3xl flex-1">${nextEvent.title}</span>
-      <span class="text-lg text-gray-500 shrink-0">${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)} – ${formatHHMM(nextEvent.endTime ?? nextEvent.end_time)}</span>
-            ${nextEvent.going === false ? `<span class="text-lg text-red-500 shrink-0">Not Going</span>` : `<span class="text-lg text-gray-500 shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`}
-      <div class="flex"><!-- avatars --></div>
+    <div class="flex items-center justify-between gap-4 mb-2">
+      <h3 class="text-lg font-medium text-gray-500">NEXT EVENT</h3>
+      <p class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-lg text-gray-700 shrink-0">${timeLabel}</p>
+    </div>
+    <h2 class="text-4xl ${colors.text} flex-1 mb-2">${nextEvent.title}</h2>
+    <p class="text-xl ${colors.text} space-y-4 mb-4">
+       Starts at ${startTime} and ends at ${endTime} <br />
+      <span class="text-lg ${colors.text} shrink-0  rounded-2xl p-2">${durationLabel}</span>
+      <span class="text-lg ${colors.text} shrink-0  rounded-2xl p-2">${locationOrStatus}</span>
+    </p>
+    <div class="flex"><!-- avatars --></div>
   `;
 }
 
@@ -275,7 +344,7 @@ function renderDashboardEvents(processed) {
       events.push(ev);
     }
   }
-  //events = events.slice(0, 5); // limit to 5 events for performance and to avoid overwhelming the user
+
   // call function to render data for the big card, or clear it if nothing is left
   if (events.length > 0) {
     bigCard(events[0]);
@@ -288,17 +357,16 @@ function renderDashboardEvents(processed) {
     return;
   }
   events.slice(1).forEach((ev) => {
-    const el = document.createElement("div");
-    el.className = "flex items-center bg-slate-200 rounded-2xl p-6 gap-4";
+    el = document.createElement("div");
+    const colors = COLOR_MAP[ev.color] ?? COLOR_MAP.gray;
+    el.className = `flex items-center ${colors.bg}  border ${colors.border} p-6 rounded-2xl gap-4`;
     el.innerHTML = `
-              <span class="text-xl font-medium flex-1"
-                >${ev.title}</span
-              >
-              <span class="text-lg text-gray-500 w-50 text-right shrink-0"
-                >${formatHHMM(ev.startTime ?? ev.start_time)} – ${formatHHMM(ev.endTime ?? ev.end_time)}</span
-              >
-              <div class="flex"><!-- avatars --></div>
-    `;
+    <span class="text-xl ${colors.text} font-medium flex-1">${ev.title}</span>
+    <span class="text-lg w-50 ${colors.text} text-center shrink-0  rounded-2xl px-2 py-1 leading-none">
+      ${formatHHMM(ev.startTime ?? ev.start_time)} – ${formatHHMM(ev.endTime ?? ev.end_time)}
+    </span>
+    <div class="flex"></div>
+  `;
     container.appendChild(el);
   });
 }
