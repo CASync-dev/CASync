@@ -239,7 +239,6 @@ function bigCard(nextEvent) {
   const startTime = formatHHMM(nextEvent.startTime ?? nextEvent.start_time);
   const endTime = formatHHMM(nextEvent.endTime ?? nextEvent.end_time);
 
-
   const evStart = nextEvent.startMinutes;
   const evEnd = nextEvent.endMinutes;
   const durationMinutes = Math.max(0, evEnd - evStart);
@@ -258,11 +257,11 @@ function bigCard(nextEvent) {
       : `<span class="text-lg text-gray-500 shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`;
 
   bigCardEl.innerHTML = `
-    <div class="flex items-center justify-between gap-4 mb-3">
+    <div class="flex items-center justify-between gap-4 mb-2">
       <h3 class="text-lg font-medium text-gray-500">NEXT EVENT</h3>
       <span class="inline-flex items-center rounded-full bg-blue-100 px-4 py-2 text-lg text-blue-600 shrink-0">${formatTime(minutesUntil)}</span>
     </div>
-    <h2 class="text-4xl flex-1 mb-4">${nextEvent.title}</h2>
+    <h2 class="text-4xl flex-1 ">${nextEvent.title}</h2>
     <p class="text-xl text-gray-500 space-y-4 mb-4">
        Starts at ${startTime} and ends at ${endTime} <br />
       <span class="text-lg text-gray-500 shrink-0 bg-slate-200 rounded-2xl p-2">${durationLabel}</span>
@@ -312,12 +311,12 @@ function renderDashboardEvents(processed) {
   events.slice(1).forEach((ev) => {
     const el = document.createElement("div");
     el.className =
-      "flex items-centerbg-slate-100 p-6 border rounded-2xl border-gray-300 p-6 gap-4";
+      "flex items-center bg-slate-100 p-6 border rounded-2xl border-gray-300 gap-4";
     el.innerHTML = `
               <span class="text-xl font-medium flex-1"
                 >${ev.title}</span
               >
-              <span class="text-lg text-gray-500 w-50 text-right shrink-0"
+              <span class="text-lg text-gray-500 w-50 text-center shrink-0 bg-slate-200 rounded-2xl px-2 py-1"
                 >${formatHHMM(ev.startTime ?? ev.start_time)} – ${formatHHMM(ev.endTime ?? ev.end_time)}</span
               >
               <div class="flex"><!-- avatars --></div>
