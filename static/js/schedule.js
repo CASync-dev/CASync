@@ -9,46 +9,40 @@ document.getElementById("add-event-form").addEventListener("submit", (e) => {
   e.preventDefault();
   // Get form values
   const title = document.getElementById("event-title").value;
-  const date = document.getElementById("event-date").value;
-  const start_time = document.getElementById("event-time-start").value;
-  const end_time = document.getElementById("event-time-end").value;
+  const startInput = document.getElementById("event-start").value;
+  const endInput = document.getElementById("event-end").value;
   const location = document.getElementById("event-location").value;
   const description = document.getElementById("event-description").value;
   const color = document.getElementById("event-color").value;
   errorElement = document.getElementById("form-message");
   // Basic validation
-  if (!title || !date || !start_time || !end_time) {
+  if (!title || !startInput || !endInput) {
     errorElement.textContent = "Please fill in all required fields.";
     errorElement.classList.remove("hidden");
     return;
   }
-  // end time must be after start time
-  if (parseTime(end_time) <= parseTime(start_time)) {
-    errorElement.textContent = "End time must be after start time.";
+  // datetime-local inputs are interpreted as local time
+  const startDate = new Date(startInput);
+  const endDate = new Date(endInput);
+  // end must be after start
+  if (endDate <= startDate) {
+    errorElement.textContent = "End must be after start.";
     errorElement.classList.remove("hidden");
     return;
   }
-  // if event is today, start time must be after current time
-  const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
-  if (date === today) {
-    const currentTime = new Date();
-    const currentTimeMinutes =
-      currentTime.getHours() * 60 + currentTime.getMinutes();
-    const startTimeMinutes = parseTime(start_time);
-    if (startTimeMinutes <= currentTimeMinutes) {
-      errorElement.textContent =
-        "Events have to be in the future. Please select a start time later than the current time.";
-      errorElement.classList.remove("hidden");
-      return;
-    }
+  // Event must be in the future
+  if (startDate <= new Date()) {
+    errorElement.textContent =
+      "Events have to be in the future. Please select a start time later than now.";
+    errorElement.classList.remove("hidden");
+    return;
   }
 
   // Create event object in json format expected by the API
   const newEvent = {
     title: title,
-    date: date,
-    start_time: start_time,
-    end_time: end_time,
+    start_time: startDate.toISOString(),
+    end_time: endDate.toISOString(),
     location: location,
     description: description,
     color: color,
@@ -161,9 +155,11 @@ function editEvent(eventId) {
   document.getElementById("edit-event-modal").showModal();
   document.getElementById("edit-event-title").value = event.title;
   document.getElementById("edit-event-description").value = event.description;
-  document.getElementById("edit-event-date").value = event.date;
-  document.getElementById("edit-event-time-start").value = event.startTime;
-  document.getElementById("edit-event-time-end").value = event.endTime;
+  // event.date / event.endDate are the local YYYY-MM-DD parts of the start and end
+  // datetimes, and event.startTime / event.endTime are the local HH:MM parts —
+  // combine for the datetime-local inputs. Multi-day events keep their two dates.
+  document.getElementById("edit-event-start").value = `${event.date}T${event.startTime}`;
+  document.getElementById("edit-event-end").value = `${event.endDate}T${event.endTime}`;
   document.getElementById("edit-event-location").value = event.location || "";
   selectColor(
     document.querySelector(
@@ -176,13 +172,15 @@ function editEvent(eventId) {
     document.getElementById("edit-event-modal").close();
     // We prevent the default form submission behavior
     e.preventDefault();
+    // datetime-local values are local wall-clock time; toISOString() normalises them to UTC.
+    const startInput = document.getElementById("edit-event-start").value;
+    const endInput = document.getElementById("edit-event-end").value;
     // We gather the updated event details from the form inputs as JSON
     const updatedEvent = {
       title: document.getElementById("edit-event-title").value,
       description: document.getElementById("edit-event-description").value,
-      date: document.getElementById("edit-event-date").value,
-      start_time: document.getElementById("edit-event-time-start").value,
-      end_time: document.getElementById("edit-event-time-end").value,
+      start_time: new Date(startInput).toISOString(),
+      end_time: new Date(endInput).toISOString(),
       location: document.getElementById("edit-event-location").value,
       color: document.getElementById("edit-event-color").value,
     };

@@ -12,8 +12,8 @@ blocks, social events, etc. — so no two users look the same. Clashes happen
 naturally from random overlap, not by design.
 
 The dev user defined in CONFIG is preserved if already in the DB and added to
-all three groups; their events inside the seed window are replaced with a known
-baseline schedule.
+all three groups. Their existing events are left untouched — this script only
+creates new users/groups/events, never overwrites yours.
 
 Tweak the CONFIG block below to change who the dev user is, how big each group
 is, the date range, etc., then run:
@@ -21,10 +21,15 @@ is, the date range, etc., then run:
     python hectic.py
 """
 import random
-from datetime import date, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from app import app, db
 from app.models import User, Event, Group
+
+# Hours in SLOT_POOL are interpreted as Perth local time, then converted to UTC
+# for storage so the calendar renders them at the intended local hour.
+PERTH_TZ = ZoneInfo('Australia/Perth')
 
 # ---------------------------------------------------------------------------
 # CONFIG — tweak these to taste, then run the script
@@ -139,26 +144,17 @@ SLOT_POOL = [
     (6, 19, 21, 'Movie Night',             'Luna Leederville'),
 ]
 
-# Dev user's baseline: (weekday, start_hour, end_hour, title, location, color)
-DEV_SCHEDULE = [
-    (0,  9, 11, 'Algorithms Lecture',     'CSSE: [1.24] Ross LT',         'indigo'),
-    (0, 14, 16, 'Agile Web Dev Lecture',  'ENGL: [G12] Lecture Theatre',  'blue'),
-    (1, 10, 12, 'Databases Lecture',      'CSSE: [G09] Fay Gale Studio',  'emerald'),
-    (1, 13, 15, 'Statistics Lecture',     'MATH: [G23] Stats LT',         'amber'),
-    (2, 11, 13, 'Networks Lecture',       'CSSE: [1.24] Ross LT',         'purple'),
-    (3,  9, 11, 'Algorithms Lab',         'CSSE: [G15] Computer Lab',     'indigo'),
-    (3, 15, 17, 'Agile Web Dev Tutorial', 'CSSE: [G09] Fay Gale Studio',  'blue'),
-    (4, 12, 14, 'Capstone Studio',        'CSSE: [G09] Fay Gale Studio',  'red'),
-    (5, 14, 16, 'Study Session',          'Reid Library',                 'teal'),
-]
-
-
 def weekday_dates(weekday):
     return [
         RANGE_START + timedelta(days=i)
         for i in range(RANGE_DAYS)
         if (RANGE_START + timedelta(days=i)).weekday() == weekday
     ]
+
+
+def _perth_hour_as_utc(d, hour):
+    """Treat hour as a Perth local clock-time on date d, return UTC datetime."""
+    return datetime.combine(d, time(hour, 0), tzinfo=PERTH_TZ).astimezone(timezone.utc)
 
 
 def add_events(user, schedule):
@@ -168,9 +164,8 @@ def add_events(user, schedule):
             db.session.add(Event(
                 title=title,
                 description=f'{title}\nLocation: {location}',
-                date=d,
-                start_time=time(sh, 0),
-                end_time=time(eh, 0),
+                start_time=_perth_hour_as_utc(d, sh),
+                end_time=_perth_hour_as_utc(d, eh),
                 location=location,
                 color=color,
                 user_id=user.id,
@@ -231,16 +226,6 @@ with app.app_context():
     purge_previous_hectic_data(group_names)
 
     dev_user = get_or_create_dev_user()
-
-    Event.query.filter(
-        Event.user_id == dev_user.id,
-        Event.date >= RANGE_START,
-        Event.date <= RANGE_END,
-    ).delete(synchronize_session=False)
-    db.session.flush()
-
-    print(f"Seeding {dev_user.username}'s baseline schedule...")
-    add_events(dev_user, DEV_SCHEDULE)
 
     for gname, n_members in GROUPS.items():
         group = Group(group_name=gname)

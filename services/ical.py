@@ -1,5 +1,5 @@
 import requests # for fetching the iCal feed from the URL
-from datetime import datetime, time # for handling date and time fields
+from datetime import datetime, date, time, timedelta, timezone # for handling date and time fields
 from icalendar import Calendar as ICalendar # for parsing iCal data
 import ipaddress, socket # for URL safety checks
 from urllib.parse import urlparse # for URL parsing
@@ -85,37 +85,40 @@ def fetch_ical_events(url):
 
 # Convert a single VEVENT into a plain dict
 
+def _to_utc_datetime(value, end_of_day=False):
+    """
+    Coerce an iCal DTSTART/DTEND value (date or datetime, naive or aware) to a
+    UTC-aware datetime. Bare dates become midnight UTC; if end_of_day is True
+    they become the start of the next day so all-day events span the full day.
+    """
+    if isinstance(value, datetime):
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(timezone.utc)
+    # Bare date — all-day event.
+    if end_of_day:
+        value = value + timedelta(days=1)
+    return datetime.combine(value, time(0, 0), tzinfo=timezone.utc)
+
+
 def parse_ical_event(component, user_id):
     """
     Convert one iCal VEVENT component into a dict matching our Event model's fields.
-    Heavily utilises icalnder package
+    Heavily utilises icalnder package.
 
-    iCal DTSTART/DTEND values can be either a date or a datetime.
-    - If it's a datetime, we split it into date + time.
-    - If it's a date only (all-day event), we default to 00:00 start and 23:59 end.
+    DTSTART/DTEND become full UTC datetimes so multi-day events are preserved.
+    All-day events (DTSTART is a bare date) get midnight UTC for start and
+    midnight UTC of the following day for end.
     """
     dtstart = component.get("DTSTART").dt
     dtend   = component.get("DTEND").dt
 
-    # Handle both date and datetime cases for start and end times
-    if isinstance(dtstart, datetime):
-        event_date = dtstart.date()
-        start_time = dtstart.time().replace(tzinfo=None)  # strip timezone — store as local time
-    else:
-        event_date = dtstart          # already a date object
-        start_time = time(0, 0)       # all-day event — default to midnight
+    start_time = _to_utc_datetime(dtstart)
+    end_time   = _to_utc_datetime(dtend, end_of_day=not isinstance(dtend, datetime))
 
-    # For the end time, if it's a datetime we take the time part. If it's a date, we default to 23:59 to represent the end of the day.
-    if isinstance(dtend, datetime):
-        end_time = dtend.time().replace(tzinfo=None)
-    else:
-        end_time = time(23, 59)       # all-day event — default to end of day
-
-    # Now we build a dict with the fields we need for our Event model. We also handle missing fields and convert them to strings.
     return {
         "title":       str(component.get("SUMMARY", "Untitled")),
         "description": str(component.get("DESCRIPTION", "")) or None,
-        "date":        event_date,
         "start_time":  start_time,
         "end_time":    end_time,
         "location":    str(component.get("LOCATION", "")) or None,
@@ -159,7 +162,6 @@ def update_events_in_db(parsed_events, user_id):
             if ( # we only update if something has actually changed, to avoid unnecessary database writes
                 existing_event.title != event_data['title']
                 or existing_event.description != event_data['description']
-                or existing_event.date != event_data['date']
                 or existing_event.start_time != event_data['start_time']
                 or existing_event.end_time != event_data['end_time']
                 or existing_event.location != event_data['location']
@@ -168,7 +170,6 @@ def update_events_in_db(parsed_events, user_id):
                 # Update the existing event with the new details
                 existing_event.title = event_data['title']
                 existing_event.description = event_data['description']
-                existing_event.date = event_data['date']
                 existing_event.start_time = event_data['start_time']
                 existing_event.end_time = event_data['end_time']
                 existing_event.location = event_data['location']

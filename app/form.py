@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, URLField, DateField, TimeField, EmailField, PasswordField
+from wtforms import StringField, SubmitField, URLField, DateTimeLocalField, EmailField, PasswordField
 from wtforms.validators import EqualTo, InputRequired, Optional, Regexp, Length, ValidationError
 import re
 from app.models import User
@@ -65,9 +65,8 @@ VALID_EVENT_COLORS = {'indigo', 'red', 'orange', 'yellow', 'green', 'blue'}
 
 class EventForm(FlaskForm):
     title = StringField(validators=[InputRequired(), Length(min=1, max=200)])
-    date = DateField(validators=[InputRequired()])
-    start_time = TimeField(validators=[InputRequired()])
-    end_time = TimeField(validators=[InputRequired()])
+    start_time = DateTimeLocalField(validators=[InputRequired()])
+    end_time = DateTimeLocalField(validators=[InputRequired()])
     location = StringField(validators=[Optional(), Length(max=300)])
     description = StringField(validators=[Optional(), Length(max=500)])
     color = StringField(validators=[Optional(), Regexp(
@@ -77,7 +76,6 @@ class EventForm(FlaskForm):
     def validate_end_time(self, field):
         if self.start_time.data and field.data and field.data <= self.start_time.data:
             raise ValidationError("End time must be after start time.")
-
 
 # Settings' Changing details forms
 
