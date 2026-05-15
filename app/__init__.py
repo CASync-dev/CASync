@@ -1,7 +1,7 @@
 from flask import Flask
 
 from app.errors import error
-from .config import Config
+from .config import Config, TestConfig
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
@@ -25,6 +25,10 @@ def create_app(config_class):
     app.register_blueprint(errors_bp)
     from app.routes import bp_register
     bp_register(app)
+
+    if config_class == TestConfig:
+        from app.testing import testing 
+        app.register_blueprint(testing)
 
     return app
 

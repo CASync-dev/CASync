@@ -1,4 +1,4 @@
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timezone
 import unittest
 from flask import json, jsonify
 from app import create_app, db
@@ -476,9 +476,8 @@ class FriendsTestCase(unittest.TestCase):
         # Friend has event in 30min.
         event = Event(
         title='name',
-        date=date(2026, 5, 13),
-        start_time=time(10, 0),
-        end_time=time(11, 0),
+        start_time=datetime(2026, 5, 13, 10, 0, tzinfo=timezone.utc),
+        end_time=datetime(2026, 5, 13, 11, 0, tzinfo=timezone.utc),
         color='indigo',
         user_id=2
 

@@ -28,16 +28,9 @@ function updateTime() {
 
 // craft the url for fetching events: format is /api/friends_status?now
 function getFriendsBaseUrl() {
-  let apiUrl = "/api/friendsstatus";
-  const now = new Date();
-
-  // convert to local ISO format without timezone (e.g. "2024-06-30T14:48:00") and append as query param
-  const localISO = new Date(now - now.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, -1);
-  apiUrl += `?now=${localISO}`;
-
-  return apiUrl;
+  // Send the real UTC instant (e.g. "2024-06-30T21:48:00.000Z"). The server
+  // compares this against event times stored as naive UTC.
+  return `/api/friendsstatus?now=${new Date().toISOString()}`;
 }
 
 async function getFriends_status() {
@@ -168,19 +161,29 @@ function parseTimeToMinutes(hhmm = "00:00") {
 function processEvents(eventsData) {
   if (!eventsData) return { flat: [], byDate: {} };
 
-  // 1) flatten all users' events into an array
+  // The API gives us full ISO datetimes for startTime/endTime. We pull out the
+  // pieces we use elsewhere on the dashboard: the local date (YYYY-MM-DD) and
+  // the minutes-since-midnight for the start and end of the event.
   const flat = Object.values(eventsData)
     .flatMap((user) => Object.values(user.events))
     .map((e) => {
-      const dateISO = e.date; // e.g. "2026-05-06"
-      const start = e.startTime ?? e.start_time ?? e.start ?? "00:00";
-      const end = e.endTime ?? e.end_time ?? e.end ?? "00:00";
+      const startDate = new Date(e.startTime);
+      const endDate = new Date(e.endTime);
+      const yyyy = startDate.getFullYear();
+      const mm = String(startDate.getMonth() + 1).padStart(2, "0");
+      const dd = String(startDate.getDate()).padStart(2, "0");
+      const dateISO = `${yyyy}-${mm}-${dd}`;
+      const startHM = `${String(startDate.getHours()).padStart(2, "0")}:${String(startDate.getMinutes()).padStart(2, "0")}`;
+      const endHM = `${String(endDate.getHours()).padStart(2, "0")}:${String(endDate.getMinutes()).padStart(2, "0")}`;
       return {
         ...e,
+        // Replace ISO startTime/endTime with HH:MM so the renderers below stay simple.
+        startTime: startHM,
+        endTime: endHM,
         dateISO,
         dateObj: new Date(dateISO + "T00:00"),
-        startMinutes: parseTimeToMinutes(start),
-        endMinutes: parseTimeToMinutes(end),
+        startMinutes: startDate.getHours() * 60 + startDate.getMinutes(),
+        endMinutes: endDate.getHours() * 60 + endDate.getMinutes(),
       };
     })
     .sort((a, b) => a.startMinutes - b.startMinutes);
@@ -256,7 +259,9 @@ function renderDashboardEvents(processed) {
   const container = document.getElementById("dashboard-sub-events");
   if (!container) return;
   container.innerHTML = "";
-  const todayISO = new Date().toISOString().slice(0, 10);
+  // Build the key from local date parts to match how processEvents keys byDate;
+  const d = new Date();
+  const todayISO = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const todays = processed.byDate[todayISO] || [];
 
   let events = [];

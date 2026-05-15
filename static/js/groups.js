@@ -141,7 +141,7 @@ function addGroupToPage(group) {
     </button>
     <button
       class="btn-plain mt-2 px-3 py-2 bg-blue-300 text-nearwhite rounded-lg hover:bg-blue-400"
-      onclick="openSchedule()"
+      onclick="openSchedule('${group.id}', '${group.group_name}')"
     >
       <i class="fas fa-calendar-alt"></i>
       Schedule
@@ -481,9 +481,26 @@ document
   .addEventListener("keydown", (e) => handleEnter(e, loadSelectFriends));
 
 // Schedule stuff
-function openSchedule() {
-  alert("Not yet implemented");
+function openSchedule(groupId, groupname) {
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+
+  calendarBaseUrl = `/api/events/group/${groupId}`;
+  lastFetchedStart = null;
+  lastFetchedEnd = null;
+  // re-render the calendar with the new data source
+  fetchAndRenderEvents();
+  // set the modal title to the group name
+  document.getElementById("group-schedule-title").textContent =
+    `${groupname}'s Schedule`;
+  // open the modal
+  const modal = document.getElementById("group-schedule-modal");
+  modal.showModal();
 }
+
+const scheduleModal = document.getElementById("group-schedule-modal");
+new MutationObserver(() => {
+  if (scheduleModal.open) requestAnimationFrame(() => renderDesktopEvents());
+}).observe(scheduleModal, { attributes: true, attributeFilter: ["open"] });
 
 // Calls search setup once instead of creating a new event listener every search
 document.addEventListener("DOMContentLoaded", () => {
