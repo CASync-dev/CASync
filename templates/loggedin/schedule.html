@@ -392,11 +392,7 @@
                         >
                           Event Color
                         </label>
-                        <input
-                          type="hidden"
-                          id="edit-event-color"
-                          value="indigo"
-                        />
+                        <input type="hidden" id="edit-event-color" value="" />
                         <div
                           class="flex gap-1 mt-1"
                           id="edit-color-picker-buttons"
@@ -487,6 +483,17 @@
     gridScroll.addEventListener("scroll", () => {
       dayHeadersScroll.scrollLeft = gridScroll.scrollLeft;
     });
+
+    // Sets the default values for event creation to local time in the correct format
+    (function () {
+      const pad = (n) => String(n).padStart(2, "0");
+      const fmt = (d) =>
+        `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      const start = new Date();
+      const end = new Date(start.getTime() + 60 * 60 * 1000); // +1h
+      document.getElementById("event-start").value = fmt(start);
+      document.getElementById("event-end").value = fmt(end);
+    })();
   </script>
   <!-- tailwind js -->
   <script
