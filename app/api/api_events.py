@@ -235,8 +235,8 @@ def api_group_events(group_id):
     user_ids = [user.id for user in group.members]
     events = Event.query.where(
         Event.user_id.in_(user_ids),
-        Event.date >= start_date,
-        Event.date <= end_date
+        Event.start_time >= start_date,
+        Event.end_time <= end_date
     ).all()
     # format the events in the standard format specified above
     # A user

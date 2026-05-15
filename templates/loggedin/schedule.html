@@ -73,7 +73,10 @@
                       />
                     </div>
                     <div class="mb-3">
-                      <label for="event-start" class="block text-sm font-medium">
+                      <label
+                        for="event-start"
+                        class="block text-sm font-medium"
+                      >
                         Starts
                       </label>
                       <input
@@ -94,9 +97,9 @@
                         name="event-end"
                         class="mt-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         {% if now.hour == 23 %}
-                          value="{{ (now + timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M') }}"
+                          value="{{ (now + timedelta(hours=1, minutes=1)).strftime('%Y-%m-%dT%H:%M') }}"
                         {% else %}
-                          value="{{ now.replace(hour=now.hour+1).strftime('%Y-%m-%dT%H:%M') }}"
+                          value="{{ now.replace(hour=now.hour+1, minute=now.minute+1).strftime('%Y-%m-%dT%H:%M') }}"
                         {% endif %}
                       />
                     </div>
