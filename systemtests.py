@@ -42,7 +42,8 @@ class SeleniumTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         if cls.client:
-            cls.client.close()
+            cls.client.get('http://127.0.0.1:9000/shutdown') # Calls route that shuts down the app.
+            cls.client.quit()
             db.session.remove()
             db.drop_all()
             cls.app_context.pop()
@@ -72,8 +73,12 @@ class SeleniumTests(unittest.TestCase):
     def test_register(self):
         pass
 
-    def test_login(self):
+    def test_loginlogout(self):
         self.driver.get(localHost + "login") #Gets login url
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'login'))
+        )
 
         self.driver.find_element(By.ID, 'username').send_keys("gerald")
         self.driver.find_element(By.ID, 'password').send_keys("foo")
@@ -84,8 +89,44 @@ class SeleniumTests(unittest.TestCase):
         )
 
         greeting = self.driver.find_element(By.ID, 'title_username')
-        print(greeting)
         self.assertEqual(greeting.text, 'Hello, gerald!')
+
+        self.driver.find_element(By.ID, 'logout').click()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'login'))
+        )
+        msg = self.driver.find_element(By.ID, 'msg')
+        self.assertEqual(msg.text, 'You have been logged out.')
+
+    def test_login_incorrect(self):
+        self.driver.get(localHost + "login") #Gets login url
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'login'))
+        )
+
+        self.driver.find_element(By.ID, 'username').send_keys("gerald")
+        self.driver.find_element(By.ID, 'password').send_keys("bar")
+        self.driver.find_element(By.ID, 'log').click()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'login'))
+        )
+
+        error = self.driver.find_element(By.ID, 'msg')
+        self.assertEqual(error.text, 'Invalid username or password')
+
+        self.driver.find_element(By.ID, 'username').send_keys("fakeuser")
+        self.driver.find_element(By.ID, 'password').send_keys("bar")
+        self.driver.find_element(By.ID, 'log').click()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'login'))
+        )
+
+        error = self.driver.find_element(By.ID, 'msg')
+        self.assertEqual(error.text, 'Invalid username or password')
 
     def test_dash(self):
         pass
