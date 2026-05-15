@@ -238,19 +238,35 @@ function bigCard(nextEvent) {
 
   const startTime = formatHHMM(nextEvent.startTime ?? nextEvent.start_time);
   const endTime = formatHHMM(nextEvent.endTime ?? nextEvent.end_time);
-  const timeRange = `${startTime} – ${endTime}`;
+
+
+  const evStart = nextEvent.startMinutes;
+  const evEnd = nextEvent.endMinutes;
+  const durationMinutes = Math.max(0, evEnd - evStart);
+
+  const dMin = Math.max(0, Math.round(durationMinutes || 0));
+  const dH = Math.floor(dMin / 60);
+  const dR = dMin % 60;
+  let durationLabel = "";
+  if (dH > 0) durationLabel += `${dH} hr${dH !== 1 ? "s" : ""}`;
+  if (dR > 0) durationLabel += (durationLabel ? " " : "") + `${dR} min`;
+  if (!durationLabel) durationLabel = `${dMin} min`;
+
   const locationOrStatus =
     nextEvent.going === false
       ? `<span class="text-lg text-red-500 shrink-0">Not Going</span>`
       : `<span class="text-lg text-gray-500 shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`;
 
   bigCardEl.innerHTML = `
-    <h3 class="text-xl font-medium text-dark space-y-4 mb-4">NEXT EVENT</h3>
-    <h2 class="text-3xl flex-1">${nextEvent.title}</h2>
-    <p class="text-3xl text-dark space-y-4 mb-4">
-      in <span class="text-blue-600">${formatTime(minutesUntil)}</span> at ${startTime}
-      <span class="text-lg text-gray-500 shrink-0">${timeRange}</span>
-      ${locationOrStatus}
+    <div class="flex items-center justify-between gap-4 mb-3">
+      <h3 class="text-lg font-medium text-gray-500">NEXT EVENT</h3>
+      <span class="inline-flex items-center rounded-full bg-blue-100 px-4 py-2 text-lg text-blue-600 shrink-0">${formatTime(minutesUntil)}</span>
+    </div>
+    <h2 class="text-4xl flex-1 mb-4">${nextEvent.title}</h2>
+    <p class="text-xl text-gray-500 space-y-4 mb-4">
+       Starts at ${startTime} and ends at ${endTime} <br />
+      <span class="text-lg text-gray-500 shrink-0 bg-slate-200 rounded-2xl p-2">${durationLabel}</span>
+      <span class="text-lg text-gray-500 shrink-0 bg-slate-200 rounded-2xl p-2">${locationOrStatus}</span>
     </p>
     <div class="flex"><!-- avatars --></div>
   `;
