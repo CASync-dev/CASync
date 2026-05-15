@@ -23,7 +23,9 @@ document.getElementById("add-event-form").addEventListener("submit", (e) => {
   }
   // datetime-local inputs are interpreted as local time
   const startDate = new Date(startInput);
+  console.log(startDate.toISOString())
   const endDate = new Date(endInput);
+  console.log(endDate.toISOString())
   // end must be after start
   if (endDate <= startDate) {
     errorElement.textContent = "End must be after start.";

@@ -1,5 +1,5 @@
 import unittest
-from datetime import date, time
+from datetime import date, datetime, time, timezone
 
 from app import create_app, db
 from app.config import TestConfig
@@ -36,9 +36,8 @@ class EventsTestCase(unittest.TestCase):
         self.event = Event(
             title='Existing event',
             description='Seeded event',
-            date=date(2026, 5, 13),
-            start_time=time(10, 0),
-            end_time=time(11, 0),
+            start_time=datetime(2026, 5, 13, 10, 0, tzinfo=timezone.utc),
+            end_time=datetime(2026, 5, 13, 11, 0, tzinfo=timezone.utc),
             location='Room 101',
             color='indigo',
             user_id=self.user.id,
@@ -53,13 +52,17 @@ class EventsTestCase(unittest.TestCase):
 
     def test_create_event(self):
         self.login_as(self.user)
+        start = datetime(2026, 5, 13, 14, 0, tzinfo=timezone.utc).isoformat()
+        start = start.replace('+00:00', 'Z')
+        end = datetime(2026, 5, 13, 15, 0, tzinfo=timezone.utc).isoformat()
+        end = end.replace('+00:00', 'Z')
 
         response = self.client.post('/api/events', json={
             'title': 'New event',
             'description': 'Created in test',
             'date': '2026-05-13',
-            'start_time': '14:00',
-            'end_time': '15:00',
+            'start_time': start,
+            'end_time': end,
             'location': 'Library',
             'color': 'emerald',
         })
