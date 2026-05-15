@@ -829,7 +829,7 @@ The general flow of it is:
         return {
           type: 'multi',
           date, startTime, endTime, segmentIndex, segmentCount, startIso, endIso,
-          participants: cluster.map(e => ({ name: e.username, class: e.title, color: e.color })),
+          participants: cluster.map(e => ({ name: e.username, class: e.title, color: e.color, pfp: e.pfp })),
         };
       });
     }
