@@ -293,7 +293,7 @@ function bigCard(nextEvent) {
   const locationOrStatus =
     nextEvent.going === false
       ? `<span class="text-lg text-red-500 shrink-0">Not Going</span>`
-      : `<span class="text-lg text-gray-500 shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`;
+      : `<span class="text-lg  shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`;
 
   // build the header time label: show "IN X" when upcoming, but just "RIGHT NOW" when ongoing
   const timeLabel =
@@ -310,10 +310,10 @@ function bigCard(nextEvent) {
       <p class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-lg text-gray-700 shrink-0">${timeLabel}</p>
     </div>
     <h2 class="text-4xl ${colors.text} flex-1 mb-2">${nextEvent.title}</h2>
-    <p class="text-xl text-gray-500 space-y-4 mb-4">
+    <p class="text-xl ${colors.text} space-y-4 mb-4">
        Starts at ${startTime} and ends at ${endTime} <br />
-      <span class="text-lg ${colors.text} shrink-0 bg-slate-200 rounded-2xl p-2">${durationLabel}</span>
-      <span class="text-lg ${colors.text} shrink-0 bg-slate-200 rounded-2xl p-2">${locationOrStatus}</span>
+      <span class="text-lg ${colors.text} shrink-0  rounded-2xl p-2">${durationLabel}</span>
+      <span class="text-lg ${colors.text} shrink-0  rounded-2xl p-2">${locationOrStatus}</span>
     </p>
     <div class="flex"><!-- avatars --></div>
   `;
