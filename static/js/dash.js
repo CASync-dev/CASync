@@ -256,12 +256,18 @@ function bigCard(nextEvent) {
       ? `<span class="text-lg text-red-500 shrink-0">Not Going</span>`
       : `<span class="text-lg text-gray-500 shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`;
 
+  // build the header time label: show "IN X" when upcoming, but just "RIGHT NOW" when ongoing
+  const timeLabel =
+    minutesUntil === 0
+      ? `<span class="text-blue-600">RIGHT NOW</span>`
+      : `IN <span class="ml-2 text-blue-600">${formatTime(minutesUntil)}</span>`;
+
   bigCardEl.innerHTML = `
     <div class="flex items-center justify-between gap-4 mb-2">
       <h3 class="text-lg font-medium text-gray-500">NEXT EVENT</h3>
-      <span class="inline-flex items-center rounded-full bg-blue-100 px-4 py-2 text-lg text-blue-600 shrink-0">${formatTime(minutesUntil)}</span>
+      <p class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-lg text-gray-700 shrink-0">${timeLabel}</p>
     </div>
-    <h2 class="text-4xl flex-1 ">${nextEvent.title}</h2>
+    <h2 class="text-4xl flex-1 mb-2">${nextEvent.title}</h2>
     <p class="text-xl text-gray-500 space-y-4 mb-4">
        Starts at ${startTime} and ends at ${endTime} <br />
       <span class="text-lg text-gray-500 shrink-0 bg-slate-200 rounded-2xl p-2">${durationLabel}</span>
@@ -316,7 +322,7 @@ function renderDashboardEvents(processed) {
               <span class="text-xl font-medium flex-1"
                 >${ev.title}</span
               >
-              <span class="text-lg text-gray-500 w-50 text-center shrink-0 bg-slate-200 rounded-2xl px-2 py-1"
+              <span class="text-lg text-gray-500 w-50 text-center shrink-0 bg-slate-200 rounded-2xl px-2 py-1 leading-none"
                 >${formatHHMM(ev.startTime ?? ev.start_time)} – ${formatHHMM(ev.endTime ?? ev.end_time)}</span
               >
               <div class="flex"><!-- avatars --></div>
