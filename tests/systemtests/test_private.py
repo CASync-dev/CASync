@@ -306,6 +306,21 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         friend_results = self.driver.find_elements(By.CSS_SELECTOR, ".friend-result")
         self.assertEqual(len(friend_results), 1)
         self.assertIn("Mkgee", friend_results[0].text)
+        # refresh the page and reopen the modal to search for the users username instead of email, check the search still works
+        self.driver.refresh()
+        self.driver.find_element(By.ID, 'add-friend-menu-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'add-friend-modal'))
+        )
+        self.driver.find_element(By.ID, 'user-search-input').send_keys("Mkgee")
+        self.driver.find_element(By.ID, 'submit-search-friends-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".friend-result"))
+        )
+        friend_results = self.driver.find_elements(By.CSS_SELECTOR, ".friend-result")
+        self.assertEqual(len(friend_results), 1)
+        self.assertIn("Mkgee", friend_results[0].text)
+
         # click the add friend button and check it changes to sent
         add_btn = friend_results[0].find_element(By.XPATH, ".//button[contains(@id, 'add-friend-btn')]")
         add_btn.click()
