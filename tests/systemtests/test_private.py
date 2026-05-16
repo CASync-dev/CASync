@@ -261,13 +261,37 @@ class PrivateSeleniumTests(BaseSeleniumTest):
     # ------------------------------------------------------------------------------------------------------- #
     # GROUPS #
 
-    def test_groups(self):
-        pass
+    '''
+    Quick test command:
+    python -m unittest -v tests.systemtests.test_private.PrivateSeleniumTests.<test_function>
+    ''' 
+
+    # Check that clicking links/buttons correctly takes users to Groups page
+    def test_groups_navigation(self):
+        # Click on groups link/page
+        self.driver.find_element(By.ID, 'nav-groups').click()
+
+        # Check url is groups
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains('/groups')
+        )
+
+        self.assertIn('/groups', self.driver.current_url)
+
+        # Check that there are no groups created (for new user)
+        ul_groups_list = self.driver.find_element(By.ID, 'groups-list')
+        li_groups = ul_groups_list.find_elements(By.TAG_NAME, 'li') 
+        self.assertFalse(li_groups)
+
+
+    
+        
+        
 
     # ------------------------------------------------------------------------------------------------------- #
     # SETTINGS #
     # ------------------------------------------------------------------------------------------------------- #
-    
+
     def test_settings_changeusername(self):
         ''' Tests the change username api'''
         self.driver.find_element(By.ID, 'nav-settings').click()
