@@ -1,11 +1,13 @@
 import os
 import threading
-import time
 import unittest
+from werkzeug.serving import make_server
 from selenium import webdriver
 from app import create_app, db
 from app.config import TestConfig
 from app.models import User
+from dotenv import load_dotenv
+load_dotenv()
 
 # localhost url to be passed to driver.
 # If Github won't run the app at this port since something else is using it, change the port until it does.
@@ -43,25 +45,23 @@ class BaseSeleniumTest(unittest.TestCase):
         db.create_all()
         cls.populate_db()
 
-        # Start the Flask app in a separate thread so that it can handle requests from the Selenium WebDriver during testing
-        # We set use_reloader=False to prevent the app from starting multiple times, and daemon=True so that it will automatically close when the main thread finishes.
-        cls.server_thread = threading.Thread(
-            target=cls.app.run,
-            kwargs={'port': 9000, 'use_reloader': False},
-            daemon=True,  # alternatively we could call driver.quit() in tearDownClass, but this is simpler and ensures the server will stop even if something goes wrong with the tests
-        )
-        cls.server_thread.start()
-
-        time.sleep(1)
+        # Use make_server instead of app.run() so we can call server.shutdown() in tearDownClass,
+        # allowing the next test class to bind port 9000 with a fresh app and clean DB.
+        cls.server = make_server('127.0.0.1', 9000, cls.app)
+        cls.server_thread = threading.Thread(target=cls.server.serve_forever)
+        cls.server_thread.daemon = True # ensures the server thread will automatically close when the main thread finishes, even if something goes wrong with the tests
+        cls.server_thread.start() # Start the Flask app in a separate thread so that it can handle requests from the Selenium WebDriver during testing
 
     @classmethod
     def tearDownClass(cls):
-        # Quit the Selenium WebDriver and clean up the Flask app context and database after all tests have run
+        # Shut down the browser, stop the server, and wipe the DB so the next test class starts clean.
         if cls.driver:
             cls.driver.quit()
-            db.session.remove()
-            db.drop_all()
-            cls.app_context.pop()
+        if hasattr(cls, 'server'):
+            cls.server.shutdown()
+            cls.server_thread.join()
+        db.drop_all()
+        cls.app_context.pop()
 
     @classmethod
     def populate_db(cls):
