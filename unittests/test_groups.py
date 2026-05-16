@@ -105,11 +105,11 @@ class GroupCreationTestCase(BaseTestCase):
 
         # Verify all API response members in the group
         member_names_api = [member["username"] for member in data["group"]["members"]]
-        self.assertCountEqual(member_names_api, [self.main_user.username, self.friend1.username, self.friend1.username])
+        self.assertCountEqual(member_names_api, [self.main_user.username, self.friend1.username, self.friend2.username])
 
         # Verify all database members in the group 
         member_names_db = [member.username for member in group.members]
-        self.assertCountEqual(member_names_db, [self.main_user.username, self.friend1.username, self.friend1.username])
+        self.assertCountEqual(member_names_db, [self.main_user.username, self.friend1.username, self.friend2.username])
 
     # -- Testing creation of group with users who are not friends with current user -- #
     def test_create_group_non_friend(self):
