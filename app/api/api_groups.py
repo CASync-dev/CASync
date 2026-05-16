@@ -136,7 +136,7 @@ def create_group():
     group.members.append(current_user) 
 
     # Get current users friends
-    friendships = current_user.get_friends()
+    friend_ids = {friend.id for friend in current_user.get_friends()}
 
     # Adds the rest of friends to group
     for friend_username in friends_added:
@@ -150,7 +150,7 @@ def create_group():
             }), 404
         
         # Handles users not friends with current user
-        if user not in friendships:
+        if user.id not in friend_ids:
             return jsonify({
                 "success": False,
                 "error": f"User {friend_username} is not your friend"
