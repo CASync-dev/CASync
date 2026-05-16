@@ -84,7 +84,7 @@ def api_remove_cal():
     icalid = data['id']
     user_id = current_user.id
     # Check in case somehow the id does not belong to a calendar the user has.
-    cal = Calendar.query.where(Calendar.user_id == user_id and Calendar.id == icalid)
+    cal = Calendar.query.where(Calendar.user_id == user_id, Calendar.id == icalid).first()
     if not cal:
         return jsonify({"error": "Something's gone wrong!"})
     
@@ -95,7 +95,7 @@ def api_remove_cal():
     db.session.execute(delEvents)
 
     # 2. Remove Calendar with the link
-    delCal = delete(Calendar).where(Calendar.user_id == user_id and Calendar.id == icalid)
+    delCal = delete(Calendar).where(Calendar.user_id == user_id, Calendar.id == icalid)
     db.session.execute(delCal)
 
     # 3. Commit and return with success.
