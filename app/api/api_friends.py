@@ -62,7 +62,7 @@ def requestfriend():
         return jsonify({"error": "Invalid user_id"}), 400
     user_id = int(data['user_id'])
     # This checks if the user exists, this shoulnt be a probelm as the frontend only allows searhcing for existing users but just in case.
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
     # Check if a friend request already exists between the current user and the target user
@@ -108,7 +108,7 @@ def acceptfriend():
     # Update the friend request status to accepted
     friend_request.status = 'accepted'
     friend_request.accepted_at = db.func.now()
-    friend = User.query.get(friend_request.sender_id)
+    friend = db.session.get(User, friend_request.sender_id)
     db.session.commit()
     return jsonify({"message": f"Friend request accepted from {friend.username}!"}), 200
 

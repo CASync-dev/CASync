@@ -18,6 +18,10 @@ class FriendsTestCase(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+        
+        # closes all SQLite connections (added due to ResourceWarning: unclosed database...)
+        db.engine.dispose()
+
         self.app_context.pop()
         self.app = None
         self.app_context = None
