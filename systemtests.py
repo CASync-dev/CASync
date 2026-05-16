@@ -121,6 +121,13 @@ class SeleniumTests(unittest.TestCase):
         # check that the greeting is correct
         greeting = self.driver.find_element(By.ID, 'title_username')
         self.assertEqual(greeting.text, 'Hello, newuser!')
+        # Logout the new user
+        self.driver.find_element(By.ID, 'logout').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'login'))
+        )
+        msg = self.driver.find_element(By.ID, 'msg')
+        self.assertEqual(msg.text, 'You have been logged out.')
 
     def test_loginlogout(self):
         self.driver.get(localHost + "login") #Gets login url
