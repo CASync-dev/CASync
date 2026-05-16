@@ -10,7 +10,10 @@ function loadCreateGroup() {
 function closeLoadCreateGroup() {
   const x = document.getElementById("create-group");
   const errorMsg = document.getElementById("group-error-message");
+  const groupNameInput = document.getElementById("group-name-input")
+
   errorMsg.textContent = "";
+  groupNameInput.value = "";
   x.close();
 }
 
