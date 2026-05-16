@@ -68,6 +68,7 @@
               <i class="fas fa-user-times"></i>
             </button>
             <button
+              id="view-schedule-btn"
               class="btn-plain px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400"
               onclick="openFriendSchedule('{{ friend.id }}', '{{ friend.username }}')"
             >
@@ -363,6 +364,7 @@
                 Friend's Schedule
               </h3>
               <button
+                id="close-friend-schedule-btn"
                 type="button"
                 class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:text-sm"
                 command="close"

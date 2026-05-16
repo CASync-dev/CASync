@@ -433,7 +433,52 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         # check friend is gone
         friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
         self.assertEqual(len(friends), 0)
-    
+
+    def test_friends_schedule(self):
+        # nav to friedns page
+        self.driver.find_element(By.ID, 'nav-friends').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/friends")
+        )
+        # add a friend and an event for that friend to the test database
+        user2 = User(username="Mkgee", email="mkgee@example.com", id=67, password="foo")
+        db.session.add(user2)
+        db.session.commit()
+        friendship = Friendship(sender_id=1, recipient_id=user2.id,status='accepted')
+        db.session.add(friendship)
+        db.session.commit()
+        now = datetime.now(timezone.utc)
+        monday = now - timedelta(days=now.weekday())
+        start_time = (monday + timedelta(days=2)).replace(hour=12, minute=0, second=0, microsecond=0)
+        end_time = start_time + timedelta(hours=1)
+        event = Event(title="Mkgee's Event", start_time=start_time, end_time=end_time, user_id=user2.id)
+        db.session.add(event)
+        db.session.commit()
+        self.driver.refresh()
+        # check the friend appears in the friends list and click the button to view their schedule
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 1)
+        self.assertIn("Mkgee", friends[0].text)
+        self.driver.find_element(By.ID, 'view-schedule-btn').click()
+        # check modal opens
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend-schedule-modal'))
+        )
+        # check the modal title contains the friends name
+        self.assertIn("Mkgee's Schedule", self.driver.find_element(By.ID, 'friend-schedule-title').text)
+        # check the event appears in the friend's schedule
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "#friend-schedule-modal [data-event-id][data-col]"))
+        )
+        events = self.driver.find_elements(By.CSS_SELECTOR, "#friend-schedule-modal [data-event-id][data-col]")
+        self.assertEqual(len(events), 1)
+        self.assertIn("Mkgee's Event", events[0].text)
+        # close the modal and check it closes
+        self.driver.find_element(By.ID, 'close-friend-schedule-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'friend-schedule-modal'))
+        )
+        
     def test_groups(self):
         pass
 
