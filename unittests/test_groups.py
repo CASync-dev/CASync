@@ -128,7 +128,7 @@ class GroupCreationTestCase(BaseTestCase):
             f"User {self.non_friend.username} is not your friend"
         )
 
-    # -- Testing creation of group with users who do not exist in the system-- #
+    # -- Testing creation of group with users who do not exist in the system -- #
     def test_create_group_nonexistent_user(self):
         nonexistent_username = "sus"
 
@@ -147,6 +147,7 @@ class GroupCreationTestCase(BaseTestCase):
             f"User {nonexistent_username} not found"
         )
 
+    # -- Testing creation of group with no group name given -- #
     def test_create_group_missing_name(self):
         response = self.create_group(
             "",
@@ -163,8 +164,31 @@ class GroupCreationTestCase(BaseTestCase):
             "Group name required"
         )
 
+    # -- Testing creation of group with no friends selected -- #
     def test_create_group_empty_list(self):
-        pass
+        group_name = "Wow, so many friends"
+        response = self.create_group(
+            group_name,
+            []
+        )
+
+        # Verifies successful response (can make group with only current user)
+        self.assertEqual(response.status_code, 201)
+        data = response.get_json()
+        self.assertTrue(data["success"] )
+        self.assertEqual(data["group"]["group_name"], group_name)
+
+        # Verifies database insert is also successful
+        group = Group.query.filter_by(group_name=group_name).first()
+        self.assertIsNotNone(group)
+
+        # Verifies only current user in the group (API response)
+        member_names_api = [member["username"] for member in data["group"]["members"]]
+        self.assertCountEqual(member_names_api, [self.main_user.username])
+
+        # Verifies only current user in the group (database)
+        member_names_db = [member.username for member in group.members]
+        self.assertCountEqual(member_names_db, [self.main_user.username])
 
 
 class GroupMembershipTestCase(BaseTestCase):
