@@ -4,7 +4,7 @@ from app.config import TestConfig
 from app.models import Friendship, User, Group
 
 # Command to run all test case/class (fast copy paste):
-# python -m unittest -v unittests.test_groups
+# python -m unittest -v tests.unittests.test_groups
 
 class BaseTestCase(unittest.TestCase):
     def setUp(self):
@@ -99,7 +99,7 @@ class BaseTestCase(unittest.TestCase):
     # ------------------------------------------------------------------------------ #
 
 # Command to run this test case/class (fast copy paste):
-# python -m unittest -v unittests.test_groups.GroupCreationTestCase
+# python -m unittest -v tests.unittests.test_groups.GroupCreationTestCase
 class GroupCreationTestCase(BaseTestCase):
     # Testing Group Creation 
 
@@ -208,7 +208,7 @@ class GroupCreationTestCase(BaseTestCase):
         self.assertCountEqual(member_names_db, [self.main_user.username])
 
 # Command to run this test case/class (fast copy paste):
-# python -m unittest -v unittests.test_groups.GroupMembershipTestCase
+# python -m unittest -v tests.unittests.test_groups.GroupMembershipTestCase
 class GroupMembershipTestCase(BaseTestCase):
     # -- Testing getting current user's friends -- #
     def test_group_get_friends_list(self):
