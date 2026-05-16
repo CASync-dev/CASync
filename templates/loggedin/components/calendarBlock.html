@@ -111,7 +111,7 @@ The general flow of it is:
 
     <!-- Week Header Row: outside overflow-x-auto so it sticks; JS syncs horizontal scroll -->
     <div id="day-headers-scroll" class="overflow-x-hidden">
-      <div class="grid grid-cols-6 border-t border-gray-200 w-full min-w-150">
+      <div class="grid border-t border-gray-200 w-full" style="grid-template-columns: repeat({{ days|length + 1 }}, minmax(0, 1fr)); min-width: {{ (days|length + 1) * 8 }}rem;">
         <div
           class="p-3.5 flex items-center justify-center text-sm font-medium text-gray-900"
         ></div>
@@ -133,7 +133,7 @@ The general flow of it is:
       <!--  Calendar Grid -->
       <!-- Grid structure: 6 columns (time + 5 weekdays), multiple rows for time slots -->
       <!-- Time range: 07:00 am to 06:00 pm -->
-      <div id="desktop-grid" class="grid grid-cols-6 min-w-150">
+      <div id="desktop-grid" class="grid" style="grid-template-columns: repeat({{ days|length + 1 }}, minmax(0, 1fr)); min-width: {{ (days|length + 1) * 8 }}rem;">
         {% for hour in range(timeRange[0], timeRange[1]) %}
         <div
           class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t border-r border-gray-200 flex items-start transition-all hover:bg-stone-100"
@@ -143,9 +143,9 @@ The general flow of it is:
             else ((hour - 12) ~ ':00 pm')) }}
           </span>
         </div>
-        {% for day in range(5) %}
+        {% for day in range(days|length) %}
         <div
-          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t {{ 'border-r' if day < 4 }} border-gray-200 transition-all hover:bg-stone-100"
+          class="h-24 lg:h-20 p-0.5 md:p-3.5 border-t {{ 'border-r' if day < days|length - 1 }} border-gray-200 transition-all hover:bg-stone-100"
         ></div>
         {% endfor %} {% endfor %}
       </div>
@@ -168,6 +168,14 @@ The general flow of it is:
     // Overrideable base URL — set this before calling fetchAndRenderEvents() to change the data source
     let calendarBaseUrl = "{{ eventsUrl | safe }}";
     let events = {};
+
+    // Day column config — baked in from macro args.
+    // CALENDAR_DAYS is the ordered array of day-name strings passed to the macro (e.g. ['Mon','Tue','Wed','Thu','Fri']).
+    // DAY_OFFSET_FROM_MONDAY maps each name to its distance from Monday (Mon=0 … Sun=6),
+    // which is how getWeekDates() converts a day name to an actual calendar date.
+    const CALENDAR_DAYS = {{ days | tojson }};
+    const NUM_COLS = {{ days | length }};
+    const DAY_OFFSET_FROM_MONDAY = { Sun: 6, Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5 };
 
     // Grid Constants: base values are baked in from the macro args and never change.
     const GRID_BASE_START = {{ timeRange[0] }};
@@ -308,41 +316,29 @@ The general flow of it is:
       return result;
     }
 
-    // Get a list of ISO date strings for Monday through Friday of the current week, adjusted by weekOffset.
+    // Get a list of ISO date strings for the days in CALENDAR_DAYS for the current week + weekOffset.
+    // Each day name is mapped to its distance from Monday so arbitrary day sets work correctly
+    // (e.g. ['Sat','Sun'] or ['Mon','Wed','Fri'] or a full 7-day week).
     function getWeekDates() {
-      // Always start from the real current date so navigation never accumulates errors
       const base = new Date();
-      const currentDay = base.getDay();
-      // Calculate how many days to shift back to get to Monday (or forward if it's Sunday)
+      const currentDay = base.getDay(); // 0=Sun … 6=Sat
       const daysFromMonday = currentDay === 0 ? -6 : 1 - currentDay;
 
-      // Find Monday of the real current week, then shift by weekOffset weeks
       const monday = new Date(base);
       monday.setDate(base.getDate() + daysFromMonday + weekOffset * 7);
 
-      // Generate ISO date strings for Monday through Friday of this week
-      const weekDates = [];
-      for (let i = 0; i < 5; i++) {
+      return CALENDAR_DAYS.map(dayName => {
         const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
-        // Use local date parts to avoid UTC timezone shifting the date
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        weekDates.push(`${year}-${month}-${day}`);
-      }
-      // console.log(weekDates); // Uncomment to see the generated week dates in the console
-      return weekDates;
+        d.setDate(monday.getDate() + DAY_OFFSET_FROM_MONDAY[dayName]);
+        return d.toISOString().split('T')[0];
+      });
     }
 
     function setCalendarDates() {
       const now = new Date(); // real current date, for the title and today-highlight
 
-      // Indexed by getDay(): 0=Sun, 1=Mon, …, 6=Sat
-      // TODO: this need to change to match the macro arg
+      // Used only for the title bar (shows the day name of the anchor date)
       const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      // Mon–Fri labels for the five column headers (getDay() 1–5)
-      const weekdayNames = dayNames.slice(1, 6);
 
       const titleElement = document.getElementById('calendar-title');
 
@@ -372,7 +368,7 @@ The general flow of it is:
       } else {
         const weekDates = getWeekDates();
         const startDate = new Date(weekDates[0]);
-        const endDate = new Date(weekDates[4]);
+        const endDate = new Date(weekDates[weekDates.length - 1]);
         titleElement.textContent = `${fmtShort(startDate)} - ${fmtShort(endDate)}`;
       }
 
@@ -383,7 +379,7 @@ The general flow of it is:
         const columnDate = new Date(dateStr);
         const columnElement = document.getElementById(`date-col-${i}`);
         if (columnElement) {
-          columnElement.textContent = `${weekdayNames[i]} ${columnDate.getDate()}`;
+          columnElement.textContent = `${CALENDAR_DAYS[i]} ${columnDate.getDate()}`;
           const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
           const isToday = dateStr === todayStr;
           columnElement.classList.toggle('text-indigo-600', isToday);
@@ -400,7 +396,7 @@ The general flow of it is:
       if ( {{ enableAdaptiveDateCalls | lower }} ) {
         const weekDates = getWeekDates();
         const weekStart = new Date(weekDates[0]);
-        const weekEnd = new Date(weekDates[4]);
+        const weekEnd = new Date(weekDates[weekDates.length - 1]);
         // if the current week is already covered by the last fetch, just re-render
         if (lastFetchedStart && lastFetchedEnd && weekStart >= lastFetchedStart && weekEnd <= lastFetchedEnd) {
           renderDesktopEvents();
@@ -760,11 +756,10 @@ The general flow of it is:
     function buildCellMap(grid) {
       const cellMap = {};
       // for each child (cell) in the grid, calcualte its position and add it to the map.
+      const rowWidth = NUM_COLS + 1; // time label col + N day cols
       Array.from(grid.children).forEach((cell, i) => {
-        // col 0 is the time label column, so we skip it and adjust the index for the map accordingly
-        const col = i % 6;
-        // row is determined by how many complete sets of 6 we've seen (i.e. how many times we've wrapped back to col 0) (not great)
-        if (col !== 0) cellMap[`${col - 1}-${Math.floor(i / 6)}`] = cell;
+        const col = i % rowWidth;
+        if (col !== 0) cellMap[`${col - 1}-${Math.floor(i / rowWidth)}`] = cell;
       });
       return cellMap;
     }
@@ -921,8 +916,7 @@ The general flow of it is:
         const cells = [];
         for (let h = startHour; h < GRID_BASE_START; h++) {
           cells.push(makeTimeCell(h));
-          // day cells for this hour: we mark the last one so it gets no right border
-          for (let d = 0; d < 5; d++) cells.push(makeDayCell(d === 4));
+          for (let d = 0; d < NUM_COLS; d++) cells.push(makeDayCell(d === NUM_COLS - 1));
         }
         grid.prepend(...cells);
       }
@@ -931,8 +925,7 @@ The general flow of it is:
       if (endHour > GRID_BASE_END) {
         for (let h = GRID_BASE_END; h < endHour; h++) {
           grid.appendChild(makeTimeCell(h));
-          // day cells for this hour: we mark the last one so it gets no right border
-          for (let d = 0; d < 5; d++) grid.appendChild(makeDayCell(d === 4));
+          for (let d = 0; d < NUM_COLS; d++) grid.appendChild(makeDayCell(d === NUM_COLS - 1));
         }
       }
       // Update the effective hour range for the next render.
