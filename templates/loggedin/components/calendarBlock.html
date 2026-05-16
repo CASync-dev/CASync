@@ -560,6 +560,7 @@ The general flow of it is:
 
         // going/not going toggle (all event get one)
         const goingToggle = document.createElement('button');
+        goingToggle.id = 'going-toggle-btn';
         goingToggle.className = event.going ? 'bg-gray-500 text-white rounded p-1 hover:bg-gray-600 mt-auto' : 'bg-green-500 text-white rounded p-1 hover:bg-green-600 mt-auto';
         goingToggle.innerHTML = event.going ? `<i class="fa-solid fa-xmark"></i>` : `<i class="fa-solid fa-check"></i>`;
         goingToggle.title = event.going ? 'Mark as not going' : 'Mark as going';
