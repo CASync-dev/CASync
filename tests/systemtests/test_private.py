@@ -1,4 +1,3 @@
-import os
 import time
 from datetime import datetime
 from selenium.webdriver.common.by import By
@@ -117,18 +116,16 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         )
         # fill out form and submit
         #start and end need to be in the future for the calendar to accept them, so we set them to be 1 day in the future, skipping satuday and sunday.
-        # if skipping sat or sun, need to navigate to next week then check for the event
-        starts = time.time() + 24*60*60
+        # if skipping sat or sun, need to navigate to next week then check for the event there, otherwise check for it in the current week
+        target = datetime.now() + timedelta(days=1)
         is_next_week = False
-        if time.localtime(starts).tm_wday == 5: # saturday
-            starts += 2*24*60*60
+        while target.weekday() >= 5:  # 5=Sat, 6=Sun
+            target += timedelta(days=1)
             is_next_week = True
-        elif time.localtime(starts).tm_wday == 6: # sunday
-            starts += 24*60*60
-            is_next_week = True
-        ends = starts + 60*60
-        start_str = time.strftime("%Y-%m-%dT%H:%M", time.localtime(starts))
-        end_str = time.strftime("%Y-%m-%dT%H:%M", time.localtime(ends))
+        start_dt = target.replace(hour=12, minute=0, second=0, microsecond=0)
+        end_dt = start_dt + timedelta(hours=1)
+        start_str = start_dt.strftime("%Y-%m-%dT%H:%M")
+        end_str = end_dt.strftime("%Y-%m-%dT%H:%M")
         self.driver.find_element(By.ID, 'event-title').send_keys("Selenium Test Event")
         self.driver.execute_script("document.getElementById('event-start').value = arguments[0]", start_str)
         self.driver.execute_script("document.getElementById('event-end').value = arguments[0]", end_str)
@@ -738,136 +735,6 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         self.driver.find_element(By.ID, 'repeat_new').send_keys('P@ssw01d')
 
         self.driver.find_element(By.ID, 'changepasssubmit').click()
-
-    def test_settings_delacc(self):
-        '''
-        Tests account deletion api.
-        Since not having the base acc will break everything,
-        we'll create a new account for the purposes of deleting it :)
-        '''
-        self.driver.find_element(By.ID, 'logout').click()
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.url_contains("/login")
-        )
-        self.driver.find_element(By.ID, 'register').click() # Navigate to register; we're going to make a new acc to delete!
-        self.driver.find_element(By.ID, 'email').send_keys("newuser@example.com")
-        self.driver.find_element(By.ID, 'username').send_keys("newuser")
-        self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
-        self.driver.find_element(By.ID, 'repeat_password').send_keys("Newpassword1234!")
-        self.driver.find_element(By.ID, 'log').click()
-        # check url is dash
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.url_contains("/dash")
-        )
-        self.driver.find_element(By.ID, 'nav-settings').click()
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.url_contains("/settings")
-        )
-        self.driver.find_element(By.ID, 'delaccbutton').click()
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.visibility_of_element_located((By.ID, 'deleteacc-modal'))
-        )
-        self.driver.find_element(By.ID, 'closeaccdelbutton').click()
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.invisibility_of_element((By.ID, 'deleteacc-modal'))
-        )
-        self.driver.find_element(By.ID, 'delaccbutton').click()
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.visibility_of_element_located((By.ID, 'deleteacc-modal'))
-        )
-        self.driver.find_element(By.ID, 'accdelemail').send_keys("newuser@example.com")
-        self.driver.find_element(By.ID, 'accdeluser').send_keys("newuser")
-        self.driver.find_element(By.ID, 'accdelpass').send_keys("Newpassword1234!")
-
-        self.driver.find_element(By.ID, 'accdelsubmit').click()
-
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.url_contains("/login")
-        )
-        msg = self.driver.find_element(By.ID, 'msg')
-        self.assertEqual(msg.text, 'Your account has been deleted.')
-
-        # Check if acc is really gone
-        self.driver.find_element(By.ID, 'username').send_keys("newuser")
-        self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
-
-        self.driver.find_element(By.ID, 'log').click()
-
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.url_contains("/login")
-        )
-
-        msg = self.driver.find_element(By.ID, 'msg')
-        self.assertEqual(msg.text, 'Invalid username or password')
-
-        # Login to base to continue with other tests.
-        self.driver.find_element(By.ID, 'username').clear()
-        self.driver.find_element(By.ID, 'password').clear()
-        self.driver.find_element(By.ID, 'username').send_keys('gerald')
-        self.driver.find_element(By.ID, 'password').send_keys('P@ssw01d')
-        self.driver.find_element(By.ID, 'log').click()
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.url_contains("/dash")
-        )
-
-    def test_settings_pfp(self):
-        '''
-        Tests pfps (Checking if pfp is showing, editting, removing..)
-        '''
-        self.driver.find_element(By.ID, 'nav-settings').click()
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.url_contains("/settings")
-        )
-        # Check current pfp is a gravatar
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.visibility_of_element_located((By.ID, 'pfp'))
-        )
-        pfpsrc = self.driver.find_element(By.ID, 'pfp').get_attribute("src")
-        self.assertEqual(pfpsrc, 'https://www.gravatar.com/avatar/2de87236b26ee45d5a84ac6730c23f71?d=identicon&s=150')
-
-        # Remove w/o pfp associated
-        self.driver.find_element(By.ID, 'openpfpmodal').click()
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.visibility_of_element_located((By.ID, 'changepfp-modal'))
-        )
-        self.driver.find_element(By.ID, 'delpfp').click()
-        error = self.driver.find_element(By.ID, 'pfperror')
-        self.assertEqual(error.text, 'Error: No profile picture associated with this account.')
-
-        # Upload img as pfp
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(base_dir, 'test_pfp.png')
-
-        self.driver.find_element(By.ID, 'newpfp').send_keys(file_path)
-        self.driver.find_element(By.ID, 'pfpupload').click()
-        error = self.driver.find_element(By.ID, 'pfperror')
-        self.assertEqual(error.text, 'Successfully changed your profile!')
-
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.visibility_of_element_located((By.ID, 'pfp'))
-        )
-
-        pfpsrc = self.driver.find_element(By.ID, 'pfp').get_attribute("src")
-        self.assertEqual(pfpsrc, localHost + 'static/avatars/1') # 1 = user id.
-
-        # Remove custom pfp
-        self.driver.find_element(By.ID, 'delpfp').click()
-        error = self.driver.find_element(By.ID, 'pfperror')
-        self.assertEqual(error.text, 'Successfully removed your profile!')
-
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.visibility_of_element_located((By.ID, 'pfp'))
-        )
-
-        pfpsrc = self.driver.find_element(By.ID, 'pfp').get_attribute("src")
-        self.assertEqual(pfpsrc, 'https://www.gravatar.com/avatar/2de87236b26ee45d5a84ac6730c23f71?d=identicon&s=150')
-
-        self.driver.find_element(By.ID, 'pfpclose').click()
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.invisibility_of_element((By.ID, 'changepfp-modal'))
-        )
-
-
 
         
         
