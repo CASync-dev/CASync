@@ -132,13 +132,31 @@ def create_group():
     group = Group(group_name=name)
     db.session.add(group) # attaches (new) group instance to the current session
 
-    # adds current user (creator of group) to group
+    # Adds current user (creator of group) to group
     group.members.append(current_user) 
+
+    # Get current users friends
+    friendships = current_user.get_friends()
 
     # Adds the rest of friends to group
     for friend_username in friends_added:
         user = User.query.filter_by(username=friend_username).first() # triggers autoflush before query executes, which caused error to happen previously
-        if user and user != current_user:
+        
+        # Handles users not existing
+        if user is None:
+            return jsonify({
+                "success": False,
+                "error": f"User {friend_username} not found"
+            }), 404
+        
+        # Handles users not friends with current user
+        if user not in friendships:
+            return jsonify({
+                "success": False,
+                "error": f"User {friend_username} is not your friend"
+            }), 400
+
+        if user != current_user:
             group.members.append(user)  # populates many-to-many relationship
 
     db.session.commit()
