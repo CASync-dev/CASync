@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -19,7 +20,7 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         # login as gerald to access authenticated pages for testing
         self.driver.get(localHost + "login")
         self.driver.find_element(By.ID, 'username').send_keys('gerald')
-        self.driver.find_element(By.ID, 'password').send_keys('foo')
+        self.driver.find_element(By.ID, 'password').send_keys('P@ssw01d')
         self.driver.find_element(By.ID, 'log').click()
         WebDriverWait(self.driver, timeout=10).until(
             EC.url_contains("/dash")
@@ -487,5 +488,254 @@ class PrivateSeleniumTests(BaseSeleniumTest):
     def test_groups(self):
         pass
 
-    def test_settings(self):
-        pass
+    def test_settings_changeusername(self):
+        ''' Tests the change username api'''
+        self.driver.find_element(By.ID, 'nav-settings').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+        username = self.driver.find_element(By.ID, 'username')
+        self.assertEqual(username.text, 'gerald')
+
+        # I think this is probably bad practice? But it's the only way it works... :(
+        element = self.driver.find_element(By.ID, 'changeuserbutton')
+        self.driver.execute_script("arguments[0].scrollIntoView()", element)
+        element.click()
+
+        # Test case for empty field:
+        self.driver.find_element(By.ID, 'newusersubmitbutton').click()
+        msg = self.driver.find_element(By.ID, 'usererror')
+        self.assertEqual(msg.text, 'New Username field is required.')
+
+        # Actual changing of username:
+        self.driver.find_element(By.ID, 'newuser').send_keys('gareld')
+        self.driver.find_element(By.ID, 'newusersubmitbutton').click()
+
+        msg = self.driver.find_element(By.ID, 'usererror')
+        self.assertEqual(msg.text, 'Successfully changed your username!')
+
+        # self.driver.find_element(By.ID, 'newuserclosebutton').click()
+        newusername = self.driver.find_element(By.ID, 'username')
+        self.assertEqual(newusername.text, 'gareld')
+
+        # Restoring to old username 
+
+        # self.driver.find_element(By.ID, 'changeuserbutton').click()
+        self.driver.find_element(By.ID, 'newuser').clear()
+        self.driver.find_element(By.ID, 'newuser').send_keys('gerald')
+        self.driver.find_element(By.ID, 'newusersubmitbutton').click()
+
+        msg = self.driver.find_element(By.ID, 'usererror')
+        self.assertEqual(msg.text, 'Successfully changed your username!')
+        self.driver.find_element(By.ID, 'newuserclosebutton').click()
+
+        username = self.driver.find_element(By.ID, 'username')
+        self.assertEqual(username.text, 'gerald')
+        self.driver.find_element(By.ID, 'newuserclosebutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'changeuser-modal'))
+        )
+
+    def test_settings_changeemail(self):
+        ''' Tests the change email api'''
+        self.driver.find_element(By.ID, 'nav-settings').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+
+        email = self.driver.find_element(By.ID, 'email')
+        self.assertEqual(email.text, 'gerald@hotmail.com')
+
+        # I think this is probably bad practice? But it's the only way it works... :(
+        element = self.driver.find_element(By.ID, 'changeemailbutton')
+        self.driver.execute_script("arguments[0].scrollIntoView()", element)
+        element.click()
+        
+        # Test case; no field filled in
+        self.driver.find_element(By.ID, 'newemailsubmitbutton').click()
+        error = self.driver.find_element(By.ID, 'mailerror')
+        self.assertEqual(error.text, 'New Email field is required.')
+
+        # Actually changing email
+        self.driver.find_element(By.ID, 'newemail').send_keys('gerald@gmail.com')
+        self.driver.find_element(By.ID, 'newemailsubmitbutton').click()
+
+        error = self.driver.find_element(By.ID, 'mailerror')
+        self.assertEqual(error.text, 'Successfully changed your email!')
+
+        email = self.driver.find_element(By.ID, 'email')
+        self.assertEqual(email.text, 'gerald@gmail.com')
+
+        # Reset email back to base
+        self.driver.find_element(By.ID, 'newemail').clear()
+        self.driver.find_element(By.ID, 'newemail').send_keys('gerald@hotmail.com')
+        self.driver.find_element(By.ID, 'newemailsubmitbutton').click()
+
+        error = self.driver.find_element(By.ID, 'mailerror')
+        self.assertEqual(error.text, 'Successfully changed your email!')
+        email = self.driver.find_element(By.ID, 'email')
+        self.assertEqual(email.text, 'gerald@hotmail.com')
+
+        self.driver.find_element(By.ID, 'newemailclosebutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'changemail-modal'))
+        )
+
+    def test_settings_icalimportedit(self):
+        '''
+        Tests ical import, sync and editting
+        It should also check events are loaded in schedule maybe? 
+        For now it just checks that the ui is working well ig
+        Tests multiple icals as well.
+        '''
+        SAMPLE_ICAL1 = 'https://raw.githubusercontent.com/LVaclav/test-icals/refs/heads/main/cal-v1.ics'
+        SAMPLE_ICAL2 = "https://raw.githubusercontent.com/LVaclav/test-icals/refs/heads/main/cal-v2.ics"
+
+        self.driver.find_element(By.ID, 'nav-settings').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+        lastsync = self.driver.find_element(By.ID, 'last-synced')
+        self.assertEqual('Never', lastsync.text)
+        self.driver.find_element(By.ID, 'ical_url').send_keys(SAMPLE_ICAL1)
+        self.driver.find_element(By.ID, 'icalsubmit').click()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'sync-button'))
+        )
+        msg = self.driver.find_element(By.ID, 'msgs')
+        # Doing an assert in, in case of spaces
+        self.assertIn('Imported 5 events, updated 0.', msg.text) # ical id = 1
+
+        now = datetime.now().strftime("%d/%m/%y")
+        lastsync = self.driver.find_element(By.ID, 'last-synced')
+        self.assertEqual(now, lastsync.text)
+        numcal = self.driver.find_element(By.ID, 'sync-button')
+        self.assertIn('Sync (1) cals', numcal.text)
+        self.driver.find_element(By.ID, 'sync-button').click()
+        syncmsg = self.driver.find_element(By.ID, 'syncmsg')
+        self.assertEqual(syncmsg.text, 'Successfully synced calendar. 0 events created, 0 events updated.')
+
+        self.driver.find_element(By.ID, 'ical_url').clear()
+        self.driver.find_element(By.ID, 'ical_url').send_keys(SAMPLE_ICAL2)
+        self.driver.find_element(By.ID, 'icalsubmit').click()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'sync-button'))
+        )
+
+        msg = self.driver.find_element(By.ID, 'msgs')
+        self.assertIn('Imported 6 events, updated 0.', msg.text) # ical id = 2
+        now = datetime.now().strftime("%d/%m/%y")
+        lastsync = self.driver.find_element(By.ID, 'last-synced')
+        self.assertEqual(now, lastsync.text)
+        numcal = self.driver.find_element(By.ID, 'sync-button')
+        self.assertIn('Sync (2) cals', numcal.text)
+
+        # Editting ical links
+        self.driver.find_element(By.ID, 'editicalbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'ical-modal'))
+        )
+        link1 = self.driver.find_element(By.ID, 'icallink1')
+        self.assertIn('https://raw.githubusercontent.com/LVaclav/test-icals/refs/heads/main/cal-v1.ics', link1.text)
+        link2 = self.driver.find_element(By.ID, 'icallink2')
+        self.assertIn('https://raw.githubusercontent.com/LVaclav/test-icals/refs/heads/main/cal-v2.ics', link2.text)
+
+        self.driver.find_element(By.ID, 'removeicallink2').click()
+        msg = self.driver.find_element(By.ID, 'icalediterror')
+        self.assertEqual('Succesfully removed iCal Link!', msg.text)
+
+        self.driver.find_element(By.ID, 'closeediticalbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'ical-modal'))
+        )
+        # Simulatng a refresh
+        self.driver.find_element(By.ID, 'nav-dash').click()
+        self.driver.find_element(By.ID, 'nav-settings').click()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'sync-button'))
+        )
+        numcal = self.driver.find_element(By.ID, 'sync-button')
+        self.assertIn('Sync (1) cals', numcal.text)
+
+        # Reset links for next tests.
+        self.driver.find_element(By.ID, 'editicalbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'ical-modal'))
+        )
+        self.driver.find_element(By.ID, 'removeicallink1').click()
+        msg = self.driver.find_element(By.ID, 'icalediterror')
+        self.assertEqual('Succesfully removed iCal Link!', msg.text)
+        self.driver.find_element(By.ID, 'closeediticalbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'ical-modal'))
+        )
+
+    def test_settings_changepassword(self):
+        '''
+        Tests changing password api (form)
+        '''
+        self.driver.find_element(By.ID, 'nav-settings').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+        self.driver.find_element(By.ID, 'changepasswordbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'changepass-modal'))
+        )
+        self.driver.find_element(By.ID, 'changepassclosebutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'changepass-modal'))
+        )
+        self.driver.find_element(By.ID, 'changepasswordbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'changepass-modal'))
+        )
+        # Fail test cases already done in unittest, so we'll only go through the actual process.
+        self.driver.find_element(By.ID, 'current_password').send_keys('P@ssw01d')
+        self.driver.find_element(By.ID, 'new_password').send_keys('r@nd0mp4SS!')
+        self.driver.find_element(By.ID, 'repeat_new').send_keys('r@nd0mp4SS!')
+
+        self.driver.find_element(By.ID, 'changepasssubmit').click()
+
+        msg = self.driver.find_element(By.ID, 'msgs')
+        self.assertEqual("Successfully changed user's password.", msg.text)
+
+        # Testing logging in works with the new pass.
+        self.driver.find_element(By.ID, 'logout').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/login")
+        )
+        self.driver.find_element(By.ID, 'username').send_keys('gerald')
+        self.driver.find_element(By.ID, 'password').send_keys('r@nd0mp4SS!')
+        self.driver.find_element(By.ID, 'log').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/dash")
+        )
+        self.driver.find_element(By.ID, 'nav-settings').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+
+        # Reseting pass back for next tests.
+        self.driver.find_element(By.ID, 'changepasswordbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'changepass-modal'))
+        )
+        self.driver.find_element(By.ID, 'current_password').send_keys('r@nd0mp4SS!')
+        self.driver.find_element(By.ID, 'new_password').send_keys('P@ssw01d')
+        self.driver.find_element(By.ID, 'repeat_new').send_keys('P@ssw01d')
+
+        self.driver.find_element(By.ID, 'changepasssubmit').click()
+
+        
+        
+

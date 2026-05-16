@@ -66,7 +66,7 @@ class PublicSeleniumTests(BaseSeleniumTest):
         )
 
         self.driver.find_element(By.ID, 'username').send_keys("gerald")
-        self.driver.find_element(By.ID, 'password').send_keys("foo")
+        self.driver.find_element(By.ID, 'password').send_keys("P@ssw01d")
         self.driver.find_element(By.ID, 'log').click()
 
         WebDriverWait(self.driver, timeout=10).until(
@@ -83,6 +83,25 @@ class PublicSeleniumTests(BaseSeleniumTest):
         )
         msg = self.driver.find_element(By.ID, 'msg')
         self.assertEqual(msg.text, 'You have been logged out.')
+
+    def test_register_fail(self):
+        self.driver.get(localHost + "register")
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'register'))
+        )
+
+        # Test Case: Fail to fill all fields required.
+        # The unittests go into a lot more checking on different types of errors, but
+        # Here, we're just making sure we've been redirected/stopped correctly.
+
+        self.driver.find_element(By.ID, 'log').click()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'register'))
+        )
+        error = self.driver.find_element(By.ID, 'error')
+        self.assertEqual(error.text, 'All fields are required.')
 
     def test_login_incorrect(self):
         self.driver.get(localHost + "login")  # Gets login url
