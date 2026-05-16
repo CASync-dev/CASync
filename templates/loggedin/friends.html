@@ -27,6 +27,7 @@
           Friend Requests ({{ friend_requests|length }})
         </button>
         <button
+          id="add-friend-menu-btn"
           class="btn-primary shadow-black max-sm:w-full px-4 ml-auto mr-2 max-sm:ml-0 max-sm:mr-0 h-10 whitespace-nowrap cursor-pointer"
           command="show-modal"
           commandfor="add-friend-modal"
@@ -41,7 +42,7 @@
         {% for friend in friends %}
           <li
             id="friend-{{ friend.id }}"
-            class="py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200"
+            class="friend py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200"
           >
             <div class="flex items-center">
               <img

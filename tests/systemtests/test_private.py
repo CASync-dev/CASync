@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from tests.systemtests.base import BaseSeleniumTest, localHost
 
 from app import db
-from app.models import Event
+from app.models import Event, User, Friendship
 from datetime import datetime, timedelta, timezone
 
 # extends the BaseSeleniumTest class, which sets up the testing var for selenium
@@ -243,8 +243,59 @@ class PrivateSeleniumTests(BaseSeleniumTest):
 
 
 
-    def test_friends(self):
-        pass
+    def test_friends_search(self):
+        self.driver.find_element(By.ID, 'nav-friends').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/friends")
+        )
+        # add two friends to test database for gerald, then refresh the page and check that they appear in the search results when typing their names into the search box
+        user2 = User(username="Mkgee", email="mkgee@example.com", id=67, password="foo")
+        user3 = User(username="Soul Wun", email="soulwun@example.com", id=69, password="foo")
+        db.session.add(user2)
+        db.session.add(user3)
+        db.session.commit()
+        friendship1 = Friendship(sender_id=1, recipient_id=user2.id,status='accepted')
+        friendship2 = Friendship(sender_id=user3.id, recipient_id=1,status='accepted')
+        db.session.add(friendship1)
+        db.session.add(friendship2)
+        db.session.commit()
+        self.driver.refresh()
+        #check friends load
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 2)
+        # check that the search box is present and can be typed into
+        search_box = self.driver.find_element(By.ID, 'friend-search-input')
+        search_box.send_keys("Mkgee")
+        self.assertEqual(search_box.get_attribute("value"), "Mkgee")
+        #check only the searched friend appears
+        visible_friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend:not(.hidden)")
+
+        self.assertIn("Mkgee", visible_friends[0].text)
+        #clear search and check both friends appear again
+        search_box.clear()
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 2)
+        #search for the other friend and check it appears
+        search_box.send_keys("Soul Wun")
+        self.assertEqual(search_box.get_attribute("value"), "Soul Wun")
+        visible_friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend:not(.hidden)")
+        self.assertEqual(len(visible_friends), 1) # only soul wun should appear
+        self.assertIn("Soul Wun", visible_friends[0].text)
+
+    def test_friends_add(self):
+        self.driver.find_element(By.ID, 'nav-friends').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/friends")
+        )
+        # add a user to the test database
+        user2 = User(username="Mkgee", email="mkgee@example.com", id=67, password="foo")
+        db.session.add(user2)
+        db.session.commit()
+        #open add friend modal
+        self.driver.find_element(By.ID, 'add-friend-menu-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'add-friend-modal'))
+        )
 
     def test_groups(self):
         pass
