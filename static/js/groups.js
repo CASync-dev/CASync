@@ -4,17 +4,17 @@ let grouplist = [];
 
 // Functions for Group Dialog Modal
 function loadCreateGroup() {
-  const x = document.getElementById("create-group");
-  x.showModal();
+  const createGroupModal = document.getElementById("create-group");
+  createGroupModal.showModal();
 }
 function closeLoadCreateGroup() {
-  const x = document.getElementById("create-group");
+  const createGroupModal = document.getElementById("create-group");
   const errorMsg = document.getElementById("group-error-message");
   const groupNameInput = document.getElementById("group-name-input")
 
   errorMsg.textContent = "";
   groupNameInput.value = "";
-  x.close();
+  createGroupModal.close();
 }
 
 // Functions for Friends Dialog Modal
@@ -51,12 +51,12 @@ async function loadSelectFriends() {
 }
 
 function closeLoadSelectFriends() {
-  const x = document.getElementById("select-friend");
+  const selectFriendModal = document.getElementById("select-friend");
   // Reset all saved values.
   groupname = "";
   grouplist = [];
   window.addMemberMode = false; // reset flag
-  x.close();
+  selectFriendModal.close();
 }
 
 async function submitGroupCreation() {
@@ -340,13 +340,13 @@ function getGroupId(groupId) {
 }
 
 async function openGroupDetail() {
-  const x = document.getElementById("group-details");
-  x.showModal();
+  const groupDetailModal = document.getElementById("group-details");
+  groupDetailModal.showModal();
 }
 
 function closeGroupDetail() {
-  const x = document.getElementById("group-details");
-  x.close();
+  const groupDetailModal = document.getElementById("group-details");
+  groupDetailModal.close();
 }
 
 async function loadGroupMembers() {
