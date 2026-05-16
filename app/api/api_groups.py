@@ -175,21 +175,21 @@ def leave_group():
     data = request.get_json()
     group_id = data.get("group_id")
     if not group_id:
-        return jsonify({"error: Invalid group_id"}), 400
+        return jsonify({"success": False, "error": "Invalid group_id"}), 400
 
     try:
         group_id = int(data["group_id"])
     except (TypeError, ValueError):
-        return jsonify({"error: Invalid group_id"}), 400
+        return jsonify({"success": False, "error": "Invalid group_id"}), 400
 
     # Check if current user exists in the given group (find relationship row)
     # Uses .delete because user_group_association is a raw SQL table, not a python ORM object
-    group = Group.query.get(group_id)
+    group = db.session.get(Group, group_id)
     if not group:
-        return jsonify({"error": "Group not found"}), 404
+        return jsonify({"success": False, "error": "Group not found"}), 404
 
     if current_user not in group.members:
-        return jsonify({"error": "You are not in this group"}), 404
+        return jsonify({"success": False, "error": "You are not in this group"}), 403
 
     group.members.remove(current_user)
 
@@ -199,4 +199,7 @@ def leave_group():
 
     db.session.commit()
 
-    return jsonify({"Message": "You have successfully left the group."}), 200
+    return jsonify({
+        "success": True,
+        "message": "You have successfully left the group."
+    }), 200

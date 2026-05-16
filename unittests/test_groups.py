@@ -1,7 +1,10 @@
 import unittest
 from app import create_app, db
 from app.config import TestConfig
-from app.models import Event, Friendship, User, Group
+from app.models import Friendship, User, Group
+
+# Command to run all test case/class (fast copy paste):
+# python -m unittest -v unittests.test_groups
 
 class BaseTestCase(unittest.TestCase):
     def setUp(self):
@@ -465,7 +468,103 @@ class GroupMembershipTestCase(BaseTestCase):
 
     # ------------------------------------------------------------------------------ #
 
-    def test_leave_group(self):
-        pass
-    
+    def test_leave_group_success(self):
+        # Create group
+        group_name = "Study :("
+        response_group = self.create_group(
+            group_name,
+            [self.friend1.username, self.friend2.username]
+        )
+        self.assertEqual(response_group.status_code, 201)
+
+        # Get data from response
+        data_group = response_group.get_json()
+        group_id = data_group["group"]["id"]
+
+        response = self.client.post("/api/group/leave", json = {
+            "group_id": group_id,
+        })
+
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["message"], "You have successfully left the group.")
+
+        # Check the database to see member has indeed left
+        group = Group.query.filter_by(group_name=group_name).first()
+        self.assertIsNotNone(group)
+        self.assertNotIn(self.main_user.username, [member.username for member in group.members])
+
+
+    def test_leave_group_no_remaining_members(self):
+        # Create group
+        group_name = "Study :("
+        response_group = self.create_group(
+            group_name,
+            []
+        )
+        self.assertEqual(response_group.status_code, 201)
+
+        # Get data from response
+        data_group = response_group.get_json()
+        group_id = data_group["group"]["id"]
+
+        response = self.client.post("/api/group/leave", json = {
+            "group_id": group_id,
+        })
+
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["message"], "You have successfully left the group.")
+
+        # Check that group does not exist in the db anymore
+        group = Group.query.filter_by(group_name=group_name).first()
+        self.assertIsNone(group)
+
+    def test_leave_group_member_not_in_group(self):
+        # Create group
+        group_name = "Study :("
+        response_group = self.create_group(
+            group_name,
+            [self.friend1.username]
+        )
+        self.assertEqual(response_group.status_code, 201)
+
+        # Get data from response
+        data_group = response_group.get_json()
+        group_id = data_group["group"]["id"]
+
+        self.logout_user()
+        self.login_user(self.friend2, "ack")
+
+        response = self.client.post("/api/group/leave", json = {
+            "group_id": group_id,
+        })
+
+        self.assertEqual(response.status_code, 403)
+        data = response.get_json()
+        self.assertFalse(data["success"])
+        self.assertEqual(data["error"], "You are not in this group")
+
+    def test_leave_group_invalid_group(self):
+        nonexistent_group_id = 999
+        response = self.client.post("/api/group/leave", json = {
+            "group_id": nonexistent_group_id,
+        })
+
+        self.assertEqual(response.status_code, 404)
+        data = response.get_json()
+        self.assertFalse(data["success"])
+        self.assertEqual(data["error"], "Group not found")
+
+    def test_leave_group_invalid_id(self):
+        response = self.client.post("/api/group/leave", json = {
+            "group_id": "nope",
+        })
+
+        self.assertEqual(response.status_code, 400)
+        data = response.get_json()
+        self.assertFalse(data["success"])
+        self.assertEqual(data["error"], "Invalid group_id")
     # ------------------------------------------------------------------------------ #

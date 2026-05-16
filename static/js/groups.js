@@ -325,7 +325,7 @@ async function confirmLeaveGroup() {
     document.getElementById(`group-${groupId}`).remove();
     document.getElementById("remove-confirmation").close();
   } catch (err) {
-    console.error("Error: ", err);
+    console.error("error: ", err);
   }
 }
 
