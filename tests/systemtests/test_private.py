@@ -5,17 +5,18 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from tests.systemtests.base import BaseSeleniumTest, localHost
 
-
+# extends the BaseSeleniumTest class, which sets up the testing var for selenium
 class PrivateSeleniumTests(BaseSeleniumTest):
-    """Selenium tests for routes requiring an authenticated session."""
+    """Selenium tests for routes requiring a logged in session."""
 
     def setUp(self):
+        # call setup from the base config
         super().setUp()
         # login as gerald to access authenticated pages for testing
         self.driver.get(localHost + "login")
         self.driver.find_element(By.ID, 'username').send_keys('gerald')
         self.driver.find_element(By.ID, 'password').send_keys('foo')
-        self.driver.find_element(By.ID, 'login').click()
+        self.driver.find_element(By.ID, 'log').click()
         WebDriverWait(self.driver, timeout=10).until(
             EC.url_contains("/dash")
         )
