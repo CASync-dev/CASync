@@ -66,7 +66,7 @@ class PublicSeleniumTests(BaseSeleniumTest):
         )
 
         self.driver.find_element(By.ID, 'username').send_keys("gerald")
-        self.driver.find_element(By.ID, 'password').send_keys("foo")
+        self.driver.find_element(By.ID, 'password').send_keys("P@ssw01d")
         self.driver.find_element(By.ID, 'log').click()
 
         WebDriverWait(self.driver, timeout=10).until(

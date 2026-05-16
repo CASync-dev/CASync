@@ -66,7 +66,7 @@ class BaseSeleniumTest(unittest.TestCase):
     @classmethod
     def populate_db(cls):
         user = User(username='gerald', email='gerald@hotmail.com')  # userid = 1
-        user.password = 'foo'
+        user.password = 'P@ssw01d'
         db.session.add(user)
         db.session.commit()
 

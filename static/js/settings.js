@@ -59,6 +59,7 @@ function showMsg(msg, isSuccess) {
     const msgEl = document.createElement("p");
     msgEl.className = `${isSuccess ? "text-green-600" : "text-red-600"} text-sm mt-2`;
     msgEl.textContent = msg;
+    msgEl.id = "syncmsg"
     document.querySelector("form").appendChild(msgEl);
     setTimeout(() => {
     msgEl.remove();

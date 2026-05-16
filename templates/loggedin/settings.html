@@ -19,6 +19,7 @@
           <div class="flex flex-row max-sm:flex-col justify-between items-center">
             <p class="text-gray-500">Username: <span id = "username"> {{current_user.username}} </span></p>
             <button
+              id = "changeuserbutton"
               command="show-modal"
               commandfor="changeuser-modal"
               class="bg-gray-300 rounded-2xl inline-block max-sm:w-full py-2 px-2 cursor-pointer shadow-2xl hover:shadow transition duration-200 w-1/2"
@@ -29,6 +30,7 @@
           <div class="flex flex-row max-sm:flex-col justify-between items-center">
             <p class="text-gray-500">Email: <span id = "email"> {{current_user.email}} </span></p>
             <button
+              id = "changeemailbutton"
               command="show-modal"
               commandfor="changemail-modal"
               class="bg-gray-300 rounded-2xl py-2 px-2 cursor-pointer max-sm:w-full shadow-2xl hover:shadow transition duration-200 w-1/2"
@@ -73,13 +75,14 @@
         {{ form.ical_url( id="ical_url", placeholder="https://...",
         class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm" ) }}
         <div class="flex ml-4">
-          {{ form.submit(class="ml-4 bg-green-600 text-white py-2 px-4
+          {{ form.submit(id = "icalsubmit",class="ml-4 bg-green-600 text-white py-2 px-4
           rounded-md text-sm hover:bg-green-700 cursor-pointer max-sm:ml-2") }}
         </div>
       </div>
       {% with messages = get_flashed_messages(with_categories=true) %} {% for
       category, message in messages %}
       <p
+        id = "msgs"
         class="{{ 'text-green-600' if category == 'success' else 'text-red-600' }} text-sm"
       >
         {{ message }}
@@ -90,15 +93,16 @@
             cpform.errors.items()
           %}
             {% for error in errors %}
-              <p class="text-red-400 text-sm mt-1 max-w-sm">{{ error }}</p>
+              <p id = "errors" class="text-red-400 text-sm mt-1 max-w-sm">{{ error }}</p>
             {% endfor %}
       {% endfor %}{% endif %}
     </form>
           <button
-        command="show-modal"
-        commandfor="ical-modal"
-        class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
-      >
+          id = "editicalbutton"
+          command="show-modal"
+          commandfor="ical-modal"
+          class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
+        >
         Edit iCal Links
       </button>
     </div>
@@ -110,6 +114,7 @@
     <div id="account-settings" class="mt-2 sm:mx-auto py-3">
       <p class="text-gray-500"></p>
       <button
+        id = "changepasswordbutton"
         command="show-modal"
         commandfor="changepass-modal"
         class="bg-gray-300 rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
@@ -118,6 +123,7 @@
       </button>
       <p class="text-gray-500"></p>
       <button
+        id = "delaccbutton"
         command = "show-modal"
         commandfor = "deleteacc-modal"
         class="bg-red-600 text-white rounded-2xl p-1.5 cursor-pointer m-2.5 shadow-2xl hover:shadow transition duration-200 w-full"
@@ -254,6 +260,7 @@
         </div>
         <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 justify-between">
           <button
+            id = "newusersubmitbutton"
             type="button"
             class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
             onclick = "return changeUsername();"
@@ -261,6 +268,7 @@
             Submit
           </button>
           <button
+            id = "newuserclosebutton"
             type="button"
             class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
             command="close"
@@ -339,6 +347,7 @@
         </div>
         <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 justify-between">
           <button
+            id = "newemailsubmitbutton"
             type="button"
             class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
             onclick = "return changeEmail();"
@@ -346,6 +355,7 @@
             Submit
           </button>
           <button
+            id = "newemailclosebutton"
             type="button"
             class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
             command="close"
@@ -395,10 +405,11 @@
                 <div class="mt-3 flex flex-wrap gap-4 justify-between text-gray-400"> 
                   {% if links %}
                   {% for cal in links %}
-                  <div class="{{cal.id}} w-full flex">
+                  <div id = "icallink{{cal.id}}" class="{{cal.id}} w-full flex">
                     {{ cal.ical_url }}
 
                     <button 
+                      id = "removeicallink{{cal.id}}"
                       onclick = "return removeLink('{{cal.id}}');"
                       class = "{{cal.id}} rounded-sm bg-red-500 p-2 text-white cursor-pointer hover:bg-red-700 focus:ring-2 focus:ring-red-800"
                       > 
@@ -418,6 +429,7 @@
             </div>
             <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
           <button
+            id = "closeediticalbutton"
             type="button"
             class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
             command="close"
@@ -483,8 +495,9 @@
                     <span class = "font-bold"> Please note this password somewhere safe. </span>
                   </p>
                 <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                  {{ cpform.submit(class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm") }}
+                  {{ cpform.submit(id = "changepasssubmit" ,class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm") }}
                   <button
+                    id = "changepassclosebutton"
                     type="button"
                     class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
                     command="close"
