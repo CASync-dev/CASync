@@ -25,7 +25,7 @@ class BaseTestCase(unittest.TestCase):
 
         # closes all SQLite connections (added due to ResourceWarning: unclosed database...)
         db.engine.dispose()
-        
+
         self.app_context.pop()
         self.app = None
         self.app_context = None
@@ -122,13 +122,29 @@ class GroupCreationTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         data = response.get_json()
         self.assertFalse(data["success"] )
+        self.assertIn("error", data)
         self.assertEqual(
             data["error"],
             f"User {self.non_friend.username} is not your friend"
         )
 
     def test_create_group_nonexistent_user(self):
-        pass
+        nonexistent_username = "sus"
+
+        response = self.create_group(
+            "No Seriously, Who are You?",
+            [self.friend1.username, nonexistent_username]
+        )
+
+        # Verifies response should fail (you should not be able to add nonexistent user)
+        self.assertEqual(response.status_code, 404)
+        data = response.get_json()
+        self.assertFalse(data["success"])
+        self.assertIn("error", data)
+        self.assertEqual(
+            data["error"],
+            f"User {nonexistent_username} not found"
+        )
 
     def test_create_group_missing_name(self):
         pass
