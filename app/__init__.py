@@ -26,10 +26,6 @@ def create_app(config_class):
     from app.routes import bp_register
     bp_register(app)
 
-    if config_class == TestConfig:
-        from app.testing import testing 
-        app.register_blueprint(testing)
-
     return app
 
 from app import models
