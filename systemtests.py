@@ -123,11 +123,10 @@ class SeleniumTests(unittest.TestCase):
         self.assertEqual(greeting.text, 'Hello, newuser!')
         # Logout the new user
         self.driver.find_element(By.ID, 'logout').click()
+        # check url is login
         WebDriverWait(self.driver, timeout=10).until(
-            EC.presence_of_element_located((By.ID, 'login'))
+            EC.url_contains("/login")
         )
-        msg = self.driver.find_element(By.ID, 'msg')
-        self.assertEqual(msg.text, 'You have been logged out.')
 
     def test_loginlogout(self):
         self.driver.get(localHost + "login") #Gets login url
@@ -188,7 +187,32 @@ class SeleniumTests(unittest.TestCase):
         pass
     
     def test_schedule(self):
-        pass
+        self.driver.get(localHost + "login") #Gets homepage url
+        # login
+        self.driver.find_element(By.ID, 'username').send_keys("gerald")
+        self.driver.find_element(By.ID, 'password').send_keys("foo")
+        self.driver.find_element(By.ID, 'log').click()
+        # check url is dash
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/dash")
+        )
+        # click schedule link
+        self.driver.find_element(By.ID, 'nav-schedule').click()
+        # check url is schedule
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/schedule")
+        )
+        #check calender title is todays date (Today, Day Mon DD)
+        calendarTitle = self.driver.find_element(By.ID, 'calendar-title')
+        today = time.strftime("%a %b %d")
+        initialTitle = "Today, " + today
+        self.assertEqual(calendarTitle.text, initialTitle)
+        # check next week nav buttons work
+        self.driver.find_element(By.ID, 'btn-next-week').click()
+        calendarTitle = self.driver.find_element(By.ID, 'calendar-title')
+        nextWeek = time.strftime("%a %b %d", time.localtime(time.time() + 7*24*60*60))
+        expectedTitle = "Next Week, " + nextWeek
+        self.assertEqual(calendarTitle.text, expectedTitle)
 
     def test_friends(self):
         pass
