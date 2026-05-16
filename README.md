@@ -103,11 +103,20 @@ Tests live in the [tests/](tests/) directory and use Python's built-in `unittest
 - Run just the unit tests or just the Selenium system tests:
 
   ```bash
-  python -m unittest tests.unittests.test_app
-  python -m unittest tests.systemtests.test_public
+  python -m unittest tests.unittests
+  python -m unittest tests.systemtests
   ```
 
-The system tests use Selenium with Firefox (geckodriver required) and run headless by default. Set `HEADLESS=0` in your .env to watch the browser, e.g. `HEADLESS=0 python -m unittest`.
+  (Each package's `__init__.py` re-exports its test modules so these commands pick them all up — remember to add new test files there.)
+
+- You can also target a specific test:
+
+  ```bash
+  python -m unittest tests.unittests.test_app
+  python -m unittest tests.systemtests.test_private
+  ```
+
+The system tests use Selenium with Firefox and run headless by default. Set `HEADLESS=0` in your .env to watch the browser, e.g. `HEADLESS=0 python -m unittest`.
 
 
 ## Docs
