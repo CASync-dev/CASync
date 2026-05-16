@@ -1,3 +1,4 @@
+import os
 import time
 from datetime import datetime
 from selenium.webdriver.common.by import By
@@ -569,6 +570,62 @@ class PrivateSeleniumTests(BaseSeleniumTest):
             EC.url_contains("/dash")
         )
 
+    def test_settings_pfp(self):
+        '''
+        Tests pfps (Checking if pfp is showing, editting, removing..)
+        '''
+        self.driver.find_element(By.ID, 'nav-settings').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+        # Check current pfp is a gravatar
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'pfp'))
+        )
+        pfpsrc = self.driver.find_element(By.ID, 'pfp').get_attribute("src")
+        self.assertEqual(pfpsrc, 'https://www.gravatar.com/avatar/2de87236b26ee45d5a84ac6730c23f71?d=identicon&s=150')
+
+        # Remove w/o pfp associated
+        self.driver.find_element(By.ID, 'openpfpmodal').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'changepfp-modal'))
+        )
+        self.driver.find_element(By.ID, 'delpfp').click()
+        error = self.driver.find_element(By.ID, 'pfperror')
+        self.assertEqual(error.text, 'Error: No profile picture associated with this account.')
+
+        # Upload img as pfp
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(base_dir, 'test_pfp.png')
+
+        self.driver.find_element(By.ID, 'newpfp').send_keys(file_path)
+        self.driver.find_element(By.ID, 'pfpupload').click()
+        error = self.driver.find_element(By.ID, 'pfperror')
+        self.assertEqual(error.text, 'Successfully changed your profile!')
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'pfp'))
+        )
+
+        pfpsrc = self.driver.find_element(By.ID, 'pfp').get_attribute("src")
+        self.assertEqual(pfpsrc, localHost + 'static/avatars/1') # 1 = user id.
+
+        # Remove custom pfp
+        self.driver.find_element(By.ID, 'delpfp').click()
+        error = self.driver.find_element(By.ID, 'pfperror')
+        self.assertEqual(error.text, 'Successfully removed your profile!')
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'pfp'))
+        )
+
+        pfpsrc = self.driver.find_element(By.ID, 'pfp').get_attribute("src")
+        self.assertEqual(pfpsrc, 'https://www.gravatar.com/avatar/2de87236b26ee45d5a84ac6730c23f71?d=identicon&s=150')
+
+        self.driver.find_element(By.ID, 'pfpclose').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'changepfp-modal'))
+        )
 
 
 

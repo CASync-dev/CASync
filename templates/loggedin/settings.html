@@ -9,7 +9,7 @@
        
     <div id="profile-settings" class="mt-2 sm:mx-auto py-3">
       <div class="flex flex-row max-sm:flex-col gap-6 items-center">
-        <button class="relative group cursor-pointer shrink-0 rounded-full" command="show-modal" commandfor="changepfp-modal">
+        <button id = "openpfpmodal" class="relative group cursor-pointer shrink-0 rounded-full" command="show-modal" commandfor="changepfp-modal">
           <img id = "pfp" src="{{current_user.avatar(150)}}" class="h-24 w-24 rounded-full" />
           <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200">
             <span class="text-white text-xs font-medium">Change</span>
@@ -173,7 +173,7 @@
                   <br>
                   <div class = "justify-between items-center">
                     <button type = "submit" id = "pfpupload" class = "mt-3 p-1.5 rounded-sm bg-primary hover:bg-blue-700 text-white cursor-pointer"> Submit </button>
-                    <button type = "button" onclick = "return delPFP();" class = "mt-3 p-1.5 rounded-sm bg-red-500 hover:bg-red-600 text-white cursor-pointer"> Remove </button>
+                    <button id = "delpfp" type = "button" onclick = "return delPFP();" class = "mt-3 p-1.5 rounded-sm bg-red-500 hover:bg-red-600 text-white cursor-pointer"> Remove </button>
                   </div>
                 </form>
                 <p id = "pfperror"></p>
@@ -185,6 +185,7 @@
         </div>
         <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
           <button
+            id="pfpclose"
             type="button"
             class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
             command="close"
