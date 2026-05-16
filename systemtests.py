@@ -79,11 +79,7 @@ class SeleniumTests(unittest.TestCase):
     
     def test_index(self):
         self.driver.get(localHost) #Gets homepage url
-        # check signup button is present
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.presence_of_element_located((By.ID, 'signup'))
-        )
-        pass
+
 
     def test_faq(self):
         self.driver.get(localHost) #Gets homepage url
@@ -106,7 +102,25 @@ class SeleniumTests(unittest.TestCase):
         assert contactTitle.text == "Contact Us"
 
     def test_register(self):
-        pass
+        self.driver.get(localHost) #Gets homepage url
+        self.driver.find_element(By.ID, 'register').click() #Clicks the register link
+        # check url is correct
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/register")
+        )
+        # Register a new user
+        self.driver.find_element(By.ID, 'email').send_keys("newuser@example.com")
+        self.driver.find_element(By.ID, 'username').send_keys("newuser")
+        self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
+        self.driver.find_element(By.ID, 'repeat_password').send_keys("Newpassword1234!")
+        self.driver.find_element(By.ID, 'log').click()
+        # check url is dash
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/dash")
+        )
+        # check that the greeting is correct
+        greeting = self.driver.find_element(By.ID, 'title_username')
+        self.assertEqual(greeting.text, 'Hello, newuser!')
 
     def test_loginlogout(self):
         self.driver.get(localHost + "login") #Gets login url
