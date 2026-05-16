@@ -5,6 +5,10 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from tests.systemtests.base import BaseSeleniumTest, localHost
 
+from app import db
+from app.models import Event
+from datetime import datetime, timedelta, timezone
+
 # extends the BaseSeleniumTest class, which sets up the testing var for selenium
 class PrivateSeleniumTests(BaseSeleniumTest):
     """Selenium tests for routes requiring a logged in session."""
@@ -73,9 +77,6 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         events = self.driver.find_elements(By.CSS_SELECTOR, "[data-event-id][data-col]")
         self.assertEqual(len(events), 0)
         # manually add an event to the test database for gerald, then refresh the page and check that it appears
-        from app import db
-        from app.models import Event
-        from datetime import datetime, timedelta, timezone
         # Wednesday noon UTC of the current ISO week (Mon–Fri); always goes back to the past Monday
         now = datetime.now(timezone.utc)
         monday = now - timedelta(days=now.weekday())
@@ -134,6 +135,47 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         events = self.driver.find_elements(By.CSS_SELECTOR, "[data-event-id][data-col]")
         self.assertEqual(len(events), 1)
         self.assertIn("Selenium Test Event", events[0].text)
+
+    def test_schedule_event_edit(self):
+        self.driver.find_element(By.ID, 'nav-schedule').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/schedule")
+        )
+        # manually add an event to the test database for gerald
+        now = datetime.now(timezone.utc)
+        monday = now - timedelta(days=now.weekday())
+        start_time = (monday + timedelta(days=2)).replace(hour=12, minute=0, second=0, microsecond=0)
+        end_time = start_time + timedelta(hours=1)
+        event = Event(title="Test Event", start_time=start_time, end_time=end_time, user_id=1)
+        db.session.add(event)
+        db.session.commit()
+        self.driver.refresh()
+        # wait for event to load and click it to open the edit modal
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "[data-event-id][data-col]"))
+        )
+        self.driver.find_element(By.CSS_SELECTOR, "[data-event-id][data-col]").click()
+        self.driver.find_element(By.ID, 'edit-event-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'edit-event-modal'))
+        )
+        # change the title and submit
+        title_input = self.driver.find_element(By.ID, 'edit-event-title')
+        title_input.clear()
+        title_input.send_keys("Edited Test Event")
+        self.driver.find_element(By.ID, 'save-edit-btn').click()
+        # Wait for the modal to close
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'edit-event-modal'))
+        )
+        # wait for the calendar to re-render with the updated title (fetch is async)
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.text_to_be_present_in_element((By.CSS_SELECTOR, "[data-event-id][data-col]"), "Edited Test Event")
+        )
+        events = self.driver.find_elements(By.CSS_SELECTOR, "[data-event-id][data-col]")
+        self.assertEqual(len(events), 1)
+        self.assertIn("Edited Test Event", events[0].text)
+
 
     def test_friends(self):
         pass
