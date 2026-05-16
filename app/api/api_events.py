@@ -109,6 +109,7 @@ def api_eventslist():
 # acceepts a format like this: GET /api/events/me?start=2026-04-21&end=2026-04-25
 # responds with a list of events in that date range for the current user
 @api_events.route("/api/events/me")
+@login_required
 def api_events_range():
     """
     Accepts a start and end date as query parameters as:
