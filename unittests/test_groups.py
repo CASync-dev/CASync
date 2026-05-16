@@ -128,6 +128,7 @@ class GroupCreationTestCase(BaseTestCase):
             f"User {self.non_friend.username} is not your friend"
         )
 
+    # -- Testing creation of group with users who do not exist in the system-- #
     def test_create_group_nonexistent_user(self):
         nonexistent_username = "sus"
 
@@ -147,7 +148,20 @@ class GroupCreationTestCase(BaseTestCase):
         )
 
     def test_create_group_missing_name(self):
-        pass
+        response = self.create_group(
+            "",
+            [self.friend1.username, self.friend2.username]
+        )
+
+        # Verifies response should fail (group name is required)
+        self.assertEqual(response.status_code, 400)
+        data = response.get_json()
+        self.assertFalse(data["success"])
+        self.assertIn("error", data)
+        self.assertEqual(
+            data["error"],
+            "Group name required"
+        )
 
     def test_create_group_empty_list(self):
         pass

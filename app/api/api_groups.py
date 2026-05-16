@@ -127,7 +127,10 @@ def create_group():
 
     # Validate group name exist
     if not name:
-        return jsonify({"error": "Group name required"}), 400
+        return jsonify({
+            "success": False,
+            "error": "Group name required"
+        }), 400
 
     group = Group(group_name=name)
     db.session.add(group) # attaches (new) group instance to the current session
