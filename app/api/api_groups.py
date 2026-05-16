@@ -14,7 +14,7 @@ def group_get_friends():
     friends = current_user.get_friends()  # list of user objects
 
     # Format response to JSON for browsers
-    return jsonify({"friends": [friend.public_dict() for friend in friends]}), 200
+    return jsonify({"success": True, "friends": [friend.public_dict() for friend in friends]}), 200
 
 
 @api_groups.route("/api/group/add_member", methods=["POST"])
@@ -29,23 +29,23 @@ def add_member():
 
     # Validation for group ID
     if not group_id:
-        return jsonify({"error": "group_id is required"}), 400
+        return jsonify({"success": False, "error": "group_id is required"}), 400
     try:
         group_id = int(group_id)
     except (TypeError, ValueError):
-        return jsonify({"error": "invalid group_id"}), 400
+        return jsonify({"success": False, "error": "invalid group_id"}), 400
 
     # Validation for at least one user being added
     if not usernames_to_add or len(usernames_to_add) == 0:
-        return jsonify({"error": "No users to add"}), 400
+        return jsonify({"success": False, "error": "No users to add"}), 400
 
     # Fetch group
-    group = Group.query.get(group_id)
+    group = db.session.get(Group, group_id)
     if not group:
-        return jsonify({"error": "Group not found"}), 404
+        return jsonify({"success": False, "error": "Group not found"}), 404
 
     if current_user not in group.members:
-        return jsonify({"error": "You are not in this group"}), 404
+        return jsonify({"success": False, "error": "You are not in this group"}), 403
 
     # Track results for detailed response
     added_users = []
@@ -76,11 +76,12 @@ def add_member():
         group.members.append(user)
         added_users.append(user.to_dict())
 
-        # If no users were actually added, return error
+    # If no users were actually added, return error
     if len(added_users) == 0:
         return jsonify(
             {
-                "error": "No valid users were added. User(s) may already be in the group.",
+                "success": False,
+                "error": "No valid users were added. User(s) may already be in the group or does not exist.",
                 "skipped": skipped_users,
                 "not_found": not_found_users,
             }
@@ -105,10 +106,10 @@ def add_member():
 @api_groups.route("/api/group/<int:group_id>", methods=["GET"])
 @login_required
 def get_group_details(group_id):
-    group = Group.query.get(group_id)
+    group = db.session.get(Group, group_id)
 
     if not group:
-        return jsonify({"error": "Could not find group"}), 404
+        return jsonify({"success": False, "error": "Could not find group"}), 404
 
     return jsonify(group.to_dict()), 200
 
@@ -127,23 +128,44 @@ def create_group():
 
     # Validate group name exist
     if not name:
-        return jsonify({"error": "Group name required"}), 400
+        return jsonify({
+            "success": False,
+            "error": "Group name required"
+        }), 400
 
     group = Group(group_name=name)
     db.session.add(group) # attaches (new) group instance to the current session
 
-    # adds current user (creator of group) to group
+    # Adds current user (creator of group) to group
     group.members.append(current_user) 
+
+    # Get current users friends
+    friend_ids = {friend.id for friend in current_user.get_friends()}
 
     # Adds the rest of friends to group
     for friend_username in friends_added:
         user = User.query.filter_by(username=friend_username).first() # triggers autoflush before query executes, which caused error to happen previously
-        if user and user != current_user:
+        
+        # Handles users not existing
+        if user is None:
+            return jsonify({
+                "success": False,
+                "error": f"User {friend_username} not found"
+            }), 404
+        
+        # Handles users not friends with current user
+        if user.id not in friend_ids:
+            return jsonify({
+                "success": False,
+                "error": f"User {friend_username} is not your friend"
+            }), 400
+
+        if user != current_user:
             group.members.append(user)  # populates many-to-many relationship
 
     db.session.commit()
 
-    return jsonify({"success": True, "group": group.to_dict()})
+    return jsonify({"success": True, "group": group.to_dict()}), 201
 
 
 # Handles users leaving the group
@@ -153,21 +175,21 @@ def leave_group():
     data = request.get_json()
     group_id = data.get("group_id")
     if not group_id:
-        return jsonify({"error: Invalid group_id"}), 400
+        return jsonify({"success": False, "error": "Invalid group_id"}), 400
 
     try:
         group_id = int(data["group_id"])
     except (TypeError, ValueError):
-        return jsonify({"error: Invalid group_id"}), 400
+        return jsonify({"success": False, "error": "Invalid group_id"}), 400
 
     # Check if current user exists in the given group (find relationship row)
     # Uses .delete because user_group_association is a raw SQL table, not a python ORM object
-    group = Group.query.get(group_id)
+    group = db.session.get(Group, group_id)
     if not group:
-        return jsonify({"error": "Group not found"}), 404
+        return jsonify({"success": False, "error": "Group not found"}), 404
 
     if current_user not in group.members:
-        return jsonify({"error": "You are not in this group"}), 404
+        return jsonify({"success": False, "error": "You are not in this group"}), 403
 
     group.members.remove(current_user)
 
@@ -177,4 +199,7 @@ def leave_group():
 
     db.session.commit()
 
-    return jsonify({"Message": "You have successfully left the group."}), 200
+    return jsonify({
+        "success": True,
+        "message": "You have successfully left the group."
+    }), 200
