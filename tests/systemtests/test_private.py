@@ -616,7 +616,9 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         numcal = self.driver.find_element(By.ID, 'sync-button')
         self.assertIn('Sync (1) cals', numcal.text)
         self.driver.find_element(By.ID, 'sync-button').click()
-        syncmsg = self.driver.find_element(By.ID, 'syncmsg')
+        syncmsg = WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'syncmsg'))
+        )
         self.assertEqual(syncmsg.text, 'Successfully synced calendar. 0 events created, 0 events updated.')
 
         self.driver.find_element(By.ID, 'ical_url').clear()
