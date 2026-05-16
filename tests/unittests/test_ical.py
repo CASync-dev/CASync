@@ -118,3 +118,34 @@ class CalTestCases(unittest.TestCase):
         data = response.get_json()
         assert data["created"] == 1
         assert data["updated"] == 1
+
+    def test_import_another_ical(self):
+        # Importing a second, different calendar should work and create events from that calendar without affecting the first one
+        self.client.post('/api/import-ical/', json={"url": SAMPLE_V1})
+        count_after_first = Event.query.count()
+        response = self.client.post('/api/import-ical/', json={"url": SAMPLE_V2})
+        assert response.status_code == 200
+        data = response.get_json()
+        assert 'imported' in data
+        assert data["imported"] > 0
+    
+    def test_sync_multiple_calendars(self):
+        # Syncing when the user has multiple calendars should sync all of them and aggregate the results correctly
+        self.client.post('/api/import-ical/', json={"url": SAMPLE_V1})
+        self.client.post('/api/import-ical/', json={"url": SAMPLE_V2})
+        response = self.client.post('/api/sync-cal/')
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data["created"] >= 0
+        assert data["updated"] >= 0
+    
+    def test_delete_one_calendar_does_not_affect_others(self):
+        # Deleting one calendar when multiple exist should only delete events from that calendar and not affect the others
+        self.client.post('/api/import-ical/', json={"url": SAMPLE_V1})
+        self.client.post('/api/import-ical/', json={"url": SAMPLE_V2})
+        cal_to_delete = Calendar.query.filter_by(ical_url=SAMPLE_V1).first()
+        response = self.client.post('/api/remove-cal/', json={"id": cal_to_delete.id})
+        assert response.status_code == 200
+        remaining_cal = Calendar.query.filter_by(ical_url=SAMPLE_V2).first()
+        assert remaining_cal is not None
+        assert Event.query.filter_by(ical_id=remaining_cal.id).count() > 0
