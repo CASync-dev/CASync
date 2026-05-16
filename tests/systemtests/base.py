@@ -14,7 +14,7 @@ load_dotenv()
 localHost = "http://127.0.0.1:9000/"
 
 # Set HEADLESS=0 to watch the browser run the tests; defaults to headless for CI.
-HEADLESS = os.environ.get("HEADLESS", "1") != "0"
+HEADLESS = os.environ.get("HEADLESS", "1").strip().lower() not in ("0", "false", "no")
 
 
 class BaseSeleniumTest(unittest.TestCase):
