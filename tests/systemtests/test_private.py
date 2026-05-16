@@ -26,6 +26,9 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         )
 
     def tearDown(self):
+        # delete any events created during the test so each test starts with a clean slate
+        Event.query.delete()
+        db.session.commit()
         # logout after each test to ensure a clean slate for the next one
         self.driver.find_element(By.ID, 'logout').click()
         WebDriverWait(self.driver, timeout=10).until(
@@ -175,6 +178,41 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         events = self.driver.find_elements(By.CSS_SELECTOR, "[data-event-id][data-col]")
         self.assertEqual(len(events), 1)
         self.assertIn("Edited Test Event", events[0].text)
+    
+    def test_schedule_event_delete(self):
+        self.driver.find_element(By.ID, 'nav-schedule').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/schedule")
+        )
+        # manually add an event to the test database for gerald
+        now = datetime.now(timezone.utc)
+        monday = now - timedelta(days=now.weekday())
+        start_time = (monday + timedelta(days=2)).replace(hour=12, minute=0, second=0, microsecond=0)
+        end_time = start_time + timedelta(hours=1)
+        event = Event(title="Test Event", start_time=start_time, end_time=end_time, user_id=1)
+        db.session.add(event)
+        db.session.commit()
+        self.driver.refresh()
+        # wait for event to load and click it to expand it
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "[data-event-id][data-col]"))
+        )
+        self.driver.find_element(By.CSS_SELECTOR, "[data-event-id][data-col]").click()
+        self.driver.find_element(By.ID, 'delete-event-btn').click()
+        #wait for modal to open
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'delete-confirmation'))
+        )
+        #confirm deletion
+        self.driver.find_element(By.ID, 'confirm-delete-btn').click()
+        # Wait for the modal to close
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'delete-confirmation'))
+        )
+        # wait for the calendar to re-render without the deleted event (fetch is async)
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.CSS_SELECTOR, "[data-event-id][data-col]"))
+        )
 
 
     def test_friends(self):
