@@ -96,7 +96,7 @@ class GroupCreationTestCase(BaseTestCase):
         # Verifies response is successful
         self.assertEqual(response.status_code, 201)
         data = response.get_json()
-        self.assertTrue(data["success"] )
+        self.assertTrue(data["success"])
         self.assertEqual(data["group"]["group_name"], "Study (Till You) Break")
 
         # Verifies database insert is also successful
@@ -193,7 +193,22 @@ class GroupCreationTestCase(BaseTestCase):
 
 class GroupMembershipTestCase(BaseTestCase):
     def test_group_get_friends_list(self):
-        pass
+        response = self.client.get("/api/group/friends")
+
+        # Verifies response is successful and contains friends
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data["success"])
+        self.assertIn("friends", data)
+        self.assertEqual(len(data["friends"]), 2)
+
+        # Validate actual usernames
+        friend_names = [friend["username"] for friend in data["friends"]]
+        self.assertIn(self.friend1.username, friend_names)
+        self.assertIn(self.friend2.username, friend_names)
+
+        # Validate non-friends not included in list
+        self.assertNotIn(self.non_friend.username, friend_names)
 
     # ------------------------------------------------------------------------------ #
 

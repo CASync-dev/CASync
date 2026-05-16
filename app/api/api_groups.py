@@ -14,7 +14,7 @@ def group_get_friends():
     friends = current_user.get_friends()  # list of user objects
 
     # Format response to JSON for browsers
-    return jsonify({"friends": [friend.public_dict() for friend in friends]}), 200
+    return jsonify({"success": True, "friends": [friend.public_dict() for friend in friends]}), 200
 
 
 @api_groups.route("/api/group/add_member", methods=["POST"])
@@ -29,23 +29,23 @@ def add_member():
 
     # Validation for group ID
     if not group_id:
-        return jsonify({"error": "group_id is required"}), 400
+        return jsonify({"success": False, "error": "group_id is required"}), 400
     try:
         group_id = int(group_id)
     except (TypeError, ValueError):
-        return jsonify({"error": "invalid group_id"}), 400
+        return jsonify({"success": False, "error": "invalid group_id"}), 400
 
     # Validation for at least one user being added
     if not usernames_to_add or len(usernames_to_add) == 0:
-        return jsonify({"error": "No users to add"}), 400
+        return jsonify({"success": False, "error": "No users to add"}), 400
 
     # Fetch group
     group = Group.query.get(group_id)
     if not group:
-        return jsonify({"error": "Group not found"}), 404
+        return jsonify({"success": False, "error": "Group not found"}), 404
 
     if current_user not in group.members:
-        return jsonify({"error": "You are not in this group"}), 404
+        return jsonify({"success": False, "error": "You are not in this group"}), 404
 
     # Track results for detailed response
     added_users = []
@@ -80,6 +80,7 @@ def add_member():
     if len(added_users) == 0:
         return jsonify(
             {
+                "success": False,
                 "error": "No valid users were added. User(s) may already be in the group.",
                 "skipped": skipped_users,
                 "not_found": not_found_users,
@@ -108,7 +109,7 @@ def get_group_details(group_id):
     group = Group.query.get(group_id)
 
     if not group:
-        return jsonify({"error": "Could not find group"}), 404
+        return jsonify({"success": False, "error": "Could not find group"}), 404
 
     return jsonify(group.to_dict()), 200
 
