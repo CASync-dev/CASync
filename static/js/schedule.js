@@ -163,12 +163,9 @@ function editEvent(eventId) {
   document.getElementById("edit-event-start").value = `${event.date}T${event.startTime}`;
   document.getElementById("edit-event-end").value = `${event.endDate}T${event.endTime}`;
   document.getElementById("edit-event-location").value = event.location || "";
-  selectColor(
-    document.querySelector(
-      `#edit-color-picker-buttons #${event.color}-color-btn`,
-    ),
-    event.color,
-  );
+  const colorToSelect = event.color || 'indigo';
+  const colorBtn = document.querySelector(`#edit-color-picker-buttons #${colorToSelect}-color-btn`);
+  if (colorBtn) editColor(colorBtn, colorToSelect);
   // When the user submits the edit form, we gather the updated details and send a PUT request to the API
   document.getElementById("save-edit-btn").onclick = (e) => {
     document.getElementById("edit-event-modal").close();
