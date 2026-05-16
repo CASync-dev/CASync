@@ -553,20 +553,21 @@
                 <form method="post" action="/settings" class = "text-gray-400 mt-3 px-5"> 
                   {{ acdform.hidden_tag() }}
                   {{ acdform.email.label }}
-                  {{ acdform.email(size=25, class = "text-black flex-1 my-3 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
+                  {{ acdform.email(size=25, id = "accdelemail",class = "text-black flex-1 my-3 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
                   <br>
                   {{ acdform.username.label }}
-                  {{ acdform.username(size=25, class = "text-black flex-1 my-3 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
+                  {{ acdform.username(size=25, id = "accdeluser", class = "text-black flex-1 my-3 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
                   <br>
                   {{ acdform.password.label }}
-                  {{ acdform.password(size=25, class = "text-black flex-1 my-3 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
+                  {{ acdform.password(size=25, id = "accdelpass", class = "text-black flex-1 my-3 rounded-md border border-gray-300  text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50")}}
                   <p class = "font-bold text-red-600 "> 
                     Warning! Are you sure you want to delete your account? All of your data will be deleted. 
                       To cancel account deletion, leave this page at any time.
                   </p>
                   <div class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 md:justify-between">
-                  {{ acdform.submit(class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm") }}
+                  {{ acdform.submit(id = "accdelsubmit", class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-red-800 bg-red-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm") }}
                   <button
+                    id = "closeaccdelbutton"
                     type="button"
                     class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
                     command="close"

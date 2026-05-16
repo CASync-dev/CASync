@@ -498,6 +498,80 @@ class PrivateSeleniumTests(BaseSeleniumTest):
 
         self.driver.find_element(By.ID, 'changepasssubmit').click()
 
+    def test_settings_delacc(self):
+        '''
+        Tests account deletion api.
+        Since not having the base acc will break everything,
+        we'll create a new account for the purposes of deleting it :)
+        '''
+        self.driver.find_element(By.ID, 'logout').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/login")
+        )
+        self.driver.find_element(By.ID, 'register').click() # Navigate to register; we're going to make a new acc to delete!
+        self.driver.find_element(By.ID, 'email').send_keys("newuser@example.com")
+        self.driver.find_element(By.ID, 'username').send_keys("newuser")
+        self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
+        self.driver.find_element(By.ID, 'repeat_password').send_keys("Newpassword1234!")
+        self.driver.find_element(By.ID, 'log').click()
+        # check url is dash
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/dash")
+        )
+        self.driver.find_element(By.ID, 'nav-settings').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+        self.driver.find_element(By.ID, 'delaccbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'deleteacc-modal'))
+        )
+        self.driver.find_element(By.ID, 'closeaccdelbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'deleteacc-modal'))
+        )
+        self.driver.find_element(By.ID, 'delaccbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'deleteacc-modal'))
+        )
+        self.driver.find_element(By.ID, 'accdelemail').send_keys("newuser@example.com")
+        self.driver.find_element(By.ID, 'accdeluser').send_keys("newuser")
+        self.driver.find_element(By.ID, 'accdelpass').send_keys("Newpassword1234!")
+
+        self.driver.find_element(By.ID, 'accdelsubmit').click()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/login")
+        )
+        msg = self.driver.find_element(By.ID, 'msg')
+        self.assertEqual(msg.text, 'Your account has been deleted.')
+
+        # Check if acc is really gone
+        self.driver.find_element(By.ID, 'username').send_keys("newuser")
+        self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
+
+        self.driver.find_element(By.ID, 'log').click()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/login")
+        )
+
+        msg = self.driver.find_element(By.ID, 'msg')
+        self.assertEqual(msg.text, 'Invalid username or password')
+
+        # Login to base to continue with other tests.
+        self.driver.find_element(By.ID, 'username').clear()
+        self.driver.find_element(By.ID, 'password').clear()
+        self.driver.find_element(By.ID, 'username').send_keys('gerald')
+        self.driver.find_element(By.ID, 'password').send_keys('P@ssw01d')
+        self.driver.find_element(By.ID, 'log').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/dash")
+        )
+
+
+
+
         
         
 
