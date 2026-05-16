@@ -249,5 +249,95 @@ class PrivateSeleniumTests(BaseSeleniumTest):
     def test_groups(self):
         pass
 
-    def test_settings(self):
-        pass
+    def test_settings_changeusername(self):
+        ''' Tests the change username api'''
+        self.driver.find_element(By.ID, 'nav-settings').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+        username = self.driver.find_element(By.ID, 'username')
+        self.assertEqual(username.text, 'gerald')
+
+        # I think this is probably bad practice? But it's the only way it works... :(
+        element = self.driver.find_element(By.ID, 'changeuserbutton')
+        self.driver.execute_script("arguments[0].scrollIntoView()", element)
+        element.click()
+
+        # Test case for empty field:
+        self.driver.find_element(By.ID, 'newusersubmitbutton').click()
+        msg = self.driver.find_element(By.ID, 'usererror')
+        self.assertEqual(msg.text, 'New Username field is required.')
+
+        # Actual changing of username:
+        self.driver.find_element(By.ID, 'newuser').send_keys('gareld')
+        self.driver.find_element(By.ID, 'newusersubmitbutton').click()
+
+        msg = self.driver.find_element(By.ID, 'usererror')
+        self.assertEqual(msg.text, 'Successfully changed your username!')
+
+        # self.driver.find_element(By.ID, 'newuserclosebutton').click()
+        newusername = self.driver.find_element(By.ID, 'username')
+        self.assertEqual(newusername.text, 'gareld')
+
+        # Restoring to old username 
+
+        # self.driver.find_element(By.ID, 'changeuserbutton').click()
+        self.driver.find_element(By.ID, 'newuser').clear()
+        self.driver.find_element(By.ID, 'newuser').send_keys('gerald')
+        self.driver.find_element(By.ID, 'newusersubmitbutton').click()
+
+        msg = self.driver.find_element(By.ID, 'usererror')
+        self.assertEqual(msg.text, 'Successfully changed your username!')
+        self.driver.find_element(By.ID, 'newuserclosebutton').click()
+
+        username = self.driver.find_element(By.ID, 'username')
+        self.assertEqual(username.text, 'gerald')
+        self.driver.find_element(By.ID, 'newuserclosebutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'changeuser-modal'))
+        )
+
+    def test_settings_changeemail(self):
+        ''' Tests the change email api'''
+        self.driver.find_element(By.ID, 'nav-settings').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+
+        email = self.driver.find_element(By.ID, 'email')
+        self.assertEqual(email.text, 'gerald@hotmail.com')
+
+        # I think this is probably bad practice? But it's the only way it works... :(
+        element = self.driver.find_element(By.ID, 'changeemailbutton')
+        self.driver.execute_script("arguments[0].scrollIntoView()", element)
+        element.click()
+        
+        # Test case; no field filled in
+        self.driver.find_element(By.ID, 'newemailsubmitbutton').click()
+        error = self.driver.find_element(By.ID, 'mailerror')
+        self.assertEqual(error.text, 'New Email field is required.')
+
+        # Actually changing email
+        self.driver.find_element(By.ID, 'newemail').send_keys('gerald@gmail.com')
+        self.driver.find_element(By.ID, 'newemailsubmitbutton').click()
+
+        error = self.driver.find_element(By.ID, 'mailerror')
+        self.assertEqual(error.text, 'Successfully changed your email!')
+
+        email = self.driver.find_element(By.ID, 'email')
+        self.assertEqual(email.text, 'gerald@gmail.com')
+
+        # Reset email back to base
+        self.driver.find_element(By.ID, 'newemail').clear()
+        self.driver.find_element(By.ID, 'newemail').send_keys('gerald@hotmail.com')
+        self.driver.find_element(By.ID, 'newemailsubmitbutton').click()
+
+        error = self.driver.find_element(By.ID, 'mailerror')
+        self.assertEqual(error.text, 'Successfully changed your email!')
+        email = self.driver.find_element(By.ID, 'email')
+        self.assertEqual(email.text, 'gerald@hotmail.com')
+
+        self.driver.find_element(By.ID, 'newemailclosebutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'changemail-modal'))
+        )
