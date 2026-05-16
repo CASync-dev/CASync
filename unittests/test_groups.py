@@ -192,6 +192,7 @@ class GroupCreationTestCase(BaseTestCase):
 
 
 class GroupMembershipTestCase(BaseTestCase):
+    # -- Testing getting current user's friends -- #
     def test_group_get_friends_list(self):
         response = self.client.get("/api/group/friends")
 
@@ -212,9 +213,39 @@ class GroupMembershipTestCase(BaseTestCase):
 
     # ------------------------------------------------------------------------------ #
 
-    def test_get_group(self):
-        pass
+    # -- Testing getting group details -- #
+    def test_get_group_details(self):
+        # Create group
+        group_name = "Hello Group!"
+        response_group = self.create_group(
+            group_name,
+            [self.friend1.username, self.friend2.username] # sends list of friends, current user manually added in the api
+        )
+        self.assertEqual(response_group.status_code, 201)
 
+        # Get data from response
+        data_group = response_group.get_json()
+        group_id = data_group["group"]["id"]
+
+        # Call the GET endpoint
+        response_details = self.client.get(f"/api/group/{group_id}")
+        self.assertEqual(response_details.status_code, 200)
+
+        data_details = response_details.get_json()
+        self.assertEqual(data_details["group_name"], group_name)
+
+        # Verify members retrieved correctly
+        member_names = [member["username"] for member in data_details["members"]]
+        self.assertCountEqual(member_names, [self.main_user.username, self.friend1.username, self.friend2.username])
+
+    def test_get_nonexistent_group_details(self):
+        nonexistent_id = 999
+        response = self.client.get(f"/api/group/{nonexistent_id}")
+
+        self.assertEqual(response.status_code, 404)
+
+        data = response.get_json()
+        self.assertEqual(data["error"], "Could not find group")
     # ------------------------------------------------------------------------------ #
 
     def test_add_group_member(self):

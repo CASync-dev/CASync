@@ -106,7 +106,7 @@ def add_member():
 @api_groups.route("/api/group/<int:group_id>", methods=["GET"])
 @login_required
 def get_group_details(group_id):
-    group = Group.query.get(group_id)
+    group = db.session.get(Group, group_id)
 
     if not group:
         return jsonify({"success": False, "error": "Could not find group"}), 404
