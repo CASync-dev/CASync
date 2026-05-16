@@ -3,8 +3,6 @@ from app import create_app, db
 from app.config import TestConfig
 from app.models import Event, Friendship, User, Group
 
-# Command to run this test case/class (fast copy paste):
-# python -m unittest -v unittests.test_groups.GroupCreationTestCase
 class BaseTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app(config_class=TestConfig())
@@ -62,18 +60,32 @@ class BaseTestCase(unittest.TestCase):
             db.session.add(friendship)
         db.session.commit()
 
-        self.login_user(self.main_user)
+        self.login_user(self.main_user, "foo")
 
     # Helper functions
-    def login_user(self, user):
+    def login_user(self, user, password):
+        # Ensure that whoever was logged in previous is logged out
+        self.logout_user()
+
         # Simulates (manually) fake login session for the current user (gerald)
-        with self.client.session_transaction() as session:
-            session['_user_id'] = str(user.id)
-            session['_fresh'] = True # for security-sensitive actions (Copied from Tehei's example)
+        # with self.client.session_transaction() as session:
+        #     session['_user_id'] = str(user.id)
+        #     session['_fresh'] = True # for security-sensitive actions (Copied from Tehei's example)
 
         # Performs actual login request
-        # self.client.post('/login', data={'username': 'gerald', 'password': 'foo'})
-        # self.main_user = main_user
+        self.client.post('/login', data={
+            'username': user.username, 
+            'password': password
+        })
+        self.main_user = user
+
+    def logout_user(self):
+        # Simulated log out
+        # with self.client.session_transaction() as session:
+        #     session.clear()
+
+        # Actual logout
+        self.client.get("/logout")
 
     def create_group(self, name, members):
         return self.client.post('/api/group/create', json={
@@ -83,6 +95,8 @@ class BaseTestCase(unittest.TestCase):
 
     # ------------------------------------------------------------------------------ #
 
+# Command to run this test case/class (fast copy paste):
+# python -m unittest -v unittests.test_groups.GroupCreationTestCase
 class GroupCreationTestCase(BaseTestCase):
     # Testing Group Creation 
 
@@ -190,7 +204,8 @@ class GroupCreationTestCase(BaseTestCase):
         member_names_db = [member.username for member in group.members]
         self.assertCountEqual(member_names_db, [self.main_user.username])
 
-
+# Command to run this test case/class (fast copy paste):
+# python -m unittest -v unittests.test_groups.GroupMembershipTestCase
 class GroupMembershipTestCase(BaseTestCase):
     # -- Testing getting current user's friends -- #
     def test_group_get_friends_list(self):
@@ -219,7 +234,7 @@ class GroupMembershipTestCase(BaseTestCase):
         group_name = "Hello Group!"
         response_group = self.create_group(
             group_name,
-            [self.friend1.username, self.friend2.username] # sends list of friends, current user manually added in the api
+            [self.friend1.username, self.friend2.username]
         )
         self.assertEqual(response_group.status_code, 201)
 
@@ -248,9 +263,206 @@ class GroupMembershipTestCase(BaseTestCase):
         self.assertEqual(data["error"], "Could not find group")
     # ------------------------------------------------------------------------------ #
 
-    def test_add_group_member(self):
-        pass
+    # -- Testing adding a new member to existing group -- #
+    def test_add_group_member_success(self):
+        # Create group
+        group_name = "Another One!"
+        response_group = self.create_group(
+            group_name,
+            [self.friend1.username]
+        )
+        self.assertEqual(response_group.status_code, 201)
+
+        # Get data from response
+        data_group = response_group.get_json()
+        group_id = data_group["group"]["id"]
+        friends_to_add = [self.friend2.username]
+
+        # Call the add member method
+        response = self.client.post("/api/group/add_member", json = {
+            "group_id": group_id,
+            "list": friends_to_add
+        })
+
+        self.assertEqual(response.status_code, 200)
+
+        # Verify the response has correctly added the user
+        data = response.get_json()
+        friends_names = [added_user["username"] for added_user in data["added_users"]]
+
+        self.assertTrue(data["success"])
+        self.assertIn(self.friend2.username, friends_names)
+
+        # Database check the added user
+        group = db.session.get(Group, group_id)
+        self.assertIn(self.friend2, group.members)
     
+    # -- Testing adding a user who does not exist to existing group -- #
+    def test_add_nonexistent_member(self):
+        # Create group
+        group_name = "Another One!"
+        response_group = self.create_group(
+            group_name,
+            [self.friend1.username]
+        )
+        self.assertEqual(response_group.status_code, 201)
+
+        # Get data from response
+        data_group = response_group.get_json()
+        group_id = data_group["group"]["id"]
+        nonexistent_user = "whomst"
+        friends_to_add = [nonexistent_user]
+
+        # Call the add member method
+        response = self.client.post("/api/group/add_member", json = {
+            "group_id": group_id,
+            "list": friends_to_add
+        })
+
+        data = response.get_json()
+
+        # Verify response should not be successful (cannot add user who doesn't exist)
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(data["success"])
+        self.assertIn("not_found", data)
+        self.assertIn(nonexistent_user, data["not_found"])
+        self.assertEqual(
+            data["error"], 
+            "No valid users were added. User(s) may already be in the group or does not exist."
+        )
+
+    # -- Testing adding a user who does already exists in the group -- #
+    def test_add_member_already_in_group(self):
+        # Create group
+        group_name = "You're already here, buddy!"
+        response_group = self.create_group(
+            group_name,
+            [self.friend1.username, self.friend2.username]
+        )
+        self.assertEqual(response_group.status_code, 201)
+
+        # Get data from response
+        data_group = response_group.get_json()
+        group_id = data_group["group"]["id"]
+        friends_to_add = [self.friend1.username]
+
+        # Call the add member method
+        response = self.client.post("/api/group/add_member", json = {
+            "group_id": group_id,
+            "list": friends_to_add
+        })
+
+        data = response.get_json()
+
+        # Verify response should not be successful (cannot add user who's already in the group)
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(data["success"])
+        self.assertIn("skipped", data)
+        self.assertIn(self.friend1.username, data["skipped"])
+        self.assertEqual(
+            data["error"], 
+            "No valid users were added. User(s) may already be in the group or does not exist."
+        )
+
+    # -- Testing adding a users who either already existed in group, new user actually added, and nonexistent user -- #
+    def test_add_member_mixed_input(self):
+        # Create group
+        group_name = "Study :("
+        response_group = self.create_group(
+            group_name,
+            [self.friend1.username]
+        )
+        self.assertEqual(response_group.status_code, 201)
+
+        # Get data from response
+        data_group = response_group.get_json()
+        nonexistent_user = "ghost"
+        group_id = data_group["group"]["id"]
+        friends_to_add = [self.friend1.username, self.friend2.username, nonexistent_user]
+
+        # Call the add member method
+        response = self.client.post("/api/group/add_member", json = {
+            "group_id": group_id,
+            "list": friends_to_add
+        })
+
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+
+        self.assertIn(self.friend2.username, [user["username"] for user in data["added_users"]])
+        self.assertIn(nonexistent_user, data["not_found"])
+        self.assertIn(self.friend1.username, data["skipped"])
+        self.assertEqual(data["message"], "Added 1 member(s) to group")
+
+    # -- Testing adding a user but missing id was given -- #
+    def test_add_member_missing_group_id(self):
+        friends_to_add = [self.friend1.username, self.friend2.username]
+
+        # Call the add member method
+        response = self.client.post("/api/group/add_member", json = {
+            "list": friends_to_add
+        })
+
+        self.assertEqual(response.status_code, 400)
+        data = response.get_json()
+        self.assertFalse(data["success"])
+        self.assertEqual(data["error"], "group_id is required")
+
+    # -- Testing adding a user but no isers were given -- #
+    def test_add_member_empty_list(self):
+        # Create group
+        group_name = "Study :("
+        response_group = self.create_group(
+            group_name,
+            [self.friend1.username]
+        )
+        self.assertEqual(response_group.status_code, 201)
+
+        # Get data from response
+        data_group = response_group.get_json()
+        group_id = data_group["group"]["id"]
+
+        # Call the add member method
+        response = self.client.post("/api/group/add_member", json = {
+            "group_id": group_id,
+            "list": []
+        })
+
+        self.assertEqual(response.status_code, 400)
+        data = response.get_json()
+        self.assertFalse(data["success"])
+        self.assertEqual(data["error"], "No users to add")
+
+    # -- Testing adding a user but the person adding is not in the group (not authenticated/allowed) -- #
+    def test_add_member_adder_not_in_group(self):
+        # Create group
+        group_name = "Study :("
+        response_group = self.create_group(
+            group_name,
+            [self.friend1.username]
+        )
+        self.assertEqual(response_group.status_code, 201)
+
+        # Get data from response
+        data_group = response_group.get_json()
+        group_id = data_group["group"]["id"]
+
+        # Login as a different user not friends with anyone in group
+        self.logout_user()
+        self.login_user(self.non_friend, "roll")
+
+        # Call the add member method
+        response = self.client.post("/api/group/add_member", json = {
+            "group_id": group_id,
+            "list": [self.friend2.username]
+        })
+
+        self.assertEqual(response.status_code, 403)
+        data = response.get_json()
+        self.assertFalse(data["success"])
+        self.assertEqual(data["error"], "You are not in this group")
+
+
     # ------------------------------------------------------------------------------ #
 
     def test_leave_group(self):

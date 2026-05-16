@@ -40,12 +40,12 @@ def add_member():
         return jsonify({"success": False, "error": "No users to add"}), 400
 
     # Fetch group
-    group = Group.query.get(group_id)
+    group = db.session.get(Group, group_id)
     if not group:
         return jsonify({"success": False, "error": "Group not found"}), 404
 
     if current_user not in group.members:
-        return jsonify({"success": False, "error": "You are not in this group"}), 404
+        return jsonify({"success": False, "error": "You are not in this group"}), 403
 
     # Track results for detailed response
     added_users = []
@@ -76,12 +76,12 @@ def add_member():
         group.members.append(user)
         added_users.append(user.to_dict())
 
-        # If no users were actually added, return error
+    # If no users were actually added, return error
     if len(added_users) == 0:
         return jsonify(
             {
                 "success": False,
-                "error": "No valid users were added. User(s) may already be in the group.",
+                "error": "No valid users were added. User(s) may already be in the group or does not exist.",
                 "skipped": skipped_users,
                 "not_found": not_found_users,
             }
