@@ -28,7 +28,7 @@ class BaseTestCase(unittest.TestCase):
         self.app = None
         self.app_context = None
 
-    # Referenced from test_friends
+    # Referenced from test_friends (minimal and reusable, other tests may add to this)
     def populate_db(self):
         # Create users
         self.main_user = User(username='gerald', email='sekai@hotmail.com') # id = 1
@@ -62,6 +62,7 @@ class BaseTestCase(unittest.TestCase):
 
         self.login_user(self.main_user)
 
+    # Helper functions
     def login_user(self, user):
         # Simulates (manually) fake login session for the current user (gerald)
         with self.client.session_transaction() as session:
@@ -87,7 +88,7 @@ class GroupCreationTestCase(BaseTestCase):
     def test_create_group_success(self):
         response = self.create_group(
             "Study (Till You) Break",
-            ["allen", "bob"] # sends list of friends, current user manually added in the api
+            [self.friend1.username, self.friend2.username] # sends list of friends, current user manually added in the api
         )
 
         # Verifies response is successful
@@ -102,11 +103,11 @@ class GroupCreationTestCase(BaseTestCase):
 
         # Verify all API response members in the group
         member_names_api = [member["username"] for member in data["group"]["members"]]
-        self.assertCountEqual(member_names_api, ["allen", "gerald", "bob"])
+        self.assertCountEqual(member_names_api, [self.main_user.username, self.friend1.username, self.friend1.username])
 
         # Verify all database members in the group 
         member_names_db = [member.username for member in group.members]
-        self.assertCountEqual(member_names_db, ["allen", "gerald", "bob"])
+        self.assertCountEqual(member_names_db, [self.main_user.username, self.friend1.username, self.friend1.username])
 
     # -- Testing creation of group with users who are not friends with current user -- #
     def test_create_group_non_friend(self):
@@ -122,18 +123,18 @@ class GroupCreationTestCase(BaseTestCase):
         pass
 
 
-class GroupManagementTestCase(BaseTestCase):
-    def test_group_friends_list(self):
-        pass
-
-    # ------------------------------------------------------------------------------ #
-
-    def test_add_group_member(self):
+class GroupMembershipTestCase(BaseTestCase):
+    def test_group_get_friends_list(self):
         pass
 
     # ------------------------------------------------------------------------------ #
 
     def test_get_group(self):
+        pass
+
+    # ------------------------------------------------------------------------------ #
+
+    def test_add_group_member(self):
         pass
     
     # ------------------------------------------------------------------------------ #
