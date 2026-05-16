@@ -143,7 +143,7 @@ def create_group():
 
     db.session.commit()
 
-    return jsonify({"success": True, "group": group.to_dict()})
+    return jsonify({"success": True, "group": group.to_dict()}), 201
 
 
 # Handles users leaving the group

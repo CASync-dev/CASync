@@ -70,7 +70,7 @@ class GroupCreationTestCase(unittest.TestCase):
         })
 
         # Verifies response is successful
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         data = response.get_json()
         self.assertTrue(data["success"] )
         self.assertEqual(data["group"]["group_name"], "Study (Till You) Break")
