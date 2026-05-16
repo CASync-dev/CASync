@@ -296,6 +296,99 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         WebDriverWait(self.driver, timeout=10).until(
             EC.presence_of_element_located((By.ID, 'add-friend-modal'))
         )
+        # type user email and submit search
+        self.driver.find_element(By.ID, 'user-search-input').send_keys("mkgee@example.com")
+        self.driver.find_element(By.ID, 'submit-search-friends-btn').click()
+        # wait for search results to appear and check that the searched user appears
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".friend-result"))
+        )
+        friend_results = self.driver.find_elements(By.CSS_SELECTOR, ".friend-result")
+        self.assertEqual(len(friend_results), 1)
+        self.assertIn("Mkgee", friend_results[0].text)
+        # click the add friend button and check it changes to sent
+        add_btn = friend_results[0].find_element(By.XPATH, ".//button[contains(@id, 'add-friend-btn')]")
+        add_btn.click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.text_to_be_present_in_element((By.XPATH, ".//button[contains(@id, 'add-friend-btn')]"), "Request Sent")
+        )
+        self.assertEqual(add_btn.text, "Request Sent")
+        # close the friend modal 
+        self.driver.find_element(By.ID, 'close-add-friend-modal-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'add-friend-modal'))
+        )
+        # set the friendship to accepted in the database, refresh the page, and check that the new friend appears in the friends list
+        friendship = Friendship(sender_id=1, recipient_id=user2.id,status='accepted')
+        db.session.add(friendship)
+        db.session.commit()
+        self.driver.refresh()
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 1)
+        self.assertIn("Mkgee", friends[0].text)
+
+    def test_friends_requests(self):
+        self.driver.find_element(By.ID, 'nav-friends').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/friends")
+        )
+        # add a user and a pending friend request to the test database, then refresh the page and check that the friend request appears in the friend requests section
+        user2 = User(username="Mkgee", email="mkgee@example.com", id=67, password="foo")
+        db.session.add(user2)
+        db.session.commit()
+        friendship = Friendship(sender_id=user2.id, recipient_id=1, status='pending')
+        db.session.add(friendship)
+        db.session.commit()
+        self.driver.refresh()
+        # open friend request modal)
+        self.driver.find_element(By.ID, 'friend-requests-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend-requests-modal'))
+        )
+        # check that the friend request appears with the correct username
+        request_elements = self.driver.find_elements(By.CSS_SELECTOR, ".friend-request")
+        
+        self.assertEqual(len(request_elements), 1)
+        self.assertIn("Mkgee", request_elements[0].text)
+        # click the accept button and check that the request is removed from the pending requests and appears in the friends list
+        self.driver.find_element(By.ID,'accept-friend-request-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element(request_elements[0])
+        )
+        # check modal closes
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'friend-requests-modal'))
+        )
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 1)
+        self.assertIn("Mkgee", friends[0].text)
+        # set another pending friend request in the database, refresh, click the reject button
+        user3 = User(username="Soul Wun", email="soulwun@example.com", id=68, password="foo")
+        db.session.add(user3)
+        db.session.commit()
+        friendship2 = Friendship(sender_id=user3.id, recipient_id=1, status='pending')
+        db.session.add(friendship2)
+        db.session.commit()
+        self.driver.refresh()
+        self.driver.find_element(By.ID, 'friend-requests-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend-requests-modal'))
+        )
+        request_elements = self.driver.find_elements(By.CSS_SELECTOR, ".friend-request")
+        self.assertEqual(len(request_elements), 1)
+        self.assertIn("Soul Wun", request_elements[0].text)
+        self.driver.find_element(By.ID,'reject-friend-request-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element(request_elements[0])
+        )
+        # close modal and check the rejected friend does not appear in the friends list
+        self.driver.find_element(By.ID, 'close-friend-requests-modal-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'friend-requests-modal'))
+        )
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 1) # only mkgee should be in the friends list, soul wun should be rejected
+        self.assertIn("Mkgee", friends[0].text)
 
     def test_groups(self):
         pass
