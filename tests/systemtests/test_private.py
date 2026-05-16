@@ -28,6 +28,11 @@ class PrivateSeleniumTests(BaseSeleniumTest):
     def tearDown(self):
         # delete any events created during the test so each test starts with a clean slate
         Event.query.delete()
+        # delete any users created during the test except for gerald (id=1) who is needed to log in and access the authenticated pages
+        User.query.filter(User.id != 1).delete()
+        # delete any friendships created during the test
+        Friendship.query.delete()
+        
         db.session.commit()
         # logout after each test to ensure a clean slate for the next one
         self.driver.find_element(By.ID, 'logout').click()
