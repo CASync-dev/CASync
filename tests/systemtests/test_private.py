@@ -63,7 +63,8 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         # check previous week nav button works
         self.driver.find_element(By.ID, 'btn-last-week').click()
         calendarTitle = self.driver.find_element(By.ID, 'calendar-title')
-        prev_week = time.strftime("%a %b %-d", time.localtime(time.time() - 7*24*60*60))
+        d = datetime.now() - timedelta(days=7)
+        prev_week = d.strftime("%a %b ") + str(d.day)
         expected_title = "Last Week, " + prev_week
         self.assertEqual(calendarTitle.text, expected_title)
         # go back to current week so tearDown's logout has a clean state
