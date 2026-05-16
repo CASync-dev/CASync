@@ -405,6 +405,35 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         self.assertEqual(len(friends), 1) # only mkgee should be in the friends list, soul wun should be rejected
         self.assertIn("Mkgee", friends[0].text)
 
+    def test_friends_remove(self):
+        self.driver.find_element(By.ID, 'nav-friends').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/friends")
+        )
+        # add a friend to the test database, refresh the page, check that they appear in the friends list, click the remove button, and check that they are removed from the friends list
+        user2 = User(username="Mkgee", email="mkgee@example.com", id=67, password="foo")
+        db.session.add(user2)
+        db.session.commit()
+        friendship = Friendship(sender_id=1, recipient_id=user2.id,status='accepted')
+        db.session.add(friendship)
+        db.session.commit()
+        self.driver.refresh()
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 1)
+        self.assertIn("Mkgee", friends[0].text)
+        self.driver.find_element(By.ID, 'remove-friend-btn').click()
+        #check confirmation modal appears, click confirm, and check modal closes
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'remove-confirmation'))
+        )
+        self.driver.find_element(By.ID, 'confirm-delete-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'remove-confirmation'))
+        )
+        # check friend is gone
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 0)
+    
     def test_groups(self):
         pass
 
