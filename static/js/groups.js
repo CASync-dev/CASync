@@ -136,6 +136,7 @@ function addGroupToPage(group) {
 
     <!-- Buttons -->
     <button
+      id="btn-leave-group-${group.id}"
       class="btn-plain mt-2 px-3 sm:ml-auto py-2 bg-red-300 text-nearwhite rounded-lg hover:bg-red-400"
       onclick="leaveGroup(${group.id})"
     >
@@ -143,6 +144,7 @@ function addGroupToPage(group) {
       Leave
     </button>
     <button
+      id="btn-groups-schedule-${group.id}"
       class="btn-plain mt-2 px-3 py-2 bg-blue-300 text-nearwhite rounded-lg hover:bg-blue-400"
       onclick="openSchedule('${group.id}', '${group.group_name}')"
     >
@@ -150,6 +152,7 @@ function addGroupToPage(group) {
       Schedule
   </button>
   <button
+    id="btn-groups-details-${group.id}"
     class = "btn-plain bg-dark rounded-lg sm:rounded-full px-4 py-3"
     onclick = "getGroupId(${group.id}); openGroupDetail(); loadGroupMembers()">
     <i class = "fas fa-info text-nearwhite text-center"></i>

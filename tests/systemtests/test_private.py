@@ -365,6 +365,9 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         # Check 'Complete' button works in select friends modal to create group
         self.open_select_friend_modal()
         self.driver.find_element(By.ID, 'friend-search-submit').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element_located((By.ID, 'select-friend'))
+        )
 
         # Check if group with only current user is created
         myGroupId = 1 # first group created, should have id = 1
@@ -383,13 +386,52 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         for btn in buttons:
             self.assertTrue(btn.is_displayed())
             self.assertTrue(btn.is_enabled())
+        
+    def test_groups_leave_group(self):
+        # Create a group
+        self.go_to_groups_page()
+        self.open_select_friend_modal()
+        self.driver.find_element(By.ID, 'friend-search-submit').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element_located((By.ID, 'select-friend'))
+        )
 
-        # Force page refresh since teardown logout doesn't like it
-        self.driver.refresh()
-        WebDriverWait(self.driver, 10).until(
-            EC.url_contains('/groups')
+        myGroupId = 1 # first group created, should have id = 1
+        myGroup = WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, f'group-{myGroupId}'))
         )
         
+        # Go to Leave button
+        leave_button = myGroup.find_element(By.ID, f"btn-leave-group-{myGroupId}")
+        self.driver.execute_script("arguments[0].scrollIntoView({block:'center'})", leave_button)
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.element_to_be_clickable((By.ID, f"btn-leave-group-{myGroupId}"))
+        )
+        leave_button.click()
+
+        leave_group_modal = WebDriverWait(self.driver, timeout=10).until(
+                EC.visibility_of_element_located((By.ID, 'remove-confirmation'))
+            )
+        self.assertTrue(leave_group_modal.is_displayed())
+
+        # Confirm leaving group
+        self.driver.find_element(By.ID, 'confirm-delete-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+                EC.invisibility_of_element_located((By.ID, 'remove-confirmation'))
+            )
+        
+        # Check that group has been removed from screen
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element_located((By.ID, f'group-{myGroupId}'))
+        )
+
+    
+
+
+
+
+
+
 
         
         
