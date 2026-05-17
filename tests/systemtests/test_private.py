@@ -878,12 +878,42 @@ class PrivateSeleniumTests(BaseSeleniumTest):
             EC.invisibility_of_element_located((By.ID, 'group-details'))
         )
         
+    def test_group_open_schedule(self):
+        # Create a group
+        self.go_to_groups_page()
+        user2, user3 = self.add_friends_to_user()
 
+        self.open_select_friend_modal()
+        self.driver.find_element(By.ID, 'friend-search-submit').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element_located((By.ID, 'select-friend'))
+        )
 
+        # Wait for group to pop up
+        group_name = 'My Group'
+        group_id = 1 # first group created, should have id = 1
+        my_group = WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, f'group-{group_id}'))
+        )
+        self.assertIn(group_name, my_group.text)
 
+        # Go to schedule
+        self.driver.find_element(By.ID, f'btn-groups-schedule-{group_id}').click()
+        groups_schedule = WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'group-schedule-modal'))
+        )
 
+        # Check schedule elements (simple check)
+        group_schedule_title = self.driver.find_element(By.ID, 'group-schedule-title')
+        calendar_title = self.driver.find_element(By.ID, "calendar-title")
+        self.assertEqual(f"{group_name}'s Schedule", group_schedule_title.text)
+        self.assertIn("Today", calendar_title.text)
 
-
+        # Close calendar modal
+        self.driver.find_element(By.ID, 'btn-close-group-calendar').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element_located((By.ID, 'group-schedule-modal'))
+        )
         
 
     # ------------------------------------------------------------------------------------------------------- #
