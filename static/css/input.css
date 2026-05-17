@@ -58,6 +58,10 @@
   .h2 {
     @apply text-2xl block font-semibold mb-4;
   }
+
+  .img-uniform {
+    @apply w-full max-w-xl object-contain;
+  }
 }
 
 @theme {
