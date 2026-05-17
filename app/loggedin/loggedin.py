@@ -11,6 +11,16 @@ from app.models import Calendar, User, Friendship
 
 loggedin = Blueprint('loggedin', __name__, template_folder='../templates/loggedin', static_folder='../static')
 
+@loggedin.context_processor
+def inject_friend_requests():
+    if not current_user.is_authenticated:
+        return {}
+    count = Friendship.query.filter(
+        (Friendship.recipient_id == current_user.id) &
+        (Friendship.status == 'pending')
+    ).count()
+    return {'friend_requests_count': count}
+
 
 @loggedin.route("/dash")
 @login_required

@@ -92,7 +92,10 @@
             class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.friends' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
           >
             <i class="fas fa-solid fa-user-group w-5 mr-3"></i>
-            <span class="font-medium">Friends</span>
+            <span class="font-medium pr-2">Friends</span>
+            {% if friend_requests_count %}
+              <span class="ml-1 text-xs bg-red-500 text-white rounded-full px-2 py-0.5">{{ friend_requests_count }}</span>
+            {% endif %}
           </a>
           <a
             id="nav-groups"
