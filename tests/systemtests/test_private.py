@@ -114,18 +114,16 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         )
         # fill out form and submit
         #start and end need to be in the future for the calendar to accept them, so we set them to be 1 day in the future, skipping satuday and sunday.
-        # if skipping sat or sun, need to navigate to next week then check for the event
-        starts = time.time() + 24*60*60
+        # if skipping sat or sun, need to navigate to next week then check for the event there, otherwise check for it in the current week
+        target = datetime.now() + timedelta(days=1)
         is_next_week = False
-        if time.localtime(starts).tm_wday == 5: # saturday
-            starts += 2*24*60*60
+        while target.weekday() >= 5:  # 5=Sat, 6=Sun
+            target += timedelta(days=1)
             is_next_week = True
-        elif time.localtime(starts).tm_wday == 6: # sunday
-            starts += 24*60*60
-            is_next_week = True
-        ends = starts + 60*60
-        start_str = time.strftime("%Y-%m-%dT%H:%M", time.localtime(starts))
-        end_str = time.strftime("%Y-%m-%dT%H:%M", time.localtime(ends))
+        start_dt = target.replace(hour=12, minute=0, second=0, microsecond=0)
+        end_dt = start_dt + timedelta(hours=1)
+        start_str = start_dt.strftime("%Y-%m-%dT%H:%M")
+        end_str = end_dt.strftime("%Y-%m-%dT%H:%M")
         self.driver.find_element(By.ID, 'event-title').send_keys("Selenium Test Event")
         self.driver.execute_script("document.getElementById('event-start').value = arguments[0]", start_str)
         self.driver.execute_script("document.getElementById('event-end').value = arguments[0]", end_str)
