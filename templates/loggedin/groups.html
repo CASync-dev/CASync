@@ -17,6 +17,11 @@
     <!-- Adding groups to the page -->
     <div class="mt-6">
       <ul id="groups-list">
+        {% if groups|length == 0 %}
+          <p class="text-gray-500 text-center py-10">
+            You are not in any groups yet. Start creating or joining some!
+          </p>
+        {% endif %}
         <!-- FFilter through groups table to find group with current user in done in app pkg?-->
         <!-- Displays groups when page is first loaded  -->
         {% for group in groups %}
@@ -32,7 +37,10 @@
                 <p class="text-xl font-medium">{{ group.group_name }}</p>
 
                 <!-- Member Avatars -->
-                <div id="group-member-avatars" class="flex items-center my-2 group-avatars">
+                <div
+                  id="group-member-avatars"
+                  class="flex items-center my-2 group-avatars"
+                >
                   {# For the first 8 members of the group, after show a +n #}
                   {% for user in group.members[:8] %}
                     <img
@@ -44,7 +52,9 @@
                     />
                   {% endfor %}
                   {% if group.members|length > 8 %}
-                    <div class="w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark flex items-center justify-center bg-gray-300 text-gray-600 font-bold">
+                    <div
+                      class="w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark flex items-center justify-center bg-gray-300 text-gray-600 font-bold"
+                    >
                       +{{ group.members|length - 8 }}
                     </div>
                   {% endif %}

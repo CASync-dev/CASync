@@ -41,6 +41,9 @@
     </div>
     <div class="mt-6">
       <ul class="" id="friends-list">
+        {% if friends|length == 0 %}
+          <p class="text-gray-500 text-center py-10">You have no friends yet. Start adding some!</p>
+        {% endif %}
         <!-- Friend list items -->
         {% for friend in friends %}
           <li
