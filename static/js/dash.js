@@ -83,15 +83,15 @@ function renderFriendsStatus(friends_status) {
     li.className =
       "py-4 flex items-center bg-blue-600 justify-between rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-md ring-white transition duration-200";
     li.innerHTML = `
-      <div class="flex items-center ">
-        <img class="h-15 w-15 rounded-full" src="${friend.avatar_url}" alt="${friend.username}'s avatar" />
+      <div id = "friend${friend.id}" class="flex items-center ">
+        <img id = "friend${friend.id}pfp" class="h-15 w-15 rounded-full" src="${friend.avatar_url}" alt="${friend.username}'s avatar" />
         <div class="ml-4">
-          <p class="text-sm font-medium text-white">${friend.username}</p>
-          <p class="hidden sm:block text-sm text-white">${friend.email}</p>
+          <p id = "friend${friend.id}username" class="text-sm font-medium text-white">${friend.username}</p>
+          <p id = "friend${friend.id}mail" class="hidden sm:block text-sm text-white">${friend.email}</p>
         </div>
       </div>
 
-      <p class=" px-3 py-2 text-white text-sm sm:text-base">
+      <p id = "friend${friend.id}status" class=" px-3 py-2 text-white text-sm sm:text-base">
         ${displayTimeTillNextClass(friend.minutes_until_next)}
       </p>
     `;
@@ -240,11 +240,11 @@ function bigCard(nextEvent) {
       <h3 class="text-4xl font-medium text-dark space-y-4 mb-4">
               Next Event:
             </h3>
-      <h4 class="text-3xl text-dark space-y-4 mb-4">
+      <h4 id = "untilevent${nextEvent.id}" class="text-3xl text-dark space-y-4 mb-4">
           in <span class="text-blue-600">${formatTime(minutesUntil)}</span> at ${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)}
       </h4>
-      <span class="text-3xl flex-1">${nextEvent.title}</span>
-      <span class="text-lg text-gray-500 shrink-0">${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)} – ${formatHHMM(nextEvent.endTime ?? nextEvent.end_time)}</span>
+      <span id = "${nextEvent.id}eventtitle" class="text-3xl flex-1">${nextEvent.title}</span>
+      <span id = "${nextEvent.id}eventtimespan" class="text-lg text-gray-500 shrink-0">${formatHHMM(nextEvent.startTime ?? nextEvent.start_time)} – ${formatHHMM(nextEvent.endTime ?? nextEvent.end_time)}</span>
             ${nextEvent.going === false ? `<span class="text-lg text-red-500 shrink-0">Not Going</span>` : `<span class="text-lg text-gray-500 shrink-0">${nextEvent.location ? `@ ${nextEvent.location}` : ""}</span>`}
       <div class="flex"><!-- avatars --></div>
   `;
