@@ -250,7 +250,9 @@ class PrivateSeleniumTests(BaseSeleniumTest):
             EC.presence_of_element_located((By.CSS_SELECTOR, "[data-event-id][data-col]"))
         )
         self.driver.find_element(By.CSS_SELECTOR, "[data-event-id][data-col]").click()
-        self.driver.find_element(By.ID, 'going-toggle-btn').click()
+        btn = self.driver.find_element(By.ID, 'going-toggle-btn')
+        self.driver.execute_script("arguments[0].scrollIntoView()", btn)
+        btn.click()
         # wait for the calendar to re-render with the updated going status (fetch is async)
         WebDriverWait(self.driver, timeout=10).until(
             EC.element_to_be_clickable((By.ID, 'going-toggle-btn'))
@@ -967,7 +969,6 @@ class PrivateSeleniumTests(BaseSeleniumTest):
 
         username = self.driver.find_element(By.ID, 'username')
         self.assertEqual(username.text, 'gerald')
-        self.driver.find_element(By.ID, 'newuserclosebutton').click()
         WebDriverWait(self.driver, timeout=10).until(
             EC.invisibility_of_element((By.ID, 'changeuser-modal'))
         )
