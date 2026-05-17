@@ -32,7 +32,7 @@
   }
 
   .card-form {
-    @apply bg-primary/90 p-6 px-12 m-6 border-8 rounded-3xl border-primary-dark/70 drop-shadow-xl drop-shadow-black shadow;
+    @apply bg-primary/90 p-4 px-6 m-4 border-2 rounded-2xl border-gray-300 drop-shadow-md shadow;
   }
 
   .section-layout {
@@ -57,6 +57,10 @@
 
   .h2 {
     @apply text-2xl block font-semibold mb-4;
+  }
+
+  .img-uniform {
+    @apply w-full max-w-xl object-contain;
   }
 }
 

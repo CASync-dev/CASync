@@ -5,13 +5,23 @@
     <section class="section-layout">
       <!-- This section introduces the app -->
       <div class="container-layout">
-        <div class="container-spacing">
-          <div class="flex flex-col gap-6 md:w-1/2">
-            <h1 class="h1">
+        <div class="container-spacing flex flex-col lg:flex-row items-center gap-5">
+          <div class="flex flex-col gap-3 ">
+            <h1 class="text-5xl mb-3">
               The All-in-One Timetable
-              <br />
-              That You Need
             </h1>
+<<<<<<< HEAD
+            <h2 class="text-xl">For students by students</h2>
+            <ul class="list-disc pl-5">
+              <li>See your classes</li>
+              <li>Share your schedule with friends in one click</li>
+              <li>Know when your friends are free</li>
+              <li>Plan meetups and stay connected with your friends</li>
+              <li>Create and join groups with your friends</li>
+            </ul>
+            <div class="mt-4">
+              <a class="btn-primary" href="{{ url_for('loggedout.register') }}">
+=======
             <p class="wrap-break-word text-base">
               Tired of not knowing your friends' schedule? Always stressed when
               trying to compare availability and plan a meet up with your group?
@@ -24,54 +34,107 @@
                 class="btn-primary"
                 href="{{ url_for('loggedout.register') }}"
               >
+>>>>>>> main
                 Sign Up Now!
               </a>
             </div>
           </div>
-          <div class="flex justify-center lg:justify-end md:w-1/2 mt-8 md:mt-0">
-            <div class="relative aspect-square sm:w-80 md:w-96">
-              <!-- Not sure if thats the way to import images, check later?-->
-              <img
-                src="{{ url_for('static', filename='images/promo.png') }}"
-                class="h-full w-full object-cover"
-                alt="Promo picture of a timetable in the app"
-              />
-            </div>
+          <div class="flex justify-center lg:justify-end mt-8 md:mt-0 ">
+            <img
+              src="{{ url_for('static', filename='images/schedule.png') }}"
+              class="img-uniform rounded-2xl"
+              alt="Promo picture of a timetable in the app"
+            />
           </div>
         </div>
       </div>
       <br />
       <br />
-      <!-- This section gives a brief summary on the app-->
+      <!-- Dashbaord page section-->
       <div class="bg-midgray w-full">
         <div class="container-layout">
-          <div class="container-spacing">
+          <div class="container-spacing flex flex-col lg:flex-row lg:items-center gap-8">
             <!-- Currently using a temporary image; Image to be changed-->
             <div
-              class="flex justify-center lg:justify-start md:w-1/2 mt-8 md:mt-0"
+              class="flex justify-center lg:justify-end mt-8 md:mt-0"
             >
               <img
-                src="{{ url_for('static', filename='images/temp01.png') }}"
-                class="sm:w-80 md:w-96 object-cover max-md:block"
+                src="{{ url_for('static', filename='images/Dash_promo.png') }}"
+                class="img-uniform rounded-2xl"
                 alt="Promo picture of two timetables"
               />
             </div>
             <!-- Text content for summary -->
             <div class="flex flex-col gap-6 md:w-1/2">
-              <h1 class="h1 text-right">Sync With Your Friends</h1>
-              <p class="text-base text-right">
-                With CASync, you can easily share your timetable with your
-                friends and see their schedules in one place. No more
-                back-and-forth messages trying to figure out when everyone is
-                free, simply add your friends and see their availability at a
-                glance. You can also create groups to share your timetable with
-                specific friends, making it even easier to plan meetups and stay
-                connected with your friends.
+              <h1 class="text-3xl">Your day in a single page</h1>
+              <p class="text-base ">
+                Tired of juggling apps just to figure out your day? Our dashboard brings 
+                everything together — view your own schedule, see which friends are free 
+                right now, and find the perfect window to grab a coffee or catch up between 
+                classes. No more back-and-forth texts asking "are you free?" You'll always know.
               </p>
             </div>
           </div>
         </div>
       </div>
+      <!-- Groups and friends section -->
+      <div class="container-layout">
+        <div class="container-spacing flex flex-col lg:flex-row items-center lg:items-center gap-5">
+          <div class="flex flex-col gap-3 md:w-1/2">
+            <h1 class="text-3xl mb-3 lg:whitespace-nowrap">
+              Friends and Groups
+            </h1>
+            <p class="text-base leading-relaxed">
+                Add friends and view their timetables to find the perfect time to meet up.
+                Create groups for your classes, clubs, or friend circles to easily share schedules and plan meetups.
+            </p>
+          </div>
+          <div class="flex justify-center lg:justify-end mt-8 lg:mt-0 ">
+            <img
+              src="{{ url_for('static', filename='images/groups.png') }}"
+              class="img-uniform rounded-2xl"
+              alt="Promo picture of a timetable in the app"
+            />
+          </div>
+        </div>
+      </div>
+      <!-- Schedule page section-->
+      <div class="bg-midgray w-full">
+        <div class="container-layout">
+          <div class="container-spacing flex flex-col lg:flex-row lg:items-center gap-8">
+            <!-- Currently using a temporary image; Image to be changed-->
+            <div
+              class="flex justify-center lg:justify-end mt-8 md:mt-0"
+            >
+              <img
+                src="{{ url_for('static', filename='images/schedule_create_event.png') }}"
+                class="img-uniform rounded-2xl"
+                alt="Promo picture of two timetables"
+              />
+            </div>
+            <!-- Text content for summary -->
+            <div class="flex flex-col gap-2 md:w-1/2">
+              <h1 class="text-3xl mb-4">View and manage your schedule</h1>
+              <p class = "text-md">The traditional schedule view plus powerful management features:</p>
+              <ul class="list-disc pl-5">
+              <li>View your full timetable at a glance</li>
+              <li>Add your own classes and events</li>
+              <li>Mark whether you're attending or skipping classes</li>
+              <li>Delete events you no longer need</li>
+            </ul>
+            <div class="mt-6">
+              <a class="btn-primary" href="{{ url_for('loggedout.register') }}">
+                Sign Up Now!
+              </a>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br />
+      <br />
     </section>
   </main>
 {% endblock %}
+
+
