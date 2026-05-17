@@ -24,10 +24,10 @@
               </a>
             </div>
           </div>
-          <div class="flex justify-center lg:justify-end mt-8 md:mt-0 border-2 border-gray-300 rounded-2xl ">
+          <div class="flex justify-center lg:justify-end mt-8 md:mt-0 ">
             <img
               src="{{ url_for('static', filename='images/schedule.png') }}"
-              class="max-w-xl w-full object-contain rounded-2xl"
+              class="max-w-xl w-full object-contain border border-gray-300 rounded-2xl "
               alt="Promo picture of a timetable in the app"
             />
           </div>
@@ -35,31 +35,28 @@
       </div>
       <br />
       <br />
-      <!-- This section gives a brief summary on the app-->
+      <!-- Dashbaord page section-->
       <div class="bg-midgray w-full">
         <div class="container-layout">
-          <div class="container-spacing">
+          <div class="container-spacing flex flex-col lg:flex-row lg:items-start gap-8">
             <!-- Currently using a temporary image; Image to be changed-->
             <div
-              class="flex justify-center lg:justify-start md:w-1/2 mt-8 md:mt-0"
+              class="flex justify-center lg:justify-end mt-8 md:mt-0"
             >
-              <img
-                src="{{ url_for('static', filename='images/temp01.png') }}"
-                class="sm:w-80 md:w-96 object-cover max-md:block"
+              <img  
+                src="{{ url_for('static', filename='images/Dash_promo.png') }}"
+                class=" max-w-xl w-full object-contain border border-gray-300 rounded-2xl"
                 alt="Promo picture of two timetables"
               />
             </div>
             <!-- Text content for summary -->
             <div class="flex flex-col gap-6 md:w-1/2">
-              <h1 class="h1 text-right">Sync With Your Friends</h1>
-              <p class="text-base text-right">
-                With CASync, you can easily share your timetable with your
-                friends and see their schedules in one place. No more
-                back-and-forth messages trying to figure out when everyone is
-                free, simply add your friends and see their availability at a
-                glance. You can also create groups to share your timetable with
-                specific friends, making it even easier to plan meetups and stay
-                connected with your friends.
+              <h1 class="text-5xl">Your day in a single page</h1>
+              <p class="text-base ">
+                Tired of juggling apps just to figure out your day? Our dashboard brings 
+                everything together — view your own schedule, see which friends are free 
+                right now, and find the perfect window to grab a coffee or catch up between 
+                classes. No more back-and-forth texts asking "are you free?" You'll always know.
               </p>
             </div>
           </div>
