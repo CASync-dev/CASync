@@ -1,3 +1,16 @@
+FROM node:22-alpine AS css-builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY static/css/input.css ./static/css/input.css
+COPY templates/ ./templates/
+
+RUN npm run build:css
+
+
 FROM python:3.12-alpine
 
 WORKDIR /app
@@ -8,6 +21,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt gunicorn
 
 COPY . .
+COPY --from=css-builder /app/static/css/output.css ./static/css/output.css
 
 RUN mkdir -p instance static/avatars
 
