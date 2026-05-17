@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="static/images/logo.png" alt="CASync logo" width="420" />
+</p>
+
 # CASync
 
 A platform for connecting timetables
