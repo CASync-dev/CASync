@@ -34,7 +34,7 @@ Use the planning dir for plans
 1. Clone the project
 
    ```bash
-   git clone git@github.com:stoveup/AgileWeb2026.git
+   git clone git@github.com:CASync-dev/CASync.git
    cd AgileWeb2026
    ```
 
