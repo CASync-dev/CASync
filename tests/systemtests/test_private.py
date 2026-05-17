@@ -1373,12 +1373,12 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         hr = start.hour
         if (start.hour > 12): # Scuffed way to getting 12 hour format for hour but it works.
             hr = start.hour-12
-        starttimeformat = f'{hr}:{start.minute} {period}'
+        starttimeformat = f'{hr}:{start.minute:02d} {period}'
         period = datetime.strftime(end, '%p')
         hr = end.hour
         if (end.hour > 12): # Scuffed way to getting 12 hour format for hour but it works.
             hr = end.hour-12
-        endtimeformat = f'{hr}:{end.minute} {period}'
+        endtimeformat = f'{hr}:{end.minute:02d} {period}'
 
         self.assertEqual('Existing event', eventTitle.text)
         span = "Starts at " + starttimeformat + ' and ends at ' + endtimeformat
