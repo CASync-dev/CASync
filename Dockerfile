@@ -31,7 +31,7 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
 RUN echo "==> [py] installing build deps" \
- && apk add --no-cache gcc musl-dev libffi-dev
+ && apk add --no-cache gcc musl-dev libffi-dev curl
 
 RUN echo "==> [py] installing python dependencies"
 COPY requirements.txt .
