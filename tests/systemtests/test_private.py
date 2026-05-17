@@ -970,12 +970,63 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         self.assertEqual('No more classes today', friendstatus.text)
 
         # Test cases on friend status api done in unittest.
+        # Test javascript rendering
+        start = datetime.now(tz=timezone.utc) + timedelta(minutes=2)
+        end = datetime.now(tz=timezone.utc) + timedelta(minutes=4)
+        self.event = Event(
+            title='Friend event 1',
+            description='Seeded event',
+            start_time=start,
+            end_time=end,
+            location='Room 101',
+            color='indigo',
+            user_id=2,
+        )
+        db.session.add(self.event)
+        db.session.commit()
+
+        start = start.astimezone()
+        end = end.astimezone()
+
+        self.driver.refresh()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend2'))
+        )
+        friendstatus = self.driver.find_element(By.ID, 'friend2status')
+        self.assertEqual('Next class in 1 min', friendstatus.text) # Accounts for time passed
+        # Unfortunately we can't reliably check this if the system takes a whole min to process until here from event creation.
+
+        start = datetime.now(tz=timezone.utc) - timedelta(minutes=2)
+        end = datetime.now(tz=timezone.utc) + timedelta(minutes=2)
+        self.event = Event(
+            title='Friend event 2',
+            description='Seeded event',
+            start_time=start,
+            end_time=end,
+            location='Room 101',
+            color='indigo',
+            user_id=2,
+        )
+        db.session.add(self.event)
+        db.session.commit()
+
+        start = start.astimezone()
+        end = end.astimezone()
+
+        self.driver.refresh()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend2'))
+        )
+        friendstatus = self.driver.find_element(By.ID, 'friend2status')
+        self.assertEqual('In class, Ending in 1 minutes', friendstatus.text)
+
 
         self.driver.refresh()
         WebDriverWait(self.driver, timeout=10).until(
             EC.url_contains("/dash")
         )
 
+        # Testing logo sends user to dash.
         self.driver.find_element(By.ID, 'logonavhome').click()
         WebDriverWait(self.driver, timeout=10).until(
             EC.url_contains("/dash")
