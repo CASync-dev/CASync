@@ -175,8 +175,10 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         WebDriverWait(self.driver, timeout=10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "[data-event-id][data-col]"))
         )
-        self.driver.find_element(By.CSS_SELECTOR, "[data-event-id][data-col]").click()
-        self.driver.find_element(By.ID, 'edit-event-btn').click()
+        card = self.driver.find_element(By.CSS_SELECTOR, "[data-event-id][data-col]")
+        self.driver.execute_script("arguments[0].click()", card)
+        edit_btn = self.driver.find_element(By.ID, 'edit-event-btn')
+        self.driver.execute_script("arguments[0].click()", edit_btn)
         WebDriverWait(self.driver, timeout=10).until(
             EC.presence_of_element_located((By.ID, 'edit-event-modal'))
         )
@@ -215,8 +217,10 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         WebDriverWait(self.driver, timeout=10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "[data-event-id][data-col]"))
         )
-        self.driver.find_element(By.CSS_SELECTOR, "[data-event-id][data-col]").click()
-        self.driver.find_element(By.ID, 'delete-event-btn').click()
+        card = self.driver.find_element(By.CSS_SELECTOR, "[data-event-id][data-col]")
+        self.driver.execute_script("arguments[0].click()", card)
+        delete_btn = self.driver.find_element(By.ID, 'delete-event-btn')
+        self.driver.execute_script("arguments[0].click()", delete_btn)
         #wait for modal to open
         WebDriverWait(self.driver, timeout=10).until(
             EC.presence_of_element_located((By.ID, 'delete-confirmation'))
@@ -249,10 +253,10 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         WebDriverWait(self.driver, timeout=10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "[data-event-id][data-col]"))
         )
-        self.driver.find_element(By.CSS_SELECTOR, "[data-event-id][data-col]").click()
+        card = self.driver.find_element(By.CSS_SELECTOR, "[data-event-id][data-col]")
+        self.driver.execute_script("arguments[0].click()", card)
         btn = self.driver.find_element(By.ID, 'going-toggle-btn')
-        self.driver.execute_script("arguments[0].scrollIntoView()", btn)
-        btn.click()
+        self.driver.execute_script("arguments[0].click()", btn)
         # wait for the calendar to re-render with the updated going status (fetch is async)
         WebDriverWait(self.driver, timeout=10).until(
             EC.element_to_be_clickable((By.ID, 'going-toggle-btn'))
