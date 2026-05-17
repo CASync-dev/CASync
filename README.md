@@ -120,10 +120,11 @@ The system tests use Selenium with Firefox and run headless by default. Set `HEA
 
 
 ## Docs
+**Notice: Docs are currently outdated at the moment. Will be updated in a future PR.**
 
 Go to the /docs directory for explantions for how the app works.
 
-# Plans And Structre
+# Plans And Structure
 
 ## Pages
 
