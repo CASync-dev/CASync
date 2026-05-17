@@ -33,6 +33,7 @@ class BaseSeleniumTest(unittest.TestCase):
             options.add_argument("--headless")
         try:
             cls.driver = webdriver.Firefox(options=options)
+            cls.driver.set_window_size(1440, 900)
         except Exception:
             return
 
