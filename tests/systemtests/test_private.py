@@ -42,9 +42,6 @@ class PrivateSeleniumTests(BaseSeleniumTest):
             EC.url_contains("/login")
         )
 
-    def test_dash(self):
-        pass
-
     def test_schedule_navigation(self):
         # click schedule link
         self.driver.find_element(By.ID, 'nav-schedule').click()
@@ -867,6 +864,128 @@ class PrivateSeleniumTests(BaseSeleniumTest):
             EC.invisibility_of_element((By.ID, 'changepfp-modal'))
         )
 
+    def test_dash(self):
+        '''
+        Checks all elements are displaying properly. Relatively shorter test since no interactivity here
+        '''
+        self.driver.find_element(By.ID, 'nav-dash').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/dash")
+        )
+        #...
+        greeting = self.driver.find_element(By.ID, 'title_username')
+        self.assertIn('Hello, gerald!', greeting.text)
+
+        # Checking clock
+        actualtime = datetime.strftime(datetime.now(), '%I:%M')
+        actualperiod = datetime.strftime(datetime.now(), '%p')
+
+        time = self.driver.find_element(By.ID, 'time')
+        self.assertEqual(actualtime, time.text)
+
+        period = self.driver.find_element(By.ID, 'period')
+        self.assertEqual(actualperiod, period.text)
+
+        # Checking date
+
+        actualweekday = datetime.strftime(datetime.now(), '%A')
+        weekday = self.driver.find_element(By.ID, 'day')
+        self.assertEqual(actualweekday, weekday.text)
+
+        actualdate = datetime.strftime(datetime.now(), '%B %d, %Y')
+        date = self.driver.find_element(By.ID, 'current-date')
+        self.assertEqual(actualdate, date.text)
+
+        # Checking events today (Should be none since we have no events!)
+        eventstoday = self.driver.find_element(By.ID,  'big-card')
+        self.assertEqual('All done! No more events today.', eventstoday.text)
+
+        # Unfortunately it'd be pretty difficult to check events today are being rendered
+        # (Esp. if the tests are run an hr from midnight)
+        # Maybe test event thats happening now?
+        start = datetime.now(tz=timezone.utc) - timedelta(minutes=2)
+        end = datetime.now(tz=timezone.utc) + timedelta(minutes=2)
+        self.event = Event(
+            title='Existing event',
+            description='Seeded event',
+            start_time=start,
+            end_time=end,
+            location='Room 101',
+            color='indigo',
+            user_id=1,
+        )
+        db.session.add(self.event)
+        db.session.commit()
+
+        start = start.astimezone()
+        end = end.astimezone()
+
+        self.driver.refresh()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'big-card'))
+        )
+
+        untilMin = self.driver.find_element(By.ID, 'untilevent1')
+        eventTitle = self.driver.find_element(By.ID, '1eventtitle')
+        eventSpan = self.driver.find_element(By.ID, '1eventtimespan')
+
+        self.assertIn('RIGHT NOW', untilMin.text)
+        starttimeformat = datetime.strftime(start, '%I:%M %p')
+        endtimeformat = datetime.strftime(end, '%I:%M %p')
+        self.assertIn(starttimeformat, untilMin.text)
+
+        self.assertEqual('Existing event', eventTitle.text)
+        span = starttimeformat + ' – ' + endtimeformat
+        self.assertEqual(span, eventSpan.text)
+
+        # Rest of event rendering tests done in unittests.
+
+        # Testing friends card
+        friendavailable = self.driver.find_element(By.ID, 'friends-list')
+        self.assertEqual('No friends :( add some friends in the friends section.', friendavailable.text)
+
+        # Some db commits:
+        friend = User(username='allen', email='friend@fun.net') # User to friend. id = 2
+        friend.password = 'bar'
+        db.session.add(friend)
+        db.session.commit()
+
+        fq = Friendship(sender_id=1, recipient_id=2, status='accepted', created_at=db.func.now(), accepted_at=db.func.now())
+        db.session.add(fq)
+        db.session.commit()
+
+        self.driver.refresh()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend2'))
+        )
+
+        friendpfp = self.driver.find_element(By.ID, 'friend2pfp').get_attribute("src")
+        self.assertEqual('https://www.gravatar.com/avatar/90dae26ca1e83875794c56b583a8f940?d=identicon&s=150', friendpfp)
+        friendusername = self.driver.find_element(By.ID, 'friend2username')
+        self.assertEqual('allen', friendusername.text)
+        friendmail = self.driver.find_element(By.ID, 'friend2mail')
+        self.assertEqual('friend@fun.net', friendmail.text)
+
+        friendstatus = self.driver.find_element(By.ID, 'friend2status')
+        self.assertEqual('No more classes today', friendstatus.text)
+
+        # Test cases on friend status api done in unittest.
+
+        self.driver.refresh()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/dash")
+        )
+
+        self.driver.find_element(By.ID, 'logonavhome').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/dash")
+        )
+
+
+
+        
 
 
         
