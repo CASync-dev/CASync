@@ -38,7 +38,7 @@
       <!-- Dashbaord page section-->
       <div class="bg-midgray w-full">
         <div class="container-layout">
-          <div class="container-spacing flex flex-col lg:flex-row lg:items-start gap-8">
+          <div class="container-spacing flex flex-col lg:flex-row lg:items-center gap-8">
             <!-- Currently using a temporary image; Image to be changed-->
             <div
               class="flex justify-center lg:justify-end mt-8 md:mt-0"
@@ -64,7 +64,7 @@
       </div>
       <!-- Groups and friends section -->
       <div class="container-layout">
-        <div class="container-spacing flex flex-col lg:flex-row items-center lg:items-start gap-5">
+        <div class="container-spacing flex flex-col lg:flex-row items-center lg:items-center gap-5">
           <div class="flex flex-col gap-3 md:w-1/2">
             <h1 class="text-3xl mb-3 lg:whitespace-nowrap">
               Friends and Groups
@@ -86,7 +86,7 @@
       <!-- Schedule page section-->
       <div class="bg-midgray w-full">
         <div class="container-layout">
-          <div class="container-spacing flex flex-col lg:flex-row lg:items-start gap-8">
+          <div class="container-spacing flex flex-col lg:flex-row lg:items-center gap-8">
             <!-- Currently using a temporary image; Image to be changed-->
             <div
               class="flex justify-center lg:justify-end mt-8 md:mt-0"
@@ -107,6 +107,11 @@
               <li>Mark whether you're attending or skipping classes</li>
               <li>Delete events you no longer need</li>
             </ul>
+            <div class="mt-6">
+              <a class="btn-primary" href="{{ url_for('loggedout.register') }}">
+                Sign Up Now!
+              </a>
+            </div>
             </div>
           </div>
         </div>
