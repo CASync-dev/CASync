@@ -266,7 +266,15 @@ class PrivateSeleniumTests(BaseSeleniumTest):
     python -m unittest -v tests.systemtests.test_private.PrivateSeleniumTests.<test_function>
     ''' 
 
-    # Helper functions
+    # ---------------- #
+    # Helper functions #
+    # ---------------- #
+
+    def go_to_groups_page(self):
+        self.driver.find_element(By.ID, 'nav-groups').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains('/groups')
+        )
 
     # Opens the create group modal (assumes user is on groups page)
     def open_create_group_modal(self):
@@ -280,9 +288,9 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         self.driver.find_element(By.ID, 'btn-close-create-group').click()
         return WebDriverWait(self.driver, timeout=10).until(
                 EC.invisibility_of_element_located((By.ID, 'create-group'))
-            ) # modal is closed
+            )
     
-    # Opens the select friend modal (assumes the create group modal is open)
+    # Opens the select friend modal (opens the group modal within it, assumes group modal was initially closed)
     def open_select_friend_modal(self):
         create_group_modal = self.open_create_group_modal()
         group_name_input = create_group_modal.find_element(By.ID, 'group-name-input')
@@ -303,8 +311,7 @@ class PrivateSeleniumTests(BaseSeleniumTest):
                 EC.invisibility_of_element_located((By.ID, 'select-friend'))
             )
 
-        
-
+    # ---------------- #       
 
     # Check that clicking links/buttons correctly takes users to Groups page
     def test_groups_navigation(self):
@@ -324,63 +331,68 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         self.assertFalse(li_groups)
 
     # Check that creating a group works (single person only, no friends yet)
-    def test_groups_create_group_single(self):
+    def test_groups_create_group_with_single_user(self):
+        # Go to groups page
+        self.go_to_groups_page()
+
         # Check that the 'Create Group' button works
-        self.driver.find_element(By.ID, 'btn-create-group').click()
-        create_group_modal = WebDriverWait(self.driver, timeout=10).until(
-                EC.visibility_of_element_located((By.ID, 'create-group'))
-            ) # modal is visible
-        self.assertTrue(create_group_modal) # modal exists
-        self.assertTrue(create_group_modal.is_displayed()) # modal is visible
+        create_group_modal = self.open_create_group_modal()
+        self.assertTrue(create_group_modal.is_displayed())
         self.assertIn("Create a Group", create_group_modal.text)
         self.assertIn("Name your new group", create_group_modal.text)
-        
-        # Check 'Close' button in create group modal works
-        self.driver.find_element(By.ID, 'btn-close-create-group').click()
-        create_group_modal = WebDriverWait(self.driver, timeout=10).until(
-                EC.invisibility_of_element_located((By.ID, 'create-group'))
-            ) # modal is closed
 
         # Check input works
-        self.driver.find_element(By.ID, 'btn-create-group').click() # opens create group modal again
-        WebDriverWait(self.driver, timeout=10).until(
-                EC.visibility_of_element_located((By.ID, 'create-group'))
-            )
+        group_name_input = create_group_modal.find_element(By.ID, 'group-name-input')
         
-        group_name_input = WebDriverWait(self.driver, timeout=10).until(
-                EC.visibility_of_element_located((By.ID, 'group-name-input'))
-            )
-        self.assertTrue(group_name_input) # input exists
-        self.assertTrue(group_name_input.is_displayed()) # input is visible
-        
+        # Check typing into input works
         group_name = 'My Group'
         group_name_input.clear()
         group_name_input.send_keys(group_name)
+        self.assertEqual(group_name_input.get_attribute("value"), group_name)
+        
+        # Check closing and reopening the modal
+        self.close_create_group_modal()
 
-        # Check typing into input works
-        self.assertEqual(
-            group_name_input.get_attribute("value"),
-            group_name
-        )
-
-        # Check next button works
-        self.driver.find_element(By.ID, 'group-name-next').click()
-        select_friend_modal = WebDriverWait(self.driver, timeout=10).until(
-                EC.visibility_of_element_located((By.ID, 'select-friend'))
-            ) # modal is visible
-        self.assertTrue(select_friend_modal) # modal exists
-        self.assertTrue(select_friend_modal.is_displayed()) # modal is visible
+        # Check going to select friends modal
+        select_friend_modal = self.open_select_friend_modal()
+        self.assertTrue(select_friend_modal.is_displayed())
         self.assertIn("Create a Group", select_friend_modal.text)
         self.assertIn(f"Add your friends to {group_name}!", select_friend_modal.text)
+
+        # Check closing select friends modal
+        self.close_select_friend_modal()
         
-        # Check `Close` button in select friends modal works
-        self.driver.find_element(By.ID, 'btn-close-select-friend').click()
-        select_friend_modal = WebDriverWait(self.driver, timeout=10).until(
-                EC.invisibility_of_element_located((By.ID, 'select-friend'))
-            ) # modal is closed
+        # Check 'Complete' button works in select friends modal to create group
+        self.open_select_friend_modal()
+        self.driver.find_element(By.ID, 'friend-search-submit').click()
+
+        # Check if group with only current user is created
+        myGroupId = 1 # first group created, should have id = 1
+        myGroup = WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, f'group-{myGroupId}'))
+        )
+
+        self.assertIn(group_name, myGroup.text)
+
+        buttons = myGroup.find_elements(By.TAG_NAME, 'button')
+        button_texts = [btn.text for btn in buttons]
+        self.assertEqual(len(buttons), 3)
+        self.assertIn("Leave", button_texts)
+        self.assertIn("Schedule", button_texts)
+
+        for btn in buttons:
+            self.assertTrue(btn.is_displayed())
+            self.assertTrue(btn.is_enabled())
+
+        # Force page refresh since teardown logout doesn't like it
+        self.driver.refresh()
+        WebDriverWait(self.driver, 10).until(
+            EC.url_contains('/groups')
+        )
         
 
-        # Check 'Complete' button works in select friends modal to create group
+        
+        
 
         
         
