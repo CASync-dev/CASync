@@ -976,6 +976,43 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         friendstatus = self.driver.find_element(By.ID, 'friend2status')
         self.assertEqual('No more classes today', friendstatus.text)
 
+        # Testing multi-friend rendering
+        friend = User(username='bob', email='chillguy@gmail.com') # User to friend. id = 3
+        friend.password = 'bar'
+        db.session.add(friend)
+        db.session.commit()
+
+        fq = Friendship(sender_id=1, recipient_id=3, status='accepted', created_at=db.func.now(), accepted_at=db.func.now())
+        db.session.add(fq)
+        db.session.commit()
+
+        self.driver.refresh()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend2'))
+        )
+
+        friendpfp = self.driver.find_element(By.ID, 'friend2pfp').get_attribute("src")
+        self.assertEqual('https://www.gravatar.com/avatar/90dae26ca1e83875794c56b583a8f940?d=identicon&s=150', friendpfp)
+        friendusername = self.driver.find_element(By.ID, 'friend2username')
+        self.assertEqual('allen', friendusername.text)
+        friendmail = self.driver.find_element(By.ID, 'friend2mail')
+        self.assertEqual('friend@fun.net', friendmail.text)
+
+        friendstatus = self.driver.find_element(By.ID, 'friend3status')
+        self.assertEqual('No more classes today', friendstatus.text)
+
+        friendpfp = self.driver.find_element(By.ID, 'friend3pfp').get_attribute("src")
+        self.assertEqual('https://www.gravatar.com/avatar/0617ccc0cc6152aaf58197f9595c9e9d?d=identicon&s=150', friendpfp)
+        friendusername = self.driver.find_element(By.ID, 'friend3username')
+        self.assertEqual('bob', friendusername.text)
+        friendmail = self.driver.find_element(By.ID, 'friend3mail')
+        self.assertEqual('chillguy@gmail.com', friendmail.text)
+
+        friendstatus = self.driver.find_element(By.ID, 'friend3status')
+        self.assertEqual('No more classes today', friendstatus.text)
+
+        
+
         # Test cases on friend status api done in unittest.
         # Test javascript rendering
         start = datetime.now(tz=timezone.utc) + timedelta(minutes=2)
@@ -1026,12 +1063,6 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         )
         friendstatus = self.driver.find_element(By.ID, 'friend2status')
         self.assertEqual('In class, Ending in 1 minutes', friendstatus.text)
-
-
-        self.driver.refresh()
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.url_contains("/dash")
-        )
 
         # Testing logo sends user to dash.
         self.driver.find_element(By.ID, 'logonavhome').click()
