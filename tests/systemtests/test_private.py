@@ -42,6 +42,10 @@ class PrivateSeleniumTests(BaseSeleniumTest):
             EC.url_contains("/login")
         )
 
+    # ------------------------------------------------------------------------------------------------------- #
+    # SCHEDULE #
+    # ------------------------------------------------------------------------------------------------------- #
+
     def test_schedule_navigation(self):
         # click schedule link
         self.driver.find_element(By.ID, 'nav-schedule').click()
@@ -493,11 +497,6 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         
     # ------------------------------------------------------------------------------------------------------- #
     # GROUPS #
-
-    '''
-    Quick test command:
-    python -m unittest -v tests.systemtests.test_private.PrivateSeleniumTests.<test_function>
-    ''' 
 
     # ---------------- #
     # Helper functions #
