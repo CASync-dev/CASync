@@ -20,9 +20,13 @@ jobs:
                 python -m pip install --upgrade pip
                 pip install -r requirements.txt
 
-            - name: Run Tests
+            - name: Run Unit Tests
               run: |
                 python -m unittest tests.unittests -v
-               
+
+            - name: Run System Tests
+              run: |
+                python -m unittest tests.systemtests -v
+
 
     
