@@ -83,15 +83,15 @@ function renderFriendsStatus(friends_status) {
     li.className =
       "py-4 flex items-center bg-blue-500 justify-between rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-md ring-white transition duration-200";
     li.innerHTML = `
-      <div class="flex items-center ">
-        <img class="h-15 w-15 rounded-full" src="${friend.avatar_url}" alt="${friend.username}'s avatar" />
+      <div id = "friend${friend.id}" class="flex items-center ">
+        <img id = "friend${friend.id}pfp" class="h-15 w-15 rounded-full" src="${friend.avatar_url}" alt="${friend.username}'s avatar" />
         <div class="ml-4">
-          <p class="text-sm font-medium text-white">${friend.username}</p>
-          <p class="hidden sm:block text-sm text-white">${friend.email}</p>
+          <p id = "friend${friend.id}username" class="text-sm font-medium text-white">${friend.username}</p>
+          <p id = "friend${friend.id}mail" class="hidden sm:block text-sm text-white">${friend.email}</p>
         </div>
       </div>
 
-      <p class=" px-3 py-2 text-white text-sm sm:text-base">
+      <p id = "friend${friend.id}status" class=" px-3 py-2 text-white text-sm sm:text-base">
         ${displayTimeTillNextClass(friend.minutes_until_next)}
       </p>
     `;
@@ -307,10 +307,10 @@ function bigCard(nextEvent) {
   bigCardEl.innerHTML = `
     <div class="flex items-center justify-between gap-4 mb-2">
       <h3 class="text-lg font-medium text-gray-500">NEXT EVENT</h3>
-      <p class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-lg text-gray-700 shrink-0">${timeLabel}</p>
+      <p id = "untilevent${nextEvent.id}"class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-lg text-gray-700 shrink-0">${timeLabel}</p>
     </div>
-    <h2 class="text-4xl ${colors.text} flex-1 mb-2">${nextEvent.title}</h2>
-    <p class="text-xl ${colors.text} space-y-4 mb-4">
+    <h2 id = "${nextEvent.id}eventtitle" class="text-4xl ${colors.text} flex-1 mb-2">${nextEvent.title}</h2>
+    <p id = "${nextEvent.id}eventtimespan"class="text-xl ${colors.text} space-y-4 mb-4">
        Starts at ${startTime} and ends at ${endTime} <br />
       <span class="text-lg ${colors.text} shrink-0  rounded-2xl p-2">${durationLabel}</span>
       <span class="text-lg ${colors.text} shrink-0  rounded-2xl p-2">${locationOrStatus}</span>

@@ -109,6 +109,7 @@ def api_eventslist():
 # acceepts a format like this: GET /api/events/me?start=2026-04-21&end=2026-04-25
 # responds with a list of events in that date range for the current user
 @api_events.route("/api/events/me")
+@login_required
 def api_events_range():
     """
     Accepts a start and end date as query parameters as:
@@ -257,8 +258,8 @@ def api_create_event():
     {
         "title": "Event Title",
         "description": "Event Description",
-        "start_time": "2024-07-01T14:00:00Z",
-        "end_time": "2024-07-01T15:00:00Z",
+        "start_time": "2024-07-01T14:00:00.000Z",
+        "end_time": "2024-07-01T15:00:00.000Z",
         "user_id": 1
         "location": "Event Location",
         "color": "indigo"
@@ -266,9 +267,18 @@ def api_create_event():
     start_time and end_time are full ISO datetimes with a timezone offset.
     """
     data = request.get_json()
-    errors = _validate_event_data(data)
-    if errors:
-        return jsonify({"errors": errors}), 400
+    
+     # Required fields
+    if not data.get('title') or not data.get('start_time') or not data.get('end_time'):
+        return jsonify({"error": "Please fill in all required fields."}), 400
+    
+    # End time after start time
+    start = datetime.strptime(data['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ').time()
+    end = datetime.strptime(data['end_time'], '%Y-%m-%dT%H:%M:%S.%fZ').time()
+    if end <= start:
+        return jsonify({"error": "End time must be after start time."}), 400
+    
+
     event = Event(
         title=data['title'],
         description=data.get('description', ''),
@@ -288,7 +298,7 @@ def api_create_event():
 @login_required
 def api_delete_event(event_id):
     # check if event exists and belongs to the user
-    event = Event.query.get(event_id)
+    event = db.session.get(Event, event_id)
     if not event:
         return jsonify({"error": "Event not found"}), 404
     if event.user_id != current_user.id:
@@ -304,7 +314,7 @@ def api_delete_event(event_id):
 @api_events.route("/api/events/<int:event_id>", methods=["PUT", "GET"])
 @login_required
 def api_edit_event(event_id):
-    event = Event.query.get(event_id)
+    event = db.session.get(Event, event_id)
     if not event:
         return jsonify({"error": "Event not found"}), 404
     if event.user_id != current_user.id:
@@ -312,10 +322,22 @@ def api_edit_event(event_id):
     # check if event is custom (not imported from ical) - we don't want to allow editing of imported events through this route
     if event.ical_id:
         return jsonify({"error": "Cannot edit imported events"}), 400
+    
     data = request.get_json()
-    errors = _validate_event_data(data)
-    if errors:
-        return jsonify({"errors": errors}), 400
+    
+    # VALIDATE input fields
+    # Required fields
+    if not data.get('title') or not data.get('start_time') or not data.get('end_time'):
+        return jsonify({"error": "Please fill in all required fields."}), 400
+    
+    # End time after start time
+    start = datetime.strptime(data['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ').time()
+    end = datetime.strptime(data['end_time'], '%Y-%m-%dT%H:%M:%S.%fZ').time()
+    if end <= start:
+        return jsonify({"error": "End time must be after start time."}), 400
+    
+    
+    # update the event details - again we should add some validation here but we'll assume the data is correct for now
     event.title = data['title']
     event.description = data.get('description', '')
     event.start_time = datetime.fromisoformat(data['start_time'].replace('Z', '+00:00'))
@@ -328,7 +350,7 @@ def api_edit_event(event_id):
 @api_events.route("/api/events/<int:event_id>/toggle_going", methods=["POST"])
 @login_required
 def api_toggle_going(event_id):
-    event = Event.query.get(event_id)
+    event = db.session.get(Event, event_id)
     if not event:
         return jsonify({"error": "Event not found"}), 404
     if event.user_id != current_user.id:

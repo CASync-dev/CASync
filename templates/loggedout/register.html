@@ -92,14 +92,14 @@
             for
             category, message in messages
           %}
-            <p class="text-red-400 text-sm mt-1 max-w-sm">{{ message }}</p>
+            <p id = "msg" class="text-red-400 text-sm mt-1 max-w-sm">{{ message }}</p>
           {% endfor %}{% endwith %}
           {% if form.errors %}{%
             for field, errors in
             form.errors.items()
           %}
             {% for error in errors %}
-              <p class="text-red-400 text-sm mt-1 max-w-sm">{{ error }}</p>
+              <p id = "error" class="text-red-400 text-sm mt-1 max-w-sm">{{ error }}</p>
             {% endfor %}
           {% endfor %}{% endif %}
           <br />

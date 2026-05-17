@@ -45,19 +45,21 @@ def store_ical_url(url, user_id):
     """
     Store the user's iCal feed URL in the database. This allows us to fetch and update events later.
     """
-    # Check if the user already has a calendar, for now we only support one calendar per user.
-    # If they do, update the URL if differnet
-    # if the url is the same, fetch the same url again but with an update
-    calendar = Calendar.query.filter_by(user_id=user_id).first()
+    # Check if the user already has a calendar of the same url, if so we update the existing calendar's URL and synced_at timestamp. 
+    # If not, we create a new calendar entry for the user.
+    calendar = Calendar.query.filter_by(user_id=user_id, ical_url=url).first()
     if calendar:
-        calendar.ical_url = url
+        calendar.synced_at = datetime.now(timezone.utc)
         has_calendar = True
+        cal_id = calendar.id
     else:
-        calendar = Calendar(user_id=user_id, ical_url=url)
-        db.session.add(calendar)
+        new_calendar = Calendar(user_id=user_id, ical_url=url, synced_at=datetime.now(timezone.utc))
+        db.session.add(new_calendar)
+        db.session.flush()  # populate new_calendar.id before commit
+        cal_id = new_calendar.id
         has_calendar = False
     db.session.commit()
-    return has_calendar  # no error
+    return has_calendar, cal_id  # no error
 
 
 # Fetch the raw iCal data from the URL
@@ -67,17 +69,23 @@ def fetch_ical_events(url):
     Download the iCal feed from the given URL and return a list of VEVENT components.
     Raises an exception if the request fails or the content cannot be parsed.
     """
-    # max size
-    MAX_BYTES = 10 * 1024 * 1024  # 10 MB can fit something like ~5,000–20,000 events.
-    # Use requests to fetch the content. We set a timeout
-    response = requests.get(url, timeout=10)
-    # Check for HTTP errors
-    response.raise_for_status()
-    # content too big
-    if response.headers.get('Content-Length') and int(response.headers['Content-Length']) > MAX_BYTES:
-        raise ValueError("The iCal feed is too large to process.")
+    # max size — ~5,000–20,000 events fits comfortably in 10 MB
+    MAX_BYTES = 10 * 1024 * 1024
+    # Stream the response so we can enforce the size limit on actual bytes received,
+    # not just the Content-Length header (which servers can omit or lie about)
+    with requests.get(url, timeout=10, stream=True) as response:
+        # Check for HTTP errors
+        response.raise_for_status()
+        chunks = []
+        received = 0
+        for chunk in response.iter_content(chunk_size=65536):
+            received += len(chunk)
+            if received > MAX_BYTES:
+                raise ValueError("The iCal feed is too large to process.")
+            chunks.append(chunk)
+        raw = b"".join(chunks)
     # Parse the iCal content using icalendar. This will give us a Calendar object with all the components.
-    calendar = ICalendar.from_ical(response.content)
+    calendar = ICalendar.from_ical(raw)
 
     # Walk the calendar and collect only VEVENT components
     return [component for component in calendar.walk() if component.name == "VEVENT"]
@@ -101,7 +109,7 @@ def _to_utc_datetime(value, end_of_day=False):
     return datetime.combine(value, time(0, 0), tzinfo=timezone.utc)
 
 
-def parse_ical_event(component, user_id):
+def parse_ical_event(component, user_id, cal_id):
     """
     Convert one iCal VEVENT component into a dict matching our Event model's fields.
     Heavily utilises icalnder package.
@@ -123,13 +131,13 @@ def parse_ical_event(component, user_id):
         "end_time":    end_time,
         "location":    str(component.get("LOCATION", "")) or None,
         "ical_uid":    str(component.get("UID", "")),
-        "ical_id":    Calendar.query.filter_by(user_id=user_id).first().id,  # link to the calendar this event came from
+        "ical_id":    cal_id,  # link to the calendar this event came from
     }
 
 
 # Persist the parsed events to the database
 
-def save_events_to_db(parsed_events, user_id):
+def save_events_to_db(parsed_events, user_id, cal_id):
     """
     Save a list of parsed event dicts to the database, linked to the given user.
     Returns the number of events saved.
@@ -139,13 +147,13 @@ def save_events_to_db(parsed_events, user_id):
         db.session.add(event)
     
     # Update the synced_at timestamp on the user's calendar
-    Calendar.query.filter_by(user_id=user_id).update({"synced_at": datetime.now()})
+    Calendar.query.filter_by(user_id=user_id, id=cal_id).update({"synced_at": datetime.now(timezone.utc)})
 
     db.session.commit()
     return len(parsed_events)
 
 # just update db events
-def update_events_in_db(parsed_events, user_id):
+def update_events_in_db(parsed_events, user_id, cal_id):
     """
     Update existing events in the database based on their ical_id. If an event with the same ical_id, user_id and ical_id exists, update its details. If not, create a new event.
     Returns a tuple: (created_count, updated_count)
@@ -182,7 +190,7 @@ def update_events_in_db(parsed_events, user_id):
             created_count += 1
     
     # Update the synced_at timestamp on the user's calendar
-    Calendar.query.filter_by(user_id=user_id).update({"synced_at": datetime.now()})
+    Calendar.query.filter_by(user_id=user_id, id=cal_id).update({"synced_at": datetime.now(timezone.utc)})
 
     db.session.commit()
     return created_count, updated_count
@@ -206,7 +214,7 @@ def import_ical(url, user_id):
     if url_error:
         return None, url_error
 
-    has_calendar = store_ical_url(url, user_id)  # store the URL and get whether it's a new calendar or an update
+    has_calendar, cal_id = store_ical_url(url, user_id)  # store the URL and get whether it's a new calendar or an update
     # 2. Fetch iCal events from the URL
     try:
         ical_events = fetch_ical_events(url)
@@ -224,7 +232,7 @@ def import_ical(url, user_id):
     parsed_events = []
     for component in ical_events:
         try:
-            parsed_events.append(parse_ical_event(component, user_id))
+            parsed_events.append(parse_ical_event(component, user_id, cal_id))
         except Exception:
             continue  # skip this event and move on
 
@@ -234,13 +242,13 @@ def import_ical(url, user_id):
     # 4. Save to the database
     if has_calendar:  # if the user already had a calendar, we update existing events instead of creating new ones
         try:
-            created_count, updated_count = update_events_in_db(parsed_events, user_id)
+            created_count, updated_count = update_events_in_db(parsed_events, user_id, cal_id)
         except Exception as e:
             return None, f"Failed to update events in the database: {e}"
         return {"created": created_count, "updated": updated_count}, None
-    elif not has_calendar:
+    else:
         try:
-            count = save_events_to_db(parsed_events, user_id)
+            count = save_events_to_db(parsed_events, user_id, cal_id)
         except Exception as e:
             return None, f"Failed to save events to the database: {e}"
         return {"imported": count}, None

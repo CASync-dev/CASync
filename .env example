@@ -1,2 +1,4 @@
 dev-secret-key=supersecretkey
 SQLALCHEMY_DATABASE_URI=sqlite:///app.db
+# for testing:
+HEADLESS=TRUE

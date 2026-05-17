@@ -6,6 +6,7 @@
     <div class="flex items-center pb-3 border-b border-gray-300">
       <h1 class="text-3xl font-bold">Groups</h1>
       <button
+        id="btn-create-group"
         class="btn-primary shadow-black  px-4 ml-auto mr-2 h-10 whitespace-nowrap cursor-pointer"
         onclick="return loadCreateGroup()"
       >
@@ -31,10 +32,11 @@
                 <p class="text-xl font-medium">{{ group.group_name }}</p>
 
                 <!-- Member Avatars -->
-                <div class="flex items-center my-2 group-avatars">
+                <div id="group-member-avatars" class="flex items-center my-2 group-avatars">
                   {# For the first 8 members of the group, after show a +n #}
                   {% for user in group.members[:8] %}
                     <img
+                      id="{{ user.username }}-avatar"
                       src="{{ user.avatar(200) }}"
                       class="w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
                       alt="{{ user.username }}'s profile picture"
@@ -51,6 +53,7 @@
             </div>
             <!-- Buttons -->
             <button
+              id="btn-leave-group-{{ group.id }}"
               class="btn-plain mt-2 px-3 py-2 sm:ml-auto bg-red-300 text-nearwhite rounded-lg hover:bg-red-400"
               onclick="leaveGroup('{{ group.id }}')"
             >
@@ -58,6 +61,7 @@
               Leave
             </button>
             <button
+              id="btn-groups-schedule-{{ group.id }}"
               class="btn-plain mt-2 px-3 py-2 bg-blue-300 text-nearwhite rounded-lg hover:bg-blue-400"
               onclick="openSchedule('{{ group.id }}', '{{ group.group_name }}')"
             >
@@ -65,6 +69,7 @@
               Schedule
             </button>
             <button
+              id="btn-groups-details-{{ group.id }}"
               class="btn-plain bg-dark rounded-lg sm:rounded-full px-4 py-3 hover:bg-gray-800"
               onclick="openGroupDetail(); getGroupId('{{ group.id }}'); loadGroupMembers()"
             >
@@ -168,6 +173,7 @@
                 ></div>
                 <div class="flex justify-end">
                   <button
+                    id="btn-close-create-group"
                     type="button"
                     class="
                         cursor-pointer mt-3 mx-0 sm:flex sm:justify-end sm:px-6 inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm
@@ -262,6 +268,7 @@
                     Complete
                   </button>
                   <button
+                    id="btn-close-select-friend"
                     type="button"
                     class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
                     onclick="return closeLoadSelectFriends()"
@@ -373,6 +380,7 @@
                 ></h2>
               </div>
               <button
+                id="btn-close-group-details"
                 onclick="closeGroupDetail()"
                 class="w-10 h-10 rounded-full transition-smooth flex items-center justify-center"
               >
@@ -396,6 +404,7 @@
 
                   <!-- Try to reuse already existing friend modal? -->
                   <button
+                    id="btn-add-member-modal"
                     onclick="openAddMemberModal()"
                     class="btn-primary px-4 py-2 text-sm text-center"
                   >
@@ -442,6 +451,7 @@
                 group's Schedule
               </h3>
               <button
+                id="btn-close-group-calendar"
                 type="button"
                 class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:text-sm"
                 command="close"

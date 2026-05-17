@@ -3,8 +3,24 @@ from flask import current_app, url_for
 from app import db
 from flask_login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import Column, Table, ForeignKey
+from sqlalchemy import Column, Table, ForeignKey, DateTime, TypeDecorator
 from sqlalchemy.orm import DeclarativeBase, relationship
+
+
+# Custom column type that re-attaches UTC on read.
+# SQLite has no native timezone storage, so DateTime(timezone=True) values come
+# back naive even though we always write UTC. Without this, equality checks
+# against freshly-parsed UTC-aware datetimes (e.g. iCal sync) would always
+# report a difference and mark every event as "updated".
+class UTCDateTime(TypeDecorator):
+    impl = DateTime(timezone=True)
+    cache_ok = True
+
+    def process_result_value(self, value, dialect):
+        # Only re-tag naive values; preserve any tzinfo the driver did return.
+        if value is not None and value.tzinfo is None:
+            return value.replace(tzinfo=timezone.utc)
+        return value
 from . import login_manager
 from hashlib import md5
 
@@ -71,10 +87,10 @@ class User(UserMixin, db.Model):
         if self.avatarurl:
             return self.getavatar()
         else:
-            return self.gravatar(150)
+            return self.gravatar(size)
 
-    def public_dict(self):
-        return {"id": self.id, "username": self.username, "pfp": self.avatar(200)}
+    def public_dict(self, size=150):
+        return {"id": self.id, "username": self.username, "pfp": self.avatar(size)}
 
     def get_friends(self):
         # This method retrieves all friends of the user by querying the Friendship model for entries where the user is either the sender
@@ -100,10 +116,9 @@ class Event(db.Model):
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     # Full ISO datetimes (UTC) so events can span multiple days.
-    # NOTE: SQLite drops the tz offset on write, so values come back naive.
-    # By convention everything stored here is UTC clock-time; to_dict re-tags on read.
-    start_time = db.Column(db.DateTime(timezone=True), nullable=False)
-    end_time = db.Column(db.DateTime(timezone=True), nullable=False)
+    # UTCDateTime re-tags values as UTC on read since SQLite strips the tz offset.
+    start_time = db.Column(UTCDateTime, nullable=False)
+    end_time = db.Column(UTCDateTime, nullable=False)
     location = db.Column(db.String(200))  # optional
     color = db.Column(
         db.String(20)

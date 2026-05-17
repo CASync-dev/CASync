@@ -59,6 +59,7 @@ function showMsg(msg, isSuccess) {
     const msgEl = document.createElement("p");
     msgEl.className = `${isSuccess ? "text-green-600" : "text-red-600"} text-sm mt-2`;
     msgEl.textContent = msg;
+    msgEl.id = "syncmsg"
     document.querySelector("form").appendChild(msgEl);
     setTimeout(() => {
     msgEl.remove();
@@ -120,7 +121,10 @@ async function changeUsername() {
 
     const token = document.querySelector('meta[name="csrf-token"]').content;
     if (newusername == "") {
-        return
+        errormsg.classList.remove("text-green-600");
+        errormsg.classList.add("text-red-600");
+        errormsg.innerHTML = "New Username field is required.";
+        return;
     }
     try {
       const response = await fetch("/api/changeusername", {
@@ -140,7 +144,6 @@ async function changeUsername() {
         errormsg.classList.remove("text-green-600");
         errormsg.classList.add("text-red-600");
         errormsg.innerHTML = "Error:" + error;
-        console.error("Error:", error);
         return
     }
     errormsg.classList.remove("text-red-600");
@@ -159,7 +162,10 @@ async function changeEmail() {
 
     const token = document.querySelector('meta[name="csrf-token"]').content;
     if (newmail == "") {
-        return
+        errormsg.classList.remove("text-green-600");
+        errormsg.classList.add("text-red-600");
+        errormsg.innerHTML = "New Email field is required.";
+        return;
     }
     try {
     const response = await fetch("/api/changeemail", {
@@ -179,7 +185,6 @@ async function changeEmail() {
     errormsg.classList.remove("text-green-600");
     errormsg.classList.add("text-red-600");
     errormsg.innerHTML = error;
-    console.error("Error:", error);
     return
     }
     errormsg.classList.remove("text-red-600");
@@ -214,7 +219,6 @@ async function removeLink(urlid) {
         errormsg.classList.remove("text-green-600");
         errormsg.classList.add("text-red-600");
         errormsg.innerHTML = error;
-        console.error("Error:", error);
         return;
     }
     errormsg.classList.remove("text-red-600");
@@ -265,7 +269,6 @@ document.getElementById("pfpform").addEventListener('submit', async function(e) 
         errormsg.classList.remove("text-green-600");
         errormsg.classList.add("text-red-600");
         errormsg.innerHTML = error;
-        console.error("Error:", error);
         return;
     } 
     errormsg.classList.remove("text-red-600");
@@ -297,7 +300,6 @@ async function delPFP() {
         errormsg.classList.remove("text-green-600");
         errormsg.classList.add("text-red-600");
         errormsg.innerHTML = error;
-        console.error("Error:", error);
         return;
     }
     errormsg.classList.remove("text-red-600");
