@@ -19,6 +19,7 @@
       <div
         class="flex ml-auto max-sm:ml-0 gap-2 flex-row max-lg:flex-col max-sm:inline items-end max-sm:items-center mt-2 sm:mt-0"
       >
+<<<<<<< HEAD
           <button
             class="btn-primary shadow-black max-sm:w-full px-4 ml-auto max-sm:ml-0 mr-2 max-sm:mr-0  h-10 whitespace-nowrap cursor-pointer"
             command="show-modal"
@@ -29,7 +30,18 @@
               {{ friend_requests|length }}
             </span>
           </button>
+=======
         <button
+          id="friend-requests-btn"
+          class="btn-primary shadow-black max-sm:w-full px-4 ml-auto max-sm:ml-0 mr-2 max-sm:mr-0  h-10 whitespace-nowrap cursor-pointer"
+          command="show-modal"
+          commandfor="friend-requests-modal"
+        >
+          Friend Requests ({{ friend_requests|length }})
+        </button>
+>>>>>>> main
+        <button
+          id="add-friend-menu-btn"
           class="btn-primary shadow-black max-sm:w-full px-4 ml-auto mr-2 max-sm:ml-0 max-sm:mr-0 h-10 whitespace-nowrap cursor-pointer"
           command="show-modal"
           commandfor="add-friend-modal"
@@ -44,7 +56,7 @@
         {% for friend in friends %}
           <li
             id="friend-{{ friend.id }}"
-            class="py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200"
+            class="friend py-4 flex items-center justify-between border border-gray-300 rounded-2xl mb-2 px-3 hover:ring-1 hover:shadow shadow-xl ring-white transition duration-200"
           >
             <div class="flex items-center">
               <img
@@ -62,12 +74,14 @@
               </div>
             </div>
             <button
+              id="remove-friend-btn"
               class="btn-plain px-3 ml-auto py-2 bg-red-300 text-white rounded-lg hover:bg-red-400"
               onclick="removeFriend('{{ friend.id }}')"
             >
               <i class="fas fa-user-times"></i>
             </button>
             <button
+              id="view-schedule-btn"
               class="btn-plain px-3 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-400"
               onclick="openFriendSchedule('{{ friend.id }}', '{{ friend.username }}')"
             >
@@ -191,8 +205,10 @@
                       class="flex-1 rounded-md border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                       placeholder="Friend's Username/Email"
                       autocomplete="off"
+                      onkeydown="if(event.key==='Enter') searchFriends()"
                     />
                     <button
+                      id="submit-search-friends-btn"
                       type="button"
                       onclick="searchFriends()"
                       class="btn-plain shrink-0 rounded-md border border-transparent bg-green-600 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
@@ -212,6 +228,7 @@
             class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
           >
             <button
+              id="close-add-friend-modal-btn"
               type="button"
               class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
               command="close"
@@ -259,7 +276,10 @@
                 </h3>
                 <div class="mt-2">
                   <p class="text-sm text-gray-500"></p>
-                  <div class="mt-3 flex flex-col w-full gap-2">
+                  <div
+                    id="friend-request-results"
+                    class="mt-3 flex flex-col w-full gap-2"
+                  >
                     {% if friend_requests|length == 0 %}
                       <p class="text-sm text-gray-500">
                         No pending friend requests.
@@ -268,7 +288,7 @@
                     {% for request in friend_requests %}
                       <div
                         id="friend-request-{{ request.id }}"
-                        class="flex items-center justify-between rounded-md border border-gray-300 bg-white p-4 shadow-sm"
+                        class="friend-request flex items-center justify-between rounded-md border border-gray-300 bg-white p-4 shadow-sm"
                       >
                         <div class="flex items-center">
                           <img
@@ -287,6 +307,7 @@
                         </div>
                         <div class="flex space-x-2">
                           <button
+                            id="accept-friend-request-btn"
                             type="button"
                             class="rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                             onclick="acceptFriendRequest('{{ request.id }}')"
@@ -294,6 +315,7 @@
                             Accept
                           </button>
                           <button
+                            id="reject-friend-request-btn"
                             type="button"
                             class="rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                             onclick="rejectFriendRequest('{{ request.id }}')"
@@ -312,6 +334,7 @@
             class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
           >
             <button
+              id="close-friend-requests-modal-btn"
               type="button"
               class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
               command="close"
@@ -354,6 +377,7 @@
                 Friend's Schedule
               </h3>
               <button
+                id="close-friend-schedule-btn"
                 type="button"
                 class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:text-sm"
                 command="close"

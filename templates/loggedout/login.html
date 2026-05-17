@@ -58,7 +58,7 @@
             for
             category, message in messages
           %}
-            <p class="text-green-400 text-sm mt-1">{{ message }}</p>
+            <p id = "msg" class="{{ 'text-red-600' if category == 'error' else 'text-green-600' }} text-sm mt-1">{{ message }}</p>
           {% endfor %}{% endwith %}
           {% if form.errors %}{%
             for field, errors in

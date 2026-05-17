@@ -14,7 +14,7 @@ def getusers():
     # Email search: Must be exact for privacy reasons
     data = request.get_json()
     if 'search' not in data or len(data['search']) < 1:
-        return jsonify({"Error: Invalid search"}), 400
+        return jsonify({"Error": "Invalid search"}), 400
     # If it's an email
     if '@' in data['search']:
         searchmail = data['search']
@@ -28,7 +28,7 @@ def getusers():
             ((Friendship.sender_id == current_user.id) & (Friendship.recipient_id == mail.id)) |
             ((Friendship.sender_id == mail.id) & (Friendship.recipient_id == current_user.id))
         ).first()
-        if existing_friendship:
+        if existing_friendship and existing_friendship.status != 'rejected':
             return jsonify({'results': 0})
         # We call the public_dict method to only return the id and username of the user from the USer object.
         return jsonify({'results': [mail.public_dict()]})
@@ -43,8 +43,8 @@ def getusers():
         users = [u for u in users if u.id != current_user.id]
         # Filter out users that already have a friendship with the current user
         users = [u for u in users if not Friendship.query.filter(
-            ((Friendship.sender_id == current_user.id) & (Friendship.recipient_id == u.id)) |
-            ((Friendship.sender_id == u.id) & (Friendship.recipient_id == current_user.id))
+            ((Friendship.sender_id == current_user.id) & (Friendship.recipient_id == u.id) & (Friendship.status != 'rejected')) |
+            ((Friendship.sender_id == u.id) & (Friendship.recipient_id == current_user.id) & (Friendship.status != 'rejected'))
         ).first()]
         if users == []:
             return jsonify({'results': 0})
@@ -59,12 +59,12 @@ def requestfriend():
     data = request.get_json()
     # Check if the user_id is provided in the request data
     if 'user_id' not in data:
-        return jsonify({"Error: Invalid user_id"}), 400
+        return jsonify({"error": "Invalid user_id"}), 400
     user_id = int(data['user_id'])
     # This checks if the user exists, this shoulnt be a probelm as the frontend only allows searhcing for existing users but just in case.
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
-        return jsonify({"Error: User not found"}), 404
+        return jsonify({"error": "User not found"}), 404
     # Check if a friend request already exists between the current user and the target user
     existing_request = Friendship.query.filter(
         ((Friendship.sender_id == current_user.id) & (Friendship.recipient_id == user_id)) |
@@ -93,7 +93,7 @@ def requestfriend():
 def acceptfriend():
     data = request.get_json()
     if 'request_id' not in data:
-        return jsonify({"Error: Invalid request_id"}), 400
+        return jsonify({"Error": "Invalid request_id"}), 400
     request_id = data['request_id']
     # Check if the friend request exists and is pending
     # can only accept friend requests that are sent to the current user, not ones they sent themselves
@@ -101,14 +101,14 @@ def acceptfriend():
         ((Friendship.id == request_id) & (Friendship.status == 'pending'))
     ).first()
     if not friend_request:
-        return jsonify({"Error: No pending friend request found"}), 404
+        return jsonify({"Error": "No pending friend request found"}), 404
     # Check if the current user is the recipient of the friend request
     if friend_request.recipient_id != current_user.id:
-        return jsonify({"Error: You can only accept friend requests sent to you"}), 403
+        return jsonify({"Error": "You can only accept friend requests sent to you"}), 403
     # Update the friend request status to accepted
     friend_request.status = 'accepted'
     friend_request.accepted_at = db.func.now()
-    friend = User.query.get(friend_request.sender_id)
+    friend = db.session.get(User, friend_request.sender_id)
     db.session.commit()
     return jsonify({"message": f"Friend request accepted from {friend.username}!"}), 200
 
@@ -117,7 +117,7 @@ def acceptfriend():
 def rejectfriend():
     data = request.get_json()
     if 'request_id' not in data:
-        return jsonify({"Error: Invalid request_id"}), 400
+        return jsonify({"Error": "Invalid request_id"}), 400
     request_id = data['request_id']
     # Check if the friend request exists and is pending
     # can only reject friend requests that are sent to the current user, not ones they sent themselves
@@ -125,10 +125,10 @@ def rejectfriend():
         ((Friendship.id == request_id) & (Friendship.status == 'pending'))
     ).first()
     if not friend_request:
-        return jsonify({"Error: No pending friend request found"}), 404
+        return jsonify({"Error": "No pending friend request found"}), 404
     # Check if the current user is the recipient of the friend request
     if friend_request.recipient_id != current_user.id:
-        return jsonify({"Error: You can only reject friend requests sent to you"}), 403
+        return jsonify({"Error": "You can only reject friend requests sent to you"}), 403
     # Update the friend request status to rejected
     friend_request.status = 'rejected'
     db.session.commit()
@@ -139,7 +139,7 @@ def rejectfriend():
 def removefriend():
     data = request.get_json()
     if 'friend_id' not in data:
-        return jsonify({"Error: Invalid friend_id"}), 400
+        return jsonify({"Error": "Invalid friend_id"}), 400
     friend_id = int(data['friend_id'])
     # Check if a friendship exists between the current user and the target user
     friendship = Friendship.query.filter(
@@ -147,7 +147,7 @@ def removefriend():
         ((Friendship.sender_id == friend_id) & (Friendship.recipient_id == current_user.id))
     ).first()
     if not friendship or friendship.status != 'accepted':
-        return jsonify({"Error: You are not friends with this user"}), 404
+        return jsonify({"Error": "You are not friends with this user"}), 404
     db.session.delete(friendship)
     db.session.commit()
     return jsonify({"message": "Friend removed."}), 200
@@ -164,10 +164,8 @@ def friends_status():
     now = datetime.fromisoformat(now_str)
     if now.tzinfo is None:
         now = now.replace(tzinfo=timezone.utc)
-
-    # SQLite strips the timezone on read, so events come back as naive UTC.
-    # Strip it from `now` too so the arithmetic below has matching awareness.
-    now_naive = now.astimezone(timezone.utc).replace(tzinfo=None)
+    else:
+        now = now.astimezone(timezone.utc)
 
     friends = current_user.get_friends()
     result = []
@@ -175,21 +173,21 @@ def friends_status():
     for friend in friends:
         # Check if friend has an event right now
         current_event = Event.query.filter_by(user_id=friend.id, going=True).filter(
-            Event.start_time <= now_naive,
-            Event.end_time >= now_naive
+            Event.start_time <= now,
+            Event.end_time >= now
         ).first()
         in_class = current_event is not None
 
         # If in class, return negative minutes remaining so the frontend knows to show "In Class Now"
         next_start = None
         if in_class:
-            next_start = -int((current_event.end_time - now_naive).total_seconds() // 60)
+            next_start = -int((current_event.end_time - now).total_seconds() // 60)
         else:
             next_event = Event.query.filter_by(user_id=friend.id, going=True).filter(
-                Event.start_time > now_naive
+                Event.start_time > now
             ).order_by(Event.start_time.asc()).first()
             if next_event:
-                next_start = int((next_event.start_time - now_naive).total_seconds() // 60)
+                next_start = int((next_event.start_time - now).total_seconds() // 60)
             
         
         result.append({

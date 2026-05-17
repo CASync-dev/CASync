@@ -62,15 +62,6 @@ def settings():
             imported = result.get('imported') or result.get('created', 0)
             updated = result.get('updated', 0)
             flash(f"Imported {imported} events, updated {updated}.", "success")
-    # Change Password Form Validation
-    elif changePassform.validate_on_submit():
-        current = changePassform.current_password.data
-        if current_user.verify_password(current):
-            current_user.password = changePassform.new_password.data
-            db.session.commit()
-            flash(f"Successfully changed user's password.", "success")
-        else:
-            flash(f"Error changing password: Incorrect password.", "error")
     # Account Deletion form Validation
     elif acdform.validate_on_submit():
         if current_user.email != acdform.email.data:
@@ -85,6 +76,16 @@ def settings():
             logout_user()
             flash('Your account has been deleted.', 'info')
             return redirect(url_for('loggedout.login'))
+     # Change Password Form Validation
+    elif changePassform.validate_on_submit():
+        current = changePassform.current_password.data
+        if current_user.verify_password(current):
+            current_user.password = changePassform.new_password.data
+            db.session.commit()
+            flash(f"Successfully changed user's password.", "success")
+        else:
+            flash(f"Error changing password: Incorrect password.", "error")
+    
 
     syncs = Calendar.query.filter_by(user_id=current_user.id).order_by(Calendar.synced_at.desc()).first()
     last_synced = syncs.synced_at if syncs else "Never"
