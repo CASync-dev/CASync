@@ -117,29 +117,36 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         # fill out form and submit
         #start and end need to be in the future for the calendar to accept them, so we set them to be 1 day in the future, skipping satuday and sunday.
         # if skipping sat or sun, need to navigate to next week then check for the event there, otherwise check for it in the current week
-        target = datetime.now() + timedelta(days=1)
-        is_next_week = False
+        today = datetime.now()
+        target = today + timedelta(days=1)
+        # add days until the target is a weekday
         while target.weekday() >= 5:  # 5=Sat, 6=Sun
             target += timedelta(days=1)
-            is_next_week = True
+        # Determine if target falls outside the currently displayed calendar week (Mon–Sun)
+        week_monday = today - timedelta(days=today.weekday())
+        week_sunday = week_monday + timedelta(days=6)
+        is_next_week = target.date() > week_sunday.date()
+        # set start and end time to target day at noon and 1pm, formatted as YYYY-MM-DDTHH:MM for the datetime-local input
         start_dt = target.replace(hour=12, minute=0, second=0, microsecond=0)
         end_dt = start_dt + timedelta(hours=1)
         start_str = start_dt.strftime("%Y-%m-%dT%H:%M")
         end_str = end_dt.strftime("%Y-%m-%dT%H:%M")
+        # use JS to set the values of the datetime-local inputs since send_keys doesn't work well with them
         self.driver.find_element(By.ID, 'event-title').send_keys("Selenium Test Event")
         self.driver.execute_script("document.getElementById('event-start').value = arguments[0]", start_str)
         self.driver.execute_script("document.getElementById('event-end').value = arguments[0]", end_str)
         self.driver.find_element(By.ID, 'submit-event-btn').click()
-        #check modal closes
+        # check modal closes
         WebDriverWait(self.driver, timeout=10).until(
             EC.invisibility_of_element((By.ID, 'drawer'))
         )
-        # if the event is in the next week, navigate to next week and check for it there, otherwise check for it in the current week
+        # navigate to next week if the event was created there
         if is_next_week:
             self.driver.find_element(By.ID, 'btn-next-week').click()
-            WebDriverWait(self.driver, timeout=10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "[data-event-id][data-col]"))
-            )
+        # always wait for the event to appear before asserting
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "[data-event-id][data-col]"))
+        )
         events = self.driver.find_elements(By.CSS_SELECTOR, "[data-event-id][data-col]")
         self.assertEqual(len(events), 1)
         self.assertIn("Selenium Test Event", events[0].text)
