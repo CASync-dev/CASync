@@ -45,14 +45,14 @@ The general flow of it is:
   <div class="sticky top-0 z-20 bg-stone-50 -mr-2 pr-2">
     <!-- Calendar Header: Contains title and new activity button -->
     <div
-      class="flex flex-col md:flex-row max-md:gap-3 items-center justify-between py-4"
+      class="flex flex-col md:flex-row max-md:gap-2 max-md:items-start items-center justify-between pt-3 pb-2 md:py-4"
     >
       <!-- Calendar Icon and Current Date Display -->
-      <div class="flex items-center gap-4">
-        <i class="fa-solid fa-calendar-days text-gray-400 text-2xl"></i>
+      <div class="flex items-center gap-3 md:gap-4">
+        <i class="fa-solid fa-calendar-days text-gray-400 text-xl md:text-2xl"></i>
         <h6
           id="calendar-title"
-          class="text-xl leading-8 font-semibold text-gray-900"
+          class="text-base md:text-xl leading-6 md:leading-8 font-semibold text-gray-900"
         >
           Today, Month YYYY
         </h6>
@@ -88,24 +88,26 @@ The general flow of it is:
     </div>
 
     <!-- Week navigation buttons -->
-    <div class="flex justify-between py-2">
+    <div class="flex justify-between items-center gap-2 py-2">
       <button
         id="btn-last-week"
-        class="btn-primary flex gap-2 transition-all duration-300"
+        class="btn-primary flex gap-2 transition-all duration-300 max-md:py-2 max-md:px-3 max-md:text-sm max-md:mx-0"
       >
-        < Last week
+        <span class="hidden sm:inline">< Last week</span>
+        <span class="sm:hidden">< Prev</span>
       </button>
       <button
         id="btn-today"
-        class="btn-plain hidden bg-emerald-500 flex items-center py-3 gap-2 text-white transition-all duration-300 hover:bg-emerald-700 shadow-dark shadow-md"
+        class="btn-plain hidden bg-emerald-500 flex items-center py-3 gap-2 text-white transition-all duration-300 hover:bg-emerald-700 shadow-dark shadow-md max-md:py-2 max-md:px-3 max-md:text-sm max-md:mx-0"
       >
         Today
       </button>
       <button
         id="btn-next-week"
-        class="btn-primary flex gap-2 transition-all duration-300"
+        class="btn-primary flex gap-2 transition-all duration-300 max-md:py-2 max-md:px-3 max-md:text-sm max-md:mx-0"
       >
-        Next week >
+        <span class="hidden sm:inline">Next week ></span>
+        <span class="sm:hidden">Next ></span>
       </button>
     </div>
 
@@ -129,7 +131,7 @@ The general flow of it is:
 
   <!-- Calendar Grid Container -->
   <div class="relative">
-    <div id="grid-scroll" class="overflow-x-auto}">
+    <div id="grid-scroll" class="overflow-x-auto">
       <!--  Calendar Grid -->
       <!-- Grid structure: 6 columns (time + 5 weekdays), multiple rows for time slots -->
       <!-- Time range: 07:00 am to 06:00 pm -->
