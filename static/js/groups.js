@@ -106,6 +106,7 @@ function addGroupToPage(group) {
     .map((member) => {
       return `
       <img
+        id = "${member.username}-avatar"
         src = "${member.pfp}"
         class = "w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
         alt = "${member.username}'s profile picture"
@@ -128,7 +129,7 @@ function addGroupToPage(group) {
         </p>
 
         <!-- Member Avatars -->
-        <div class = "flex items-center mt-2">
+        <div id="group-member-avatars" class = "flex items-center my-2 group-avatars">
           ${memberAvatars}
         </div>
       </div>

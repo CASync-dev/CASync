@@ -543,6 +543,22 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         return WebDriverWait(self.driver, timeout=10).until(
                 EC.invisibility_of_element_located((By.ID, 'select-friend'))
             )
+    
+    def add_friends_to_user(self):
+        # Add two friends to test database for gerald, then refresh the page (Yoinked from friends test)
+        user2 = User(username="Mkgee", email="mkgee@example.com", id=67, password="foo")
+        user3 = User(username="Soul Wun", email="soulwun@example.com", id=69, password="foo")
+        db.session.add(user2)
+        db.session.add(user3)
+        db.session.commit()
+        friendship1 = Friendship(sender_id=1, recipient_id=user2.id,status='accepted')
+        friendship2 = Friendship(sender_id=user3.id, recipient_id=1,status='accepted')
+        db.session.add(friendship1)
+        db.session.add(friendship2)
+        db.session.commit()
+        self.driver.refresh()
+
+        return user2, user3
 
     # ---------------- #       
 
@@ -619,6 +635,21 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         for btn in buttons:
             self.assertTrue(btn.is_displayed())
             self.assertTrue(btn.is_enabled())
+
+        # Check if avatars of each member exists
+        # group_avatars = self.driver.find_element(By.ID, 'group-member-avatars')
+        member_avatars = WebDriverWait(self.driver, 10).until(
+            lambda d: d.find_element(By.ID, "group-member-avatars").find_elements(By.TAG_NAME, "img")
+        )
+
+        avatar_id = [img.get_attribute("id") for img in member_avatars]
+
+        self.assertEqual(len(member_avatars), 1)
+        self.assertIn('gerald-avatar', avatar_id)
+
+        # Check if avatars are visible
+        for avatar in member_avatars:
+            self.assertTrue(avatar.is_displayed())
         
     def test_groups_leave_group(self):
         # Create a group
@@ -658,18 +689,127 @@ class PrivateSeleniumTests(BaseSeleniumTest):
             EC.invisibility_of_element_located((By.ID, f'group-{myGroupId}'))
         )
 
-    
+    def test_group_create_with_friends(self):
+        # Go to groups page and add friends to gerald
+        self.go_to_groups_page()
+        user2, user3 = self.add_friends_to_user()
+
+        # Open select friend modal and wait until friends pop up in search results
+        self.open_select_friend_modal()
+        WebDriverWait(self.driver, timeout=10).until(
+            lambda driver: len(driver.find_elements(By.CSS_SELECTOR, "#friend-search-results li")) > 0
+        )
+        friends_search_result = self.driver.find_element(By.ID, 'friend-search-results')
+
+        # Add friends to group
+        friends_search_result.find_element(By.ID, user2.username).click()
+        friends_search_result.find_element(By.ID, user3.username).click()
+
+        # Create the group
+        self.driver.find_element(By.ID, 'friend-search-submit').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element_located((By.ID, 'select-friend'))
+        )
+
+        # Check if group is created
+        group_name = 'My Group'
+        group_id = 1 # first group created, should have id = 1
+        my_group = WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, f'group-{group_id}'))
+        )
+
+        self.assertIn(group_name, my_group.text)
+
+        buttons = my_group.find_elements(By.TAG_NAME, 'button')
+        button_texts = [btn.text for btn in buttons]
+        self.assertEqual(len(buttons), 3)
+        self.assertIn("Leave", button_texts)
+        self.assertIn("Schedule", button_texts)
+
+        for btn in buttons:
+            self.assertTrue(btn.is_displayed())
+            self.assertTrue(btn.is_enabled())
+
+        # Check if avatars of each member exists
+        # group_avatars = self.driver.find_element(By.ID, 'group-member-avatars')
+        member_avatars = WebDriverWait(self.driver, 10).until(
+            lambda d: d.find_element(By.ID, "group-member-avatars").find_elements(By.TAG_NAME, "img")
+        )
+
+        avatar_id = [img.get_attribute("id") for img in member_avatars]
+
+        self.assertEqual(len(member_avatars), 3)
+        self.assertIn('gerald-avatar', avatar_id)
+        self.assertIn(f'{user2.username}-avatar', avatar_id)
+        self.assertIn(f'{user3.username}-avatar', avatar_id)
+
+        # Check if avatars are visible
+        for avatar in member_avatars:
+            self.assertTrue(avatar.is_displayed())
+
+    def test_group_details(self):
+        # Go to groups page and add friends to gerald
+        self.go_to_groups_page()
+        user2, user3 = self.add_friends_to_user()
+
+        # Open select friend modal and wait until friends pop up in search results
+        self.open_select_friend_modal()
+        WebDriverWait(self.driver, timeout=10).until(
+            lambda driver: len(driver.find_elements(By.CSS_SELECTOR, "#friend-search-results li")) > 0
+        )
+        friends_search_result = self.driver.find_element(By.ID, 'friend-search-results')
+
+        # Add friends to group
+        friends_search_result.find_element(By.ID, user2.username).click()
+        friends_search_result.find_element(By.ID, user3.username).click()
+
+        # Create the group
+        self.driver.find_element(By.ID, 'friend-search-submit').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element_located((By.ID, 'select-friend'))
+        )
+
+        # Check if group is created
+        group_name = 'My Group'
+        group_id = 1 # first group created, should have id = 1
+        my_group = WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, f'group-{group_id}'))
+        )
+        self.assertIn(group_name, my_group.text)
+
+        # Check if buttons exist
+        buttons = my_group.find_elements(By.TAG_NAME, 'button')
+        for btn in buttons:
+            self.assertTrue(btn.is_displayed())
+            self.assertTrue(btn.is_enabled())
+
+        # Go to group details
+        self.driver.find_element(By.ID, f'btn-groups-details-{group_id}').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'group-details'))
+        )
+
+        # Wait until all members pop up
+        WebDriverWait(self.driver, timeout=10).until(
+            lambda driver: len(driver.find_elements(By.CSS_SELECTOR, '#add-members-list li')) == 3
+        )
+
+        members_list = self.driver.find_element(By.ID, 'add-members-list').find_elements(By.TAG_NAME, 'li')
+        self.assertEqual(len(members_list), 3)
+
+
+        # Check if image is displayed
+        for li in members_list:
+            self.assertTrue(li.find_element(By.TAG_NAME, 'img').is_displayed)
+
+        # Close group details
+        self.driver.find_element(By.ID, 'btn-close-group-details').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element_located((By.ID, 'group-details'))
+        )
 
 
 
-
-
-
-
-        
-        
-
-        
         
 
     # ------------------------------------------------------------------------------------------------------- #

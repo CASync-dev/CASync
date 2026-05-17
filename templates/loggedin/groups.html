@@ -32,10 +32,11 @@
                 <p class="text-xl font-medium">{{ group.group_name }}</p>
 
                 <!-- Member Avatars -->
-                <div class="flex items-center my-2 group-avatars">
+                <div id="group-member-avatars" class="flex items-center my-2 group-avatars">
                   {# For the first 8 members of the group, after show a +n #}
                   {% for user in group.members[:8] %}
                     <img
+                      id="{{ user.username }}-avatar"
                       src="{{ user.avatar(200) }}"
                       class="w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
                       alt="{{ user.username }}'s profile picture"
@@ -379,6 +380,7 @@
                 ></h2>
               </div>
               <button
+                id="btn-close-group-details"
                 onclick="closeGroupDetail()"
                 class="w-10 h-10 rounded-full transition-smooth flex items-center justify-center"
               >
