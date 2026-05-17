@@ -68,5 +68,5 @@ CMD ["sh", "-c", "exec gunicorn \
   --access-logfile - \
   --error-logfile - \
   --log-level info \
-  --access-logformat '%(h)s \"%(r)s\" %(s)s %(b)s %(L)ss \"%(f)s\" \"%(a)s\"' \
+  --access-logformat '%(h)s xff=%({X-Forwarded-For}i)s xri=%({X-Real-IP}i)s xfp=%({X-Forwarded-Proto}i)s \"%(r)s\" %(s)s %(b)s %(L)ss \"%(f)s\" \"%(a)s\"' \
   wsgi:app"]
