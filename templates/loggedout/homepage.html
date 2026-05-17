@@ -62,7 +62,7 @@
           </div>
         </div>
       </div>
-      <!--  -->
+      <!-- Groups and friends section -->
       <div class="container-layout">
         <div class="container-spacing flex flex-col lg:flex-row items-center lg:items-start gap-5">
           <div class="flex flex-col gap-3 md:w-1/2">
@@ -80,6 +80,34 @@
               class="max-w-xl w-full object-contain border border-gray-200 rounded-2xl "
               alt="Promo picture of a timetable in the app"
             />
+          </div>
+        </div>
+      </div>
+      <!-- Schedule page section-->
+      <div class="bg-midgray w-full">
+        <div class="container-layout">
+          <div class="container-spacing flex flex-col lg:flex-row lg:items-start gap-8">
+            <!-- Currently using a temporary image; Image to be changed-->
+            <div
+              class="flex justify-center lg:justify-end mt-8 md:mt-0"
+            >
+              <img  
+                src="{{ url_for('static', filename='images/schedule_create_event.png') }}"
+                class=" max-w-xl w-full object-contain border border-gray-200 rounded-2xl"
+                alt="Promo picture of two timetables"
+              />
+            </div>
+            <!-- Text content for summary -->
+            <div class="flex flex-col gap-2 md:w-1/2">
+              <h1 class="text-3xl mb-4">View and manage your schedule</h1>
+              <p class = "text-md">The traditional schedule view plus powerful management features:</p>
+              <ul class="list-disc pl-5">
+              <li>View your full timetable at a glance</li>
+              <li>Add your own classes and events</li>
+              <li>Mark whether you're attending or skipping classes</li>
+              <li>Delete events you no longer need</li>
+            </ul>
+            </div>
           </div>
         </div>
       </div>
