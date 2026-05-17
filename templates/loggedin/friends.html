@@ -24,7 +24,11 @@
           command="show-modal"
           commandfor="friend-requests-modal"
         >
-          Friend Requests ({{ friend_requests|length }})
+          Friend Requests:
+          <span {% if friend_requests|length > 0 %}class="text-white bg-red-500 rounded-full px-1 font-semibold"{% endif %}>
+            {{ friend_requests|length }}
+          </span>
+          
         </button>
         <button
           class="btn-primary shadow-black max-sm:w-full px-4 ml-auto mr-2 max-sm:ml-0 max-sm:mr-0 h-10 whitespace-nowrap cursor-pointer"
