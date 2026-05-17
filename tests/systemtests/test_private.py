@@ -8,7 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from tests.systemtests.base import BaseSeleniumTest, localHost
 
 from app import db
-from app.models import Event, User, Friendship
+from app.models import Event, User, Friendship, Group, user_group_association
 from datetime import datetime, timedelta, timezone
 
 # extends the BaseSeleniumTest class, which sets up the testing var for selenium
@@ -28,12 +28,16 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         )
 
     def tearDown(self):
+        # delete association rows first
+        db.session.execute(user_group_association.delete())
         # delete any events created during the test so each test starts with a clean slate
         Event.query.delete()
         # delete any users created during the test except for gerald (id=1) who is needed to log in and access the authenticated pages
         User.query.filter(User.id != 1).delete()
         # delete any friendships created during the test
         Friendship.query.delete()
+        # delete any group events cerated during testing
+        Group.query.delete()
         
         db.session.commit()
         # logout after each test to ensure a clean slate for the next one
@@ -753,9 +757,10 @@ class PrivateSeleniumTests(BaseSeleniumTest):
 
         # Open select friend modal and wait until friends pop up in search results
         self.open_select_friend_modal()
-        WebDriverWait(self.driver, timeout=10).until(
-            lambda driver: len(driver.find_elements(By.CSS_SELECTOR, "#friend-search-results li")) > 0
+        members_list = WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_all_elements_located((By.CSS_SELECTOR, "#friend-search-results li"))
         )
+        self.assertEqual(len(members_list), 2)
         friends_search_result = self.driver.find_element(By.ID, 'friend-search-results')
 
         # Add friends to group
