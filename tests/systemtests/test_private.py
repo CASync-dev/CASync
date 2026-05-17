@@ -257,9 +257,12 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         self.driver.execute_script("arguments[0].click()", card)
         btn = self.driver.find_element(By.ID, 'going-toggle-btn')
         self.driver.execute_script("arguments[0].click()", btn)
-        # wait for the calendar to re-render with the updated going status (fetch is async)
+        # wait for the calendar to re-render with the updated going status (fetch is async).
+        # Button class flips to bg-green-500 when going toggles to false (use that to detect change)
         WebDriverWait(self.driver, timeout=10).until(
-            EC.element_to_be_clickable((By.ID, 'going-toggle-btn'))
+            EC.text_to_be_present_in_element_attribute(
+                (By.ID, 'going-toggle-btn'), 'class', 'bg-green-500'
+            )
         )
         event = Event.query.filter_by(title="Test Event").first()
         self.assertFalse(event.going)
