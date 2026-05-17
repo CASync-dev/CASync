@@ -936,13 +936,21 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         eventSpan = self.driver.find_element(By.ID, '1eventtimespan')
 
         self.assertIn('RIGHT NOW', untilMin.text)
-        starttimeformat = datetime.strftime(start, '%I:%M %p')
-        endtimeformat = datetime.strftime(end, '%I:%M %p')
-        self.assertIn(starttimeformat, untilMin.text)
+        period = datetime.strftime(start, '%p')
+        hr = start.hour
+        if (start.hour > 12): # Scuffed way to getting 12 hour format for hour but it works.
+            hr = start.hour-12
+        starttimeformat = f'{hr}:{start.minute} {period}'
+        period = datetime.strftime(end, '%p')
+        hr = end.hour
+        if (end.hour > 12): # Scuffed way to getting 12 hour format for hour but it works.
+            hr = end.hour-12
+        endtimeformat = f'{hr}:{end.minute} {period}'
 
         self.assertEqual('Existing event', eventTitle.text)
-        span = starttimeformat + ' – ' + endtimeformat
-        self.assertEqual(span, eventSpan.text)
+        span = "Starts at " + starttimeformat + ' and ends at ' + endtimeformat
+        self.assertIn(span, eventSpan.text)
+        self.assertIn('@ Room 101', eventSpan.text)
 
         # Rest of event rendering tests done in unittests.
 

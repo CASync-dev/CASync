@@ -307,10 +307,10 @@ function bigCard(nextEvent) {
   bigCardEl.innerHTML = `
     <div class="flex items-center justify-between gap-4 mb-2">
       <h3 class="text-lg font-medium text-gray-500">NEXT EVENT</h3>
-      <p class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-lg text-gray-700 shrink-0">${timeLabel}</p>
+      <p id = "untilevent${nextEvent.id}"class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-lg text-gray-700 shrink-0">${timeLabel}</p>
     </div>
-    <h2 class="text-4xl ${colors.text} flex-1 mb-2">${nextEvent.title}</h2>
-    <p class="text-xl ${colors.text} space-y-4 mb-4">
+    <h2 id = "${nextEvent.id}eventtitle" class="text-4xl ${colors.text} flex-1 mb-2">${nextEvent.title}</h2>
+    <p id = "${nextEvent.id}eventtimespan"class="text-xl ${colors.text} space-y-4 mb-4">
        Starts at ${startTime} and ends at ${endTime} <br />
       <span class="text-lg ${colors.text} shrink-0  rounded-2xl p-2">${durationLabel}</span>
       <span class="text-lg ${colors.text} shrink-0  rounded-2xl p-2">${locationOrStatus}</span>
