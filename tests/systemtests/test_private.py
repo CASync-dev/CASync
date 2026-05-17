@@ -1,3 +1,4 @@
+import os
 import time
 from datetime import datetime
 from selenium.webdriver.common.by import By
@@ -7,7 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from tests.systemtests.base import BaseSeleniumTest, localHost
 
 from app import db
-from app.models import Event
+from app.models import Event, User, Friendship
 from datetime import datetime, timedelta, timezone
 
 # extends the BaseSeleniumTest class, which sets up the testing var for selenium
@@ -29,23 +30,17 @@ class PrivateSeleniumTests(BaseSeleniumTest):
     def tearDown(self):
         # delete any events created during the test so each test starts with a clean slate
         Event.query.delete()
+        # delete any users created during the test except for gerald (id=1) who is needed to log in and access the authenticated pages
+        User.query.filter(User.id != 1).delete()
+        # delete any friendships created during the test
+        Friendship.query.delete()
+        
         db.session.commit()
         # logout after each test to ensure a clean slate for the next one
         self.driver.find_element(By.ID, 'logout').click()
         WebDriverWait(self.driver, timeout=10).until(
             EC.url_contains("/login")
         )
-
-    # ------------------------------------------------------------------------------------------------------- #
-    # DASH #
-    # ------------------------------------------------------------------------------------------------------- #
-
-    def test_dash(self):
-        pass
-
-    # ------------------------------------------------------------------------------------------------------- #
-    # SCHEDULE #
-    # ------------------------------------------------------------------------------------------------------- #
 
     def test_schedule_navigation(self):
         # click schedule link
@@ -119,32 +114,37 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         )
         # fill out form and submit
         #start and end need to be in the future for the calendar to accept them, so we set them to be 1 day in the future, skipping satuday and sunday.
-        # if skipping sat or sun, need to navigate to next week then check for the event
-        starts = time.time() + 24*60*60
-        is_next_week = False
-        if time.localtime(starts).tm_wday == 5: # saturday
-            starts += 2*24*60*60
-            is_next_week = True
-        elif time.localtime(starts).tm_wday == 6: # sunday
-            starts += 24*60*60
-            is_next_week = True
-        ends = starts + 60*60
-        start_str = time.strftime("%Y-%m-%dT%H:%M", time.localtime(starts))
-        end_str = time.strftime("%Y-%m-%dT%H:%M", time.localtime(ends))
+        # if skipping sat or sun, need to navigate to next week then check for the event there, otherwise check for it in the current week
+        today = datetime.now()
+        target = today + timedelta(days=1)
+        # add days until the target is a weekday
+        while target.weekday() >= 5:  # 5=Sat, 6=Sun
+            target += timedelta(days=1)
+        # Determine if target falls outside the currently displayed calendar week (Mon–Sun)
+        week_monday = today - timedelta(days=today.weekday())
+        week_sunday = week_monday + timedelta(days=6)
+        is_next_week = target.date() > week_sunday.date()
+        # set start and end time to target day at noon and 1pm, formatted as YYYY-MM-DDTHH:MM for the datetime-local input
+        start_dt = target.replace(hour=12, minute=0, second=0, microsecond=0)
+        end_dt = start_dt + timedelta(hours=1)
+        start_str = start_dt.strftime("%Y-%m-%dT%H:%M")
+        end_str = end_dt.strftime("%Y-%m-%dT%H:%M")
+        # use JS to set the values of the datetime-local inputs since send_keys doesn't work well with them
         self.driver.find_element(By.ID, 'event-title').send_keys("Selenium Test Event")
         self.driver.execute_script("document.getElementById('event-start').value = arguments[0]", start_str)
         self.driver.execute_script("document.getElementById('event-end').value = arguments[0]", end_str)
         self.driver.find_element(By.ID, 'submit-event-btn').click()
-        #check modal closes
+        # check modal closes
         WebDriverWait(self.driver, timeout=10).until(
             EC.invisibility_of_element((By.ID, 'drawer'))
         )
-        # if the event is in the next week, navigate to next week and check for it there, otherwise check for it in the current week
+        # navigate to next week if the event was created there
         if is_next_week:
             self.driver.find_element(By.ID, 'btn-next-week').click()
-            WebDriverWait(self.driver, timeout=10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "[data-event-id][data-col]"))
-            )
+        # always wait for the event to appear before asserting
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "[data-event-id][data-col]"))
+        )
         events = self.driver.find_elements(By.CSS_SELECTOR, "[data-event-id][data-col]")
         self.assertEqual(len(events), 1)
         self.assertIn("Selenium Test Event", events[0].text)
@@ -255,9 +255,242 @@ class PrivateSeleniumTests(BaseSeleniumTest):
     # FRIENDS #
     # ------------------------------------------------------------------------------------------------------- #
 
-    def test_friends(self):
-        pass
+    def test_friends_search(self):
+        self.driver.find_element(By.ID, 'nav-friends').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/friends")
+        )
+        # add two friends to test database for gerald, then refresh the page and check that they appear in the search results when typing their names into the search box
+        user2 = User(username="Mkgee", email="mkgee@example.com", id=67, password="foo")
+        user3 = User(username="Soul Wun", email="soulwun@example.com", id=69, password="foo")
+        db.session.add(user2)
+        db.session.add(user3)
+        db.session.commit()
+        friendship1 = Friendship(sender_id=1, recipient_id=user2.id,status='accepted')
+        friendship2 = Friendship(sender_id=user3.id, recipient_id=1,status='accepted')
+        db.session.add(friendship1)
+        db.session.add(friendship2)
+        db.session.commit()
+        self.driver.refresh()
+        #check friends load
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 2)
+        # check that the search box is present and can be typed into
+        search_box = self.driver.find_element(By.ID, 'friend-search-input')
+        search_box.send_keys("Mkgee")
+        self.assertEqual(search_box.get_attribute("value"), "Mkgee")
+        #check only the searched friend appears
+        visible_friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend:not(.hidden)")
 
+        self.assertIn("Mkgee", visible_friends[0].text)
+        #clear search and check both friends appear again
+        search_box.clear()
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 2)
+        #search for the other friend and check it appears
+        search_box.send_keys("Soul Wun")
+        self.assertEqual(search_box.get_attribute("value"), "Soul Wun")
+        visible_friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend:not(.hidden)")
+        self.assertEqual(len(visible_friends), 1) # only soul wun should appear
+        self.assertIn("Soul Wun", visible_friends[0].text)
+
+    def test_friends_add(self):
+        self.driver.find_element(By.ID, 'nav-friends').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/friends")
+        )
+        # add a user to the test database
+        user2 = User(username="Mkgee", email="mkgee@example.com", id=67, password="foo")
+        db.session.add(user2)
+        db.session.commit()
+        #open add friend modal
+        self.driver.find_element(By.ID, 'add-friend-menu-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'add-friend-modal'))
+        )
+        # type user email and submit search
+        self.driver.find_element(By.ID, 'user-search-input').send_keys("mkgee@example.com")
+        self.driver.find_element(By.ID, 'submit-search-friends-btn').click()
+        # wait for search results to appear and check that the searched user appears
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".friend-result"))
+        )
+        friend_results = self.driver.find_elements(By.CSS_SELECTOR, ".friend-result")
+        self.assertEqual(len(friend_results), 1)
+        self.assertIn("Mkgee", friend_results[0].text)
+        # refresh the page and reopen the modal to search for the users username instead of email, check the search still works
+        self.driver.refresh()
+        self.driver.find_element(By.ID, 'add-friend-menu-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'add-friend-modal'))
+        )
+        self.driver.find_element(By.ID, 'user-search-input').send_keys("Mkgee")
+        self.driver.find_element(By.ID, 'submit-search-friends-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".friend-result"))
+        )
+        friend_results = self.driver.find_elements(By.CSS_SELECTOR, ".friend-result")
+        self.assertEqual(len(friend_results), 1)
+        self.assertIn("Mkgee", friend_results[0].text)
+
+        # click the add friend button and check it changes to sent
+        add_btn = friend_results[0].find_element(By.XPATH, ".//button[contains(@id, 'add-friend-btn')]")
+        add_btn.click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.text_to_be_present_in_element((By.XPATH, ".//button[contains(@id, 'add-friend-btn')]"), "Request Sent")
+        )
+        self.assertEqual(add_btn.text, "Request Sent")
+        # close the friend modal 
+        self.driver.find_element(By.ID, 'close-add-friend-modal-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'add-friend-modal'))
+        )
+        # set the friendship to accepted in the database, refresh the page, and check that the new friend appears in the friends list
+        friendship = Friendship(sender_id=1, recipient_id=user2.id,status='accepted')
+        db.session.add(friendship)
+        db.session.commit()
+        self.driver.refresh()
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 1)
+        self.assertIn("Mkgee", friends[0].text)
+
+    def test_friends_requests(self):
+        self.driver.find_element(By.ID, 'nav-friends').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/friends")
+        )
+        # add a user and a pending friend request to the test database, then refresh the page and check that the friend request appears in the friend requests section
+        user2 = User(username="Mkgee", email="mkgee@example.com", id=67, password="foo")
+        db.session.add(user2)
+        db.session.commit()
+        friendship = Friendship(sender_id=user2.id, recipient_id=1, status='pending')
+        db.session.add(friendship)
+        db.session.commit()
+        self.driver.refresh()
+        # open friend request modal)
+        self.driver.find_element(By.ID, 'friend-requests-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend-requests-modal'))
+        )
+        # check that the friend request appears with the correct username
+        request_elements = self.driver.find_elements(By.CSS_SELECTOR, ".friend-request")
+        
+        self.assertEqual(len(request_elements), 1)
+        self.assertIn("Mkgee", request_elements[0].text)
+        # click the accept button and check that the request is removed from the pending requests and appears in the friends list
+        self.driver.find_element(By.ID,'accept-friend-request-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element(request_elements[0])
+        )
+        # check modal closes
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'friend-requests-modal'))
+        )
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 1)
+        self.assertIn("Mkgee", friends[0].text)
+        # set another pending friend request in the database, refresh, click the reject button
+        user3 = User(username="Soul Wun", email="soulwun@example.com", id=68, password="foo")
+        db.session.add(user3)
+        db.session.commit()
+        friendship2 = Friendship(sender_id=user3.id, recipient_id=1, status='pending')
+        db.session.add(friendship2)
+        db.session.commit()
+        self.driver.refresh()
+        self.driver.find_element(By.ID, 'friend-requests-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend-requests-modal'))
+        )
+        request_elements = self.driver.find_elements(By.CSS_SELECTOR, ".friend-request")
+        self.assertEqual(len(request_elements), 1)
+        self.assertIn("Soul Wun", request_elements[0].text)
+        self.driver.find_element(By.ID,'reject-friend-request-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element(request_elements[0])
+        )
+        # close modal and check the rejected friend does not appear in the friends list
+        self.driver.find_element(By.ID, 'close-friend-requests-modal-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'friend-requests-modal'))
+        )
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 1) # only mkgee should be in the friends list, soul wun should be rejected
+        self.assertIn("Mkgee", friends[0].text)
+
+    def test_friends_remove(self):
+        self.driver.find_element(By.ID, 'nav-friends').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/friends")
+        )
+        # add a friend to the test database, refresh the page, check that they appear in the friends list, click the remove button, and check that they are removed from the friends list
+        user2 = User(username="Mkgee", email="mkgee@example.com", id=67, password="foo")
+        db.session.add(user2)
+        db.session.commit()
+        friendship = Friendship(sender_id=1, recipient_id=user2.id,status='accepted')
+        db.session.add(friendship)
+        db.session.commit()
+        self.driver.refresh()
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 1)
+        self.assertIn("Mkgee", friends[0].text)
+        self.driver.find_element(By.ID, 'remove-friend-btn').click()
+        #check confirmation modal appears, click confirm, and check modal closes
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'remove-confirmation'))
+        )
+        self.driver.find_element(By.ID, 'confirm-delete-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'remove-confirmation'))
+        )
+        # check friend is gone
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 0)
+
+    def test_friends_schedule(self):
+        # nav to friedns page
+        self.driver.find_element(By.ID, 'nav-friends').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/friends")
+        )
+        # add a friend and an event for that friend to the test database
+        user2 = User(username="Mkgee", email="mkgee@example.com", id=67, password="foo")
+        db.session.add(user2)
+        db.session.commit()
+        friendship = Friendship(sender_id=1, recipient_id=user2.id,status='accepted')
+        db.session.add(friendship)
+        db.session.commit()
+        now = datetime.now(timezone.utc)
+        monday = now - timedelta(days=now.weekday())
+        start_time = (monday + timedelta(days=2)).replace(hour=12, minute=0, second=0, microsecond=0)
+        end_time = start_time + timedelta(hours=1)
+        event = Event(title="Mkgee's Event", start_time=start_time, end_time=end_time, user_id=user2.id)
+        db.session.add(event)
+        db.session.commit()
+        self.driver.refresh()
+        # check the friend appears in the friends list and click the button to view their schedule
+        friends = self.driver.find_elements(By.CSS_SELECTOR, ".friend")
+        self.assertEqual(len(friends), 1)
+        self.assertIn("Mkgee", friends[0].text)
+        self.driver.find_element(By.ID, 'view-schedule-btn').click()
+        # check modal opens
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend-schedule-modal'))
+        )
+        # check the modal title contains the friends name
+        self.assertIn("Mkgee's Schedule", self.driver.find_element(By.ID, 'friend-schedule-title').text)
+        # check the event appears in the friend's schedule
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "#friend-schedule-modal [data-event-id][data-col]"))
+        )
+        events = self.driver.find_elements(By.CSS_SELECTOR, "#friend-schedule-modal [data-event-id][data-col]")
+        self.assertEqual(len(events), 1)
+        self.assertIn("Mkgee's Event", events[0].text)
+        # close the modal and check it closes
+        self.driver.find_element(By.ID, 'close-friend-schedule-btn').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'friend-schedule-modal'))
+        )
+        
     # ------------------------------------------------------------------------------------------------------- #
     # GROUPS #
 
@@ -571,7 +804,9 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         numcal = self.driver.find_element(By.ID, 'sync-button')
         self.assertIn('Sync (1) cals', numcal.text)
         self.driver.find_element(By.ID, 'sync-button').click()
-        syncmsg = self.driver.find_element(By.ID, 'syncmsg')
+        syncmsg = WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'syncmsg'))
+        )
         self.assertEqual(syncmsg.text, 'Successfully synced calendar. 0 events created, 0 events updated.')
 
         self.driver.find_element(By.ID, 'ical_url').clear()
@@ -690,6 +925,348 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         self.driver.find_element(By.ID, 'repeat_new').send_keys('P@ssw01d')
 
         self.driver.find_element(By.ID, 'changepasssubmit').click()
+
+    def test_settings_delacc(self):
+        '''
+        Tests account deletion api.
+        Since not having the base acc will break everything,
+        we'll create a new account for the purposes of deleting it :)
+        '''
+        self.driver.find_element(By.ID, 'logout').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/login")
+        )
+        self.driver.find_element(By.ID, 'register').click() # Navigate to register; we're going to make a new acc to delete!
+        self.driver.find_element(By.ID, 'email').send_keys("newuser@example.com")
+        self.driver.find_element(By.ID, 'username').send_keys("newuser")
+        self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
+        self.driver.find_element(By.ID, 'repeat_password').send_keys("Newpassword1234!")
+        self.driver.find_element(By.ID, 'log').click()
+        # check url is dash
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/dash")
+        )
+        self.driver.find_element(By.ID, 'nav-settings').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+        self.driver.find_element(By.ID, 'delaccbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'deleteacc-modal'))
+        )
+        self.driver.find_element(By.ID, 'closeaccdelbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'deleteacc-modal'))
+        )
+        self.driver.find_element(By.ID, 'delaccbutton').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'deleteacc-modal'))
+        )
+        self.driver.find_element(By.ID, 'accdelemail').send_keys("newuser@example.com")
+        self.driver.find_element(By.ID, 'accdeluser').send_keys("newuser")
+        self.driver.find_element(By.ID, 'accdelpass').send_keys("Newpassword1234!")
+
+        self.driver.find_element(By.ID, 'accdelsubmit').click()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/login")
+        )
+        msg = self.driver.find_element(By.ID, 'msg')
+        self.assertEqual(msg.text, 'Your account has been deleted.')
+
+        # Check if acc is really gone
+        self.driver.find_element(By.ID, 'username').send_keys("newuser")
+        self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
+
+        self.driver.find_element(By.ID, 'log').click()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/login")
+        )
+
+        msg = self.driver.find_element(By.ID, 'msg')
+        self.assertEqual(msg.text, 'Invalid username or password')
+
+        # Login to base to continue with other tests.
+        self.driver.find_element(By.ID, 'username').clear()
+        self.driver.find_element(By.ID, 'password').clear()
+        self.driver.find_element(By.ID, 'username').send_keys('gerald')
+        self.driver.find_element(By.ID, 'password').send_keys('P@ssw01d')
+        self.driver.find_element(By.ID, 'log').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/dash")
+        )
+
+    def test_settings_pfp(self):
+        '''
+        Tests pfps (Checking if pfp is showing, editting, removing..)
+        '''
+        self.driver.find_element(By.ID, 'nav-settings').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/settings")
+        )
+        # Check current pfp is a gravatar
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'pfp'))
+        )
+        pfpsrc = self.driver.find_element(By.ID, 'pfp').get_attribute("src")
+        self.assertEqual(pfpsrc, 'https://www.gravatar.com/avatar/2de87236b26ee45d5a84ac6730c23f71?d=identicon&s=150')
+
+        # Remove w/o pfp associated
+        self.driver.find_element(By.ID, 'openpfpmodal').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'changepfp-modal'))
+        )
+        self.driver.find_element(By.ID, 'delpfp').click()
+        error = self.driver.find_element(By.ID, 'pfperror')
+        self.assertEqual(error.text, 'Error: No profile picture associated with this account.')
+
+        # Upload img as pfp
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(base_dir, 'test_pfp.png')
+
+        self.driver.find_element(By.ID, 'newpfp').send_keys(file_path)
+        self.driver.find_element(By.ID, 'pfpupload').click()
+        error = self.driver.find_element(By.ID, 'pfperror')
+        self.assertEqual(error.text, 'Successfully changed your profile!')
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'pfp'))
+        )
+
+        pfpsrc = self.driver.find_element(By.ID, 'pfp').get_attribute("src")
+        self.assertEqual(pfpsrc, localHost + 'static/avatars/1') # 1 = user id.
+
+        # Remove custom pfp
+        self.driver.find_element(By.ID, 'delpfp').click()
+        error = self.driver.find_element(By.ID, 'pfperror')
+        self.assertEqual(error.text, 'Successfully removed your profile!')
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'pfp'))
+        )
+
+        pfpsrc = self.driver.find_element(By.ID, 'pfp').get_attribute("src")
+        self.assertEqual(pfpsrc, 'https://www.gravatar.com/avatar/2de87236b26ee45d5a84ac6730c23f71?d=identicon&s=150')
+
+        self.driver.find_element(By.ID, 'pfpclose').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element((By.ID, 'changepfp-modal'))
+        )
+
+    def test_dash(self):
+        '''
+        Checks all elements are displaying properly. Relatively shorter test since no interactivity here
+        '''
+        self.driver.find_element(By.ID, 'nav-dash').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/dash")
+        )
+        #...
+        greeting = self.driver.find_element(By.ID, 'title_username')
+        self.assertIn('Hello, gerald!', greeting.text)
+
+        # Checking clock
+        actualtime = datetime.strftime(datetime.now(), '%I:%M')
+        actualperiod = datetime.strftime(datetime.now(), '%p')
+
+        time = self.driver.find_element(By.ID, 'time')
+        self.assertEqual(actualtime, time.text)
+
+        period = self.driver.find_element(By.ID, 'period')
+        self.assertEqual(actualperiod, period.text)
+
+        # Checking date
+
+        actualweekday = datetime.strftime(datetime.now(), '%A')
+        weekday = self.driver.find_element(By.ID, 'day')
+        self.assertEqual(actualweekday, weekday.text)
+
+        actualdate = datetime.strftime(datetime.now(), '%B %d, %Y')
+        date = self.driver.find_element(By.ID, 'current-date')
+        self.assertEqual(actualdate, date.text)
+
+        # Checking events today (Should be none since we have no events!)
+        eventstoday = self.driver.find_element(By.ID,  'big-card')
+        self.assertEqual('All done! No more events today.', eventstoday.text)
+
+        # Unfortunately it'd be pretty difficult to check events today are being rendered
+        # (Esp. if the tests are run an hr from midnight)
+        # Maybe test event thats happening now?
+        start = datetime.now(tz=timezone.utc) - timedelta(minutes=2)
+        end = datetime.now(tz=timezone.utc) + timedelta(minutes=2)
+        self.event = Event(
+            title='Existing event',
+            description='Seeded event',
+            start_time=start,
+            end_time=end,
+            location='Room 101',
+            color='indigo',
+            user_id=1,
+        )
+        db.session.add(self.event)
+        db.session.commit()
+
+        start = start.astimezone()
+        end = end.astimezone()
+
+        self.driver.refresh()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'big-card'))
+        )
+
+        untilMin = self.driver.find_element(By.ID, 'untilevent1')
+        eventTitle = self.driver.find_element(By.ID, '1eventtitle')
+        eventSpan = self.driver.find_element(By.ID, '1eventtimespan')
+
+        self.assertIn('RIGHT NOW', untilMin.text)
+        period = datetime.strftime(start, '%p')
+        hr = start.hour
+        if (start.hour > 12): # Scuffed way to getting 12 hour format for hour but it works.
+            hr = start.hour-12
+        starttimeformat = f'{hr}:{start.minute} {period}'
+        period = datetime.strftime(end, '%p')
+        hr = end.hour
+        if (end.hour > 12): # Scuffed way to getting 12 hour format for hour but it works.
+            hr = end.hour-12
+        endtimeformat = f'{hr}:{end.minute} {period}'
+
+        self.assertEqual('Existing event', eventTitle.text)
+        span = "Starts at " + starttimeformat + ' and ends at ' + endtimeformat
+        self.assertIn(span, eventSpan.text)
+        self.assertIn('@ Room 101', eventSpan.text)
+
+        # Rest of event rendering tests done in unittests.
+
+        # Testing friends card
+        friendavailable = self.driver.find_element(By.ID, 'friends-list')
+        self.assertEqual('No friends :( add some friends in the friends section.', friendavailable.text)
+
+        # Some db commits:
+        friend = User(username='allen', email='friend@fun.net') # User to friend. id = 2
+        friend.password = 'bar'
+        db.session.add(friend)
+        db.session.commit()
+
+        fq = Friendship(sender_id=1, recipient_id=2, status='accepted', created_at=db.func.now(), accepted_at=db.func.now())
+        db.session.add(fq)
+        db.session.commit()
+
+        self.driver.refresh()
+
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend2'))
+        )
+
+        friendpfp = self.driver.find_element(By.ID, 'friend2pfp').get_attribute("src")
+        self.assertEqual('https://www.gravatar.com/avatar/90dae26ca1e83875794c56b583a8f940?d=identicon&s=150', friendpfp)
+        friendusername = self.driver.find_element(By.ID, 'friend2username')
+        self.assertEqual('allen', friendusername.text)
+        friendmail = self.driver.find_element(By.ID, 'friend2mail')
+        self.assertEqual('friend@fun.net', friendmail.text)
+
+        friendstatus = self.driver.find_element(By.ID, 'friend2status')
+        self.assertEqual('No more classes today', friendstatus.text)
+
+        # Testing multi-friend rendering
+        friend = User(username='bob', email='chillguy@gmail.com') # User to friend. id = 3
+        friend.password = 'bar'
+        db.session.add(friend)
+        db.session.commit()
+
+        fq = Friendship(sender_id=1, recipient_id=3, status='accepted', created_at=db.func.now(), accepted_at=db.func.now())
+        db.session.add(fq)
+        db.session.commit()
+
+        self.driver.refresh()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend2'))
+        )
+
+        friendpfp = self.driver.find_element(By.ID, 'friend2pfp').get_attribute("src")
+        self.assertEqual('https://www.gravatar.com/avatar/90dae26ca1e83875794c56b583a8f940?d=identicon&s=150', friendpfp)
+        friendusername = self.driver.find_element(By.ID, 'friend2username')
+        self.assertEqual('allen', friendusername.text)
+        friendmail = self.driver.find_element(By.ID, 'friend2mail')
+        self.assertEqual('friend@fun.net', friendmail.text)
+
+        friendstatus = self.driver.find_element(By.ID, 'friend3status')
+        self.assertEqual('No more classes today', friendstatus.text)
+
+        friendpfp = self.driver.find_element(By.ID, 'friend3pfp').get_attribute("src")
+        self.assertEqual('https://www.gravatar.com/avatar/0617ccc0cc6152aaf58197f9595c9e9d?d=identicon&s=150', friendpfp)
+        friendusername = self.driver.find_element(By.ID, 'friend3username')
+        self.assertEqual('bob', friendusername.text)
+        friendmail = self.driver.find_element(By.ID, 'friend3mail')
+        self.assertEqual('chillguy@gmail.com', friendmail.text)
+
+        friendstatus = self.driver.find_element(By.ID, 'friend3status')
+        self.assertEqual('No more classes today', friendstatus.text)
+
+        
+
+        # Test cases on friend status api done in unittest.
+        # Test javascript rendering
+        start = datetime.now(tz=timezone.utc) + timedelta(minutes=2)
+        end = datetime.now(tz=timezone.utc) + timedelta(minutes=4)
+        self.event = Event(
+            title='Friend event 1',
+            description='Seeded event',
+            start_time=start,
+            end_time=end,
+            location='Room 101',
+            color='indigo',
+            user_id=2,
+        )
+        db.session.add(self.event)
+        db.session.commit()
+
+        start = start.astimezone()
+        end = end.astimezone()
+
+        self.driver.refresh()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend2'))
+        )
+        friendstatus = self.driver.find_element(By.ID, 'friend2status')
+        self.assertEqual('Next class in 1 min', friendstatus.text) # Accounts for time passed
+        # Unfortunately we can't reliably check this if the system takes a whole min to process until here from event creation.
+
+        start = datetime.now(tz=timezone.utc) - timedelta(minutes=2)
+        end = datetime.now(tz=timezone.utc) + timedelta(minutes=2)
+        self.event = Event(
+            title='Friend event 2',
+            description='Seeded event',
+            start_time=start,
+            end_time=end,
+            location='Room 101',
+            color='indigo',
+            user_id=2,
+        )
+        db.session.add(self.event)
+        db.session.commit()
+
+        start = start.astimezone()
+        end = end.astimezone()
+
+        self.driver.refresh()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'friend2'))
+        )
+        friendstatus = self.driver.find_element(By.ID, 'friend2status')
+        self.assertEqual('In class, Ending in 1 minutes', friendstatus.text)
+
+        # Testing logo sends user to dash.
+        self.driver.find_element(By.ID, 'logonavhome').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/dash")
+        )
+
+
+
+        
+
 
         
         
