@@ -5,34 +5,31 @@
     <section class="section-layout">
       <!-- This section introduces the app -->
       <div class="container-layout">
-        <div class="container-spacing">
-          <div class="flex flex-col gap-6 md:w-1/2">
-            <h1 class="h1">
+        <div class="container-spacing flex flex-col lg:flex-row items-center gap-5">
+          <div class="flex flex-col gap-3 ">
+            <h1 class="text-5xl mb-3">
               The All-in-One Timetable
-              <br />
-              That You Need
             </h1>
-            <p class="wrap-break-word text-base">
-              Tired of not knowing your friends' schedule? Always stressed when
-              trying to compare availability and plan a meet up with your group?
-              Well, CASync is here to solve your problem! Share your timetable
-              with your friends today.
-            </p>
-            <div class="">
+            <h2 class="text-xl">For students by students</h2>
+            <ul class="list-disc pl-5">
+              <li>See your classes</li>
+              <li>Share your schedule with friends in one click</li>
+              <li>Know when your friends are free</li>
+              <li>Plan meetups and stay connected with your friends</li>
+              <li>Create and join groups with your friends</li>
+            </ul>
+            <div class="mt-4">
               <a class="btn-primary" href="{{ url_for('loggedout.register') }}">
                 Sign Up Now!
               </a>
             </div>
           </div>
-          <div class="flex justify-center lg:justify-end md:w-1/2 mt-8 md:mt-0">
-            <div class="relative aspect-square sm:w-80 md:w-96">
-              <!-- Not sure if thats the way to import images, check later?-->
-              <img
-                src="{{ url_for('static', filename='images/promo.png') }}"
-                class="h-full w-full object-cover"
-                alt="Promo picture of a timetable in the app"
-              />
-            </div>
+          <div class="flex justify-center lg:justify-end mt-8 md:mt-0 border-2 border-gray-300 rounded-2xl ">
+            <img
+              src="{{ url_for('static', filename='images/schedule.png') }}"
+              class="max-w-xl w-full object-contain rounded-2xl"
+              alt="Promo picture of a timetable in the app"
+            />
           </div>
         </div>
       </div>
