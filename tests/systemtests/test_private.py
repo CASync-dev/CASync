@@ -808,6 +808,80 @@ class PrivateSeleniumTests(BaseSeleniumTest):
             EC.invisibility_of_element_located((By.ID, 'group-details'))
         )
 
+    def test_groups_adding_friends_to_existing_group(self):
+        # Create a group
+        self.go_to_groups_page()
+        user2, user3 = self.add_friends_to_user()
+
+        self.open_select_friend_modal()
+        self.driver.find_element(By.ID, 'friend-search-submit').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element_located((By.ID, 'select-friend'))
+        )
+
+        # Wait for group to pop up
+        group_name = 'My Group'
+        group_id = 1 # first group created, should have id = 1
+        my_group = WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, f'group-{group_id}'))
+        )
+        self.assertIn(group_name, my_group.text)
+
+        # Go to group details
+        self.driver.find_element(By.ID, f'btn-groups-details-{group_id}').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.visibility_of_element_located((By.ID, 'group-details'))
+        )
+
+        # Wait until all members pop up
+        WebDriverWait(self.driver, timeout=10).until(
+            lambda driver: len(driver.find_elements(By.CSS_SELECTOR, '#add-members-list li')) == 1
+        )
+
+        # Open add member modal
+        self.driver.find_element(By.ID, 'btn-add-member-modal').click()
+        add_member_modal = WebDriverWait(self.driver, timeout=10).until(
+                EC.visibility_of_element_located((By.ID, 'select-friend'))
+            )
+        self.assertIn("Add Members to Group", add_member_modal.text)
+        self.assertIn(f"Add your friends to {group_name}", add_member_modal.text)
+
+        # Wait until buttons pop up and add friends to group
+        WebDriverWait(self.driver, timeout=10).until(
+            lambda d: len(d.find_elements(By.CSS_SELECTOR, '#friend-search-list li button')) >= 2
+        )
+        self.driver.find_element(By.ID, user2.username).click()
+        self.driver.find_element(By.ID, user3.username).click()
+        self.driver.find_element(By.ID, 'friend-search-submit').click()
+
+        # Wait for modal to close and group details to update
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element_located((By.ID, 'select-friend'))
+        )
+
+        WebDriverWait(self.driver, timeout=10).until(
+            lambda d: len(d.find_elements(By.CSS_SELECTOR, '#add-members-list li')) == 3
+        )
+
+        # Check to see that group details has updated
+        members = self.driver.find_elements(By.CSS_SELECTOR, '#add-members-list li')
+        member_texts = [member.text for member in members]
+        self.assertEqual(len(member_texts), 3)
+
+
+        avatar_imgs = self.driver.find_elements(By.CSS_SELECTOR, '#group-member-avatars img')
+        self.assertEqual(len(avatar_imgs), 3)
+
+        # Close group details
+        self.driver.find_element(By.ID, 'btn-close-group-details').click()
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.invisibility_of_element_located((By.ID, 'group-details'))
+        )
+        
+
+
+
+
 
 
         
