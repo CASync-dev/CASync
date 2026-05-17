@@ -4,14 +4,17 @@ let grouplist = [];
 
 // Functions for Group Dialog Modal
 function loadCreateGroup() {
-  const x = document.getElementById("create-group");
-  x.showModal();
+  const createGroupModal = document.getElementById("create-group");
+  createGroupModal.showModal();
 }
 function closeLoadCreateGroup() {
-  const x = document.getElementById("create-group");
+  const createGroupModal = document.getElementById("create-group");
   const errorMsg = document.getElementById("group-error-message");
+  const groupNameInput = document.getElementById("group-name-input")
+
   errorMsg.textContent = "";
-  x.close();
+  groupNameInput.value = "";
+  createGroupModal.close();
 }
 
 // Functions for Friends Dialog Modal
@@ -48,12 +51,12 @@ async function loadSelectFriends() {
 }
 
 function closeLoadSelectFriends() {
-  const x = document.getElementById("select-friend");
+  const selectFriendModal = document.getElementById("select-friend");
   // Reset all saved values.
   groupname = "";
   grouplist = [];
   window.addMemberMode = false; // reset flag
-  x.close();
+  selectFriendModal.close();
 }
 
 async function submitGroupCreation() {
@@ -103,6 +106,7 @@ function addGroupToPage(group) {
     .map((member) => {
       return `
       <img
+        id = "${member.username}-avatar"
         src = "${member.pfp}"
         class = "w-8 h-8 rounded-full -ml-2 first:ml-0 border-2 border-dark"
         alt = "${member.username}'s profile picture"
@@ -125,7 +129,7 @@ function addGroupToPage(group) {
         </p>
 
         <!-- Member Avatars -->
-        <div class = "flex items-center mt-2">
+        <div id="group-member-avatars" class = "flex items-center my-2 group-avatars">
           ${memberAvatars}
         </div>
       </div>
@@ -133,6 +137,7 @@ function addGroupToPage(group) {
 
     <!-- Buttons -->
     <button
+      id="btn-leave-group-${group.id}"
       class="btn-plain mt-2 px-3 sm:ml-auto py-2 bg-red-300 text-nearwhite rounded-lg hover:bg-red-400"
       onclick="leaveGroup(${group.id})"
     >
@@ -140,6 +145,7 @@ function addGroupToPage(group) {
       Leave
     </button>
     <button
+      id="btn-groups-schedule-${group.id}"
       class="btn-plain mt-2 px-3 py-2 bg-blue-300 text-nearwhite rounded-lg hover:bg-blue-400"
       onclick="openSchedule('${group.id}', '${group.group_name}')"
     >
@@ -147,6 +153,7 @@ function addGroupToPage(group) {
       Schedule
   </button>
   <button
+    id="btn-groups-details-${group.id}"
     class = "btn-plain bg-dark rounded-lg sm:rounded-full px-4 py-3"
     onclick = "getGroupId(${group.id}); openGroupDetail(); loadGroupMembers()">
     <i class = "fas fa-info text-nearwhite text-center"></i>
@@ -325,7 +332,7 @@ async function confirmLeaveGroup() {
     document.getElementById(`group-${groupId}`).remove();
     document.getElementById("remove-confirmation").close();
   } catch (err) {
-    console.error("Error: ", err);
+    console.error("error: ", err);
   }
 }
 
@@ -337,13 +344,13 @@ function getGroupId(groupId) {
 }
 
 async function openGroupDetail() {
-  const x = document.getElementById("group-details");
-  x.showModal();
+  const groupDetailModal = document.getElementById("group-details");
+  groupDetailModal.showModal();
 }
 
 function closeGroupDetail() {
-  const x = document.getElementById("group-details");
-  x.close();
+  const groupDetailModal = document.getElementById("group-details");
+  groupDetailModal.close();
 }
 
 async function loadGroupMembers() {

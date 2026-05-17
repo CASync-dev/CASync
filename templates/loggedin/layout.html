@@ -47,6 +47,7 @@
           class="flex items-center justify-between px-6 py-4 border-b border-gray-200"
         >
           <a
+            id = "logonavhome"
             href="{{ url_for('loggedin.dash') }}"
             class="flex items-center space-x-2"
           >
@@ -70,6 +71,7 @@
           <!-- Not Authed -->
           <!-- Authed -->
           <a
+            id="nav-dash"
             href="{{ url_for('loggedin.dash') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.dash' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
           >
@@ -77,6 +79,7 @@
             <span class="font-medium">Dashboard</span>
           </a>
           <a
+            id="nav-schedule"
             href="{{ url_for('loggedin.schedule') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.schedule' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
           >
@@ -84,6 +87,7 @@
             <span class="font-medium">Your Schedule</span>
           </a>
           <a
+            id="nav-friends"
             href="{{ url_for('loggedin.friends') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.friends' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
           >
@@ -91,6 +95,7 @@
             <span class="font-medium">Friends</span>
           </a>
           <a
+            id="nav-groups"
             href="{{ url_for('loggedin.groups') }}"
             class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.groups' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
           >
@@ -101,6 +106,7 @@
           <!-- Settings and user -->
           <div class="pt-4 mt-4 border-t border-gray-200">
             <a
+              id="nav-settings"
               href="{{ url_for('loggedin.settings') }}"
               class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-light hover:text-primary transition group {% if request.endpoint == 'loggedin.settings' %}bg-primary-light text-primary shadow-primary-dark shadow-md {% else %}text-nearwhite{% endif %}"
             >
@@ -113,6 +119,7 @@
         <!-- Logout at bottom -->
         <div class="p-4 border-t border-gray-200">
           <a
+            id = 'logout'
             href="/logout"
             return false;
             "
