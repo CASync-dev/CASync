@@ -3,20 +3,20 @@
   <!-- Main dashboard layout: top header row and bottom two-column content -->
   <div class="container-loggedin flex flex-col">
     <!-- Top row: username/date on the left, live clock on the right -->
-    <div class="flex flex-col sm:flex-row justify-between gap-2 sm:gap-4">
+    <div class="flex flex-col sm:flex-row justify-between gap-2 sm:gap-4 mt-4 sm:mt-6 md:mt-8">
       <!-- Top-left: day/date and username header -->
-      <div class="p-4 sm:p-6 md:p-8 space-y-2 sm:space-y-4 mb-4">
-        <h1 id="title_username" class="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-600">
+      <div class="p-4 sm:p-6 md:p-8 space-y-2 sm:space-y-4 mb-4 border rounded-2xl border-gray-300 shadow-md">
+        <h1 id="title_username" class="inline-block text-2xl sm:text-3xl md:text-4xl font-normal text-gray-600 bg-slate-200 rounded-full p-5">
           Hello, <span  class="text-blue-600"> {{ current_user.username }}</span>!
         </h1>
 
-        <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-gray-600 mt-4 sm:mt-6 md:mt-10">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-gray-600 mt-1 sm:mt-2 md:mt-4">
           <span id="day" class="text-blue-600"></span>,
           <span id="current-date"></span>
         </h2>
       </div>
       <!-- Top-right: live clock display -->
-      <div class="flex items-center justify-center border-5 rounded-2xl border-gray-300 mx-2 sm:mx-4 my-2 sm:my-8">
+      <div class="flex items-center justify-center border rounded-2xl border-gray-300 mx-2 sm:mx-4 my-2 sm:my-8 shadow-md">
         <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl p-4 sm:p-6 md:p-8 lg:p-10 text-center">
           <span id="time" class="text-blue-600"> 2:30</span>
           <span id="period" class="text-gray-600">PM</span>
@@ -25,12 +25,12 @@
     </div>
 
     <!-- Bottom row: events panel on the left, friends panel on the right -->
-    <div class="mt-1 sm:mt-2 flex flex-col gap-4 lg:flex-row">
-      <div class="flex-1 min-w-0 p-4">
+    <div class="mt-1 sm:mt-2 flex flex-col gap-4 lg:flex-row ">
+      <div class="flex-1 min-w-0 p-4 mt-3.5 ml-4 mb-4 border rounded-2xl border-gray-300 shadow-md">
         <!-- Left panel: next event and event list -->
         <div class="flex flex-col gap-4">
           <!-- Primary event card -->
-          <div id="big-card" class="flex flex-col bg-slate-200 rounded-2xl p-6">
+          <div id="big-card" class="flex flex-col p-6 border rounded-2xl border-gray-300">
             <!-- big card content rendered from dash.js -->
           </div>
 
@@ -41,10 +41,10 @@
         </div>
       </div>
 
-      <div class="flex-1 min-w-0 p-4 mt-3.5 mr-4 mb-4 bg-slate-200 rounded-2xl">
-        <!-- Right panel: friends who are available now -->
-        <h3 class="text-4xl text-dark space-y-4 mb-4">
-          Friends available now:
+      <div class="flex-1 min-w-0 p-4 mt-3.5 mr-4 mb-4 border rounded-2xl border-gray-300 shadow-md">
+        <!-- Right panel: friends who are available now --> 
+        <h3 class="inline-block text-lg font-medium text-dark mb-4 bg-slate-200 rounded-2xl px-3 py-1">
+          Friends available now
         </h3>
         <div id="friends-list" class="flex flex-col gap-3 overflow-y-auto max-h-96">
           <!-- Friend items will be rendered here by dash.js -->
