@@ -29,4 +29,5 @@ class TestConfig(Config):
 
     # Creates a non persistent database in the memory
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:' #'sqlite://' should also work but will stick to :memory for now
+    SECRET_KEY = 'DEV-TEST' # This is a secret key only used for testing.
     TESTING = True
