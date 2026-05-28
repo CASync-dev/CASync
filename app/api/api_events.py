@@ -8,34 +8,6 @@ api_events = Blueprint('api_events', __name__)
 
 VALID_COLORS = {'indigo', 'red', 'orange', 'yellow', 'green', 'blue'}
 
-def _validate_event_data(data):
-    errors = []
-    title = data.get('title', '')
-    if not title or not title.strip():
-        errors.append("Title is required.")
-    elif len(title) > 200:
-        errors.append("Title must be 200 characters or fewer.")
-    if not data.get('start_time'):
-        errors.append("Start time is required.")
-    if not data.get('end_time'):
-        errors.append("End time is required.")
-    if data.get('start_time') and data.get('end_time'):
-        try:
-            start = datetime.fromisoformat(data['start_time'].replace('Z', '+00:00'))
-            end = datetime.fromisoformat(data['end_time'].replace('Z', '+00:00'))
-            if end <= start:
-                errors.append("End time must be after start time.")
-        except ValueError:
-            errors.append("Invalid datetime format, expected ISO 8601.")
-    color = data.get('color')
-    if color and color not in VALID_COLORS:
-        errors.append(f"Invalid color. Must be one of: {', '.join(sorted(VALID_COLORS))}.")
-    if data.get('description') and len(data['description']) > 500:
-        errors.append("Description must be 500 characters or fewer.")
-    if data.get('location') and len(data['location']) > 300:
-        errors.append("Location must be 300 characters or fewer.")
-    return errors
-
 # -- API EVENT ROUTES
 """
    Standard Get Events Response:
