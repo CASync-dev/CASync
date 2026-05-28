@@ -494,7 +494,7 @@ The general flow of it is:
       // Event title — always shown
       const title = document.createElement('p');
       title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
-      if (event.showUsername && event.username) {
+      if (event.showUsername && event.username && event.pfp) {
         // if the we are showing usernames we can also render the profile picture as a small circle in front of the event title.
         const pfp = document.createElement('img');
         pfp.src = event.pfp;
@@ -673,6 +673,7 @@ The general flow of it is:
       const pfpRow = document.createElement('div');
       pfpRow.className = 'flex items-center';
       event.participants.slice(0, 4).forEach((p, i) => {
+        if (!p.pfp) return;
         const pfp = document.createElement('img');
         pfp.src = p.pfp;
         pfp.alt = `${p.name}'s profile picture`;
