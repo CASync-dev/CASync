@@ -1,4 +1,5 @@
 import requests # for fetching the iCal feed from the URL
+from requests.adapters import HTTPAdapter # for pinning DNS at the adapter layer
 from datetime import datetime, date, time, timedelta, timezone # for handling date and time fields
 from icalendar import Calendar as ICalendar # for parsing iCal data
 import ipaddress, socket # for URL safety checks
@@ -6,19 +7,97 @@ from urllib.parse import urlparse # for URL parsing
 
 from app import db
 from app.models import Event, Calendar
-#sanitise input and check that the URL is safe to fetch from.
-# prefevent ssrf attack : no funky ip stuff
+
+# Address categories we refuse to fetch from. Anything in these ranges could
+# point at internal services or cloud metadata endpoints (e.g. 169.254.169.254
+# on AWS/GCP), and is never a legitimate iCal feed host.
+_DISALLOWED_IP_PROPS = (
+    "is_private",
+    "is_loopback",
+    "is_link_local",
+    "is_multicast",
+    "is_reserved",
+    "is_unspecified",
+)
+
+
+# sanitise input and check that the URL is safe to fetch from.
+# prevent ssrf attack: no funky ip stuff
 def _is_safe_url(url):
+    """
+    Validate that fetching `url` won't trigger SSRF, and return the address
+    we should connect to.
+
+    Returns a (family, ip, port) tuple on success, or None if the URL is
+    unsafe (still truthy/falsy for callers that just need a yes/no).
+
+    This closes three holes a naive resolve-and-trust check leaves open:
+      * Uses getaddrinfo instead of gethostbyname so AAAA-only hostnames
+        can't slip past an IPv4-only resolver.
+      * Validates *every* address the hostname resolves to, not just the
+        first — a hostname with one public and one private record is still
+        rejected.
+      * Returns the validated IP so the caller can pin the TCP connection
+        to it. Re-resolving at request time would re-open the DNS-rebinding
+        (TOCTOU) window where a hostile resolver swaps the answer.
+    """
     parsed = urlparse(url)
-    hostname = parsed.hostname
-    if not hostname:
-        return False
+    if parsed.scheme != "https" or not parsed.hostname:
+        return None
+
+    port = parsed.port or 443
     try:
-        ip = ipaddress.ip_address(socket.gethostbyname(hostname))
-        return ip.is_global and not ip.is_loopback and not ip.is_private
-    except (socket.gaierror, ValueError):
-        return False
-    
+        infos = socket.getaddrinfo(parsed.hostname, port, type=socket.SOCK_STREAM)
+    except socket.gaierror:
+        return None
+    if not infos:
+        return None
+
+    chosen = None
+    for family, _socktype, _proto, _canon, sockaddr in infos:
+        try:
+            ip = ipaddress.ip_address(sockaddr[0])
+        except ValueError:
+            return None
+        if any(getattr(ip, prop) for prop in _DISALLOWED_IP_PROPS):
+            return None
+        if chosen is None:
+            chosen = (family, sockaddr[0], port)
+
+    return chosen
+
+
+class _PinnedHTTPSAdapter(HTTPAdapter):
+    """
+    HTTPS adapter that connects to a pre-validated IP while keeping the
+    original hostname for SNI and certificate validation.
+
+    Used together with _is_safe_url to defeat DNS-rebinding: we resolve and
+    validate the IP once, then pin the TCP connection to that exact address
+    instead of letting urllib3 re-resolve the hostname a moment later.
+    """
+
+    def __init__(self, hostname, pinned_ip, *args, **kwargs):
+        self._hostname = hostname
+        self._pinned_ip = pinned_ip
+        super().__init__(*args, **kwargs)
+
+    def init_poolmanager(self, *args, **kwargs):
+        # SNI + cert chain are still checked against the real hostname even
+        # though we're connecting to an IP literal.
+        kwargs["server_hostname"] = self._hostname
+        kwargs["assert_hostname"] = self._hostname
+        return super().init_poolmanager(*args, **kwargs)
+
+    def send(self, request, **kwargs):
+        parsed = urlparse(request.url)
+        bracketed = f"[{self._pinned_ip}]" if ":" in self._pinned_ip else self._pinned_ip
+        new_netloc = f"{bracketed}:{parsed.port}" if parsed.port else bracketed
+        request.url = request.url.replace(parsed.netloc, new_netloc, 1)
+        request.headers["Host"] = parsed.hostname
+        return super().send(request, **kwargs)
+
+
 # Validate the URL before doing anything
 
 def validate_url(url):
