@@ -199,7 +199,9 @@ def api_user_events(user_id):
     except ValueError:
         return jsonify({"error": "Invalid date format, should be YYYY-MM-DD"}), 400
     # check if the user is friends with the user id provided, if not return an error message
-    # TODO: there is no friends system yet but we will do that chekck here
+    friends = current_user.get_friends()
+    if user_id not in [friend.id for friend in friends]:
+        return jsonify({"error": "Unauthorized"}), 403
 
     start_dt = datetime.combine(start_date, time(0, 0), tzinfo=timezone.utc)
     end_dt = datetime.combine(end_date, time(0, 0), tzinfo=timezone.utc) + timedelta(days=1)
