@@ -6,19 +6,15 @@ from flask_login import current_user, login_required
 
 api_events = Blueprint('api_events', __name__)
 
-VALID_COLORS = {'indigo', 'red', 'orange', 'yellow', 'green', 'blue'}
+VALID_COLORS = {'indigo', 'blue', 'green', 'rose', 'amber', 'orange', 'red', 'purple', 'gray', 'yellow', 'emerald'}
 
 def _validate_event_data(data):
     errors = []
-    title = data.get('title', '')
-    if not title or not title.strip():
-        errors.append("Title is required.")
-    elif len(title) > 200:
+    title = (data.get('title') or '').strip()
+    if not title or not data.get('start_time') or not data.get('end_time'):
+        errors.append("Please fill in all required fields.")
+    if len(data.get('title', '')) > 200:
         errors.append("Title must be 200 characters or fewer.")
-    if not data.get('start_time'):
-        errors.append("Start time is required.")
-    if not data.get('end_time'):
-        errors.append("End time is required.")
     if data.get('start_time') and data.get('end_time'):
         try:
             start = datetime.fromisoformat(data['start_time'].replace('Z', '+00:00'))
