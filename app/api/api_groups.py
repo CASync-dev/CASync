@@ -111,6 +111,9 @@ def get_group_details(group_id):
     if not group:
         return jsonify({"success": False, "error": "Could not find group"}), 404
 
+    # check user is in group
+    if current_user not in group.members:
+        return jsonify({"success": False, "error": "You are not a member of this group"}), 403
     return jsonify(group.to_dict()), 200
 
 
