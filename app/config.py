@@ -5,7 +5,7 @@ load_dotenv()
 
 class Config:
     # Secret key for session logic
-    SECRET_KEY = os.getenv('SECRET_KEY') or 'DEV_KEY'
+    SECRET_KEY = os.getenv('SECRET_KEY')
 
     # Removed below so github actions can run the tests as well.
     #Flag error if missing secret key environment var:
