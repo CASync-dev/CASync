@@ -525,7 +525,9 @@ class PrivateSeleniumTests(BaseSeleniumTest):
 
     # Opens the create group modal (assumes user is on groups page)
     def open_create_group_modal(self):
-        self.driver.find_element(By.ID, 'btn-create-group').click()
+        element = self.driver.find_element(By.ID, 'btn-create-group')
+        self.driver.execute_script("arguments[0].scrollIntoView()", element)
+        element.click()
         return WebDriverWait(self.driver, timeout=10).until(
                 EC.visibility_of_element_located((By.ID, 'create-group'))
             ) 
