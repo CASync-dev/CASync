@@ -1340,7 +1340,11 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         weekday = self.driver.find_element(By.ID, 'day')
         self.assertEqual(actualweekday, weekday.text)
 
-        actualdate = datetime.strftime(datetime.now(), '%B %d, %Y')
+        nowdate = datetime.now()
+        nowmonth = datetime.strftime(datetime.now(), '%B')
+        nowyear = datetime.strftime(datetime.now(), '%Y')
+
+        actualdate = f'{nowmonth} {nowdate.day}, {nowyear}'
         date = self.driver.find_element(By.ID, 'current-date')
         self.assertEqual(actualdate, date.text)
 
