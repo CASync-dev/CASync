@@ -1,4 +1,6 @@
 dev-secret-key=supersecretkey
 SQLALCHEMY_DATABASE_URI=sqlite:///app.db
+RESEND_API_KEY=your_resend_api_key
+BASE_URL=
 # for testing:
 HEADLESS=TRUE

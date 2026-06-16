@@ -21,6 +21,10 @@ class Config:
     # It's generally bad practice to hardcode a key even on the chance that environment variable is inaccessable.
     # If a SECRET_KEY can't be retrieved from env, the app should raise an error instead.
 
+    # Resend API key for email confirmation
+    RESEND_API_KEY = os.getenv('RESEND_API_KEY')
+    MAIL_FROM = 'noreply@send.casync.dev'
+
 class DeploymentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
 
