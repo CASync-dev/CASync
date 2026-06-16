@@ -24,6 +24,7 @@ class Config:
     # Resend API key for email confirmation
     RESEND_API_KEY = os.getenv('RESEND_API_KEY')
     MAIL_FROM = 'noreply@send.casync.dev'
+    APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:5000')  # Default to localhost for development
 
 class DeploymentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
