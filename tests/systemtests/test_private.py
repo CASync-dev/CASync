@@ -1202,6 +1202,18 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
         self.driver.find_element(By.ID, 'repeat_password').send_keys("Newpassword1234!")
         self.driver.find_element(By.ID, 'log').click()
+        # Registration requires email confirmation before login; land on /login.
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/login")
+        )
+        # Confirm the account directly (stands in for clicking the emailed link).
+        new_user = User.query.filter_by(username="newuser").first()
+        new_user.email_confirmed = True
+        db.session.commit()
+        # Log in as the new account.
+        self.driver.find_element(By.ID, 'username').send_keys("newuser")
+        self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
+        self.driver.find_element(By.ID, 'log').click()
         # check url is dash
         WebDriverWait(self.driver, timeout=10).until(
             EC.url_contains("/dash")
