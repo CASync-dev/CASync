@@ -421,3 +421,100 @@ It returns a tuple: (result, error)
 
 - On success: `({'imported': <count>}, None)`
 - On failure: `(None, '<error message>')`
+
+## Email System
+
+The transactional emails the app sends *to users*: account confirmation and
+password reset. It's **outbound only** — we don't run a mail server, and inbound
+mail (e.g. a `support@` address) is handled separately and isn't part of this.
+
+Delivery goes through [Resend](https://resend.com), a transactional email API.
+The app makes one HTTPS call with the recipient, subject, and body; Resend signs
+it with our domain's DKIM key and handles delivery. The free tier (3,000
+emails/month on one custom domain) is well above what confirmations and resets
+need.
+
+### The pieces
+
+It's split into two service modules plus templates, so the routes stay thin:
+
+```txt
+services/tokens.py   # mints + verifies signed, time-limited links
+services/email.py    # builds the message and sends it via Resend
+templates/email/     # confirm.html/.txt and reset.html/.txt bodies
+```
+
+### Tokens (`services/tokens.py`)
+
+Links are **stateless** — there's no token table. We use `itsdangerous`'s
+`URLSafeTimedSerializer` (signed with the app `SECRET_KEY`) to encode the user id
+into the URL, with a different salt per purpose so a confirm link can't be
+replayed as a reset link:
+
+- **Confirm** — salt `email-confirm`, valid **24h**.
+- **Reset** — salt `password-reset:<user.password_hash>`, valid **1h**. Binding
+  the salt to the current password hash makes a reset link **single-use**: once
+  the password changes the hash changes, so old links stop verifying. No DB state
+  needed.
+
+Each has a `make_*` / `load_*` pair. `load_*` returns the user, or `None` if the
+token is expired, tampered, malformed, or points at an unknown user.
+
+### Sending (`services/email.py`)
+
+`send_email(to, subject, html, text) -> bool` is the low-level call.
+`send_confirmation_email(user)` and `send_password_reset_email(user)` build the
+link from `APP_BASE_URL` + token, render the templates in `templates/email/`, and
+hand off to `send_email`.
+
+The important dev convenience: **if `RESEND_API_KEY` is not set, nothing is
+sent** — the full message (including the link) is logged to the console and the
+function returns `True`, so the surrounding flow behaves as if delivery worked.
+This means you can test the whole flow locally with zero email config: register,
+read the link out of your terminal, and paste it into the browser. Failures
+(bad key, unverified domain, network) are logged and return `False` — they never
+crash the request.
+
+### The flows (`app/loggedout/loggedout.py`)
+
+| Route | Method | What it does |
+| --- | --- | --- |
+| `/register` | POST | Creates the user (`email_confirmed=False`), sends a confirmation email, redirects to login. |
+| `/confirm/<token>` | GET | Verifies the token, sets `email_confirmed=True`, auto-logs-in. |
+| `/login` | POST | **Blocks login until the email is confirmed** (links to resend). |
+| `/resend_confirmation` | GET/POST | Re-sends a confirmation link. Only sends for an existing *unconfirmed* account; always flashes the same generic message. |
+| `/forgot_password` | GET/POST | Emails a reset link. Always flashes the same generic message. |
+| `/reset-password/<token>` | GET/POST | Verifies the token and sets a new password (which invalidates the link). |
+
+The `email_confirmed` flag lives on the `User` model (added via a migration in
+`migrations/versions/`). Forgot-password and resend deliberately give the **same
+response whether or not the email exists**, so the page can't be used to discover
+which addresses have accounts.
+
+### Configuration
+
+| Variable | Purpose |
+| --- | --- |
+| `RESEND_API_KEY` | Auth for the Resend API. A secret — **never** commit it (it's in `.env`, which is gitignored). Unset = console-log mode (above). |
+| `MAIL_FROM` | The verified sender address (e.g. `noreply@mail.casync.dev`). |
+| `APP_BASE_URL` | Base for the absolute links in emails. Defaults to `http://localhost:8080` (matches `run.py`); override in `.env` to match how you run the app. |
+
+> **macOS gotcha:** don't point `APP_BASE_URL` at port `5000`. macOS AirPlay
+> Receiver occupies 5000 and answers with `403 Forbidden`, so confirmation links
+> appear "broken" even though the app is fine. Use 8080 (or whatever port you
+> actually run on).
+
+Mail is sent from a dedicated subdomain so outbound sending reputation stays
+isolated from the root domain's inbound mail. For real delivery, the domain must
+be **Verified** in Resend, which needs DKIM + SPF (+ DMARC) DNS records added as
+**DNS-only**. None of that is required for local development thanks to the
+console-log fallback.
+
+### Testing
+
+The service layers are unit-tested directly (`tests/unittests/test_tokens.py`,
+`test_email.py`) and the four flows have route-level coverage in
+`test_email_routes.py`. `TestConfig` leaves `RESEND_API_KEY` unset, so tests
+never hit the network. Because login now requires a confirmed email, test
+fixtures that log in via the `/login` route seed their users with
+`email_confirmed=True`.
