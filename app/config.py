@@ -23,8 +23,11 @@ class Config:
 
     # Resend API key for email confirmation
     RESEND_API_KEY = os.getenv('RESEND_API_KEY')
-    MAIL_FROM = 'noreply@send.casync.dev'
-    APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:5000')  # Default to localhost for development
+    MAIL_FROM = 'noreply@mail.casync.dev'
+    # Base URL used to build absolute links in emails. Default matches run.py's
+    # port (8080). Override with APP_BASE_URL in .env to match how you run the app.
+    # Note: avoid port 5000 on macOS — AirPlay Receiver occupies it and returns 403.
+    APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:8080')
 
 class DeploymentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
@@ -38,5 +41,5 @@ class TestConfig(Config):
     TESTING = True
 
     RESEND_API_KEY = None  # Don't attempt to send real emails during tests
-    MAIL_FROM = 'noreply@send.casync.dev'
+    MAIL_FROM = 'noreply@mail.casync.dev'
     APP_BASE_URL = 'http://localhost:5000'
