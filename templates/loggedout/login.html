@@ -58,14 +58,14 @@
             for
             category, message in messages
           %}
-            <p id = "msg" class="{{ 'text-red-600' if category == 'error' else 'text-green-600' }} text-sm mt-1">{{ message }}</p>
+            <p id = "msg" class="{{ 'text-red-600' if category == 'error' else 'text-green-600' }} text-sm mt-1" style="width:0;min-width:100%">{{ message }}</p>
           {% endfor %}{% endwith %}
           {% if form.errors %}{%
             for field, errors in
             form.errors.items()
           %}
             {% for error in errors %}
-              <p class="text-red-400 text-sm mt-1">{{ error }}</p>
+              <p class="text-red-400 text-sm mt-1" style="width:0;min-width:100%">{{ error }}</p>
             {% endfor %}
           {% endfor %}{% endif %}
           <br />
@@ -79,11 +79,21 @@
             </button>
           </div>
           <h5 class="text-nearwhite text-xs pt-5 text-center">
-            Not a member yet? Register
+            Not a member yet?
             <a href="{{ url_for('loggedout.register') }}" class="underline">
-              here.
+              Register here.
             </a>
           </h5>
+          <h5 class="text-nearwhite text-xs pt-2 text-center">
+            <a href="{{ url_for('loggedout.forgot_password') }}" class="underline">
+              Forgot password?
+            </a>
+            &nbsp;·&nbsp;
+            <a href="{{ url_for('loggedout.resend_confirmation') }}" class="underline">
+              Resend confirmation
+            </a>
+          </h5>
+        </div>
         </div>
       </form>
     </div>
