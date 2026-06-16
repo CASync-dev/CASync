@@ -34,17 +34,22 @@ class BaseTestCase(unittest.TestCase):
     # Referenced from test_friends (minimal and reusable, other tests may add to this)
     def populate_db(self):
         # Create users
+        # These seeded users log in via the /login route, so they're confirmed.
         self.main_user = User(username='gerald', email='sekai@hotmail.com') # id = 1
         self.main_user.password = 'foo'
+        self.main_user.email_confirmed = True
 
         self.friend1 = User(username='allen', email='friend@fun.net') # User to friend. id = 2
         self.friend1.password = 'bar'
+        self.friend1.email_confirmed = True
 
         self.friend2 = User(username='bob', email='the@builder.com') # User to friend. id = 3
         self.friend2.password = 'ack'
+        self.friend2.email_confirmed = True
 
         self.non_friend = User(username='rick', email='nevergonnagive@youup.com') # User to not friend, id = 4
         self.non_friend.password = 'roll'
+        self.non_friend.email_confirmed = True
 
         # Add users to database
         db.session.add_all([

@@ -16,6 +16,7 @@ class CalTestCases(unittest.TestCase):
         #add a test user
         user = User(username='gerald', email='sekai@hotmail.com')
         user.password = 'foo'
+        user.email_confirmed = True  # confirmed so this seeded user can log in
         db.session.add(user)
         db.session.commit()
         self.client = self.app.test_client()
