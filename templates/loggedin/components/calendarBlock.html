@@ -494,7 +494,7 @@ The general flow of it is:
       // Event title — always shown
       const title = document.createElement('p');
       title.className = `text-xs font-semibold leading-tight px-1.5 pt-1 truncate ${colors.text}`;
-      if (event.showUsername && event.username) {
+      if (event.showUsername && event.username && event.pfp) {
         // if the we are showing usernames we can also render the profile picture as a small circle in front of the event title.
         const pfp = document.createElement('img');
         pfp.src = event.pfp;
@@ -531,9 +531,10 @@ The general flow of it is:
       // Extra details — hidden until the card is expanded
       const details = document.createElement('div');
       details.className = 'event-details hidden flex mt-1 px-1.5 pb-1 ';
-      details.innerHTML = `
-        <p class="text-xs ${colors.text} opacity-60 font-mono">${event.description}</p>
-      `;
+      const description = document.createElement('p');
+      description.className = `text-xs ${colors.text} opacity-60 font-mono`;
+      description.textContent = event.description ?? '';
+      details.appendChild(description);
       card.appendChild(details);
 
       {# Mutation buttons are only shown on the schedule page #}
@@ -673,6 +674,7 @@ The general flow of it is:
       const pfpRow = document.createElement('div');
       pfpRow.className = 'flex items-center';
       event.participants.slice(0, 4).forEach((p, i) => {
+        if (!p.pfp) return;
         const pfp = document.createElement('img');
         pfp.src = p.pfp;
         pfp.alt = `${p.name}'s profile picture`;
@@ -691,15 +693,23 @@ The general flow of it is:
       // Each participant gets a colored dot (their user color) + name and class.
       const details = document.createElement('div');
       details.className = 'event-details hidden flex flex-col gap-0.5 mt-1 pb-1';
-      details.innerHTML = event.participants.map(p => {
+      event.participants.forEach(p => {
         // Convert the border color class (e.g. "border-indigo-500") to a solid bg dot ("bg-indigo-500")
         const dot = (COLOR_MAP[p.color]?.border ?? 'border-gray-500').replace('border-', 'bg-');
-        return `<div class="flex items-center gap-1.5">
-          <img src="${p.pfp}" alt="${p.name}'s profile picture" class="inline-block w-4 h-4 rounded-full">
-          <span class="inline-block w-1.5 h-1.5 rounded-full ${dot}"></span>
-          <span class="text-xs text-gray-900 opacity-80">${p.name} — ${p.class}</span>
-        </div>`;
-      }).join('');
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-1.5';
+        const pfp = document.createElement('img');
+        pfp.src = p.pfp;
+        pfp.alt = `${p.name}'s profile picture`;
+        pfp.className = 'inline-block w-4 h-4 rounded-full';
+        const dotSpan = document.createElement('span');
+        dotSpan.className = `inline-block w-1.5 h-1.5 rounded-full ${dot}`;
+        const label = document.createElement('span');
+        label.className = 'text-xs text-gray-900 opacity-80';
+        label.textContent = `${p.name} — ${p.class}`;
+        row.append(pfp, dotSpan, label);
+        details.appendChild(row);
+      });
       content.appendChild(details);
 
       card.addEventListener('click', () => {

@@ -6,19 +6,15 @@ from flask_login import current_user, login_required
 
 api_events = Blueprint('api_events', __name__)
 
-VALID_COLORS = {'indigo', 'red', 'orange', 'yellow', 'green', 'blue'}
+VALID_COLORS = {'indigo', 'blue', 'green', 'rose', 'amber', 'orange', 'red', 'purple', 'gray', 'yellow', 'emerald'}
 
 def _validate_event_data(data):
     errors = []
-    title = data.get('title', '')
-    if not title or not title.strip():
-        errors.append("Title is required.")
-    elif len(title) > 200:
+    title = (data.get('title') or '').strip()
+    if not title or not data.get('start_time') or not data.get('end_time'):
+        errors.append("Please fill in all required fields.")
+    if len(data.get('title', '')) > 200:
         errors.append("Title must be 200 characters or fewer.")
-    if not data.get('start_time'):
-        errors.append("Start time is required.")
-    if not data.get('end_time'):
-        errors.append("End time is required.")
     if data.get('start_time') and data.get('end_time'):
         try:
             start = datetime.fromisoformat(data['start_time'].replace('Z', '+00:00'))
@@ -199,7 +195,9 @@ def api_user_events(user_id):
     except ValueError:
         return jsonify({"error": "Invalid date format, should be YYYY-MM-DD"}), 400
     # check if the user is friends with the user id provided, if not return an error message
-    # TODO: there is no friends system yet but we will do that chekck here
+    friends = current_user.get_friends()
+    if user_id not in [friend.id for friend in friends]:
+        return jsonify({"error": "Unauthorized"}), 403
 
     start_dt = datetime.combine(start_date, time(0, 0), tzinfo=timezone.utc)
     end_dt = datetime.combine(end_date, time(0, 0), tzinfo=timezone.utc) + timedelta(days=1)
@@ -267,7 +265,12 @@ def api_create_event():
     start_time and end_time are full ISO datetimes with a timezone offset.
     """
     data = request.get_json()
-    
+
+    # VALIDATE input fields
+    errors = _validate_event_data(data)
+    if errors:
+        return jsonify({"error": "; ".join(errors)}), 400
+
      # Required fields
     if not data.get('title') or not data.get('start_time') or not data.get('end_time'):
         return jsonify({"error": "Please fill in all required fields."}), 400
@@ -324,6 +327,13 @@ def api_edit_event(event_id):
         return jsonify({"error": "Cannot edit imported events"}), 400
     
     data = request.get_json()
+
+    # VALIDATE input fields
+    errors = _validate_event_data(data)
+    if errors:
+        return jsonify({"error": "; ".join(errors)}), 400
+
+    
     
     # VALIDATE input fields
     # Required fields

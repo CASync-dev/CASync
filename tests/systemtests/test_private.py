@@ -57,15 +57,17 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         WebDriverWait(self.driver, timeout=10).until(
             EC.url_contains("/schedule")
         )
-        # check calender title is todays date (Today, Day Mon DD)
+        # check calender title is todays date (Today, Day Month D)
         calendarTitle = self.driver.find_element(By.ID, 'calendar-title')
-        today = time.strftime("%a %b %d")
+        now = datetime.now()
+        today = now.strftime("%a %B ") + str(now.day)
         initialTitle = "Today, " + today
         self.assertEqual(calendarTitle.text, initialTitle)
         # check next week nav buttons work
         self.driver.find_element(By.ID, 'btn-next-week').click()
         calendarTitle = self.driver.find_element(By.ID, 'calendar-title')
-        nextWeek = time.strftime("%a %b %d", time.localtime(time.time() + 7*24*60*60))
+        next_week_dt = now + timedelta(days=7)
+        nextWeek = next_week_dt.strftime("%a %B ") + str(next_week_dt.day)
         expectedTitle = "Next Week, " + nextWeek
         self.assertEqual(calendarTitle.text, expectedTitle)
         # check today nav button works
@@ -75,8 +77,8 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         # check previous week nav button works
         self.driver.find_element(By.ID, 'btn-last-week').click()
         calendarTitle = self.driver.find_element(By.ID, 'calendar-title')
-        d = datetime.now() - timedelta(days=7)
-        prev_week = d.strftime("%a %b ") + str(d.day)
+        d = now - timedelta(days=7)
+        prev_week = d.strftime("%a %B ") + str(d.day)
         expected_title = "Last Week, " + prev_week
         self.assertEqual(calendarTitle.text, expected_title)
         # go back to current week so tearDown's logout has a clean state
@@ -523,7 +525,9 @@ class PrivateSeleniumTests(BaseSeleniumTest):
 
     # Opens the create group modal (assumes user is on groups page)
     def open_create_group_modal(self):
-        self.driver.find_element(By.ID, 'btn-create-group').click()
+        element = self.driver.find_element(By.ID, 'btn-create-group')
+        self.driver.execute_script("arguments[0].scrollIntoView()", element)
+        element.click()
         return WebDriverWait(self.driver, timeout=10).until(
                 EC.visibility_of_element_located((By.ID, 'create-group'))
             ) 
@@ -1338,7 +1342,11 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         weekday = self.driver.find_element(By.ID, 'day')
         self.assertEqual(actualweekday, weekday.text)
 
-        actualdate = datetime.strftime(datetime.now(), '%B %d, %Y')
+        nowdate = datetime.now()
+        nowmonth = datetime.strftime(datetime.now(), '%B')
+        nowyear = datetime.strftime(datetime.now(), '%Y')
+
+        actualdate = f'{nowmonth} {nowdate.day}, {nowyear}'
         date = self.driver.find_element(By.ID, 'current-date')
         self.assertEqual(actualdate, date.text)
 
