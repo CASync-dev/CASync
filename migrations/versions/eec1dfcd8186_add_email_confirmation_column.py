@@ -23,6 +23,7 @@ def upgrade():
 
     # ### end Alembic commands ###
 
+    # Grandfather existing users in as already confirmed.
     users = sa.table('users', sa.column('email_confirmed', sa.Boolean()))
     op.execute(users.update().values(email_confirmed=True))
 
