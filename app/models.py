@@ -211,7 +211,7 @@ class Group(db.Model):
     group_name = db.Column(db.String(500), nullable=False)
     # Need to hold list of user_ids...
     # Many to many relationship with users
-    group_events = db.relationship("GroupEvent", backref="group_id", lazy="dynamic")
+    group_events = db.relationship("GroupEvent", backref="group_events.id", lazy="dynamic")
     # Many to many relationship with group_events
 
     def __repr__(self):
