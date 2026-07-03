@@ -1,7 +1,7 @@
 from datetime import datetime, time, timedelta, timezone
 from app import db
 from flask import Blueprint, jsonify, request
-from app.models import Calendar, User, Event, Group
+from app.models import Calendar, GroupEvent, User, Event, Group
 from flask_login import current_user, login_required
 
 api_events = Blueprint('api_events', __name__)
@@ -242,7 +242,23 @@ def api_group_events(group_id):
     user_dict = {str(user.id): {"username": user.username, "pfp": user.avatar(200), "events": {}} for user in group.members}
     for event in events:
         user_dict[str(event.user_id)]["events"][str(event.id)] = event.to_dict()
-    return jsonify(user_dict)
+
+    # Now onto the group events...
+    g_events = GroupEvent.query.where(
+        GroupEvent.group_id == group_id,
+        GroupEvent.start_time >= start_date,
+        GroupEvent.end_time <= end_date
+    ).all()
+
+    group_events = dict()
+    glist = []
+    for gevent in g_events:
+        glist.append(gevent.to_dict())
+
+    group_events[group.id] = glist
+    
+    # Rather than just passing user events, we also pass the group events in a seperate dictionary.
+    return jsonify({0: user_dict, 1: group_events})
 
 
 # -- Manipulation routes (create, edit, delete) --
