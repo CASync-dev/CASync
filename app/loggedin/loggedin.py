@@ -37,7 +37,8 @@ def schedule():
 @loggedin.route("/groups")
 @login_required
 def groups():
-    return render_template("loggedin/groups.html", groups = current_user.groups)
+    now = datetime.now()
+    return render_template("loggedin/groups.html", groups = current_user.groups, now=now, timedelta=timedelta)
 
 
 @loggedin.route("/friends")
