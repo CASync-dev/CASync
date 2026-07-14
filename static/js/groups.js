@@ -513,3 +513,52 @@ new MutationObserver(() => {
 document.addEventListener("DOMContentLoaded", () => {
   setupSearchFriend();
 });
+
+// Group Event Creation -------------------------------------------------------
+// Similar logic to schedule.js, just with a group id included :)
+
+// (Group) Event form handler
+document.getElementById("add-event-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  // Get form values
+  const title = document.getElementById("event-title").value;
+  const startInput = document.getElementById("event-start").value;
+  const endInput = document.getElementById("event-end").value;
+  const location = document.getElementById("event-location").value;
+  const description = document.getElementById("event-description").value;
+  const color = document.getElementById("event-color").value;
+  errorElement = document.getElementById("form-message");
+  // Basic validation
+  if (!title || !startInput || !endInput) {
+    errorElement.textContent = "Please fill in all required fields.";
+    errorElement.classList.remove("hidden");
+    return;
+  }
+  // datetime-local inputs are interpreted as local time
+  const startDate = new Date(startInput);
+  console.log(startDate.toISOString())
+  const endDate = new Date(endInput);
+  console.log(endDate.toISOString())
+  // end must be after start
+  if (endDate <= startDate) {
+    errorElement.textContent = "End must be after start.";
+    errorElement.classList.remove("hidden");
+    return;
+  }
+  // Event must be in the future
+  if (startDate <= new Date()) {
+    errorElement.textContent =
+      "Events have to be in the future. Please select a start time later than now.";
+    errorElement.classList.remove("hidden");
+    return;
+  }
+
+  // From here on, new content :)
+  // To be finished.
+
+  const newEvent = {
+
+  };
+
+
+});
