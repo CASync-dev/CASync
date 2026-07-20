@@ -336,7 +336,8 @@ def api_toggle_going(event_id):
     return jsonify({"id": event.id, "user_id": event.user_id, "going": event.going}), 200
 
 # Group Event Fetch
-
+# Should only call when at the groups page.
+# Fetches each users' events first, then fetches the group's events.
 @api_events.route("/api/events/group_events/<int:group_id>", methods=["GET"])
 @login_required
 def api_group_events(group_id):
@@ -389,6 +390,8 @@ def api_group_events(group_id):
 
 # Group Event Manipulation (create, edit, delete)
 
+# Group event creation
+# Using a similar format to normal events for uniformity
 @api_events.route("/api/events/group_events/create/<int:group_id>", method = ["POST"])
 @login_required
 def api_create_group_event(group_id):
