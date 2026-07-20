@@ -392,7 +392,7 @@ def api_group_events(group_id):
 
 # Group event creation
 # Using a similar format to normal events for uniformity
-@api_events.route("/api/events/group_events/create/<int:group_id>", method = ["POST"])
+@api_events.route("/api/events/group_events/create/<int:group_id>", methods = ["POST"])
 @login_required
 def api_create_group_event(group_id):
     if not group_id:
@@ -412,7 +412,7 @@ def api_create_group_event(group_id):
         "description": "Event Description",
         "start_time": "2024-07-01T14:00:00.000Z",
         "end_time": "2024-07-01T15:00:00.000Z",
-        "user_id": 1
+        "group_id": 1
         "location": "Event Location",
         "color": "indigo"
     }
@@ -449,7 +449,7 @@ def api_create_group_event(group_id):
     db.session.commit()
     return jsonify(g_event.to_dict()), 201
 
-@api_events.route("/api/events/group_events/edit/<int:group_event_id>", method = ["PUT", "GET"])
+@api_events.route("/api/events/group_events/edit/<int:group_event_id>", methods = ["PUT", "GET"])
 @login_required
 def api_edit_group_event(group_event_id):
     g_event = db.session.get(GroupEvent, group_event_id)
@@ -490,7 +490,7 @@ def api_edit_group_event(group_event_id):
     db.session.commit()
     return jsonify(g_event.to_dict()), 200
 
-@api_events.route("/api/events/group_events/delete/<int:group_event_id>", method = ["DELETE"])
+@api_events.route("/api/events/group_events/delete/<int:group_event_id>", methods = ["DELETE"])
 @login_required
 def api_delete_group_event(group_event_id):
     g_event = db.session.get(GroupEvent, group_event_id)
