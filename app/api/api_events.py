@@ -449,9 +449,57 @@ def api_create_group_event(group_id):
 @api_events.route("/api/events/group_events/edit/<int:group_event_id>", method = ["PUT", "GET"])
 @login_required
 def api_edit_group_event(group_event_id):
-    return
+    g_event = db.session.get(GroupEvent, group_event_id)
+    if not g_event:
+        return jsonify({"error": "Event not found"}), 404
+    group = db.session.get(Group, g_event.group_id)
+    if not group.is_member():
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    data = request.get_json()
+
+    # VALIDATE input fields
+    errors = _validate_event_data(data)
+    if errors:
+        return jsonify({"error": "; ".join(errors)}), 400
+
+    
+    
+    # VALIDATE input fields
+    # Required fields
+    if not data.get('title') or not data.get('start_time') or not data.get('end_time'):
+        return jsonify({"error": "Please fill in all required fields."}), 400
+    
+    # End time after start time
+    start = datetime.strptime(data['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ').time()
+    end = datetime.strptime(data['end_time'], '%Y-%m-%dT%H:%M:%S.%fZ').time()
+    if end <= start:
+        return jsonify({"error": "End time must be after start time."}), 400
+    
+    
+    # update the event details - again we should add some validation here but we'll assume the data is correct for now
+    g_event.title = data['title']
+    g_event.description = data.get('description', '')
+    g_event.start_time = datetime.fromisoformat(data['start_time'].replace('Z', '+00:00'))
+    g_event.end_time = datetime.fromisoformat(data['end_time'].replace('Z', '+00:00'))
+    g_event.location = data.get('location')
+    g_event.color = data.get('color') or 'indigo'
+    db.session.commit()
+    return jsonify(g_event.to_dict()), 200
 
 @api_events.route("/api/events/group_events/delete/<int:group_event_id>", method = ["DELETE"])
 @login_required
 def api_delete_group_event(group_event_id):
-    return
+    g_event = db.session.get(GroupEvent, group_event_id)
+    if not g_event:
+        return jsonify({"error": "Event not found"}), 404
+    group = db.session.get(Group, g_event.group_id)
+    if not group.is_member():
+        return jsonify({"error": "Unauthorised"}), 403
+    
+    # Unlike events, all group events are custom.
+    # So there will be no check for ical events here :)
+
+    db.session.delete(g_event)
+    db.session.commit()
+    return jsonify({"message": "Group Event deleted"}), 200
