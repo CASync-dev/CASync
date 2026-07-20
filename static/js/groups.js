@@ -499,6 +499,9 @@ function openSchedule(groupId, groupname) {
   // set the modal title to the group name
   document.getElementById("group-schedule-title").textContent =
     `${groupname}'s Schedule`;
+  // set create new group event button to have data-group-id of the current group-id
+  document.getElementById("btn-create-group-event").setAttribute("data-group-id", groupId);
+  document.getElementById("btn-create-group-event-mobile").setAttribute("data-group-id", groupId);
   // open the modal
   const modal = document.getElementById("group-schedule-modal");
   modal.showModal();
@@ -516,6 +519,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Group Event Creation -------------------------------------------------------
 // Similar logic to schedule.js, just with a group id included :)
+
+// Rather than re-using the drawer from the schedule page (too clunky since it'll be overlapping the group modal)
+// We'll use a close-current-modal-open-new-modal method :')
+// that probably makes sense
+
+function openGroupEventCreation(group_id) {
+  document.getElementById("create-group-event-modal").showModal();
+  document.getElementById("event-crea-groupid").value = group_id;
+  document.getElementById("group-schedule-modal").close();
+  return;
+}
+
+document.getElementById("btn-create-group-event").addEventListener('click', openGroupEventCreation);
+document.getElementById("btn-create-group-event-mobile").addEventListener('click', openGroupEventCreation);
 
 // (Group) Event form handler
 document.getElementById("add-event-form").addEventListener("submit", (e) => {
@@ -557,7 +574,11 @@ document.getElementById("add-event-form").addEventListener("submit", (e) => {
   // To be finished.
 
   const newEvent = {
-
+    "title": title,
+    "description": description,
+    "start_time": startInput,
+    "end_time": endInput,
+    
   };
 
 

@@ -86,20 +86,19 @@ The general flow of it is:
       </button>
       {% endif %} #}
       {% if isGroupSchedule %}
-      <!-- Copied from New Activity button since it does relatively the same thing.-->
+      <!-- TODO: Change to the new group event creation modal-->
       <button
-        id="btn-create-event"
+        id="btn-create-group-event"
         class="btn-primary hidden md:flex gap-2 transition-all duration-300"
-        command="show-modal"
-        commandfor="drawer"
+        data-group-id = ""
       >
         <i class="fa-solid fa-plus text-sm"></i>
         New Group Event
       </button>
       <button
+        id="btn-create-group-event-mobile"
         class="block md:hidden fixed right-0 bottom-0 m-3 w-12 h-12 z-10 font-semibold rounded-full bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700"
-        command="show-modal"
-        commandfor="drawer"
+        data-group-id = ""
       >
         <i class="fa-solid fa-plus text-sm"></i>
       </button>
