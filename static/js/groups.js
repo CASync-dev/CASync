@@ -524,9 +524,11 @@ document.addEventListener("DOMContentLoaded", () => {
 // We'll use a close-current-modal-open-new-modal method :')
 // that probably makes sense
 
-function openGroupEventCreation(group_id) {
+function openGroupEventCreation() {
+  group_id = this.getAttribute('data-group-id');
+  console.log(group_id);
   document.getElementById("create-group-event-modal").showModal();
-  document.getElementById("event-crea-groupid").value = group_id;
+  document.getElementById("event-crea-groupid").setAttribute('value', group_id);
   document.getElementById("group-schedule-modal").close();
   return;
 }
