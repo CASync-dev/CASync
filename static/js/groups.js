@@ -526,7 +526,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function openGroupEventCreation() {
   group_id = this.getAttribute('data-group-id');
-  console.log(group_id);
   document.getElementById("create-group-event-modal").showModal();
   document.getElementById("event-crea-groupid").setAttribute('value', group_id);
   document.getElementById("group-schedule-modal").close();
@@ -535,6 +534,15 @@ function openGroupEventCreation() {
 
 document.getElementById("btn-create-group-event").addEventListener('click', openGroupEventCreation);
 document.getElementById("btn-create-group-event-mobile").addEventListener('click', openGroupEventCreation);
+
+function closeGroupEventCreation() {
+  // Not really necessary to reset this? But added just in case (though clicking out of backdrop keeps it... ;-;)
+  document.getElementById("event-crea-groupid").setAttribute('value', 'groupid');
+  document.getElementById("group-schedule-modal").showModal();
+  document.getElementById("create-group-event-modal").close();
+}
+
+document.getElementById("close-event-create-btn").addEventListener('click', closeGroupEventCreation);
 
 // (Group) Event form handler
 document.getElementById("add-event-form").addEventListener("submit", (e) => {
