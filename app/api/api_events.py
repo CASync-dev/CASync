@@ -335,10 +335,7 @@ def api_toggle_going(event_id):
     db.session.commit()
     return jsonify({"id": event.id, "user_id": event.user_id, "going": event.going}), 200
 
-# Group Event Fetch
-# Should only call when at the groups page.
-# Fetches each users' events first, then fetches the group's events.
-@api_events.route("/api/events/group_events/<int:group_id>", methods=["GET"])
+@api_events.route("/api/events/group/<int:group_id>", methods=["GET"])
 @login_required
 def api_group_events(group_id):
     # This route gets all the events for a group of users in the groups table. Also accepts a start and end date as query parameters to limit the events returned to a specific date range, same format as above routes
@@ -371,7 +368,7 @@ def api_group_events(group_id):
     for event in events:
         user_dict[str(event.user_id)]["events"][str(event.id)] = event.to_dict()
 
-    # Now onto the group events...
+    # Group Events
     g_events = GroupEvent.query.where(
         GroupEvent.group_id == group_id,
         GroupEvent.start_time >= start_date,
@@ -382,11 +379,8 @@ def api_group_events(group_id):
     glist = []
     for gevent in g_events:
         glist.append(gevent.to_dict())
-
-    group_events[group.id] = glist
     
-    # Rather than just passing user events, we also pass the group events in a seperate dictionary.
-    return jsonify({0: user_dict, 1: group_events})
+    return jsonify(user_dict)
 
 # Group Event Manipulation (create, edit, delete)
 
