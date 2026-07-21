@@ -1,4 +1,7 @@
 {% extends "loggedin/layout.html" %}
+{% block head %}
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
+{% endblock %}
 {% block content %}
   <!-- TODO: Add schedules to groups -->
   <div class="mx-4 2xl:max-w-7xl 2xl:mx-auto px-4 py-8 mt-6 rounded-xl">
@@ -653,30 +656,37 @@
                               ></button>
                             </div>
                       </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            class="bg-gray-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 justify-between"
+                      <div>
+                      <p
+                        id="form-message"
+                        class="text-sm text-red-500 hidden"
+                      ></p>
+                    </div>
+                      <div
+            class="bg-gray-200 px-4 py-3 flex flex-row-reverse mt-3 max-sm:flex-col sm:px-6 justify-between max-sm:w-full"
           >
             <button
               id="submit-event-btn"
-              type="button"
-              class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-primary px-4 py-2 text-base font-medium text-nearwhite shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+              type="submit"
+              class="cursor-pointer mx-3 mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-primary px-4 py-2 text-base font-medium text-nearwhite shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
             >
               Submit
             </button>
             <button
               id = "close-event-create-btn"
               type = "button"
-              class="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-nearwhite px-4 py-2 text-base font-medium text-primary shadow-sm hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+              class="cursor-pointer mx-3 mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-nearwhite px-4 py-2 text-base font-medium text-primary shadow-sm hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
               >
               <
             </button>
           </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
         </el-dialog-panel>
       </div>
     </dialog>

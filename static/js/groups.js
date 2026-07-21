@@ -540,12 +540,13 @@ function closeGroupEventCreation() {
   document.getElementById("event-crea-groupid").setAttribute('value', 'groupid');
   document.getElementById("group-schedule-modal").showModal();
   document.getElementById("create-group-event-modal").close();
+  document.getElementById("form-message").classList.add('hidden');
 }
 
 document.getElementById("close-event-create-btn").addEventListener('click', closeGroupEventCreation);
 
 // (Group) Event form handler
-document.getElementById("add-event-form").addEventListener("submit", (e) => {
+document.getElementById("create-group-event").addEventListener("submit", (e) => {
   e.preventDefault();
   // Get form values
   const title = document.getElementById("event-title").value;
@@ -554,6 +555,7 @@ document.getElementById("add-event-form").addEventListener("submit", (e) => {
   const location = document.getElementById("event-location").value;
   const description = document.getElementById("event-description").value;
   const color = document.getElementById("event-color").value;
+  const group_id = document.getElementById("event-crea-groupid").value;
   errorElement = document.getElementById("form-message");
   // Basic validation
   if (!title || !startInput || !endInput) {
@@ -586,10 +588,36 @@ document.getElementById("add-event-form").addEventListener("submit", (e) => {
   const newEvent = {
     "title": title,
     "description": description,
-    "start_time": startInput,
-    "end_time": endInput,
-    
+    "start_time": startDate.toISOString(),
+    "end_time": endDate.toISOString(),
+    "group_id": group_id,
+    "location": location,
+    "color": color
   };
+
+  fetch("/api/events/group_events/create/" + group_id, {
+    method: "POST",
+    headers: {"Content-Type": "application/json", "X-CSRFToken": CSRF},
+    body: JSON.stringify(newEvent),
+  }).then((response)=> {
+    if (!response.ok) {
+      throw new Error("Failed to create group event");
+    }
+    console.log("Group Event created successfully.");
+    return response.json();
+  }).then((createdEvent) => {
+    document.getElementById("create-group-event").reset();
+    selectColor(
+      document.querySelector("#color-picker-buttons button"),
+      "indigo",
+    );
+    closeGroupEventCreation();
+  }).catch((error) => {
+    console.error("Error creating event:", error);
+    errorElement.textContent = "Error creating event. Please try again.";
+    errorElement.classList.remove("hidden");
+    console.error("Error creating event:", error);
+  })
 
 
 });

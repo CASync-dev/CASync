@@ -211,7 +211,7 @@ class Group(db.Model):
     group_name = db.Column(db.String(500), nullable=False)
     # Need to hold list of user_ids...
     # Many to many relationship with users
-    group_events = db.relationship("GroupEvent", backref="group_events.id", lazy="dynamic")
+    group_events = db.relationship("GroupEvent", backref="groupowner", lazy="dynamic")
     # Many to many relationship with group_events
 
     def __repr__(self):
@@ -245,6 +245,7 @@ class GroupEvent(db.Model):
     color = db.Column(
         db.String(20)
     )  # optional, used for calendar display (e.g. "indigo", "red", etc.)
+    # Added this column but will not be currently implemented (Future feature?)
     going = db.Column(db.Boolean, nullable=False, default=True)
     created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     # Note that since this is a group event, it shouldn't have originated from an ical link.
@@ -265,7 +266,7 @@ class GroupEvent(db.Model):
             "id": self.id,
             "group_id": self.group_id,
             "created_by_id": self.created_by,
-            "created_by_username": self.created_by.username,
+            "group_user": self.groupowner.group_name,
             "title": self.title,
             "description": self.description,
             "startTime": _iso(self.start_time),

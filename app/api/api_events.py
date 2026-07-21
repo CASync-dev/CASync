@@ -437,7 +437,8 @@ def api_create_group_event(group_id):
         start_time=datetime.fromisoformat(data['start_time'].replace('Z', '+00:00')),
         end_time=datetime.fromisoformat(data['end_time'].replace('Z', '+00:00')),
         location=data.get('location'),
-        color=data.get('color', 'indigo'))
+        color=data.get('color', 'indigo'),
+        created_by=current_user.id)
     
     db.session.add(g_event)
     db.session.commit()
