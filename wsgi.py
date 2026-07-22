@@ -5,9 +5,11 @@ from app.config import DeploymentConfig
 
 app = create_app(DeploymentConfig())
 
-# One trusted hop in front of the container: Caddy, which terminates TLS and
-# sets X-Forwarded-*. x_for=1 takes the single client value Caddy appends so
-# REMOTE_ADDR is the real client IP; trusting more would let a client spoof its
-# IP via a forged X-Forwarded-For. x_proto/x_host/x_prefix stay at 1 — Caddy
-# sets each of those once.
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+# Two trusted hops in front of the container: Cloudflare (the proxied edge, which
+# terminates client TLS) and Caddy (which serves the Cloudflare Origin cert and
+# reverse-proxies to gunicorn). X-Forwarded-For arrives as "<client>, <cf ip>",
+# so x_for=2 unwinds both to leave REMOTE_ADDR as the real client. This is only
+# safe because the origin refuses non-Cloudflare traffic (inbound 80/443 is
+# restricted to Cloudflare's IP ranges); otherwise a direct hit could forge the
+# second-from-right XFF entry. x_proto/x_host/x_prefix stay at 1.
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=2, x_proto=1, x_host=1, x_prefix=1)
