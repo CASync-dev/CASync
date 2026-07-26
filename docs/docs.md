@@ -518,3 +518,7 @@ The service layers are unit-tested directly (`tests/unittests/test_tokens.py`,
 never hit the network. Because login now requires a confirmed email, test
 fixtures that log in via the `/login` route seed their users with
 `email_confirmed=True`.
+
+> Test modules only run if they're imported in `tests/unittests/__init__.py` —
+> `python -m unittest tests.unittests` finds nothing otherwise. Add a line there
+> whenever you add a `test_*.py`.
