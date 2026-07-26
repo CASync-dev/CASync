@@ -497,7 +497,7 @@ which addresses have accounts.
 | --- | --- |
 | `RESEND_API_KEY` | Auth for the Resend API. A secret — **never** commit it (it's in `.env`, which is gitignored). Unset = console-log mode (above). |
 | `MAIL_FROM` | The verified sender address (e.g. `noreply@mail.casync.dev`). |
-| `APP_BASE_URL` | Base for the absolute links in emails. Defaults to `http://localhost:8080` (matches `run.py`); override in `.env` to match how you run the app. |
+| `APP_BASE_URL` | Base for the absolute links in emails. Defaults to `http://localhost:8080` (matches `app.py`); override in `.env` to match how you run the app. |
 
 > **macOS gotcha:** don't point `APP_BASE_URL` at port `5000`. macOS AirPlay
 > Receiver occupies 5000 and answers with `403 Forbidden`, so confirmation links

@@ -25,7 +25,7 @@ class Config:
     RESEND_API_KEY = os.getenv('RESEND_API_KEY')
     # Must be an address on a domain verified in Resend, or delivery fails.
     MAIL_FROM = os.getenv('MAIL_FROM', 'noreply@mail.casync.dev')
-    # Base URL used to build absolute links in emails. Default matches run.py's
+    # Base URL used to build absolute links in emails. Default matches app.py's
     # port (8080). Override with APP_BASE_URL in .env to match how you run the app.
     # Note: avoid port 5000 on macOS — AirPlay Receiver occupies it and returns 403.
     APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:8080')
