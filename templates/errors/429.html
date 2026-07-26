@@ -1,0 +1,40 @@
+<!doctype html>
+<link
+  rel="icon"
+  type="image/png"
+  sizes="32x32"
+  href="{{ url_for('static', filename='images/bluecircle_favicon.png') }}"
+/>
+<!-- Tailwind CSS -->
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/output.css') }}"
+/>
+<main
+  class="grid min-h-full place-items-center bg-primary-dark px-6 py-24 sm:py-32 lg:px-8"
+>
+  <div class="text-center">
+    <p class="text-7xl font-semibold text-white">429</p>
+    <img
+      src="https://http.cat/429"
+      alt="429 error image"
+      class="mx-auto mt-16 w-96"
+    />
+    <h1
+      class="mt-4 text-5xl font-semibold tracking-tight text-balance text-white sm:text-7xl"
+    >
+      Too many attempts
+    </h1>
+    <p class="mt-14 text-lg font-medium text-pretty text-white sm:text-2xl">
+      You've tried that a few too many times. Please wait a little while before
+      trying again.
+    </p>
+    <div class="mt-14 flex items-center justify-center gap-x-6">
+      <a
+        href="/"
+        class="btn-primary px-2.5 py-2.5 text-2xl border border-gray-100 rounded-lg bg-white font-semibold text-primary-dark hover:bg-indigo-700 shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+        >Go back home</a
+      >
+    </div>
+  </div>
+</main>

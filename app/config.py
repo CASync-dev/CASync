@@ -30,6 +30,11 @@ class Config:
     # Note: avoid port 5000 on macOS — AirPlay Receiver occupies it and returns 403.
     APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:8080')
 
+    # Rate limiting (see app/__init__.py). Counters live in each worker's memory;
+    # set RATELIMIT_STORAGE_URI to e.g. redis://... to share them across workers.
+    RATELIMIT_STORAGE_URI = os.getenv('RATELIMIT_STORAGE_URI', 'memory://')
+    RATELIMIT_HEADERS_ENABLED = True  # Send X-RateLimit-* so clients can see the budget.
+
 class DeploymentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
 
@@ -44,3 +49,13 @@ class TestConfig(Config):
     RESEND_API_KEY = None  # Don't attempt to send real emails during tests
     MAIL_FROM = 'noreply@mail.casync.dev'
     APP_BASE_URL = 'http://localhost:5000'
+
+    # Off by default so tests can hammer the auth routes. The limiter's own tests
+    # flip this back on with RateLimitedTestConfig below.
+    RATELIMIT_ENABLED = False
+
+
+class RateLimitedTestConfig(TestConfig):
+    # Same as TestConfig but with the limiter live, for the tests that assert the
+    # throttles actually fire.
+    RATELIMIT_ENABLED = True

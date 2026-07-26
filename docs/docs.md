@@ -510,14 +510,38 @@ be **Verified** in Resend, which needs DKIM + SPF (+ DMARC) DNS records added as
 **DNS-only**. None of that is required for local development thanks to the
 console-log fallback.
 
+### Rate limiting
+
+Three of these routes send an email on our Resend quota and one guesses
+passwords, so all four are throttled per client IP with **Flask-Limiter**
+(`limiter` in `app/__init__.py`):
+
+| Route | Limit |
+| --- | --- |
+| `/login` (POST) | 20 per 5 minutes |
+| `/register` (POST) | 10 per hour |
+| `/forgot_password` (POST) | 5 per hour |
+| `/resend_confirmation` (POST) | 5 per hour |
+
+Only these POSTs are limited — GETs render the forms as often as asked, and no
+default limit is applied, so normal browsing and the dashboard's API polling are
+untouched. Exceeding a limit renders `templates/errors/429.html`.
+
+The key is `REMOTE_ADDR`, which ProxyFix has already resolved to the real client
+IP (see `wsgi.py`). Counters live in each gunicorn worker's memory, so the real
+ceiling is roughly *limit × workers* — enough to deter abuse without running
+Redis. Point `RATELIMIT_STORAGE_URI` at a shared store if exact limits ever
+matter. `TestConfig` sets `RATELIMIT_ENABLED = False` so the other suites can
+post freely; `RateLimitedTestConfig` turns it back on for the limiter's own tests.
+
 ### Testing
 
 The service layers are unit-tested directly (`tests/unittests/test_tokens.py`,
 `test_email.py`) and the four flows have route-level coverage in
-`test_email_routes.py`. `TestConfig` leaves `RESEND_API_KEY` unset, so tests
-never hit the network. Because login now requires a confirmed email, test
-fixtures that log in via the `/login` route seed their users with
-`email_confirmed=True`.
+`test_email_routes.py`, with the throttles covered in `test_ratelimit.py`.
+`TestConfig` leaves `RESEND_API_KEY` unset, so tests never hit the network.
+Because login now requires a confirmed email, test fixtures that log in via the
+`/login` route seed their users with `email_confirmed=True`.
 
 > Test modules only run if they're imported in `tests/unittests/__init__.py` —
 > `python -m unittest tests.unittests` finds nothing otherwise. Add a line there

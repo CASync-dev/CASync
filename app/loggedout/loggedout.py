@@ -9,11 +9,18 @@ from app.form import (
     ResendConfirmationForm,
 )
 from app.models import User
-from app import db
+from app import db, limiter
 from services.email import send_confirmation_email, send_password_reset_email
 from services.tokens import load_confirm_token, load_reset_token
 
 loggedout = Blueprint('loggedout', __name__, template_folder='../templates/loggedout', static_folder='../static')
+
+# Per-IP limits on the POSTs that cost us something: a login attempt is a password
+# guess, and the other three each send an email on our Resend quota. GETs stay
+# unlimited so the forms themselves always render.
+_LOGIN_LIMIT = '20 per 5 minutes'
+_EMAIL_SEND_LIMIT = '5 per hour'
+_REGISTER_LIMIT = '10 per hour'
 
 @loggedout.route("/")
 def root():
@@ -25,6 +32,7 @@ def index():
     return render_template('loggedout/homepage.html')
 
 @loggedout.route("/login", methods=['GET', 'POST'])
+@limiter.limit(_LOGIN_LIMIT, methods=['POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('loggedin.dash'))
@@ -44,6 +52,7 @@ def login():
 
 
 @loggedout.route("/register", methods=['GET', 'POST'])
+@limiter.limit(_REGISTER_LIMIT, methods=['POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('loggedin.dash'))
@@ -111,6 +120,7 @@ def confirm_email(token):
 
 # resend confirmation email
 @loggedout.route("/resend_confirmation", methods=['GET', 'POST'])
+@limiter.limit(_EMAIL_SEND_LIMIT, methods=['POST'])
 def resend_confirmation():
     if current_user.is_authenticated:
         return redirect(url_for('loggedin.dash'))
@@ -128,6 +138,7 @@ def resend_confirmation():
 
 #forgot password route
 @loggedout.route("/forgot_password", methods=['GET', 'POST'])
+@limiter.limit(_EMAIL_SEND_LIMIT, methods=['POST'])
 def forgot_password():
     if current_user.is_authenticated:
         return redirect(url_for('loggedin.dash'))

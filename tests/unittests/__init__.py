@@ -9,6 +9,7 @@ from .test_events import *
 from .test_friends import *
 from .test_groups import *
 from .test_ical import *
+from .test_ratelimit import *
 from .test_reglog import *
 from .test_tokens import *
 from .test_user import *
