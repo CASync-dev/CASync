@@ -97,15 +97,16 @@ def confirm_email(token):
     user = load_confirm_token(token)
     if user is None:
         flash('The confirmation link is invalid or has expired.', 'error')
-    elif user.email_confirmed:
+        return redirect(url_for('loggedout.resend_confirmation'))
+    if user.email_confirmed:
         flash('Account already confirmed. Please log in.', 'info')
-    else:
-        user.email_confirmed = True
-        db.session.commit()
-        flash('Your account has been confirmed!', 'success')
-        # Auto login
-        login_user(user)
-    
+        return redirect(url_for('loggedout.login'))
+
+    user.email_confirmed = True
+    db.session.commit()
+    flash('Your account has been confirmed!', 'success')
+    # Clicking the emailed link proves they own the address, so log them straight in.
+    login_user(user)
     return redirect(url_for('loggedin.dash'))
 
 # resend confirmation email

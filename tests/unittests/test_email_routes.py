@@ -92,6 +92,9 @@ class EmailRoutesTestCase(unittest.TestCase):
 
     def test_confirm_email_with_invalid_token(self):
         response = self.client.get('/confirm/not-a-real-token', follow_redirects=True)
+        # A dead link lands on the page that can mint a fresh one, not the
+        # dashboard (which would just bounce an anonymous visitor to login).
+        self.assertEqual(response.request.path, '/resend_confirmation')
         self.assertIn('invalid or has expired', response.get_data(as_text=True).lower())
         # Nothing got confirmed.
         self.assertFalse(db.session.get(User, self.unconfirmed.id).email_confirmed)
@@ -99,6 +102,7 @@ class EmailRoutesTestCase(unittest.TestCase):
     def test_confirm_email_already_confirmed(self):
         token = tokens.make_confirm_token(self.confirmed)
         response = self.client.get(f'/confirm/{token}', follow_redirects=True)
+        self.assertEqual(response.request.path, '/login')
         self.assertIn('already confirmed', response.get_data(as_text=True).lower())
 
     # --- resend confirmation ----------------------------------------------
