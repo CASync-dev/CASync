@@ -182,6 +182,22 @@ class EmailRoutesTestCase(unittest.TestCase):
         response = self.client.get(f'/reset-password/{token}', follow_redirects=True)
         self.assertEqual(response.request.path, '/forgot_password')
 
+    def test_reset_password_also_confirms_the_email(self):
+        # An account that never confirmed would otherwise reset its password and
+        # still be blocked at login; receiving the link is proof enough.
+        token = tokens.make_reset_token(self.unconfirmed)
+        response = self.client.post(f'/reset-password/{token}', data={
+            'new_password': 'N3w@Pass!', 'repeat_new': 'N3w@Pass!',
+        }, follow_redirects=True)
+        self.assertEqual(response.request.path, '/login')
+        self.assertTrue(db.session.get(User, self.unconfirmed.id).email_confirmed)
+
+        # And that new password now gets them all the way in.
+        response = self.client.post('/login', data={
+            'username': 'newbie', 'password': 'N3w@Pass!',
+        }, follow_redirects=True)
+        self.assertEqual(response.request.path, '/dash')
+
     def test_reset_password_rejects_mismatched_passwords(self):
         token = tokens.make_reset_token(self.confirmed)
         response = self.client.post(f'/reset-password/{token}', data={

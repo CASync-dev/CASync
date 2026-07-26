@@ -155,6 +155,9 @@ def reset_password(token):
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.password = form.new_password.data
+        # Receiving the reset link proves they control the address, so an account
+        # that never got confirmed shouldn't be left locked out of login.
+        user.email_confirmed = True
         db.session.commit()  # This will also invalidate the token since it checks the password hash
         flash('Your password has been reset! Please log in with your new password.', 'success')
         return redirect(url_for('loggedout.login'))

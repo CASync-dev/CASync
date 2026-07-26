@@ -484,7 +484,7 @@ crash the request.
 | `/login` | POST | **Blocks login until the email is confirmed** (links to resend). |
 | `/resend_confirmation` | GET/POST | Re-sends a confirmation link. Only sends for an existing *unconfirmed* account; always flashes the same generic message. |
 | `/forgot_password` | GET/POST | Emails a reset link. Always flashes the same generic message. |
-| `/reset-password/<token>` | GET/POST | Verifies the token and sets a new password (which invalidates the link). |
+| `/reset-password/<token>` | GET/POST | Verifies the token and sets a new password (which invalidates the link). Also marks the email confirmed — receiving the link proves the address is theirs. |
 
 The `email_confirmed` flag lives on the `User` model (added via a migration in
 `migrations/versions/`). Forgot-password and resend deliberately give the **same
