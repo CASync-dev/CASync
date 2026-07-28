@@ -8,6 +8,16 @@ from urllib.parse import urlparse # for URL parsing
 from app import db
 from app.models import Event, Calendar
 
+
+class IcalFeedError(Exception):
+    """
+    Raised when a feed is fetched successfully (HTTP 200, no network error) but
+    its content is unusable — e.g. the body is empty or exceeds the size limit.
+    Kept distinct from parser errors so the caller can surface a clear,
+    user-facing message instead of a raw icalendar traceback like
+    "Found no components where exactly one is required: b''".
+    """
+
 # Address categories we refuse to fetch from. Anything in these ranges could
 # point at internal services or cloud metadata endpoints (e.g. 169.254.169.254
 # on AWS/GCP), and is never a legitimate iCal feed host.
@@ -160,9 +170,16 @@ def fetch_ical_events(url):
         for chunk in response.iter_content(chunk_size=65536):
             received += len(chunk)
             if received > MAX_BYTES:
-                raise ValueError("The iCal feed is too large to process.")
+                raise IcalFeedError("The iCal feed is too large to process.")
             chunks.append(chunk)
         raw = b"".join(chunks)
+    # A 200 with an empty (or whitespace-only) body is the common symptom of a
+    # stale/expired CAS link. Catch it here with a clear message rather than
+    # letting the parser fail with an opaque "Found no components ... b''".
+    if not raw.strip():
+        raise IcalFeedError(
+            "The iCal feed was empty — check that the link is correct and still active."
+        )
     # Parse the iCal content using icalendar. This will give us a Calendar object with all the components.
     calendar = ICalendar.from_ical(raw)
 
@@ -297,9 +314,13 @@ def import_ical(url, user_id):
     # 2. Fetch iCal events from the URL
     try:
         ical_events = fetch_ical_events(url)
-    # We catch both network errors (requests.exceptions.RequestException) and parsing errors
+    # Network-layer failures (DNS, timeout, non-2xx, connection reset).
     except requests.exceptions.RequestException as e:
         return None, f"Could not fetch the iCal feed: {e}"
+    # Feed reached us but is unusable (empty / too large) — already a clear message.
+    except IcalFeedError as e:
+        return None, str(e)
+    # Anything else is a genuine parse failure on non-empty content.
     except Exception as e:
         return None, f"Could not parse the iCal feed: {e}"
     # If the feed was fetched successfully but contained no events, error
