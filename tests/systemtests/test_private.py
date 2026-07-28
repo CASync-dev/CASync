@@ -1197,10 +1197,29 @@ class PrivateSeleniumTests(BaseSeleniumTest):
             EC.url_contains("/login")
         )
         self.driver.find_element(By.ID, 'register').click() # Navigate to register; we're going to make a new acc to delete!
+        # Wait for the register page to load before filling it in (CI can be slow).
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'email'))
+        )
         self.driver.find_element(By.ID, 'email').send_keys("newuser@example.com")
         self.driver.find_element(By.ID, 'username').send_keys("newuser")
         self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
         self.driver.find_element(By.ID, 'repeat_password').send_keys("Newpassword1234!")
+        self.driver.find_element(By.ID, 'log').click()
+        # Registration requires email confirmation before login; land on /login.
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/login")
+        )
+        # Confirm the account directly (stands in for clicking the emailed link).
+        new_user = User.query.filter_by(username="newuser").first()
+        new_user.email_confirmed = True
+        db.session.commit()
+        # Log in as the new account (wait for the login form to be ready first).
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.presence_of_element_located((By.ID, 'username'))
+        )
+        self.driver.find_element(By.ID, 'username').send_keys("newuser")
+        self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
         self.driver.find_element(By.ID, 'log').click()
         # check url is dash
         WebDriverWait(self.driver, timeout=10).until(

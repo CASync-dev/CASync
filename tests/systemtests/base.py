@@ -68,6 +68,7 @@ class BaseSeleniumTest(unittest.TestCase):
     def populate_db(cls):
         user = User(username='gerald', email='gerald@hotmail.com')  # userid = 1
         user.password = 'P@ssw01d'
+        user.email_confirmed = True  # seeded account is already confirmed so it can log in
         db.session.add(user)
         db.session.commit()
 

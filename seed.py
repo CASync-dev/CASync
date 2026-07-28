@@ -1,3 +1,4 @@
+# Note: This is an old seed.py file that does not work in the current version of CASync. Please use seed_demo.py instead.
 import json
 from datetime import date, datetime, time, timezone
 from app import app, db

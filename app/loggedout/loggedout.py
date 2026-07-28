@@ -1,11 +1,26 @@
 from flask import Blueprint, flash, render_template, redirect, request, url_for
 from flask_login import current_user, login_user
 
-from app.form import LoginForm, RegisterForm
+from app.form import (
+    ForgotPasswordForm,
+    LoginForm,
+    RegisterForm,
+    ResetPasswordForm,
+    ResendConfirmationForm,
+)
 from app.models import User
-from app import db
+from app import db, limiter
+from services.email import send_confirmation_email, send_password_reset_email
+from services.tokens import load_confirm_token, load_reset_token
 
 loggedout = Blueprint('loggedout', __name__, template_folder='../templates/loggedout', static_folder='../static')
+
+# Per-IP limits on the POSTs that cost us something: a login attempt is a password
+# guess, and the other three each send an email on our Resend quota. GETs stay
+# unlimited so the forms themselves always render.
+_LOGIN_LIMIT = '20 per 5 minutes'
+_EMAIL_SEND_LIMIT = '5 per hour'
+_REGISTER_LIMIT = '10 per hour'
 
 @loggedout.route("/")
 def root():
@@ -17,21 +32,27 @@ def index():
     return render_template('loggedout/homepage.html')
 
 @loggedout.route("/login", methods=['GET', 'POST'])
+@limiter.limit(_LOGIN_LIMIT, methods=['POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('loggedin.dash'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user and user.verify_password(form.password.data):
+        if not user or not user.verify_password(form.password.data):
+            flash('Invalid username or password', 'error')
+        elif not user.email_confirmed:
+            # Block login until the address is confirmed. The login page carries a
+            # link to /resend_confirmation for users who need a fresh link.
+            flash('Please confirm your email address before logging in.', 'error')
+        else:
             login_user(user)
             return redirect(url_for('loggedin.dash'))
-        else:
-            flash('Invalid username or password', 'error')
     return render_template("loggedout/login.html", form=form)
 
 
 @loggedout.route("/register", methods=['GET', 'POST'])
+@limiter.limit(_REGISTER_LIMIT, methods=['POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('loggedin.dash'))
@@ -41,9 +62,11 @@ def register():
         new_user.password = form.password.data
         db.session.add(new_user)
         db.session.commit()
-        flash('Registration successful.', 'success')
-        login_user(new_user)
-        return redirect(url_for('loggedin.dash'))
+        # Send the confirmation link the user needs before they can log in.
+        send_confirmation_email(new_user)
+        flash('Registration successful! Please check your email to confirm your account.', 'success')
+        return redirect(url_for('loggedout.login'))
+
     return render_template("loggedout/register.html", form=form)
 
 # Added /home as a redirect to index, otherwise you can access the homepage from both routes and it's kinda odd
@@ -72,3 +95,82 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('loggedout.login'))
+
+# -- EMAIL ROUTES --
+
+# confrim email
+@loggedout.route("/confirm/<token>")
+def confirm_email(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('loggedin.dash'))
+    user = load_confirm_token(token)
+    if user is None:
+        flash('The confirmation link is invalid or has expired.', 'error')
+        return redirect(url_for('loggedout.resend_confirmation'))
+    if user.email_confirmed:
+        flash('Account already confirmed. Please log in.', 'info')
+        return redirect(url_for('loggedout.login'))
+
+    user.email_confirmed = True
+    db.session.commit()
+    flash('Your account has been confirmed!', 'success')
+    # Clicking the emailed link proves they own the address, so log them straight in.
+    login_user(user)
+    return redirect(url_for('loggedin.dash'))
+
+# resend confirmation email
+@loggedout.route("/resend_confirmation", methods=['GET', 'POST'])
+@limiter.limit(_EMAIL_SEND_LIMIT, methods=['POST'])
+def resend_confirmation():
+    if current_user.is_authenticated:
+        return redirect(url_for('loggedin.dash'))
+    form = ResendConfirmationForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        # Only send when there's an account that still needs confirming.
+        if user and not user.email_confirmed:
+            send_confirmation_email(user)
+        # For security, we won't reveal whether the email exists (or is already
+        # confirmed) — always flash the same generic message.
+        flash('If an unconfirmed account with that email exists, a confirmation email has been sent.', 'info')
+        return redirect(url_for('loggedout.login'))
+    return render_template("loggedout/resend_confirmation.html", form=form)
+
+#forgot password route
+@loggedout.route("/forgot_password", methods=['GET', 'POST'])
+@limiter.limit(_EMAIL_SEND_LIMIT, methods=['POST'])
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('loggedin.dash'))
+    form = ForgotPasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            # Send password reset email
+            send_password_reset_email(user)
+        # For security, we won't reveal whether the email exists or not. Just flash a generic message.
+        flash('If an account with that email exists, a password reset link has been sent.', 'info')
+        return redirect(url_for('loggedout.login'))
+    return render_template("loggedout/forgot_password.html", form=form)
+
+#reset password route
+@loggedout.route("/reset-password/<token>", methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('loggedin.dash'))
+    user = load_reset_token(token)
+    if user is None:
+        flash('The password reset link is invalid or has expired.', 'error')
+        return redirect(url_for('loggedout.forgot_password'))
+    
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.password = form.new_password.data
+        # Receiving the reset link proves they control the address, so an account
+        # that never got confirmed shouldn't be left locked out of login.
+        user.email_confirmed = True
+        db.session.commit()  # This will also invalidate the token since it checks the password hash
+        flash('Your password has been reset! Please log in with your new password.', 'success')
+        return redirect(url_for('loggedout.login'))
+    
+    return render_template("loggedout/reset_password.html", form=form)

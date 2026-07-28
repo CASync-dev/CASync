@@ -1,0 +1,9 @@
+Hi {{ user.username }},
+
+We received a request to reset your CASync password. Open the link below to
+choose a new one:
+
+{{ link }}
+
+This link expires in 1 hour. If you didn't request a password reset, you can
+ignore this email — your password won't change.

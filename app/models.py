@@ -46,6 +46,8 @@ class User(UserMixin, db.Model):
     )  # lambda so it's evaluated at insert time, not class definition
     avatarurl = db.Column(db.Boolean, default=False)  # Default uses Gravatar
 
+    email_confirmed = db.Column(db.Boolean, default=False, nullable=False)  # Default is unconfirmed
+
     events = db.relationship("Event", backref="owner", lazy="dynamic")
     # Many to many relationship with groups
 

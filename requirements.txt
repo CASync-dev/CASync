@@ -15,6 +15,8 @@ typing_extensions==4.15.0
 flask-migrate==4.1.0
 Flask-WTF==1.2.2
 flask-login==0.6.3
+Flask-Limiter==4.1.1
+limits==5.8.0
 Werkzeug==3.1.8
 itsdangerous==2.2.0
 python-dotenv==1.2.2

@@ -1,4 +1,10 @@
-dev-secret-key=supersecretkey
+SECRET_KEY=supersecretkey
 SQLALCHEMY_DATABASE_URI=sqlite:///app.db
+# Email (Resend). Leave RESEND_API_KEY unset to log emails to the console instead
+# of sending them — the whole confirm/reset flow still works locally.
+RESEND_API_KEY=your_resend_api_key
+MAIL_FROM=noreply@mail.casync.dev
+# Base for the absolute links in emails; must match the port you run the app on.
+APP_BASE_URL=http://localhost:8080
 # for testing:
 HEADLESS=TRUE
