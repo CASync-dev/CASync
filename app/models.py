@@ -213,6 +213,8 @@ class Group(db.Model):
     group_name = db.Column(db.String(500), nullable=False)
     # Need to hold list of user_ids...
     # Many to many relationship with users
+    group_events = db.relationship("GroupEvent", backref="groupowner", lazy="dynamic")
+    # Many to many relationship with group_events
 
     def __repr__(self):
         return f"<Group {self.group_name}>"
@@ -227,6 +229,57 @@ class Group(db.Model):
         # Checks if logged in user is a member of the group, used for authorisation on group routes
         return any(user.id == current_user.id for user in self.members)
 
+    
+class GroupEvent(db.Model):
+    __tablename__ = "group_events"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    group_id = db.Column(
+        db.Integer, db.ForeignKey("groups.id"), nullable=False
+    ) # Links group event to the group
+    # So when a group event is made, only need the group id.
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    # Full ISO datetimes (UTC) so events can span multiple days.
+    # UTCDateTime re-tags values as UTC on read since SQLite strips the tz offset.
+    start_time = db.Column(UTCDateTime, nullable=False)
+    end_time = db.Column(UTCDateTime, nullable=False)
+    location = db.Column(db.String(200))  # optional
+    color = db.Column(
+        db.String(20)
+    )  # optional, used for calendar display (e.g. "indigo", "red", etc.)
+    # Added this column but will not be currently implemented (Future feature?)
+    going = db.Column(db.Boolean, nullable=False, default=True)
+    created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    # Note that since this is a group event, it shouldn't have originated from an ical link.
+
+    # Serialises the object to a plain dict — useful for returning JSON from a route
+    # startTime/endTime are full ISO datetimes (UTC). The frontend derives the date and
+    # local HH:MM display from these.
+    #
+    # SQLite has no native timezone storage, so DateTime(timezone=True) values come back
+    # as naive datetimes even though we always write UTC. Re-attach UTC here so the JSON
+    # string carries the offset and the browser converts to the user's local time.
+    def to_dict(self):
+        def _iso(dt):
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt.isoformat()
+        return {
+            "id": self.id,
+            "group_id": self.group_id,
+            "created_by_id": self.created_by,
+            "group_user": self.groupowner.group_name,
+            "title": self.title,
+            "description": self.description,
+            "startTime": _iso(self.start_time),
+            "endTime": _iso(self.end_time),
+            "location": self.location,
+            "color": self.color,
+            "going": self.going,
+        }
+
+    def __repr__(self):
+        return f"<Event {self.title} at {self.start_time}>"
 
 # Association table for Many-Many relationship between User and Groups
 user_group_association = db.Table(
