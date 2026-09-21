@@ -2,6 +2,7 @@ import requests # for fetching the iCal feed from the URL
 from requests.adapters import HTTPAdapter # for pinning DNS at the adapter layer
 from datetime import datetime, date, time, timedelta, timezone # for handling date and time fields
 from icalendar import Calendar as ICalendar # for parsing iCal data
+import hashlib # for stable, provider-specific colour assignment
 import ipaddress, socket # for URL safety checks
 from urllib.parse import urlparse # for URL parsing
 
@@ -17,6 +18,71 @@ class IcalFeedError(Exception):
     user-facing message instead of a raw icalendar traceback like
     "Found no components where exactly one is required: b''".
     """
+
+
+# -- Provider ("tenant") detection -------------------------------------------
+#
+# Different universities expose iCal feeds with different field semantics, so we
+# tag each calendar with a `source` and let the parser branch on it. UWA's CAS
+# puts the human-readable course name in SUMMARY; CVUT's SIRIUS puts the course
+# code + activity type in SUMMARY and the readable name in DESCRIPTION, plus a
+# CATEGORIES list holding the course code and activity type.
+
+_UWA_HOSTS = ("cas.uwa.edu.au", "uwa.edu.au")
+_CVUT_HOSTS = ("cvut.cz",)
+
+# Palette for per-course colours. Subset of the keys the frontend's COLOR_MAP
+# understands (see static/js/dash.js); 'gray' is reserved as the fallback there.
+_CVUT_COLOR_PALETTE = (
+    "indigo", "blue", "green", "rose", "amber", "orange", "red", "purple", "yellow",
+)
+
+
+def detect_source(url):
+    """
+    Identify which provider ("tenant") an iCal feed URL belongs to, from its
+    hostname alone. Returns 'uwa', 'cvut', or 'generic'.
+    """
+    hostname = (urlparse(url).hostname or "").lower()
+    if any(hostname == h or hostname.endswith("." + h) for h in _UWA_HOSTS):
+        return "uwa"
+    if any(hostname == h or hostname.endswith("." + h) for h in _CVUT_HOSTS):
+        return "cvut"
+    return "generic"
+
+
+def _cvut_course_code(component):
+    """
+    Pull the course code out of a CVUT VEVENT's CATEGORIES. CVUT lists the code
+    (e.g. "BIE-APS.21") and the activity type (e.g. "přednáška") as separate
+    categories; the code is the one containing a digit.
+    """
+    categories = component.get("CATEGORIES")
+    if categories is None:
+        return None
+    if not isinstance(categories, list):
+        categories = [categories]
+    for category in categories:
+        # A vCategory is list-like and serialises via to_ical(); a single
+        # CATEGORIES line may also hold comma-separated values, so flatten
+        # everything to plain strings before scanning.
+        raw = category.to_ical().decode("utf-8") if hasattr(category, "to_ical") else str(category)
+        for text in raw.split(","):
+            text = text.strip()
+            if any(ch.isdigit() for ch in text):
+                return text
+    return None
+
+
+def _color_for_course(code):
+    """
+    Map a course code to a stable colour so every session of the same course
+    renders the same way across imports. md5 keeps the assignment deterministic
+    across processes (Python's built-in hash() is salted per run).
+    """
+    digest = hashlib.md5(code.encode("utf-8")).hexdigest()
+    return _CVUT_COLOR_PALETTE[int(digest, 16) % len(_CVUT_COLOR_PALETTE)]
+
 
 # Address categories we refuse to fetch from. Anything in these ranges could
 # point at internal services or cloud metadata endpoints (e.g. 169.254.169.254
@@ -130,19 +196,22 @@ def validate_url(url):
     return None  # no error
 
 # store the users ical feed URL in the database 
-def store_ical_url(url, user_id):
+def store_ical_url(url, user_id, source):
     """
     Store the user's iCal feed URL in the database. This allows us to fetch and update events later.
+    `source` is the provider tag from detect_source(); it is recorded so later
+    syncs and the UI know which tenant the feed belongs to.
     """
     # Check if the user already has a calendar of the same url, if so we update the existing calendar's URL and synced_at timestamp. 
     # If not, we create a new calendar entry for the user.
     calendar = Calendar.query.filter_by(user_id=user_id, ical_url=url).first()
     if calendar:
         calendar.synced_at = datetime.now(timezone.utc)
+        calendar.source = source
         has_calendar = True
         cal_id = calendar.id
     else:
-        new_calendar = Calendar(user_id=user_id, ical_url=url, synced_at=datetime.now(timezone.utc))
+        new_calendar = Calendar(user_id=user_id, ical_url=url, synced_at=datetime.now(timezone.utc), source=source)
         db.session.add(new_calendar)
         db.session.flush()  # populate new_calendar.id before commit
         cal_id = new_calendar.id
@@ -205,7 +274,7 @@ def _to_utc_datetime(value, end_of_day=False):
     return datetime.combine(value, time(0, 0), tzinfo=timezone.utc)
 
 
-def parse_ical_event(component, user_id, cal_id):
+def parse_ical_event(component, user_id, cal_id, source="generic"):
     """
     Convert one iCal VEVENT component into a dict matching our Event model's fields.
     Heavily utilises icalnder package.
@@ -213,6 +282,11 @@ def parse_ical_event(component, user_id, cal_id):
     DTSTART/DTEND become full UTC datetimes so multi-day events are preserved.
     All-day events (DTSTART is a bare date) get midnight UTC for start and
     midnight UTC of the following day for end.
+
+    `source` lets us branch on provider-specific field semantics. For CVUT, the
+    course code lives in CATEGORIES and we map it to a stable colour so every
+    session of a course renders the same way (the frontend's title-based colouring
+    keys off a comma, which CVUT summaries don't contain).
     """
     dtstart = component.get("DTSTART").dt
     dtend   = component.get("DTEND").dt
@@ -220,7 +294,7 @@ def parse_ical_event(component, user_id, cal_id):
     start_time = _to_utc_datetime(dtstart)
     end_time   = _to_utc_datetime(dtend, end_of_day=not isinstance(dtend, datetime))
 
-    return {
+    event = {
         "title":       str(component.get("SUMMARY", "Untitled")),
         "description": str(component.get("DESCRIPTION", "")) or None,
         "start_time":  start_time,
@@ -229,6 +303,13 @@ def parse_ical_event(component, user_id, cal_id):
         "ical_uid":    str(component.get("UID", "")),
         "ical_id":    cal_id,  # link to the calendar this event came from
     }
+
+    if source == "cvut":
+        course_code = _cvut_course_code(component)
+        if course_code:
+            event["color"] = _color_for_course(course_code)
+
+    return event
 
 
 # Persist the parsed events to the database
@@ -310,7 +391,9 @@ def import_ical(url, user_id):
     if url_error:
         return None, url_error
 
-    has_calendar, cal_id = store_ical_url(url, user_id)  # store the URL and get whether it's a new calendar or an update
+    source = detect_source(url)  # which tenant the feed belongs to (uwa/cvut/generic)
+
+    has_calendar, cal_id = store_ical_url(url, user_id, source)  # store the URL and get whether it's a new calendar or an update
     # 2. Fetch iCal events from the URL
     try:
         ical_events = fetch_ical_events(url)
@@ -332,7 +415,7 @@ def import_ical(url, user_id):
     parsed_events = []
     for component in ical_events:
         try:
-            parsed_events.append(parse_ical_event(component, user_id, cal_id))
+            parsed_events.append(parse_ical_event(component, user_id, cal_id, source))
         except Exception:
             continue  # skip this event and move on
 
