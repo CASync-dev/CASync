@@ -176,6 +176,13 @@ class Calendar(db.Model):
     synced_at = db.Column(
         db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )  # when this calendar was last synced
+    # Which provider ("tenant") the feed came from — 'uwa', 'cvut', or 'generic'.
+    # Determined from the URL hostname at import time (see services/ical.detect_source).
+    # It drives provider-specific parsing, so a CVUT feed's CATEGORIES map to a
+    # stable per-course colour instead of being dropped.
+    source = db.Column(
+        db.String(32), nullable=False, default="generic", server_default="generic"
+    )
 
     def __repr__(self):
         return f"<Calendar {self.ical_url}>"
