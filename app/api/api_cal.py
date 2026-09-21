@@ -13,7 +13,7 @@ api_cal = Blueprint('api_cal', __name__)
 def api_calendars():
     user_id = current_user.id
     calendars = Calendar.query.where(Calendar.user_id == user_id).all()
-    return jsonify([{"id": c.id, "ical_url": c.ical_url, "synced_at": c.synced_at.isoformat()} for c in calendars])
+    return jsonify([{"id": c.id, "ical_url": c.ical_url, "synced_at": c.synced_at.isoformat(), "source": c.source} for c in calendars])
 
 @api_cal.route("/api/import-ical/", methods=["POST"])
 @login_required

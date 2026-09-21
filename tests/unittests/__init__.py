@@ -13,3 +13,4 @@ from .test_ratelimit import *
 from .test_reglog import *
 from .test_tokens import *
 from .test_user import *
+from .test_cvut import *
