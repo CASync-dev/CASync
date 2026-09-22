@@ -1,7 +1,7 @@
 from datetime import datetime, time, timedelta, timezone
 from app import db
 from flask import Blueprint, jsonify, request
-from app.models import Calendar, User, Event, Group
+from app.models import Calendar, GroupEvent, User, Event, Group
 from flask_login import current_user, login_required
 
 api_events = Blueprint('api_events', __name__)
@@ -210,41 +210,6 @@ def api_user_events(user_id):
     indexed_events = {str(i + 1): e.to_dict() for i, e in enumerate(events)}
     return jsonify({user_id: {"events": indexed_events}})
 
-@api_events.route("/api/events/group/<int:group_id>", methods=["GET"])
-@login_required
-def api_group_events(group_id):
-    # This route gets all the events for a group of users in the groups table. Also accepts a start and end date as query parameters to limit the events returned to a specific date range, same format as above routes
-    # Unlike the above route this one includes the pfp and username of the user in the response as well, to make it easier for the frontend to display the events on the calendar with the correct user information without needing to make additional requests to get the user info
-    start_str = request.args.get('start')
-    end_str = request.args.get('end')
-    if not start_str or not end_str:
-        return jsonify({"error": "Missing start or end date"}), 400
-    try:
-        start_date = datetime.strptime(start_str, '%Y-%m-%d').date()
-        end_date = datetime.strptime(end_str, '%Y-%m-%d').date()
-    except ValueError:
-        return jsonify({"error": "Invalid date format, should be YYYY-MM-DD"}), 400
-    # check if the user is in the group provided, if not return an error messag
-    group = Group.query.get(group_id)
-    if not group:
-        return jsonify({"error": "Group not found"}), 404
-    if not group.is_member():
-        return jsonify({"error": "Unauthorized"}), 403
-    # get all the user ids in the group and return all events for those users in the specified date range
-    user_ids = [user.id for user in group.members]
-    events = Event.query.where(
-        Event.user_id.in_(user_ids),
-        Event.start_time >= start_date,
-        Event.end_time <= end_date
-    ).all()
-    # format the events in the standard format specified above
-    # A user
-    user_dict = {str(user.id): {"username": user.username, "pfp": user.avatar(200), "events": {}} for user in group.members}
-    for event in events:
-        user_dict[str(event.user_id)]["events"][str(event.id)] = event.to_dict()
-    return jsonify(user_dict)
-
-
 # -- Manipulation routes (create, edit, delete) --
 
 # create event API route - accepts a POST request with the event details in the body and creates a new event for the user
@@ -369,3 +334,170 @@ def api_toggle_going(event_id):
     event.going = not event.going
     db.session.commit()
     return jsonify({"id": event.id, "user_id": event.user_id, "going": event.going}), 200
+
+@api_events.route("/api/events/group/<int:group_id>", methods=["GET"])
+@login_required
+def api_group_events(group_id):
+    # This route gets all the events for a group of users in the groups table. Also accepts a start and end date as query parameters to limit the events returned to a specific date range, same format as above routes
+    # Unlike the above route this one includes the pfp and username of the user in the response as well, to make it easier for the frontend to display the events on the calendar with the correct user information without needing to make additional requests to get the user info
+    start_str = request.args.get('start')
+    end_str = request.args.get('end')
+    if not start_str or not end_str:
+        return jsonify({"error": "Missing start or end date"}), 400
+    try:
+        start_date = datetime.strptime(start_str, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_str, '%Y-%m-%d').date()
+    except ValueError:
+        return jsonify({"error": "Invalid date format, should be YYYY-MM-DD"}), 400
+    # check if the user is in the group provided, if not return an error messag
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({"error": "Group not found"}), 404
+    if not group.is_member():
+        return jsonify({"error": "Unauthorized"}), 403
+    # get all the user ids in the group and return all events for those users in the specified date range
+    user_ids = [user.id for user in group.members]
+    events = Event.query.where(
+        Event.user_id.in_(user_ids),
+        Event.start_time >= start_date,
+        Event.end_time <= end_date
+    ).all()
+    # format the events in the standard format specified above
+    # A user
+    user_dict = {str(user.id): {"username": user.username, "pfp": user.avatar(200), "events": {}} for user in group.members}
+    for event in events:
+        user_dict[str(event.user_id)]["events"][str(event.id)] = event.to_dict()
+
+    # Group Events
+    g_events = GroupEvent.query.where(
+        GroupEvent.group_id == group_id,
+        GroupEvent.start_time >= start_date,
+        GroupEvent.end_time <= end_date
+    ).all()
+
+    group_events = dict()
+    glist = []
+    for gevent in g_events:
+        glist.append(gevent.to_dict())
+    
+    return jsonify(user_dict)
+
+# Group Event Manipulation (create, edit, delete)
+
+# Group event creation
+# Using a similar format to normal events for uniformity
+@api_events.route("/api/events/group_events/create/<int:group_id>", methods = ["POST"])
+@login_required
+def api_create_group_event(group_id):
+    if not group_id:
+        return jsonify({"Error": "No group provided for group event creation."})
+    group = db.session.get(Group, group_id)
+    if not group:
+        return jsonify({"Error": "Invalid group provided"})
+    # Prevent creating group events for groups you're not a member of
+    if not group.is_member():
+        return jsonify({"Error": "You're not apart of this group!"})
+    # Gets form data
+    data = request.get_json()
+    '''
+    Expected format:
+    {
+        "title": "Event Title",
+        "description": "Event Description",
+        "start_time": "2024-07-01T14:00:00.000Z",
+        "end_time": "2024-07-01T15:00:00.000Z",
+        "group_id": 1
+        "location": "Event Location",
+        "color": "indigo"
+    }
+    start_time and end_time are full ISO datetimes with a timezone offset.
+    ...like normal event creation form, only for group events :)
+    '''
+
+    # From normal event creation
+    # VALIDATE input fields
+    errors = _validate_event_data(data)
+    if errors:
+        return jsonify({"error": "; ".join(errors)}), 400
+
+     # Required fields
+    if not data.get('title') or not data.get('start_time') or not data.get('end_time'):
+        return jsonify({"error": "Please fill in all required fields."}), 400
+    
+    # End time after start time
+    start = datetime.strptime(data['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ').time()
+    end = datetime.strptime(data['end_time'], '%Y-%m-%dT%H:%M:%S.%fZ').time()
+    if end <= start:
+        return jsonify({"error": "End time must be after start time."}), 400
+    
+    g_event = GroupEvent(
+        group_id=group_id,
+        title= data['title'],
+        description= data['description'],
+        start_time=datetime.fromisoformat(data['start_time'].replace('Z', '+00:00')),
+        end_time=datetime.fromisoformat(data['end_time'].replace('Z', '+00:00')),
+        location=data.get('location'),
+        color=data.get('color', 'indigo'),
+        created_by=current_user.id)
+    
+    db.session.add(g_event)
+    db.session.commit()
+    return jsonify(g_event.to_dict()), 201
+
+@api_events.route("/api/events/group_events/edit/<int:group_event_id>", methods = ["PUT", "GET"])
+@login_required
+def api_edit_group_event(group_event_id):
+    g_event = db.session.get(GroupEvent, group_event_id)
+    if not g_event:
+        return jsonify({"error": "Event not found"}), 404
+    group = db.session.get(Group, g_event.group_id)
+    if not group.is_member():
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    data = request.get_json()
+
+    # VALIDATE input fields
+    errors = _validate_event_data(data)
+    if errors:
+        return jsonify({"error": "; ".join(errors)}), 400
+
+    
+    
+    # VALIDATE input fields
+    # Required fields
+    if not data.get('title') or not data.get('start_time') or not data.get('end_time'):
+        return jsonify({"error": "Please fill in all required fields."}), 400
+    
+    # End time after start time
+    start = datetime.strptime(data['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ').time()
+    end = datetime.strptime(data['end_time'], '%Y-%m-%dT%H:%M:%S.%fZ').time()
+    if end <= start:
+        return jsonify({"error": "End time must be after start time."}), 400
+    
+    
+    # update the event details - again we should add some validation here but we'll assume the data is correct for now
+    g_event.title = data['title']
+    g_event.description = data.get('description', '')
+    g_event.start_time = datetime.fromisoformat(data['start_time'].replace('Z', '+00:00'))
+    g_event.end_time = datetime.fromisoformat(data['end_time'].replace('Z', '+00:00'))
+    g_event.location = data.get('location')
+    g_event.color = data.get('color') or 'indigo'
+    db.session.commit()
+    return jsonify(g_event.to_dict()), 200
+
+@api_events.route("/api/events/group_events/delete/<int:group_event_id>", methods = ["DELETE"])
+@login_required
+def api_delete_group_event(group_event_id):
+    g_event = db.session.get(GroupEvent, group_event_id)
+    if not g_event:
+        return jsonify({"error": "Event not found"}), 404
+    group = db.session.get(Group, g_event.group_id)
+    if not group.is_member():
+        return jsonify({"error": "Unauthorised"}), 403
+    
+    # Unlike events, all group events are custom.
+    # So there will be no check for ical events here :)
+
+    db.session.delete(g_event)
+    db.session.commit()
+    return jsonify({"message": "Group Event deleted"}), 200

@@ -499,6 +499,9 @@ function openSchedule(groupId, groupname) {
   // set the modal title to the group name
   document.getElementById("group-schedule-title").textContent =
     `${groupname}'s Schedule`;
+  // set create new group event button to have data-group-id of the current group-id
+  document.getElementById("btn-create-group-event").setAttribute("data-group-id", groupId);
+  document.getElementById("btn-create-group-event-mobile").setAttribute("data-group-id", groupId);
   // open the modal
   const modal = document.getElementById("group-schedule-modal");
   modal.showModal();
@@ -512,4 +515,109 @@ new MutationObserver(() => {
 // Calls search setup once instead of creating a new event listener every search
 document.addEventListener("DOMContentLoaded", () => {
   setupSearchFriend();
+});
+
+// Group Event Creation -------------------------------------------------------
+// Similar logic to schedule.js, just with a group id included :)
+
+// Rather than re-using the drawer from the schedule page (too clunky since it'll be overlapping the group modal)
+// We'll use a close-current-modal-open-new-modal method :')
+// that probably makes sense
+
+function openGroupEventCreation() {
+  group_id = this.getAttribute('data-group-id');
+  document.getElementById("create-group-event-modal").showModal();
+  document.getElementById("event-crea-groupid").setAttribute('value', group_id);
+  document.getElementById("group-schedule-modal").close();
+  return;
+}
+
+document.getElementById("btn-create-group-event").addEventListener('click', openGroupEventCreation);
+document.getElementById("btn-create-group-event-mobile").addEventListener('click', openGroupEventCreation);
+
+function closeGroupEventCreation() {
+  // Not really necessary to reset this? But added just in case (though clicking out of backdrop keeps it... ;-;)
+  document.getElementById("event-crea-groupid").setAttribute('value', 'groupid');
+  document.getElementById("group-schedule-modal").showModal();
+  document.getElementById("create-group-event-modal").close();
+  document.getElementById("form-message").classList.add('hidden');
+}
+
+document.getElementById("close-event-create-btn").addEventListener('click', closeGroupEventCreation);
+
+// (Group) Event form handler
+document.getElementById("create-group-event").addEventListener("submit", (e) => {
+  e.preventDefault();
+  // Get form values
+  const title = document.getElementById("event-title").value;
+  const startInput = document.getElementById("event-start").value;
+  const endInput = document.getElementById("event-end").value;
+  const location = document.getElementById("event-location").value;
+  const description = document.getElementById("event-description").value;
+  const color = document.getElementById("event-color").value;
+  const group_id = document.getElementById("event-crea-groupid").value;
+  errorElement = document.getElementById("form-message");
+  // Basic validation
+  if (!title || !startInput || !endInput) {
+    errorElement.textContent = "Please fill in all required fields.";
+    errorElement.classList.remove("hidden");
+    return;
+  }
+  // datetime-local inputs are interpreted as local time
+  const startDate = new Date(startInput);
+  console.log(startDate.toISOString())
+  const endDate = new Date(endInput);
+  console.log(endDate.toISOString())
+  // end must be after start
+  if (endDate <= startDate) {
+    errorElement.textContent = "End must be after start.";
+    errorElement.classList.remove("hidden");
+    return;
+  }
+  // Event must be in the future
+  if (startDate <= new Date()) {
+    errorElement.textContent =
+      "Events have to be in the future. Please select a start time later than now.";
+    errorElement.classList.remove("hidden");
+    return;
+  }
+
+  // From here on, new content :)
+  // To be finished.
+
+  const newEvent = {
+    "title": title,
+    "description": description,
+    "start_time": startDate.toISOString(),
+    "end_time": endDate.toISOString(),
+    "group_id": group_id,
+    "location": location,
+    "color": color
+  };
+
+  fetch("/api/events/group_events/create/" + group_id, {
+    method: "POST",
+    headers: {"Content-Type": "application/json", "X-CSRFToken": CSRF},
+    body: JSON.stringify(newEvent),
+  }).then((response)=> {
+    if (!response.ok) {
+      throw new Error("Failed to create group event");
+    }
+    console.log("Group Event created successfully.");
+    return response.json();
+  }).then((createdEvent) => {
+    document.getElementById("create-group-event").reset();
+    selectColor(
+      document.querySelector("#color-picker-buttons button"),
+      "indigo",
+    );
+    closeGroupEventCreation();
+  }).catch((error) => {
+    console.error("Error creating event:", error);
+    errorElement.textContent = "Error creating event. Please try again.";
+    errorElement.classList.remove("hidden");
+    console.error("Error creating event:", error);
+  })
+
+
 });
