@@ -4,7 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="theme-color" content="#1e3a8a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="CASync" />
     <link rel="icon" type="image/png" sizes="32x32" href="{{url_for('static', filename='images/bluecircle_favicon.png')}}">
+    <link rel="manifest" href="{{ url_for('loggedout.webmanifest') }}" />
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/bluecircle_favicon.png') }}" />
     <title>CASync</title>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
@@ -188,6 +194,13 @@
 
       function logoutImplementation() {
         window.location.href = "/dev/logout";
+      }
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("{{ url_for('loggedout.service_worker') }}");
+        });
       }
     </script>
     {% block scripts %}{% endblock %}
