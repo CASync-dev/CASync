@@ -6,12 +6,18 @@
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+      <meta name="theme-color" content="#1e3a8a" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <meta name="apple-mobile-web-app-title" content="CASync" />
       <link
         rel="icon"
         type="image/png"
         sizes="32x32"
         href="{{ url_for('static', filename='images/bluecircle_favicon.png') }}"
       />
+      <link rel="manifest" href="{{ url_for('loggedout.webmanifest') }}" />
+      <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/bluecircle_favicon.png') }}" />
       <title>CASync</title>
 
       <!-- Roboto font css file; Sets all text to roboto-->
@@ -189,6 +195,13 @@
     </dialog>
     <div id="content" class="flex-1">{% block content %}{% endblock %}</div>
     {% block scripts %}{% endblock %}
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("{{ url_for('loggedout.service_worker') }}");
+        });
+      }
+    </script>
 
     <!-- Footer; To be used in all (logged-out) webpages -->
     {% block footer %}

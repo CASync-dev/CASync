@@ -1,0 +1,24 @@
+{
+  "name": "CASync",
+  "short_name": "CASync",
+  "description": "A platform for connecting timetables",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "/static/images/bluecircle_favicon.png",
+      "sizes": "2000x2000",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/whitecircle_favicon.png",
+      "sizes": "2000x2000",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

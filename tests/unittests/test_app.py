@@ -54,3 +54,30 @@ class AppTestCase(unittest.TestCase):
         assert response.status_code == 404
         assert 'Sorry, we couldn’t find the page you’re looking for.' in html
         assert 'Page not found' in html
+
+    def test_manifest_route(self):
+        response = self.client.get('/manifest.webmanifest')
+        manifest = response.get_json()
+
+        assert response.status_code == 200
+        assert 'application/manifest+json' in response.content_type
+        assert manifest['name'] == 'CASync'
+        assert manifest['start_url'] == '/'
+
+    def test_service_worker_route(self):
+        response = self.client.get('/service-worker.js')
+        js = response.get_data(as_text=True)
+
+        assert response.status_code == 200
+        assert 'application/javascript' in response.content_type
+        assert 'self.addEventListener("install"' in js
+
+    def test_index_includes_pwa_metadata(self):
+        response = self.client.get('/index')
+        html = response.get_data(as_text=True)
+
+        assert response.status_code == 200
+        assert 'rel="manifest"' in html
+        assert '/manifest.webmanifest' in html
+        assert 'apple-mobile-web-app-capable' in html
+        assert 'serviceWorker.register("/service-worker.js")' in html

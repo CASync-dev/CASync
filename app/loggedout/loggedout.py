@@ -1,5 +1,6 @@
-from flask import Blueprint, flash, render_template, redirect, request, url_for
+from flask import Blueprint, current_app, flash, render_template, redirect, request, url_for
 from flask_login import current_user, login_user
+from pathlib import Path
 
 from app.form import (
     ForgotPasswordForm,
@@ -27,6 +28,28 @@ def root():
     if current_user.is_authenticated:
         return redirect(url_for('loggedin.dash'))
     return redirect(url_for('loggedout.index'))
+
+
+@loggedout.route("/manifest.webmanifest")
+def webmanifest():
+    manifest_path = Path(current_app.static_folder) / "manifest.webmanifest"
+    return current_app.response_class(
+        manifest_path.read_text(encoding="utf-8"),
+        mimetype="application/manifest+json",
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+@loggedout.route("/service-worker.js")
+def service_worker():
+    service_worker_path = Path(current_app.static_folder) / "service-worker.js"
+    return current_app.response_class(
+        service_worker_path.read_text(encoding="utf-8"),
+        mimetype="application/javascript",
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
 @loggedout.route("/index")
 def index():
     return render_template('loggedout/homepage.html')
