@@ -6,19 +6,25 @@
   "scope": "/",
   "display": "standalone",
   "background_color": "#f9fafb",
-  "theme_color": "#1e3a8a",
+  "theme_color": "#4741f7",
   "icons": [
     {
-      "src": "/static/images/bluecircle_favicon.png",
-      "sizes": "2000x2000",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/static/images/whitecircle_favicon.png",
-      "sizes": "2000x2000",
+      "src": "/static/images/icon-192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/static/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/images/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

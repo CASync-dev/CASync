@@ -56,21 +56,27 @@ class AppTestCase(unittest.TestCase):
         assert 'Page not found' in html
 
     def test_manifest_route(self):
-        response = self.client.get('/manifest.webmanifest')
-        manifest = response.get_json()
+        with self.client.get('/manifest.webmanifest') as response:
+            manifest = response.get_json()
 
-        assert response.status_code == 200
-        assert 'application/manifest+json' in response.content_type
-        assert manifest['name'] == 'CASync'
-        assert manifest['start_url'] == '/'
+            assert response.status_code == 200
+            assert 'application/manifest+json' in response.content_type
+            assert manifest['name'] == 'CASync'
+            assert manifest['start_url'] == '/'
+            assert manifest['theme_color'] == '#4741f7'
+            sizes = {icon['sizes'] for icon in manifest['icons']}
+            purposes = {icon['purpose'] for icon in manifest['icons']}
+            assert {'192x192', '512x512'} <= sizes
+            assert {'any', 'maskable'} <= purposes
 
     def test_service_worker_route(self):
-        response = self.client.get('/service-worker.js')
-        js = response.get_data(as_text=True)
+        with self.client.get('/service-worker.js') as response:
+            js = response.get_data(as_text=True)
 
-        assert response.status_code == 200
-        assert 'application/javascript' in response.content_type
-        assert 'self.addEventListener("install"' in js
+            assert response.status_code == 200
+            assert 'application/javascript' in response.content_type
+            assert 'self.addEventListener("install"' in js
+            assert 'self.addEventListener("fetch"' in js
 
     def test_index_includes_pwa_metadata(self):
         response = self.client.get('/index')
@@ -79,5 +85,7 @@ class AppTestCase(unittest.TestCase):
         assert response.status_code == 200
         assert 'rel="manifest"' in html
         assert '/manifest.webmanifest' in html
+        assert 'content="#4741f7"' in html
+        assert 'mobile-web-app-capable' in html
         assert 'apple-mobile-web-app-capable' in html
-        assert 'serviceWorker.register("/service-worker.js")' in html
+        assert '.register("/service-worker.js")' in html

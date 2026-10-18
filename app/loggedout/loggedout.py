@@ -1,6 +1,5 @@
-from flask import Blueprint, current_app, flash, render_template, redirect, request, url_for
+from flask import Blueprint, current_app, flash, render_template, redirect, request, send_from_directory, url_for
 from flask_login import current_user, login_user
-from pathlib import Path
 
 from app.form import (
     ForgotPasswordForm,
@@ -32,21 +31,21 @@ def root():
 
 @loggedout.route("/manifest.webmanifest")
 def webmanifest():
-    manifest_path = Path(current_app.static_folder) / "manifest.webmanifest"
-    return current_app.response_class(
-        manifest_path.read_text(encoding="utf-8"),
+    return send_from_directory(
+        current_app.static_folder,
+        "manifest.webmanifest",
         mimetype="application/manifest+json",
-        headers={"Cache-Control": "no-cache"},
+        max_age=0,
     )
 
 
 @loggedout.route("/service-worker.js")
 def service_worker():
-    service_worker_path = Path(current_app.static_folder) / "service-worker.js"
-    return current_app.response_class(
-        service_worker_path.read_text(encoding="utf-8"),
+    return send_from_directory(
+        current_app.static_folder,
+        "service-worker.js",
         mimetype="application/javascript",
-        headers={"Cache-Control": "no-cache"},
+        max_age=0,
     )
 
 
