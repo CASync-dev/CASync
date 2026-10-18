@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, render_template, redirect, request, url_for
+from flask import Blueprint, current_app, flash, render_template, redirect, request, send_from_directory, url_for
 from flask_login import current_user, login_user
 
 from app.form import (
@@ -27,6 +27,28 @@ def root():
     if current_user.is_authenticated:
         return redirect(url_for('loggedin.dash'))
     return redirect(url_for('loggedout.index'))
+
+
+@loggedout.route("/manifest.webmanifest")
+def webmanifest():
+    return send_from_directory(
+        current_app.static_folder,
+        "manifest.webmanifest",
+        mimetype="application/manifest+json",
+        max_age=0,
+    )
+
+
+@loggedout.route("/service-worker.js")
+def service_worker():
+    return send_from_directory(
+        current_app.static_folder,
+        "service-worker.js",
+        mimetype="application/javascript",
+        max_age=0,
+    )
+
+
 @loggedout.route("/index")
 def index():
     return render_template('loggedout/homepage.html')

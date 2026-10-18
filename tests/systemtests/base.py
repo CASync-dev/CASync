@@ -61,8 +61,9 @@ class BaseSeleniumTest(unittest.TestCase):
         if hasattr(cls, 'server'):
             cls.server.shutdown()
             cls.server_thread.join()
-        db.drop_all()
-        cls.app_context.pop()
+        if hasattr(cls, 'app_context'):
+            db.drop_all()
+            cls.app_context.pop()
 
     @classmethod
     def populate_db(cls):
