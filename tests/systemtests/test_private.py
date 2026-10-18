@@ -28,23 +28,31 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         )
 
     def tearDown(self):
-        # delete association rows first
-        db.session.execute(user_group_association.delete())
-        # delete any events created during the test so each test starts with a clean slate
-        Event.query.delete()
-        # delete any users created during the test except for gerald (id=1) who is needed to log in and access the authenticated pages
-        User.query.filter(User.id != 1).delete()
-        # delete any friendships created during the test
-        Friendship.query.delete()
-        # delete any group events cerated during testing
-        Group.query.delete()
-        
-        db.session.commit()
-        # logout after each test to ensure a clean slate for the next one
-        self.driver.find_element(By.ID, 'logout').click()
-        WebDriverWait(self.driver, timeout=10).until(
-            EC.url_contains("/login")
-        )
+        # Logout first so the browser lands on /login and any in-flight dashboard/page
+        # fetch requests in server_thread finish before we mutate the shared StaticPool
+        # in-memory SQLite connection.
+        try:
+            try:
+                self.driver.find_element(By.ID, 'logout').click()
+            except Exception:
+                self.driver.get(localHost + "logout")
+            WebDriverWait(self.driver, timeout=10).until(
+                EC.url_contains("/login")
+            )
+        finally:
+            db.session.remove()
+            # delete association rows first
+            db.session.execute(user_group_association.delete())
+            # delete any events created during the test so each test starts with a clean slate
+            Event.query.delete()
+            # delete any users created during the test except for gerald (id=1) who is needed to log in and access the authenticated pages
+            User.query.filter(User.id != 1).delete()
+            # delete any friendships created during the test
+            Friendship.query.delete()
+            # delete any group events cerated during testing
+            Group.query.delete()
+
+            db.session.commit()
 
     # ------------------------------------------------------------------------------------------------------- #
     # SCHEDULE #
@@ -1145,6 +1153,13 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         WebDriverWait(self.driver, timeout=10).until(
             EC.invisibility_of_element((By.ID, 'changepass-modal'))
         )
+        # @tailwindplus/elements runs a second dialog.close() inside nested
+        # requestAnimationFrame callbacks after the leave transition resolves.
+        # Wait two animation frames before re-opening so that callback doesn't
+        # immediately close the newly opened dialog.
+        self.driver.execute_async_script(
+            "const done = arguments[0]; requestAnimationFrame(() => requestAnimationFrame(done));"
+        )
         self.driver.find_element(By.ID, 'changepasswordbutton').click()
         WebDriverWait(self.driver, timeout=10).until(
             EC.visibility_of_element_located((By.ID, 'changepass-modal'))
@@ -1236,6 +1251,11 @@ class PrivateSeleniumTests(BaseSeleniumTest):
         self.driver.find_element(By.ID, 'closeaccdelbutton').click()
         WebDriverWait(self.driver, timeout=10).until(
             EC.invisibility_of_element((By.ID, 'deleteacc-modal'))
+        )
+        # Wait two animation frames for @tailwindplus/elements's post-close
+        # requestAnimationFrame callback to finish before re-opening.
+        self.driver.execute_async_script(
+            "const done = arguments[0]; requestAnimationFrame(() => requestAnimationFrame(done));"
         )
         self.driver.find_element(By.ID, 'delaccbutton').click()
         WebDriverWait(self.driver, timeout=10).until(
