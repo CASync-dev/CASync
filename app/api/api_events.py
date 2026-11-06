@@ -379,8 +379,9 @@ def api_group_events(group_id):
     glist = []
     for gevent in g_events:
         glist.append(gevent.to_dict())
-    
-    return jsonify(user_dict)
+
+    # user_dict: returns the user events, glist: returns group events.
+    return jsonify({'user-events': user_dict, 'group-events':glist})
 
 # Group Event Manipulation (create, edit, delete)
 
