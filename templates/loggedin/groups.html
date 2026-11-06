@@ -1,4 +1,7 @@
 {% extends "loggedin/layout.html" %}
+{% block head %}
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
+{% endblock %}
 {% block content %}
   <!-- TODO: Add schedules to groups -->
   <div class="mx-4 2xl:max-w-7xl 2xl:mx-auto px-4 py-8 mt-6 rounded-xl">
@@ -485,14 +488,231 @@
       </div>
     </dialog>
   </el-dialog>
+
+  <!-- WIP: group event creation modal -->
+  <el-dialog>
+    <dialog
+      id="create-group-event-modal"
+      class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+    >
+      <el-dialog-backdrop
+        class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0"
+      ></el-dialog-backdrop>
+
+      <div
+        tabindex="0"
+        class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+      >
+        <el-dialog-panel
+          class="relative transform overflow-hidden rounded-lg bg-gray-200 text-left shadow-xl outline -outline-offset-1 outline-white/10 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+        >
+          <div class="bg-gray-200 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 min-h-100">
+            <div class="sm:flex sm:items-start">
+              <div
+                class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-nearwhite sm:mx-0 sm:h-10 sm:w-10"
+              >
+                <i
+                  class="fa-solid fa-calendar-days"
+                  style="color: #4741f7;"
+                ></i>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3
+                  class="text-lg font-medium leading-6 text-gray-900"
+                  id="group-event-creation-modal-title"
+                >
+                  Create a Group Event
+                </h3>
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500">
+                    Enter the following fields.
+                  </p>
+                  <div class="mt-3 flex w-full items-stretch gap-2">
+                    <form id="create-group-event" class="flex flex-col items-center">
+                      <!-- Secret hidden groupid input to parse group id into form.-->
+                      <input class = "hidden" id = "event-crea-groupid" value="groupid">
+                      <div class="flex flex-row max-sm:flex-col w-full">
+                        <!-- Title & location -->
+                        <div class="flex flex-col max-sm:mx-auto">
+                          <label for="event-title" class="block">
+                            Event Title
+                          </label>
+                          <input
+                            name="event-title"
+                            id="event-title"
+                            type="text"
+                            class="mt-1 block rounded-md bg-white border-gray-300 shadow-sm max-sm:w-full focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-3"
+                          />
+                          <label for="event-location" class="block">
+                            Location
+                          </label>
+                          <input
+                            name="event-location"
+                            id="event-location"
+                            type="text"
+                            class="mt-1 block rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          />
+                        </div>
+                        <!-- Times & Colour-->
+                        <div class="flex flex-col pl-5 max-sm:pl-0 max-sm:mx-auto max-sm:items-center">
+                          <div class="mb-3">
+                            <label
+                              for="event-start"
+                              class="block"
+                            >
+                              Starts
+                            </label>
+                            <input
+                              type="datetime-local"
+                              id="event-start"
+                              name="event-start"
+                              class="mt-1 block rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              value="{{ now.strftime('%Y-%m-%dT%H:%M') }}"
+                            />
+                          </div>
+                          <div class="mb-3">
+                            <label
+                              for="event-end"
+                              class="block"
+                            >
+                              Ends
+                            </label>
+                            <input
+                              type="datetime-local"
+                              id="event-end"
+                              name="event-end"
+                              class="mt-1 block rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              {% if now.hour == 23 %}
+                                value="{{ (now + timedelta(hours=1, minutes=1)).strftime('%Y-%m-%dT%H:%M') }}"
+                              {% else %}
+                                value="{{ now.replace(hour=now.hour+1, minute=now.minute+1).strftime('%Y-%m-%dT%H:%M') }}"
+                              {% endif %}
+                            />
+                          </div>
+                          
+                          </div>
+                        </div>
+                        <!-- Description -->
+                      <div class="flex flex-col w-full items-stretch text-left">
+                        <label for="event-description" class="block max-sm:mx-auto">
+                            Description
+                        </label>
+                        <textarea
+                        id="event-description"
+                        name="event-description"
+                        rows="3"
+                        class="mt-1 mb-1 block w-full rounded-md bg-white border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      ></textarea>
+                      </div>
+                      <div>
+                            <label
+                              for="event-color"
+                              class="block"
+                            >
+                              Event Color
+                            </label>
+                            <!-- hidden input to store the selected color -->
+                            <input
+                              type="hidden"
+                              id="event-color"
+                              value="indigo"
+                            />
+                            <div class="flex gap-1" id="color-picker-buttons">
+                              <!-- indigo -->
+                              <button
+                                type="button"
+                                class="mt-1 block w-16 h-8 rounded-md bg-indigo-500 border border-gray-300 shadow-sm sm:text-sm ring-2 ring-offset-2 ring-black"
+                                onclick="selectColor(this, 'indigo')"
+                              ></button>
+                              <!-- red -->
+                              <button
+                                type="button"
+                                class="mt-1 block w-16 h-8 rounded-md bg-red-500 border border-gray-300 shadow-sm sm:text-sm"
+                                onclick="selectColor(this, 'red')"
+                              ></button>
+                              <!-- orange -->
+                              <button
+                                type="button"
+                                class="mt-1 block w-16 h-8 rounded-md bg-orange-500 border border-gray-300 shadow-sm sm:text-sm"
+                                onclick="selectColor(this, 'orange')"
+                              ></button>
+                              <!-- yellow -->
+                              <button
+                                type="button"
+                                class="mt-1 block w-16 h-8 rounded-md bg-yellow-500 border border-gray-300 shadow-sm sm:text-sm"
+                                onclick="selectColor(this, 'yellow')"
+                              ></button>
+                              <!-- green -->
+                              <button
+                                type="button"
+                                class="mt-1 block w-16 h-8 rounded-md bg-green-500 border border-gray-300 shadow-sm sm:text-sm"
+                                onclick="selectColor(this, 'green')"
+                              ></button>
+                              <!-- blue -->
+                              <button
+                                type="button"
+                                class="mt-1 block w-16 h-8 rounded-md bg-blue-500 border border-gray-300 shadow-sm sm:text-sm"
+                                onclick="selectColor(this, 'blue')"
+                              ></button>
+                            </div>
+                      </div>
+                      <div>
+                      <p
+                        id="form-message"
+                        class="text-sm text-red-500 hidden"
+                      ></p>
+                    </div>
+                      <div
+            class="bg-gray-200 px-4 py-3 flex flex-row-reverse mt-3 max-sm:flex-col sm:px-6 justify-between max-sm:w-full"
+          >
+            <button
+              id="submit-event-btn"
+              type="submit"
+              class="cursor-pointer mx-3 mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-primary px-4 py-2 text-base font-medium text-nearwhite shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+            >
+              Submit
+            </button>
+            <button
+              id = "close-event-create-btn"
+              type = "button"
+              class="cursor-pointer mx-3 mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-nearwhite px-4 py-2 text-base font-medium text-primary shadow-sm hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+              >
+              <
+            </button>
+          </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </el-dialog-panel>
+      </div>
+    </dialog>
+  </el-dialog>
 {% endblock %}
 
 {% block scripts %}
   <script src="{{ url_for('static', filename='js/groups.js') }}"></script>
+  <!-- Reusing the event functions from schedule.js -->
+  <script src="{{ url_for('static', filename='js/schedule.js')}}"></script>
 
   <!-- Tailwind Elements -->
   <script
     src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"
     type="module"
   ></script>
+  <script>
+    // Sets the default values for event creation to local time in the correct format
+    (function () {
+      const pad = (n) => String(n).padStart(2, "0");
+      const fmt = (d) =>
+        `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      const start = new Date();
+      const end = new Date(start.getTime() + 60 * 60 * 1000); // +1h
+      document.getElementById("event-start").value = fmt(start);
+      document.getElementById("event-end").value = fmt(end);
+    })();
+  </script>
 {% endblock %}

@@ -85,6 +85,24 @@ The general flow of it is:
         See Availability
       </button>
       {% endif %} #}
+      {% if isGroupSchedule %}
+      <!-- TODO: Change to the new group event creation modal-->
+      <button
+        id="btn-create-group-event"
+        class="btn-primary hidden md:flex gap-2 transition-all duration-300"
+        data-group-id = ""
+      >
+        <i class="fa-solid fa-plus text-sm"></i>
+        New Group Event
+      </button>
+      <button
+        id="btn-create-group-event-mobile"
+        class="block md:hidden fixed right-0 bottom-0 m-3 w-12 h-12 z-10 font-semibold rounded-full bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700"
+        data-group-id = ""
+      >
+        <i class="fa-solid fa-plus text-sm"></i>
+      </button>
+      {% endif %}
     </div>
 
     <!-- Week navigation buttons -->
@@ -170,6 +188,7 @@ The general flow of it is:
     // Overrideable base URL — set this before calling fetchAndRenderEvents() to change the data source
     let calendarBaseUrl = "{{ eventsUrl | safe }}";
     let events = {};
+    let g_events = [];
 
     // Grid Constants: base values are baked in from the macro args and never change.
     const GRID_BASE_START = {{ timeRange[0] }};
@@ -270,6 +289,14 @@ The general flow of it is:
         for (const key of Object.keys(userBlock.events)) {
           userBlock.events[key] = normaliseEvent(userBlock.events[key]);
         }
+      }
+      return data;
+    }
+
+    function normaliseGroupEvent(data) {
+      for (let index = 0; index < data.length; index++) {
+        const element = data[index];
+        data[index] = normaliseEvent(element);
       }
       return data;
     }
@@ -420,7 +447,14 @@ The general flow of it is:
           .then((data) => {
             lastFetchedStart = startDate;
             lastFetchedEnd = endDate;
-            events = normaliseEventsResponse(data);
+            if ("group-events" in data) {
+              events = normaliseEventsResponse(data["user-events"]);
+
+              // To keep things clean, doing this seperately :)
+              g_events = normaliseGroupEvent(data["group-events"]);
+            } else {
+              events = normaliseEventsResponse(data);
+            }
             renderDesktopEvents();
           })
           .catch((error) => {
@@ -804,7 +838,7 @@ The general flow of it is:
       // without it (i.e in single user mode) the card does not show the username
       // to do this we use tags: simple key value pairs added to the event object
       // it parses the json reponse to an array of key value pairs where the key is the user id and the value is the user data (including events)
-      const taggedRaw = Object.entries(eventsData).flatMap(([userId, userData]) =>
+      let taggedRaw = Object.entries(eventsData).flatMap(([userId, userData]) =>
         // then for each event of each user we create a new event object thatt includes the og data aswell as the tags for color and showUsername
         Object.values(userData.events).map(event => ({
           ...event, // new event object with all the og data, uses Spread syntax because we are in a arrow function
@@ -816,6 +850,7 @@ The general flow of it is:
         }))
       );
       // Split multi-day events first so each day's segment can group with same-slot segments from other users.
+      taggedRaw = taggedRaw.concat(g_events);
       const tagged = splitMultiDayEvents(taggedRaw);
 
       // Group by exact date + startTime + endTime.
@@ -960,7 +995,7 @@ The general flow of it is:
 
       const weekDates = getWeekDates();
 
-      // Route to multi-user parser if more than one user is present, otherwise use the simple flatten.
+      // Route to multi-user parser if more than one user is present, otherwise use the simple flatten. Assume multi-users = group
       const isMultiUser = Object.keys(events).length > 1;
       const flatEvents = isMultiUser ? multiUserParser(events) : flattenEvents(events);
       // Compute bounds across this week's events and extend the grid DOM if needed.
