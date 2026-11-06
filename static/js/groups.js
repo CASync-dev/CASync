@@ -612,6 +612,9 @@ document.getElementById("create-group-event").addEventListener("submit", (e) => 
       "indigo",
     );
     closeGroupEventCreation();
+    document.dispatchEvent(
+      new CustomEvent("calendar:event-created", { detail: createdEvent})
+    );
   }).catch((error) => {
     console.error("Error creating event:", error);
     errorElement.textContent = "Error creating event. Please try again.";
