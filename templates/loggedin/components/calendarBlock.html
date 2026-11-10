@@ -609,6 +609,42 @@ The general flow of it is:
         details.appendChild(buttonStack);
       {% endif %}
 
+      {# Similar system for group #}
+      {% if isGroupSchedule %}
+        const buttongroupStack = document.createElement('div');
+        buttongroupStack.className = 'flex flex-col gap-1 ml-auto';
+        // Check this is a group event
+        
+        if (event.group_user) {
+          // we add a little badge to the top right corner to indicate it is a custom event
+          const badge = document.createElement('span');
+          badge.className = 'inline-block w-2 h-2 bg-blue-500 rounded-full ml-2';
+          badge.title = 'Group event';
+          card.children[0].appendChild(badge);
+
+          // delete + edit btns stacked vertically
+          // events to be defined in groups.js
+          buttongroupStack.innerHTML = `
+            <button id="delete-event-btn" class="bg-red-500 text-white rounded p-1 hover:bg-red-600" onclick="deleteGroupEvent('${event.id}')">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+            <button id="edit-event-btn" class="bg-blue-500 text-white rounded p-1 hover:bg-blue-600" onclick="editGroupEvent('${event.id}')">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>`;
+        }
+        const groupToggle = document.createElement('button');
+          groupToggle.id = 'going-toggle-btn';
+          groupToggle.className = event.going ? 'bg-gray-500 text-white rounded p-1 hover:bg-gray-600 mt-auto' : 'bg-green-500 text-white rounded p-1 hover:bg-green-600 mt-auto';
+          groupToggle.innerHTML = event.going ? `<i class="fa-solid fa-xmark"></i>` : `<i class="fa-solid fa-check"></i>`;
+          groupToggle.title = event.going ? 'Mark as not going' : 'Mark as going';
+          // toggleGoing is defined in static/js/schedule.js
+          groupToggle.classList.add('going-toggle');
+          groupToggle.dataset.eventId = event.id;
+          groupToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleGoing(event.id); });
+          buttongroupStack.appendChild(groupToggle);
+          details.appendChild(buttongroupStack);
+      {% endif %}
+
       card.addEventListener('click', () => {
         const isExpanded = card.classList.contains('expanded');
 
