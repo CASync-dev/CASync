@@ -1050,12 +1050,10 @@ The general flow of it is:
       const cellMap = buildCellMap(grid);
       if (!cellMap['0-0']) return;
       const cellHeight = cellMap['0-0'].offsetHeight;
-      console.log(flatEvents);
       // Place each event and collect placement data for overlap calculations.
       const placed = flatEvents
         .map((event, i) => placeEvent(event, cellMap, weekDates, cellHeight, i))
         .filter(Boolean);
-      console.log(placed);
 
       // Multi-events are already grouped and don't need overlap offsets.
       applyOverlapOffsets(placed.filter(p => !p.isMulti));
@@ -1237,6 +1235,21 @@ The general flow of it is:
       }
       renderDesktopEvents();
     });
+    document.addEventListener('calendar:gevent-updated', (event) => {
+      const updatedEvent = normaliseGroupEvent([event.detail]);
+      const eventId = event.detail.id
+      const len = g_events.length
+
+      for (let i = 0; i<len, i += 1; ) {
+        if (g_events[i].id == eventId) {
+          g_events[i] = updatedEvent[0]
+          break;
+        }
+        continue;
+      }
+      renderDesktopEvents();
+    });
+
     if (calendarBaseUrl) fetchAndRenderEvents();
 </script>
 {%- endmacro %}

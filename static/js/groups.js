@@ -654,3 +654,66 @@ document.getElementById("confirm-group-delete-btn").addEventListener('click', ()
     })
     .catch((err) => console.error("Error deleting event:", err));
 });
+
+function editGroupEvent(eventId) {
+  eventId = Number(eventId);
+  // Open the edit modal and pre-fill the form with the event's current details
+  
+  let event;
+  g_events.forEach(element => {
+    if (element.id == eventId) {
+      event = element;
+    }
+  });
+  if (!event) return;
+
+  document.getElementById("edit-event-modal").showModal();
+  document.getElementById("edit-event-title").value = event.title;
+  document.getElementById("edit-event-description").value = event.description;
+  // event.date / event.endDate are the local YYYY-MM-DD parts of the start and end
+  // datetimes, and event.startTime / event.endTime are the local HH:MM parts —
+  // combine for the datetime-local inputs. Multi-day events keep their two dates.
+  document.getElementById("edit-event-start").value = `${event.date}T${event.startTime}`;
+  document.getElementById("edit-event-end").value = `${event.endDate}T${event.endTime}`;
+  document.getElementById("edit-event-location").value = event.location || "";
+  const colorToSelect = event.color || 'indigo';
+  const colorBtn = document.querySelector(`#edit-color-picker-buttons #${colorToSelect}-color-btn`);
+  if (colorBtn) editColor(colorBtn, colorToSelect);
+
+
+  // When the user submits the edit form, we gather the updated details and send a PUT request to the API
+  document.getElementById("save-group-edit-btn").onclick = (e) => {
+    document.getElementById("edit-event-modal").close();
+    // We prevent the default form submission behavior
+    e.preventDefault();
+    // datetime-local values are local wall-clock time; toISOString() normalises them to UTC.
+    const startInput = document.getElementById("edit-event-start").value;
+    const endInput = document.getElementById("edit-event-end").value;
+    // We gather the updated event details from the form inputs as JSON
+    const updatedEvent = {
+      title: document.getElementById("edit-event-title").value,
+      description: document.getElementById("edit-event-description").value,
+      start_time: new Date(startInput).toISOString(),
+      end_time: new Date(endInput).toISOString(),
+      location: document.getElementById("edit-event-location").value,
+      color: document.getElementById("edit-event-color").value,
+    };
+    // We send a PUT request to the API to update the event with the new details
+    fetch(`/api/events/group_events/edit/${eventId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": CSRF },
+      body: JSON.stringify(updatedEvent),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to update event");
+        return response.json();
+      })
+      .then((updatedEvent) => {
+        // After successfully updating the event, we dispatch a custom event that the cal block listens for to update our local list and re-render the calendar
+        document.dispatchEvent(
+          new CustomEvent("calendar:gevent-updated", { detail: updatedEvent }),
+        );
+      })
+      .catch((err) => console.error("Error updating event:", err));
+  };
+}
