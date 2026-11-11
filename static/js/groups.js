@@ -613,7 +613,7 @@ document.getElementById("create-group-event").addEventListener("submit", (e) => 
     );
     closeGroupEventCreation();
     document.dispatchEvent(
-      new CustomEvent("calendar:event-created", { detail: createdEvent})
+      new CustomEvent("calendar:gevent-created", { detail: createdEvent})
     );
   }).catch((error) => {
     console.error("Error creating event:", error);
@@ -623,4 +623,34 @@ document.getElementById("create-group-event").addEventListener("submit", (e) => 
   })
 
 
+});
+
+let gEventpendingDeleteId = null;
+
+function deleteGroupEvent(eventId) {
+  gEventpendingDeleteId = eventId;
+  document.getElementById("delete-confirmation").showModal();
+}
+
+document.getElementById("confirm-group-delete-btn").addEventListener('click', () => {
+  if (gEventpendingDeleteId === null) {
+    return;
+  }
+  const id = gEventpendingDeleteId;
+  gEventpendingDeleteId = null;
+
+  // Send DELETE request to the API to delete the event
+  fetch(`/api/events/group_events/delete/${id}`, {
+    method: "DELETE",
+    headers: {
+      "X-CSRFToken": CSRF,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("Failed to delete");
+      document.dispatchEvent(
+        new CustomEvent("calendar:gevent-deleted", { detail: { id } }),
+      );
+    })
+    .catch((err) => console.error("Error deleting event:", err));
 });

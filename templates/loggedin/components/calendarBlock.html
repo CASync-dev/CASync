@@ -467,7 +467,14 @@ The general flow of it is:
           fetch(apiUrl)
           .then((response) => response.json())
           .then((data) => {
-            events = normaliseEventsResponse(data);
+            if ("group-events" in data) {
+              events = normaliseEventsResponse(data["user-events"]);
+
+              // To keep things clean, doing this seperately :)
+              g_events = normaliseGroupEvent(data["group-events"]);
+            } else {
+              events = normaliseEventsResponse(data);
+            }
             renderDesktopEvents();
           })
           .catch((error) => {
@@ -617,8 +624,8 @@ The general flow of it is:
         
         if (event.group_user) {
           // we add a little badge to the top right corner to indicate it is a custom event
-          const badge = document.createElement('span');
-          badge.className = 'inline-block w-2 h-2 bg-blue-500 rounded-full ml-2';
+          const badge = document.createElement('i');
+          badge.className = 'fa-solid fa-user-group';
           badge.title = 'Group event';
           card.children[0].appendChild(badge);
 
@@ -640,7 +647,7 @@ The general flow of it is:
           // toggleGoing is defined in static/js/schedule.js
           groupToggle.classList.add('going-toggle');
           groupToggle.dataset.eventId = event.id;
-          groupToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleGoing(event.id); });
+          groupToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleGroupGoing(event.id); }); // Different to event, each person can toggle if they're going or not
           buttongroupStack.appendChild(groupToggle);
           details.appendChild(buttongroupStack);
       {% endif %}
@@ -1043,11 +1050,12 @@ The general flow of it is:
       const cellMap = buildCellMap(grid);
       if (!cellMap['0-0']) return;
       const cellHeight = cellMap['0-0'].offsetHeight;
-
+      console.log(flatEvents);
       // Place each event and collect placement data for overlap calculations.
       const placed = flatEvents
         .map((event, i) => placeEvent(event, cellMap, weekDates, cellHeight, i))
         .filter(Boolean);
+      console.log(placed);
 
       // Multi-events are already grouped and don't need overlap offsets.
       applyOverlapOffsets(placed.filter(p => !p.isMulti));
@@ -1208,6 +1216,25 @@ The general flow of it is:
         if (key) { delete events[userId].events[key]; break; }
       }
 
+      renderDesktopEvents();
+    });
+
+    document.addEventListener('calendar:gevent-created', (event) => {
+      const newEvent = [event.detail];
+      g_events = g_events.concat(normaliseGroupEvent(newEvent))
+      renderDesktopEvents();
+    });
+
+    document.addEventListener('calendar:gevent-deleted', (event) => {
+      const deletedId = parseInt(event.detail.id);
+      const len = g_events.length
+      for (let i = 0; i<len, i += 1; ) {
+        if (g_events[i].id == deletedId) {
+          g_events.splice(i, 1);
+          break;
+        }
+        continue;
+      }
       renderDesktopEvents();
     });
     if (calendarBaseUrl) fetchAndRenderEvents();
