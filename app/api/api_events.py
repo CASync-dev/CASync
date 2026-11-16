@@ -391,13 +391,13 @@ def api_group_events(group_id):
 @login_required
 def api_create_group_event(group_id):
     if not group_id:
-        return jsonify({"Error": "No group provided for group event creation."})
+        return jsonify({"Error": "No group provided for group event creation."}), 400
     group = db.session.get(Group, group_id)
     if not group:
-        return jsonify({"Error": "Invalid group provided"})
+        return jsonify({"Error": "Invalid group provided"}), 400
     # Prevent creating group events for groups you're not a member of
     if not group.is_member():
-        return jsonify({"Error": "You're not apart of this group!"})
+        return jsonify({"Error": "You're not apart of this group!"}), 403
     # Gets form data
     data = request.get_json()
     '''
@@ -421,6 +421,8 @@ def api_create_group_event(group_id):
     if errors:
         return jsonify({"error": "; ".join(errors)}), 400
 
+    # Just realised above function already checks for these but extra checking is fine imo
+    # Can be removed in the future if required
      # Required fields
     if not data.get('title') or not data.get('start_time') or not data.get('end_time'):
         return jsonify({"error": "Please fill in all required fields."}), 400
