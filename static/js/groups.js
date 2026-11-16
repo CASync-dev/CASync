@@ -717,3 +717,8 @@ function editGroupEvent(eventId) {
       .catch((err) => console.error("Error updating event:", err));
   };
 }
+
+function toggleGroupGoing(eventId) {
+  // To be implemented in the future. 
+  return;
+}
