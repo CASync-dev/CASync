@@ -56,10 +56,9 @@ class GroupEventTestCase(unittest.TestCase):
         self.populate_events()
 
     def login(self):
-        self.client.post('/login', data={
-                    'username': self.user.username, 
-                    'password': 'Password1!'
-                })
+        with self.client.session_transaction() as session:
+            session['_user_id'] = str(self.user.id)
+            session['_fresh'] = True
 
     def populate_events(self):
         self.gev = GroupEvent(
@@ -96,7 +95,6 @@ class GroupEventTestCase(unittest.TestCase):
             "location": "Barry J Library, Meeting Room 1",
             "color": "indigo"
         })
-
         assert response.status_code == 201
         assert response.json['title'] == "Group Event Meeting"
         assert response.json['group_id'] == self.group.id
