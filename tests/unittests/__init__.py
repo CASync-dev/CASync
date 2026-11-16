@@ -9,3 +9,4 @@ from .test_groups import *
 from .test_ical import * 
 from .test_reglog import *  
 from .test_user import * 
+from .test_gevents import *
