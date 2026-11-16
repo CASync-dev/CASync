@@ -21,6 +21,20 @@ class Config:
     # It's generally bad practice to hardcode a key even on the chance that environment variable is inaccessable.
     # If a SECRET_KEY can't be retrieved from env, the app should raise an error instead.
 
+    # Resend API key for email confirmation
+    RESEND_API_KEY = os.getenv('RESEND_API_KEY')
+    # Must be an address on a domain verified in Resend, or delivery fails.
+    MAIL_FROM = os.getenv('MAIL_FROM', 'noreply@mail.casync.dev')
+    # Base URL used to build absolute links in emails. Default matches app.py's
+    # port (8080). Override with APP_BASE_URL in .env to match how you run the app.
+    # Note: avoid port 5000 on macOS — AirPlay Receiver occupies it and returns 403.
+    APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:8080')
+
+    # Rate limiting (see app/__init__.py). Counters live in each worker's memory;
+    # set RATELIMIT_STORAGE_URI to e.g. redis://... to share them across workers.
+    RATELIMIT_STORAGE_URI = os.getenv('RATELIMIT_STORAGE_URI', 'memory://')
+    RATELIMIT_HEADERS_ENABLED = True  # Send X-RateLimit-* so clients can see the budget.
+
 class DeploymentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
 
@@ -31,3 +45,17 @@ class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:' #'sqlite://' should also work but will stick to :memory for now
     SECRET_KEY = 'DEV-TEST' # This is a secret key only used for testing.
     TESTING = True
+
+    RESEND_API_KEY = None  # Don't attempt to send real emails during tests
+    MAIL_FROM = 'noreply@mail.casync.dev'
+    APP_BASE_URL = 'http://localhost:5000'
+
+    # Off by default so tests can hammer the auth routes. The limiter's own tests
+    # flip this back on with RateLimitedTestConfig below.
+    RATELIMIT_ENABLED = False
+
+
+class RateLimitedTestConfig(TestConfig):
+    # Same as TestConfig but with the limiter live, for the tests that assert the
+    # throttles actually fire.
+    RATELIMIT_ENABLED = True

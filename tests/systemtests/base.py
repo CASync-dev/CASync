@@ -61,13 +61,15 @@ class BaseSeleniumTest(unittest.TestCase):
         if hasattr(cls, 'server'):
             cls.server.shutdown()
             cls.server_thread.join()
-        db.drop_all()
-        cls.app_context.pop()
+        if hasattr(cls, 'app_context'):
+            db.drop_all()
+            cls.app_context.pop()
 
     @classmethod
     def populate_db(cls):
         user = User(username='gerald', email='gerald@hotmail.com')  # userid = 1
         user.password = 'P@ssw01d'
+        user.email_confirmed = True  # seeded account is already confirmed so it can log in
         db.session.add(user)
         db.session.commit()
 

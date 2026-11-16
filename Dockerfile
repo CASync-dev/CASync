@@ -42,7 +42,12 @@ RUN echo "==> [app] copying application source"
 COPY . .
 COPY --from=css-builder /app/static/css/output.css ./static/css/output.css
 
-RUN mkdir -p instance static/avatars \
+# Create an unprivileged runtime user and hand it the two directories the app
+# writes to: instance/ (SQLite DB) and static/avatars/ (profile-picture uploads).
+# uid 10001 is fixed so a bind-mounted host volume can be chowned to match.
+RUN adduser -D -u 10001 appuser \
+ && mkdir -p instance static/avatars \
+ && chown -R appuser:appuser instance static/avatars \
  && echo "==> [app] runtime dirs ready" \
  && echo "==> [app] image build complete"
 
@@ -52,6 +57,10 @@ ENV FLASK_APP=app.py \
     GUNICORN_WORKERS=2 \
     GUNICORN_THREADS=4 \
     GUNICORN_TIMEOUT=60
+
+# Drop root: everything from here (including the CMD process) runs as appuser.
+# A container breakout lands as an unprivileged uid, not root.
+USER appuser
 
 # gthread worker class lets each worker handle multiple concurrent requests
 # (important when one slow iCal fetch would otherwise pin an entire sync

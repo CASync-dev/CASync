@@ -89,3 +89,20 @@ class accountDelForm(FlaskForm):
     username = StringField(validators=[InputRequired()])
     password = PasswordField(validators=[InputRequired()])
     submit = SubmitField('Delete your Account')
+
+
+# Forgot Password Form - email (InputRequired).
+class ForgotPasswordForm(FlaskForm):
+    email = EmailField(validators=[InputRequired()])
+    submit = SubmitField('Send Reset Link')
+
+# Reset Password Form - `new_password` (reuse `strong_password`) + `repeat` (`EqualTo`).
+class ResetPasswordForm(FlaskForm):
+    new_password = PasswordField('New Password', validators=[InputRequired(), strong_password])
+    repeat_new = PasswordField('Re-enter New', validators=[InputRequired(), EqualTo('new_password', message='Passwords must match')])
+    submit = SubmitField('Reset Password')
+
+# Resend Confirmation Email Form - email
+class ResendConfirmationForm(FlaskForm):
+    email = EmailField(validators=[InputRequired()])
+    submit = SubmitField('Resend Confirmation Email')

@@ -30,6 +30,7 @@ class RegLogTestCase(unittest.TestCase):
     def populate_db(self):
         user = User(username='gerald', email='sekai@hotmail.com')
         user.password = 'foo'
+        user.email_confirmed = True  # confirmed so this seeded user can log in
         db.session.add(user)
         db.session.commit()
 
@@ -68,13 +69,26 @@ class RegLogTestCase(unittest.TestCase):
             'repeat_password': 'P@ssw01d',
         }, follow_redirects=True)
         assert response.status_code == 200
-        assert response.request.path == '/dash'
-        # Should be at /dash right now. We want to test if the account was actually created, 
-        # We'll log out and login with the same user.
-        response = self.client.get('/logout', follow_redirects=True)
+        # Registration no longer logs the user in: it lands back on /login with a
+        # prompt to confirm the email first.
+        assert response.request.path == '/login'
+
+        # An unconfirmed account can't log in yet.
+        response = self.client.post('/login', data={
+            'username': 'bob',
+            'password': 'P@ssw01d'
+        }, follow_redirects=True)
         assert response.status_code == 200
         assert response.request.path == '/login'
-        # Login with new user
+        assert 'confirm your email' in response.get_data(as_text=True).lower()
+
+        # Confirm the account (the user would normally do this via the emailed link).
+        user = User.query.filter_by(username='bob').first()
+        assert user is not None
+        user.email_confirmed = True
+        db.session.commit()
+
+        # Now login succeeds and lands on the dashboard.
         response = self.client.post('/login', data={
             'username': 'bob',
             'password': 'P@ssw01d'

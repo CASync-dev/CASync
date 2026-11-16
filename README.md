@@ -128,6 +128,20 @@ The system tests use Selenium with Firefox and run headless by default. Set `HEA
 
 Go to the /docs directory for explantions for how the app works.
 
+## PWA optimisation baseline (Issue #175)
+
+The app now includes minimal PWA boilerplate for Android and iPhone:
+
+- `manifest.webmanifest` + root `service-worker.js` for installability on Chromium/Android.
+- iOS metadata (`apple-mobile-web-app-*`) + `apple-touch-icon` for add-to-home-screen on iPhone.
+- Shared layout registration of the service worker so both logged-out and logged-in pages are covered.
+
+Scope intentionally stays minimal:
+
+- No native-only integrations are implemented.
+- Login/session behavior remains server-cookie based (existing Flask-Login session handling).
+- Future native-like enhancements to explore later: offline calendar caching/read-only mode, background sync for imports, and push notifications.
+
 # Plans And Structure
 
 ## Pages

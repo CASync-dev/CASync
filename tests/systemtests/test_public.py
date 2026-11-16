@@ -3,6 +3,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from tests.systemtests.base import BaseSeleniumTest, localHost
+from app import db
+from app.models import User
 
 # extends the BaseSeleniumTest class, which sets up the testing var for selenium
 class PublicSeleniumTests(BaseSeleniumTest):
@@ -43,6 +45,19 @@ class PublicSeleniumTests(BaseSeleniumTest):
         self.driver.find_element(By.ID, 'username').send_keys("newuser")
         self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
         self.driver.find_element(By.ID, 'repeat_password').send_keys("Newpassword1234!")
+        self.driver.find_element(By.ID, 'log').click()
+        # Registration now requires email confirmation before login, so we land
+        # back on /login rather than the dashboard.
+        WebDriverWait(self.driver, timeout=10).until(
+            EC.url_contains("/login")
+        )
+        # Confirm the account directly (the user would normally click the emailed link).
+        user = User.query.filter_by(username="newuser").first()
+        user.email_confirmed = True
+        db.session.commit()
+        # Now the new user can log in.
+        self.driver.find_element(By.ID, 'username').send_keys("newuser")
+        self.driver.find_element(By.ID, 'password').send_keys("Newpassword1234!")
         self.driver.find_element(By.ID, 'log').click()
         # check url is dash
         WebDriverWait(self.driver, timeout=10).until(

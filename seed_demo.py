@@ -48,11 +48,11 @@ with flask_app.app_context():
         sys.exit(0)
 
     # ── Users ──────────────────────────────────────────────────────────────────────
-    mathew  = User(username='mathew', email='mathew.daggitt@uwa.edu.au', password=DEFAULT_PASSWORD)
-    tehei   = User(username='tehei', email='24467332@student.uwa.edu.au', password=DEFAULT_PASSWORD)
-    liam    = User(username='liam', email='24083063@student.uwa.edu.au', password=DEFAULT_PASSWORD)
-    szeying = User(username='szeying', email='24214052@student.uwa.edu.au', password=DEFAULT_PASSWORD)
-    kelly   = User(username='kelly', email='24540356@student.uwa.edu.au', password=DEFAULT_PASSWORD)
+    mathew  = User(username='mathew', email='mathew.daggitt@uwa.edu.au', password=DEFAULT_PASSWORD, email_confirmed = True)
+    tehei   = User(username='tehei', email='24467332@student.uwa.edu.au', password=DEFAULT_PASSWORD, email_confirmed = True)
+    liam    = User(username='liam', email='24083063@student.uwa.edu.au', password=DEFAULT_PASSWORD, email_confirmed = True)
+    szeying = User(username='szeying', email='24214052@student.uwa.edu.au', password=DEFAULT_PASSWORD, email_confirmed = True)
+    kelly   = User(username='kelly', email='24540356@student.uwa.edu.au', password=DEFAULT_PASSWORD, email_confirmed = True)
 
     all_users = [mathew, tehei, liam, szeying, kelly]
     for u in all_users:

@@ -31,7 +31,10 @@ def dash():
 @login_required
 def schedule():
     now = datetime.now()
-    return render_template("loggedin/schedule.html", now=now, timedelta=timedelta)
+    # timedelta rolls the minute/hour/day/month/year over for us, so this stays
+    # valid at 23:59, on the last day of a month and on new year's eve.
+    default_end = now + timedelta(hours=1, minutes=1)
+    return render_template("loggedin/schedule.html", now=now, default_end=default_end)
 
 
 @loggedin.route("/groups")

@@ -1,0 +1,9 @@
+Hi {{ user.username }},
+
+Thanks for signing up to CASync. Please confirm your email address to
+activate your account by opening the link below:
+
+{{ link }}
+
+This link expires in 24 hours. If you didn't create an account, you can
+ignore this email.
