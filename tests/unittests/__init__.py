@@ -14,3 +14,4 @@ from .test_reglog import *
 from .test_tokens import *
 from .test_user import *
 from .test_cvut import *
+from .test_gevents import *

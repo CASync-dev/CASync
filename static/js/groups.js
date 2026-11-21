@@ -499,6 +499,9 @@ function openSchedule(groupId, groupname) {
   // set the modal title to the group name
   document.getElementById("group-schedule-title").textContent =
     `${groupname}'s Schedule`;
+  // set create new group event button to have data-group-id of the current group-id
+  document.getElementById("btn-create-group-event").setAttribute("data-group-id", groupId);
+  document.getElementById("btn-create-group-event-mobile").setAttribute("data-group-id", groupId);
   // open the modal
   const modal = document.getElementById("group-schedule-modal");
   modal.showModal();
@@ -513,3 +516,209 @@ new MutationObserver(() => {
 document.addEventListener("DOMContentLoaded", () => {
   setupSearchFriend();
 });
+
+// Group Event Creation -------------------------------------------------------
+// Similar logic to schedule.js, just with a group id included :)
+
+// Rather than re-using the drawer from the schedule page (too clunky since it'll be overlapping the group modal)
+// We'll use a close-current-modal-open-new-modal method :')
+// that probably makes sense
+
+function openGroupEventCreation() {
+  group_id = this.getAttribute('data-group-id');
+  document.getElementById("create-group-event-modal").showModal();
+  document.getElementById("event-crea-groupid").setAttribute('value', group_id);
+  document.getElementById("group-schedule-modal").close();
+  return;
+}
+
+document.getElementById("btn-create-group-event").addEventListener('click', openGroupEventCreation);
+document.getElementById("btn-create-group-event-mobile").addEventListener('click', openGroupEventCreation);
+
+function closeGroupEventCreation() {
+  // Not really necessary to reset this? But added just in case (though clicking out of backdrop keeps it... ;-;)
+  document.getElementById("event-crea-groupid").setAttribute('value', 'groupid');
+  document.getElementById("group-schedule-modal").showModal();
+  document.getElementById("create-group-event-modal").close();
+  document.getElementById("form-message").classList.add('hidden');
+}
+
+document.getElementById("close-event-create-btn").addEventListener('click', closeGroupEventCreation);
+
+// (Group) Event form handler
+document.getElementById("create-group-event").addEventListener("submit", (e) => {
+  e.preventDefault();
+  // Get form values
+  const title = document.getElementById("event-title").value;
+  const startInput = document.getElementById("event-start").value;
+  const endInput = document.getElementById("event-end").value;
+  const location = document.getElementById("event-location").value;
+  const description = document.getElementById("event-description").value;
+  const color = document.getElementById("event-color").value;
+  const group_id = document.getElementById("event-crea-groupid").value;
+  errorElement = document.getElementById("form-message");
+  // Basic validation
+  if (!title || !startInput || !endInput) {
+    errorElement.textContent = "Please fill in all required fields.";
+    errorElement.classList.remove("hidden");
+    return;
+  }
+  // datetime-local inputs are interpreted as local time
+  const startDate = new Date(startInput);
+  console.log(startDate.toISOString())
+  const endDate = new Date(endInput);
+  console.log(endDate.toISOString())
+  // end must be after start
+  if (endDate <= startDate) {
+    errorElement.textContent = "End must be after start.";
+    errorElement.classList.remove("hidden");
+    return;
+  }
+  // Event must be in the future
+  if (startDate <= new Date()) {
+    errorElement.textContent =
+      "Events have to be in the future. Please select a start time later than now.";
+    errorElement.classList.remove("hidden");
+    return;
+  }
+
+  // From here on, new content :)
+  // To be finished.
+
+  const newEvent = {
+    "title": title,
+    "description": description,
+    "start_time": startDate.toISOString(),
+    "end_time": endDate.toISOString(),
+    "group_id": group_id,
+    "location": location,
+    "color": color
+  };
+
+  fetch("/api/events/group_events/create/" + group_id, {
+    method: "POST",
+    headers: {"Content-Type": "application/json", "X-CSRFToken": CSRF},
+    body: JSON.stringify(newEvent),
+  }).then((response)=> {
+    if (!response.ok) {
+      throw new Error("Failed to create group event");
+    }
+    console.log("Group Event created successfully.");
+    return response.json();
+  }).then((createdEvent) => {
+    document.getElementById("create-group-event").reset();
+    selectColor(
+      document.querySelector("#color-picker-buttons button"),
+      "indigo",
+    );
+    closeGroupEventCreation();
+    document.dispatchEvent(
+      new CustomEvent("calendar:gevent-created", { detail: createdEvent})
+    );
+  }).catch((error) => {
+    console.error("Error creating event:", error);
+    errorElement.textContent = "Error creating event. Please try again.";
+    errorElement.classList.remove("hidden");
+    console.error("Error creating event:", error);
+  })
+
+
+});
+
+let gEventpendingDeleteId = null;
+
+function deleteGroupEvent(eventId) {
+  gEventpendingDeleteId = eventId;
+  document.getElementById("delete-confirmation").showModal();
+}
+
+document.getElementById("confirm-group-delete-btn").addEventListener('click', () => {
+  if (gEventpendingDeleteId === null) {
+    return;
+  }
+  const id = gEventpendingDeleteId;
+  gEventpendingDeleteId = null;
+
+  // Send DELETE request to the API to delete the event
+  fetch(`/api/events/group_events/delete/${id}`, {
+    method: "DELETE",
+    headers: {
+      "X-CSRFToken": CSRF,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("Failed to delete");
+      document.dispatchEvent(
+        new CustomEvent("calendar:gevent-deleted", { detail: { id } }),
+      );
+    })
+    .catch((err) => console.error("Error deleting event:", err));
+});
+
+function editGroupEvent(eventId) {
+  eventId = Number(eventId);
+  // Open the edit modal and pre-fill the form with the event's current details
+  
+  let event;
+  g_events.forEach(element => {
+    if (element.id == eventId) {
+      event = element;
+    }
+  });
+  if (!event) return;
+
+  document.getElementById("edit-event-modal").showModal();
+  document.getElementById("edit-event-title").value = event.title;
+  document.getElementById("edit-event-description").value = event.description;
+  // event.date / event.endDate are the local YYYY-MM-DD parts of the start and end
+  // datetimes, and event.startTime / event.endTime are the local HH:MM parts —
+  // combine for the datetime-local inputs. Multi-day events keep their two dates.
+  document.getElementById("edit-event-start").value = `${event.date}T${event.startTime}`;
+  document.getElementById("edit-event-end").value = `${event.endDate}T${event.endTime}`;
+  document.getElementById("edit-event-location").value = event.location || "";
+  const colorToSelect = event.color || 'indigo';
+  const colorBtn = document.querySelector(`#edit-color-picker-buttons #${colorToSelect}-color-btn`);
+  if (colorBtn) editColor(colorBtn, colorToSelect);
+
+
+  // When the user submits the edit form, we gather the updated details and send a PUT request to the API
+  document.getElementById("save-group-edit-btn").onclick = (e) => {
+    document.getElementById("edit-event-modal").close();
+    // We prevent the default form submission behavior
+    e.preventDefault();
+    // datetime-local values are local wall-clock time; toISOString() normalises them to UTC.
+    const startInput = document.getElementById("edit-event-start").value;
+    const endInput = document.getElementById("edit-event-end").value;
+    // We gather the updated event details from the form inputs as JSON
+    const updatedEvent = {
+      title: document.getElementById("edit-event-title").value,
+      description: document.getElementById("edit-event-description").value,
+      start_time: new Date(startInput).toISOString(),
+      end_time: new Date(endInput).toISOString(),
+      location: document.getElementById("edit-event-location").value,
+      color: document.getElementById("edit-event-color").value,
+    };
+    // We send a PUT request to the API to update the event with the new details
+    fetch(`/api/events/group_events/edit/${eventId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": CSRF },
+      body: JSON.stringify(updatedEvent),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to update event");
+        return response.json();
+      })
+      .then((updatedEvent) => {
+        // After successfully updating the event, we dispatch a custom event that the cal block listens for to update our local list and re-render the calendar
+        document.dispatchEvent(
+          new CustomEvent("calendar:gevent-updated", { detail: updatedEvent }),
+        );
+      })
+      .catch((err) => console.error("Error updating event:", err));
+  };
+}
+
+function toggleGroupGoing(eventId) {
+  // To be implemented in the future. 
+  return;
+}
