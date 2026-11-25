@@ -110,6 +110,10 @@ def contactus():
         return redirect(url_for('loggedin.dash'))
     return render_template("loggedout/contact-us.html")
 
+@loggedout.route("/privacypolicy")
+def privacypolicy():
+    return render_template("loggedout/privacy-policy.html")
+
 # Added a logout route that logs the user out and redirects to the homepage
 from flask_login import logout_user
 @loggedout.route("/logout")
