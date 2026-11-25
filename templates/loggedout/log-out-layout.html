@@ -52,7 +52,7 @@
     {% endblock %}
   </head>
   <body class="min-h-screen flex flex-col">
-    <header class="bg-primary sticky drop-shadow-2xl shadow">
+    <header class="bg-white sticky drop-shadow-2xl shadow">
       <nav
         class="mx-auto max-w-7xl px-4 md:px-10 lg:px-16 flex items-center justify-between py-6"
       >
@@ -63,7 +63,7 @@
             class="-m-1 p-1 text-2xl text-nearwhite"
           >
             <img
-              src="{{ url_for('static', filename='images/w-logo.png') }}"
+              src="{{ url_for('static', filename='images/logo.png') }}"
               class="h-10 md:h-12 w-auto py-0.5"
             />
           </a>
@@ -84,18 +84,32 @@
           <a
             id="register"
             href="{{ url_for('loggedout.register') }}"
-            class="text-1xl font-semibold text-nearwhite max-sm:hidden px-2"
+            class="text-1xl font-semibold text-black max-sm:hidden px-2"
           >
-            Register
+            About Us
           </a>
           <a
+            id="register"
+            href="{{ url_for('loggedout.register') }}"
+            class="text-1xl font-semibold text-black max-sm:hidden px-2"
+          >
+            Features
+          </a>
+          <a
+            id="register"
+            href="{{ url_for('loggedout.faq') }}"
+            class="text-1xl font-semibold text-black max-sm:hidden px-2"
+          >
+            FAQ
+          </a>
+        </div>
+        <a
             id="login"
             href="{{ url_for('loggedout.login') }}"
-            class="text-1xl font-semibold text-nearwhite max-sm:hidden px-2"
+            class="btn-primary ml-4"
           >
             Login
           </a>
-        </div>
       </nav>
     </header>
     <dialog
@@ -115,7 +129,7 @@
             class="-m-1 p-1 text-2xl text-nearwhite font-bold"
           >
             <img
-              src="{{url_for('static', filename='images/w-logo.png')}}"
+              src="{{url_for('static', filename='images/logo.png')}}"
               class="h-10 md:h-12 max-h-28 max-w-28 py-0.5"
             />
           </a>
@@ -137,7 +151,7 @@
             <div class="">
               <a
                 href="{{ url_for('loggedout.login') }}"
-                class="text-1xl font-semibold text-nearwhite"
+                class="text-1xl font-semibold text-black"
               >
                 Login
               </a>
@@ -149,7 +163,7 @@
 
               <a
                 href="{{ url_for('loggedout.register') }}"
-                class="text-1xl font-semibold text-nearwhite"
+                class="text-1xl font-semibold text-black"
               >
                 Register
               </a>
@@ -160,7 +174,7 @@
               <br />
               <a
                 href="{{ url_for('loggedout.faq') }}"
-                class="text-1xl font-semibold text-nearwhite"
+                class="text-1xl font-semibold text-black"
               >
                 FAQ
               </a>
@@ -171,7 +185,7 @@
               <br />
               <a
                 href="{{ url_for('loggedout.contactus') }}"
-                class="text-1xl font-semibold text-nearwhite"
+                class="text-1xl font-semibold text-black"
               >
                 Contact Us
               </a>
@@ -182,7 +196,7 @@
               <br />
               <a
                 href="https://github.com/CASync-dev/CASync"
-                class="text-1xl font-semibold text-nearwhite"
+                class="text-1xl font-semibold text-black"
                 target="_blank"
               >
                 Github
@@ -208,44 +222,65 @@
 
     <!-- Footer; To be used in all (logged-out) webpages -->
     {% block footer %}
-      <div id="foot" class="bg-primary">
-        <div class="flex flex-col py-24 justify-center items-center">
-          <div class="flex flex-row mx-auto">
-            <div class="px-6 max-sm:px-3">
-              <a
-                id="faq"
-                href="{{ url_for('loggedout.faq') }}"
-                class="text-nearwhite text-2xl"
-              >
-                FAQ
-              </a>
-            </div>
-            <div class="px-6 max-sm:px-3">
-              <a
-                id="contactus"
-                href="{{ url_for('loggedout.contactus') }}"
-                class="text-nearwhite text-2xl"
-              >
-                Contact us
-              </a>
-            </div>
-            <div class="px-6 max-sm:px-3">
-              <a
-                id="github"
-                href="https://github.com/CASync-dev/CASync"
-                class="text-nearwhite text-2xl"
-                target="_blank"
-              >
-                Github
-              </a>
-            </div>
+      <div id="foot" class="bg-white justify-between flex flex-row gap-5">
+        <div class="flex flex-row py-24 ml-36 justify-center items-center text-left">
+          <div class="flex lg:flex-1">
+              <img
+                src="{{ url_for('static', filename='images/logo.png') }}"
+                class="h-10 md:h-12 w-auto"
+              />
           </div>
-          <div class="flex pt-36">
-            <span class="text-xs text-right block text-nearwhite">
-              © Copyright UWA Agile Web 2026's 12:40pm Thursday 1st week Lab
-              Group
-            </span>
+
+        </div>
+        <div class="flex flex-row py-24 mr-36 text-center gap-20">
+          <div class="flex flex-col gap-12">
+            <h1 class="font-black">
+              Links
+            </h1>
+            <a class="text-gray-500" href="https://github.com/CASync-dev/CASync">
+              <p>
+                GitHub
+              </p>
+            </a>
           </div>
+          <div class="flex flex-col gap-12">
+            <h1 class="font-black">
+              Join us Today!
+            </h1>
+            <a class="text-gray-500" href="{{ url_for('loggedout.register') }}">
+              <p>
+                Register
+              </p>
+            </a>
+            <a class="text-gray-500" href="{{ url_for('loggedout.login') }}">
+              <p>
+                Login
+              </p>
+            </a>
+            <a class="text-gray-500" href="https://github.com/CASync-dev/CASync">
+              <p>
+                Privacy Policy
+              </p>
+            </a>
+          </div>
+          <div class="flex flex-col gap-12">
+            <h1 class="font-black">
+              Other
+            </h1>
+            <a class="text-gray-500" href="{{ url_for('loggedout.faq')}}">
+              <p>
+                Frequently Asked
+                <br>
+                Questions
+              </p>
+            </a>
+            <a class="text-gray-500" href="{{ url_for('loggedout.contactus')}}">
+              <p>
+                Contact Us
+              </p>
+            </a>
+          </div>
+        </div>
       </div>
     {% endblock %}
   </body>
